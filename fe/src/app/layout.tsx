@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import type { Metadata } from "next";
 import Navigation from "@/components/layout/Navigation";
@@ -25,6 +26,8 @@ export default function RootLayout({
             <Navigation/>
             <main className="flex-1 flex justify-center items-center md:pl-28">{children}</main>
           </div>
+
+          <Footer/>
         </Providers>
       </body>
     </html>
