@@ -17,11 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="h-screen flex flex-col">
         <Providers>
           <Header/>
-          <Navigation/>
-          <main>{children}</main>
+          
+          <div className="flex flex-1 flex-col sm:flex-row">
+            <Navigation/>
+            <main className="flex-1 flex justify-center items-center">{children}</main>
+          </div>
         </Providers>
       </body>
     </html>
