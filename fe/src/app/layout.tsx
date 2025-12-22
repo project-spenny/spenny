@@ -21,7 +21,7 @@ export default function RootLayout({
         <Providers>
           <Header/>
           
-          <div className="flex flex-1 flex-col sm:flex-row">
+          <div className="pt-16 flex flex-1 flex-col sm:flex-row">
             <Navigation/>
             <main className="flex-1 flex justify-center items-center">{children}</main>
           </div>
