@@ -1,13 +1,21 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link"
+import { cn } from "@/lib/utils";
 
-const NavItem = ({label, href}: {label: string; href: string}) => {
+const NavItem = ({label, href, isActive}: {label: string; href: string; isActive: boolean}) => {
   return (
-    <Link
-        href={href}
-        className="px-3 py-1.5 font-medium flex justify-center items-center rounded-lg hover:bg-neutral-200 active:bg-neutral-300 transition-colors duration-300 md:w-24 md:h-20"
+    <Button 
+      asChild 
+      variant={isActive ? 'outline' : 'ghost'}
+      className={cn(
+        "active:bg-primary/10 duration-200 md:w-24 md:h-20",
+        isActive ? 'font-bold' : 'font-normal'
+      )}
     >
+      <Link href={href}>
         {label}
-    </Link>
+      </Link>
+    </Button>
   )
 }
 
