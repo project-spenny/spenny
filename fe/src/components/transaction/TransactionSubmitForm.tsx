@@ -1,10 +1,3 @@
-// - 거래 유형 (수입 / 지출)
-// - 금액 입력
-// - 날짜 선택 ( 기본값 : 선택된 날짜 )
-// - 카테고리 선택
-// - 태그 입력
-//     - Optional
-//     - 최대 ??자 제한
 'use client'
 import { useState } from "react"
 import { Label } from "@/components/ui/label"
