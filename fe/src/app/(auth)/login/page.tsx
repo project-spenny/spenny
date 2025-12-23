@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { supabase } from "@/utils/supabase/client";
-import { useState } from "react";
+import { supabase } from '@/utils/supabase/client';
+import { useState } from 'react';
 
-type Provider = "google" | "kakao";
+type Provider = 'google' | 'kakao';
 
 export default function LoginPage() {
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    // OAuth 로그인 처리 함수
+  // OAuth 로그인 처리 함수
   const signInWithProvider = async (provider: Provider) => {
     if (isLoading) return; // 중복 클릭 방지
     setIsLoading(true);
@@ -29,7 +29,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
       <button
         type="button"
-        onClick={() => signInWithProvider("google")}
+        onClick={() => signInWithProvider('google')}
         disabled={isLoading}
         className="rounded-md border px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
@@ -37,7 +37,7 @@ export default function LoginPage() {
       </button>
       <button
         type="button"
-        onClick={() => signInWithProvider("kakao")}
+        onClick={() => signInWithProvider('kakao')}
         disabled={isLoading}
         className="rounded-md border px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
