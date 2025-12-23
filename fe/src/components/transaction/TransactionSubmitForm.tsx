@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Input } from "../ui/input"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "../ui/button"
+import { supabase } from "@/utils/supabase/client"
 CalendarIcon
 import {
   Popover,
@@ -14,16 +15,16 @@ import {
 import { CalendarIcon } from "lucide-react"
 import { X } from "lucide-react"
 
-const DUMMY_CATEGORIES = [
-    "식비",
-    "의료비",
-    "쇼핑",
-    "교통비",
-    "공과금",
-    "월세",
-    "이자",
-    "송금",
-    "기타"
+const CATEGORIES = [
+    { id: "3de48bfe-69d9-4dbb-9a5d-ecdb807212f2", name: "식비", type: "expense" },
+    { id: "fd66cd8e-83bc-4720-8d71-34046524a849", name: "의료비", type: "expense" },
+    { id: "d9f8e176-2594-4a5c-a089-d6cae2fd97ff", name: "쇼핑", type: "expense" },
+    { id: "2f7b8dc5-9c32-4065-ac70-0edc3a02502c", name: "주거비", type: "expense" },
+    { id: "0f93d6d5-5fd0-416a-b9b0-2e42539c0ad9", name: "교통비", type: "expense" },
+    { id: "bee38c89-2393-4f72-8d77-314ca2b9c7e6", name: "문화생활", type: "expense" },
+    { id: "92a9dabd-ca15-420e-be12-2b34ab37dfb3", name: "통신비", type: "expense" },
+    { id: "94b763c9-48cd-4435-b21b-d93a41dd49da", name: "교육비", type: "expense" },
+    { id: "fb48697f-5cae-41e3-869b-0c4922523955", name: "기타", type: "expense" }
 ]
 export default function TransactionSubmitForm() {
     const [title, setTitle] = useState<string>("")
@@ -42,8 +43,41 @@ export default function TransactionSubmitForm() {
         return `${year}년 ${month}월 ${day}일`
     }
 
-    const handleSubmit = ()=>{
-        console.log('submit')
+    const handleSubmit = async(e: React.FormEvent)=>{
+        e.preventDefault();
+
+        try{
+            const {data:{user}, error: authError } = await supabase.auth.getUser();
+            if(!user||authError ){
+                console.log("로그인이 필요합니다")
+            }
+            const formattedDate = date.toISOString().split('T')[0]
+
+            const { data, error } = await supabase
+                .from('transactions')
+                .insert({
+                    user_id: user?.id,
+                    title: title.trim(),
+                    type: transactionType,
+                    amount: Number(amount),
+                    date: formattedDate,
+                    category_id: category,
+                    tags: tags.length > 0 ? tags : null
+                })
+                .select()
+
+                console.log(data)
+                if (error) {
+                    console.error('Insert error:', error)
+                    alert("저장 실패: " + error.message)
+                    return
+                }
+
+            alert("거래 내역이 저장되었습니다")
+
+        }catch(error){
+            console.log('error')
+        }
     }
 
     const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -160,12 +194,12 @@ export default function TransactionSubmitForm() {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                         <div className="grid grid-cols-3">
-                            {DUMMY_CATEGORIES.map((e,index)=>(
+                            {CATEGORIES.map((cat)=>(
                                 <div
                                     onClick={()=>{
-                                        setCategory(e)
+                                        setCategory(cat.id)
                                         setCategoryOpen(false)}}
-                                    className="text-center w-16 h-16 cursor-pointer" key={index}>{e}</div>
+                                    className="text-center w-16 h-16 cursor-pointer" key={cat.id}>{cat.name}</div>
                             ))}
                         </div>
                     </PopoverContent>
