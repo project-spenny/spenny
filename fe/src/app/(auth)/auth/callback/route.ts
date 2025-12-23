@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login`);
   }
 
-  // 유저 프로필이 존재 여부 조회
+  // 유저 프로필 존재 여부 조회
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')

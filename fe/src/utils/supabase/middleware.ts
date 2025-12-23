@@ -38,17 +38,57 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims();
-
   const user = data?.claims;
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const pathname = request.nextUrl.pathname;
+
+  const isAuthPath = pathname.startsWith('/auth');
+  const isLoginPath = pathname.startsWith('/login');
+  const isOnboardingPath = pathname.startsWith('/onboarding');
+
+  if (!user) {
+    if (!isLoginPath && !isAuthPath) {
+      // no user, potentially respond by redirecting the user to the login page
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
+  }
+
+  const userId = user.sub; // claims의 subject = auth uid(uuid)
+
+  // 유저 프로필 존재 여부 조회
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', userId)
+    .maybeSingle();
+
+  const hasProfile = !!profile && !profileError;
+
+  // 로그인 상태에서 login 페이지 접근 차단
+  if (isLoginPath) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = hasProfile ? '/' : '/onboarding';
+    return NextResponse.redirect(url);
+  }
+
+  // 온보딩 미완료면 onboarding만 허용
+  if (!hasProfile) {
+    // /auth는 OAuth 플로우 때문에 허용
+    if (!isOnboardingPath && !isAuthPath) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/onboarding';
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
+  }
+
+  // 온보딩 완료면 onboarding 접근 차단
+  if (hasProfile && isOnboardingPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
     return NextResponse.redirect(url);
   }
 
