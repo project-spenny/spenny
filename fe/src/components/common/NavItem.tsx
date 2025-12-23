@@ -8,7 +8,7 @@ const NavItem = ({label, href, isActive}: {label: string; href: string; isActive
       asChild 
       variant={isActive ? 'outline' : 'ghost'}
       className={cn(
-        "active:bg-primary/10 duration-200 md:w-24 md:h-20",
+        "active:bg-primary/10 dark:active:bg-primary/20 duration-200 md:w-24 md:h-20",
         isActive ? 'font-bold' : 'font-normal'
       )}
     >
