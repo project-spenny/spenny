@@ -1,22 +1,28 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link"
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
-const NavItem = ({label, href, isActive}: {label: string; href: string; isActive: boolean}) => {
+const NavItem = ({
+  label,
+  href,
+  isActive,
+}: {
+  label: string;
+  href: string;
+  isActive: boolean;
+}) => {
   return (
-    <Button 
-      asChild 
+    <Button
+      asChild
       variant={isActive ? 'outline' : 'ghost'}
       className={cn(
-        "active:bg-primary/10 dark:active:bg-primary/20 duration-200 md:w-24 md:h-20",
+        'active:bg-primary/10 dark:active:bg-primary/20 duration-200 md:h-20 md:w-24',
         isActive ? 'font-bold' : 'font-normal'
       )}
     >
-      <Link href={href}>
-        {label}
-      </Link>
+      <Link href={href}>{label}</Link>
     </Button>
-  )
-}
+  );
+};
 
-export default NavItem
+export default NavItem;

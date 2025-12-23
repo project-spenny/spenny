@@ -1,24 +1,26 @@
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
-import Navigation from "@/components/layout/Navigation";
+import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
+import Navigation from '@/components/layout/Navigation';
 
 const AppLayout = ({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) => {
-    return (
-        <div className="min-h-screen flex flex-col">
-            <Header/>
-        
-            <div className="pt-16 flex flex-1 flex-col md:flex-row">
-                <Navigation/>
-                <main className="flex-1 flex justify-center items-center md:pl-28">{children}</main>
-            </div>
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header />
 
-            <Footer/>
-        </div>
-    )
-}
+      <div className="flex flex-1 flex-col pt-16 md:flex-row">
+        <Navigation />
+        <main className="flex flex-1 items-center justify-center md:pl-28">
+          {children}
+        </main>
+      </div>
 
-export default AppLayout
+      <Footer />
+    </div>
+  );
+};
+
+export default AppLayout;

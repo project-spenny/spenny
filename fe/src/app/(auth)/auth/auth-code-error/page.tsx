@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function AuthCodeErrorPage() {
   return (
@@ -17,7 +17,10 @@ export default function AuthCodeErrorPage() {
         >
           로그인 다시 시도
         </Link>
-        <Link href="/" className="rounded-md border px-4 py-2 hover:bg-gray-100">
+        <Link
+          href="/"
+          className="rounded-md border px-4 py-2 hover:bg-gray-100"
+        >
           홈으로
         </Link>
       </div>
