@@ -1,9 +1,6 @@
 import "./globals.css";
 
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
 import type { Metadata } from "next";
-import Navigation from "@/components/layout/Navigation";
 import { Providers } from "./provider";
 
 export const metadata: Metadata = {
@@ -18,16 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col">
+      <body>
         <Providers>
-          <Header/>
-          
-          <div className="pt-16 flex flex-1 flex-col md:flex-row">
-            <Navigation/>
-            <main className="flex-1 flex justify-center items-center md:pl-28">{children}</main>
-          </div>
-
-          <Footer/>
+            {children}
         </Providers>
       </body>
     </html>
