@@ -1,8 +1,8 @@
 import { DUMMY_TRANSACTIONS } from '@/constants/dummyData';
-import { DrawerBottom } from '@/components/DrawerBottom';
+import { DrawerBottom } from '@/components/common/DrawerBottom';
 import LogoutButton from '@/components/LogoutButton';
 import ResponsiveWrapper from '@/components/common/ResponsiveWrapper';
-import SheetSide from '@/components/SheetSide';
+import SheetSide from '@/components/common/SheetSide';
 
 export default function Home() {
   return (

@@ -1,61 +1,59 @@
 'use client';
 
 import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 
-import { Button } from './ui/button';
-import { ChevronsRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Transaction } from '@/types/testTransaction';
 import TransactionSection from '@/components/common/TransactionSection';
+import { X } from 'lucide-react';
 
-const SheetSide = ({ data }: { data: Transaction[] }) => {
+export function DrawerBottom({ data }: { data: Transaction[] }) {
   const totalCount = data.length;
 
   return (
-    <Sheet>
-      <SheetTrigger>
-        <span className="cursor-pointer">Open Sheet Side</span>
-      </SheetTrigger>
+    <Drawer>
+      <DrawerTrigger>
+        <span className="cursor-pointer">Open Drawer Bottom</span>
+      </DrawerTrigger>
 
-      <SheetContent
-        side="right"
-        className="flex w-[540px] max-w-none flex-col outline-none sm:max-w-none"
-      >
+      <DrawerContent className="h-[85vh] outline-none">
         {/* 헤더 영역: 날짜 및 닫기 버튼 */}
-        <SheetHeader className="flex shrink-0 justify-between border-b p-4">
-          <SheetClose asChild>
+        <DrawerHeader className="relative flex shrink-0 flex-row items-center justify-between border-b px-6 py-4">
+          <DrawerClose className="absolute top-0 right-0 mr-4" asChild>
             <Button
               variant="ghost"
               size="icon"
               className="h-10 w-10 cursor-pointer rounded-full"
             >
-              <ChevronsRight size={20} />
+              <X />
             </Button>
-          </SheetClose>
+          </DrawerClose>
 
-          <div className="pl-2 text-left">
-            <SheetTitle className="py-2 text-xl font-bold">
+          <div className="text-left">
+            {/* TODO: 선택된 날짜 데이터(item.date) 연동 및 포맷팅 필요 */}
+            <DrawerTitle className="py-2 text-xl font-bold">
               12월 24일 수요일
-            </SheetTitle>
-            <SheetDescription>
+            </DrawerTitle>
+            <DrawerDescription>
               해당 날짜 거래 내역을 확인할 수 있습니다.
-            </SheetDescription>
+            </DrawerDescription>
           </div>
 
-          <SheetDescription className="text-right">
-            총 {totalCount}개
-          </SheetDescription>
-        </SheetHeader>
+          <div className="flex h-full items-end">
+            <DrawerDescription>총 {totalCount}개</DrawerDescription>
+          </div>
+        </DrawerHeader>
 
         {/* 콘텐츠 영역: 거래 내역 영역 */}
         <ScrollArea className="flex-1 overflow-y-auto">
@@ -69,7 +67,7 @@ const SheetSide = ({ data }: { data: Transaction[] }) => {
         </ScrollArea>
 
         {/* 푸터 영역: 이번 달 거래 내역 버튼 */}
-        <SheetFooter className="shrink-0 border-t p-6">
+        <DrawerFooter className="shrink-0 border-t p-6">
           <Button
             variant="outline"
             className="h-14 w-full cursor-pointer text-base"
@@ -77,10 +75,8 @@ const SheetSide = ({ data }: { data: Transaction[] }) => {
           >
             <Link href="/history">이번 달 거래 내역 보러가기</Link>
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
-};
-
-export default SheetSide;
+}
