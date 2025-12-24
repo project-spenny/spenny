@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
@@ -12,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { fi } from 'zod/v4/locales';
 
 type Gender = 'male' | 'female' | 'none';
 type FormErrors = Partial<{
@@ -21,6 +23,8 @@ type FormErrors = Partial<{
 }>;
 
 export default function OnboardingPage() {
+  const router = useRouter();
+
   const [phase, setPhase] = useState<'form' | 'intro'>('form');
   const [introStep, setIntroStep] = useState(0);
 
@@ -115,6 +119,7 @@ export default function OnboardingPage() {
   const goPrev = () => setIntroStep((s) => Math.max(0, s - 1));
   const goNext = () =>
     setIntroStep((s) => Math.min(introSteps.length - 1, s + 1));
+  const finishOnboarding = () => router.replace('/');
 
   return (
     <div className="fixed inset-0 z-50">
@@ -122,9 +127,9 @@ export default function OnboardingPage() {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       <div className="relative flex min-h-dvh items-center justify-center p-4">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-lg md:max-w-3xl">
           <Card>
-            <CardHeader className="space-y-2">
+            <CardHeader className="relative space-y-2">
               {phase === 'form' ? (
                 <>
                   <CardTitle className="text-xl">기본 정보 설정</CardTitle>
@@ -134,6 +139,14 @@ export default function OnboardingPage() {
                 </>
               ) : (
                 <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="absolute -top-3 right-2"
+                    onClick={finishOnboarding}
+                  >
+                    건너뛰기
+                  </Button>
                   <CardTitle className="text-xl">
                     {introSteps[introStep].title}
                   </CardTitle>
@@ -218,7 +231,7 @@ export default function OnboardingPage() {
                 </form>
               ) : (
                 <div className="space-y-6">
-                  <div>설명 내용</div>
+                  <div className="h-100">설명 내용</div>
                   {/* 하단 컨트롤 */}
                   <div className="grid grid-cols-3 items-center">
                     {/* 왼쪽 */}
@@ -258,10 +271,7 @@ export default function OnboardingPage() {
                     {/* 오른쪽 */}
                     <div className="justify-self-end">
                       {isLastIntro ? (
-                        <Button
-                          type="button"
-                          onClick={() => console.log('온보딩 종료')}
-                        >
+                        <Button type="button" onClick={finishOnboarding}>
                           시작하기
                         </Button>
                       ) : (
@@ -270,15 +280,6 @@ export default function OnboardingPage() {
                         </Button>
                       )}
                     </div>
-                  </div>
-                  <div className="flex justify-center">
-                    <Button
-                      type="button"
-                      variant="link"
-                      onClick={() => console.log('건너뛰기')}
-                    >
-                      건너뛰기
-                    </Button>
                   </div>
                 </div>
               )}
