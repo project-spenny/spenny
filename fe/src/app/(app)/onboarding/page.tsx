@@ -1,4 +1,5 @@
 'use client';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Card,
   CardContent,
@@ -6,6 +7,9 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function OnboardingPage() {
   return (
@@ -24,7 +28,38 @@ export default function OnboardingPage() {
               </CardDescription>
             </CardHeader>
 
-            <CardContent></CardContent>
+            <CardContent>
+              <form className="space-y-6">
+                <div className="space-y-2">
+                  <Label>닉네임</Label>
+                  <Input id="nickname" placeholder="닉네임을 입력해주세요." />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>생년월일</Label>
+                  <Input id="birth" placeholder="YYYY-MM-DD" />
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <Label>성별</Label>
+                  <RadioGroup defaultValue="none" className="flex gap-6">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="male" id="male" />
+                      <Label>남</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="female" id="female" />
+                      <Label>여</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <Button type="submit" className="w-full">
+                  저장하고 시작하기
+                </Button>
+              </form>
+            </CardContent>
           </Card>
         </div>
       </div>
