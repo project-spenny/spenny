@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Card,
@@ -211,7 +212,83 @@ export default function OnboardingPage() {
                   </Button>
                 </form>
               ) : (
-                <div>설명 화면 내용</div>
+                <div className="space-y-6">
+                  <div>설명 내용</div>
+                  {/* 하단 컨트롤 */}
+                  <div className="grid grid-cols-3 items-center">
+                    {/* 왼쪽 */}
+                    <div className="justify-self-start">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={step === 0}
+                        onClick={() =>
+                          setStep((prev) =>
+                            typeof prev === 'number'
+                              ? Math.max(0, prev - 1)
+                              : prev
+                          )
+                        }
+                      >
+                        이전
+                      </Button>
+                    </div>
+
+                    {/* 중앙 */}
+                    <div className="justify-self-center">
+                      <div
+                        className="flex items-center justify-center gap-2"
+                        aria-label="온보딩 진행 상태"
+                      >
+                        {introSteps.map((_, index) => {
+                          const active = step === index;
+                          return (
+                            <span
+                              key={index}
+                              aria-current={active ? 'step' : undefined}
+                              className={cn(
+                                'h-2 w-2 rounded-full transition-colors',
+                                active ? 'bg-primary' : 'bg-gray-200'
+                              )}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 오른쪽 */}
+                    <div className="justify-self-end">
+                      {isLastIntro ? (
+                        <Button
+                          type="button"
+                          onClick={() => console.log('온보딩 종료')}
+                        >
+                          시작하기
+                        </Button>
+                      ) : (
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            setStep((prev) =>
+                              typeof prev === 'number' ? prev + 1 : prev
+                            )
+                          }
+                        >
+                          다음
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-center">
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => console.log('건너뛰기')}
+                    >
+                      건너뛰기
+                    </Button>
+                  </div>
+                </div>
               )}
             </CardContent>
           </Card>
