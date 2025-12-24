@@ -6,6 +6,7 @@ import { Input } from "../ui/input"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "../ui/button"
 import { supabase } from "@/utils/supabase/client"
+import { toast } from "sonner"
 CalendarIcon
 import {
   Popover,
@@ -75,6 +76,11 @@ export default function TransactionSubmitForm() {
     const handleSubmit = async(e: React.FormEvent)=>{
         e.preventDefault();
 
+        if (!validateFormData()) {
+            console.log(error)
+            toast.warning(error)
+            return
+        }
         try{
             const {data:{user}, error: authError } = await supabase.auth.getUser();
             if(!user||authError ){
