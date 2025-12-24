@@ -46,45 +46,43 @@ export default function TransactionSubmitForm() {
     }
 
     const validateFormData =()=>{
-        setError(null);
-
         if(!title.trim()){
-            setError("제목을 입력해주세요");
-            return false;
+            const errorMsg = "제목을 입력해주세요";
+            return errorMsg;
         }else if(title.trim().length>20){
-            setError("제목은 20자 이내로  입력해주세요")
-            return false;
+            const errorMsg = "제목은 20자 이내로  입력해주세요"
+            return errorMsg;
         }
 
         if(!transactionType){
-            setError("거래 유형을 선택해주세요");
-            return false;
+            const errorMsg = "거래 유형을 선택해주세요";
+            return errorMsg;
         }
 
         if(!category){
-            setError("카테고리를 선택해주세요");
-            return false;
+            const errorMsg = "카테고리를 선택해주세요";
+            return errorMsg;
         }
 
         if(!amount || Number(amount)<=0){
-            setError("금액은 0보다 커야 합니다")
-            return false;
+            const errorMsg = "금액은 0보다 커야 합니다"
+            return errorMsg;
         }
-        return true;
+        return null;
 
     }
     const handleSubmit = async(e: React.FormEvent)=>{
         e.preventDefault();
 
-        if (!validateFormData()) {
-            console.log(error)
-            toast.warning(error)
+        const errorMsg = validateFormData();
+        if (errorMsg) {
+            toast.warning(errorMsg)
             return
         }
         try{
             const {data:{user}, error: authError } = await supabase.auth.getUser();
             if(!user||authError ){
-                console.log("로그인이 필요합니다")
+                toast.warning('로그인이 필요합니다')
             }
             const formattedDate = date.toISOString().split('T')[0]
 
@@ -104,7 +102,7 @@ export default function TransactionSubmitForm() {
                 console.log(data)
                 if (error) {
                     console.error('Insert error:', error)
-                    alert("저장 실패: " + error.message)
+                    toast.warning("저장 실패 \n" + error.message)
                     return
                 }
 
