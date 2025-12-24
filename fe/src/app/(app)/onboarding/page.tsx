@@ -26,6 +26,8 @@ export default function OnboardingPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [step, setStep] = useState<'form' | number>('form');
+
   const clearError = (key: keyof FormErrors) => {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
@@ -78,9 +80,8 @@ export default function OnboardingPage() {
         return;
       }
 
-      console.log('profile 저장 성공');
-      console.log('final url:', res.url);
-      console.log('content-type:', res.headers.get('content-type'));
+      // 다음 단계 이동
+      setStep(0);
     } finally {
       setIsSubmitting(false);
     }
@@ -96,81 +97,98 @@ export default function OnboardingPage() {
           {/* 기본 정보 입력 영역 */}
           <Card>
             <CardHeader className="space-y-2">
-              <CardTitle className="text-xl">기본 정보 설정</CardTitle>
-              <CardDescription>
-                서비스를 시작하기 위해 필수 정보만 먼저 입력해주세요.
-              </CardDescription>
+              {step === 'form' ? (
+                <>
+                  <CardTitle className="text-xl">기본 정보 설정</CardTitle>
+                  <CardDescription>
+                    서비스를 시작하기 위해 필수 정보만 먼저 입력해주세요.
+                  </CardDescription>
+                </>
+              ) : (
+                <>
+                  <CardTitle className="text-xl">Spenny 사용 안내</CardTitle>
+                  <CardDescription>
+                    소비를 기록하고 한눈에 확인해보세요.
+                  </CardDescription>
+                </>
+              )}
             </CardHeader>
 
             <CardContent>
-              <form className="space-y-6" onSubmit={handleSubmit}>
-                <div className="space-y-2">
-                  <Label htmlFor="nickname">닉네임</Label>
-                  <Input
-                    id="nickname"
-                    placeholder="닉네임을 입력해주세요."
-                    value={nickname}
-                    onChange={(e) => {
-                      setNickname(e.target.value);
-                      clearError('nickname');
-                    }}
-                  />
-                  {errors.nickname ? (
-                    <p className="text-sm text-red-500">{errors.nickname}</p>
-                  ) : null}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="birth">생년월일</Label>
-                  <Input
-                    id="birth"
-                    placeholder="YYYY-MM-DD"
-                    value={birthDate}
-                    onChange={(e) => {
-                      setBirthDate(e.target.value);
-                      clearError('birth_date');
-                    }}
-                  />
-                  {errors.birth_date ? (
-                    <p className="text-sm text-red-500">{errors.birth_date}</p>
-                  ) : null}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center gap-6">
-                    <Label>성별</Label>
-                    <RadioGroup
-                      value={gender}
-                      onValueChange={(v) => {
-                        setGender(v as Gender);
-                        clearError('gender');
+              {step === 'form' ? (
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  <div className="space-y-2">
+                    <Label htmlFor="nickname">닉네임</Label>
+                    <Input
+                      id="nickname"
+                      placeholder="닉네임을 입력해주세요."
+                      value={nickname}
+                      onChange={(e) => {
+                        setNickname(e.target.value);
+                        clearError('nickname');
                       }}
-                      className="flex gap-6"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="male" id="male" />
-                        <Label htmlFor="male">남</Label>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="female" id="female" />
-                        <Label htmlFor="female">여</Label>
-                      </div>
-                    </RadioGroup>
+                    />
+                    {errors.nickname ? (
+                      <p className="text-sm text-red-500">{errors.nickname}</p>
+                    ) : null}
                   </div>
-                  {errors.gender ? (
-                    <p className="text-sm text-red-500">{errors.gender}</p>
-                  ) : null}
-                </div>
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  저장
-                </Button>
-              </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="birth">생년월일</Label>
+                    <Input
+                      id="birth"
+                      placeholder="YYYY-MM-DD"
+                      value={birthDate}
+                      onChange={(e) => {
+                        setBirthDate(e.target.value);
+                        clearError('birth_date');
+                      }}
+                    />
+                    {errors.birth_date ? (
+                      <p className="text-sm text-red-500">
+                        {errors.birth_date}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-6">
+                      <Label>성별</Label>
+                      <RadioGroup
+                        value={gender}
+                        onValueChange={(v) => {
+                          setGender(v as Gender);
+                          clearError('gender');
+                        }}
+                        className="flex gap-6"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="male" id="male" />
+                          <Label htmlFor="male">남</Label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="female" id="female" />
+                          <Label htmlFor="female">여</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                    {errors.gender ? (
+                      <p className="text-sm text-red-500">{errors.gender}</p>
+                    ) : null}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    저장
+                  </Button>
+                </form>
+              ) : (
+                <div>설명 화면 내용</div>
+              )}
             </CardContent>
           </Card>
         </div>
