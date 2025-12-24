@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/drawer';
 
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Transaction } from '@/types/testTransaction';
 import TransactionSection from '@/components/common/TransactionSection';
@@ -69,8 +70,9 @@ export function DrawerBottom({ data }: { data: Transaction[] }) {
           <Button
             variant="outline"
             className="h-14 w-full cursor-pointer text-base"
+            asChild
           >
-            이번 달 거래 내역 보러가기
+            <Link href="/history">이번 달 거래 내역 보러가기</Link>
           </Button>
         </DrawerFooter>
       </DrawerContent>
