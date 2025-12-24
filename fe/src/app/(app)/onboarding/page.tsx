@@ -24,6 +24,7 @@ export default function OnboardingPage() {
   const [birthDate, setBirthDate] = useState('');
   const [gender, setGender] = useState<Gender>('none');
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const clearError = (key: keyof FormErrors) => {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
@@ -51,16 +52,38 @@ export default function OnboardingPage() {
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    console.log({
-      nickname,
-      birth_date: birthDate,
-      gender,
-    });
+    try {
+      setIsSubmitting(true);
+
+      // 서버에 프로필 정보 저장
+      const res = await fetch('/api/onboarding/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nickname,
+          birth_date: birthDate,
+          gender,
+        }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        if (data?.errors) setErrors(data.errors);
+        return;
+      }
+
+      console.log('profile 저장 성공');
+      console.log('final url:', res.url);
+      console.log('content-type:', res.headers.get('content-type'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -140,7 +163,11 @@ export default function OnboardingPage() {
                   ) : null}
                 </div>
 
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
                   저장
                 </Button>
               </form>
