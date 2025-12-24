@@ -1,8 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Card,
   CardContent,
@@ -11,9 +9,8 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { fi } from 'zod/v4/locales';
+import ProfileForm from '@/components/onboarding/ProfileForm';
+import IntroPanel from '@/components/onboarding/IntroPanel';
 
 type Gender = 'male' | 'female' | 'none';
 type FormErrors = Partial<{
@@ -54,7 +51,10 @@ export default function OnboardingPage() {
       description: '카테고리/월별 흐름을 보고 과소비를 확인할 수 있습니다.',
     },
   ] as const;
-  const isLastIntro = introStep === introSteps.length - 1;
+
+  const exitOnboarding = () => {
+    router.replace('/');
+  };
 
   const clearError = (key: keyof FormErrors) => {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
@@ -116,10 +116,24 @@ export default function OnboardingPage() {
     }
   };
 
+  // 온보딩 단계 이동 함수
   const goPrev = () => setIntroStep((s) => Math.max(0, s - 1));
   const goNext = () =>
     setIntroStep((s) => Math.min(introSteps.length - 1, s + 1));
-  const finishOnboarding = () => router.replace('/');
+
+  // 입력값 변경 핸들러
+  const handleChangeNickname = (v: string) => {
+    setNickname(v);
+    clearError('nickname');
+  };
+  const handleChangeBirthDate = (v: string) => {
+    setBirthDate(v);
+    clearError('birth_date');
+  };
+  const handleChangeGender = (v: Gender) => {
+    setGender(v);
+    clearError('gender');
+  };
 
   return (
     <div className="fixed inset-0 z-50">
@@ -143,7 +157,7 @@ export default function OnboardingPage() {
                     type="button"
                     variant="ghost"
                     className="absolute -top-3 right-2"
-                    onClick={finishOnboarding}
+                    onClick={exitOnboarding}
                   >
                     건너뛰기
                   </Button>
@@ -159,129 +173,25 @@ export default function OnboardingPage() {
 
             <CardContent>
               {phase === 'form' ? (
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                  <div className="space-y-2">
-                    <Label htmlFor="nickname">닉네임</Label>
-                    <Input
-                      id="nickname"
-                      placeholder="닉네임을 입력해주세요."
-                      value={nickname}
-                      onChange={(e) => {
-                        setNickname(e.target.value);
-                        clearError('nickname');
-                      }}
-                    />
-                    {errors.nickname ? (
-                      <p className="text-sm text-red-500">{errors.nickname}</p>
-                    ) : null}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="birth">생년월일</Label>
-                    <Input
-                      id="birth"
-                      placeholder="YYYY-MM-DD"
-                      value={birthDate}
-                      onChange={(e) => {
-                        setBirthDate(e.target.value);
-                        clearError('birth_date');
-                      }}
-                    />
-                    {errors.birth_date ? (
-                      <p className="text-sm text-red-500">
-                        {errors.birth_date}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-6">
-                      <Label>성별</Label>
-                      <RadioGroup
-                        value={gender}
-                        onValueChange={(v) => {
-                          setGender(v as Gender);
-                          clearError('gender');
-                        }}
-                        className="flex gap-6"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="male" id="male" />
-                          <Label htmlFor="male">남</Label>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="female" id="female" />
-                          <Label htmlFor="female">여</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                    {errors.gender ? (
-                      <p className="text-sm text-red-500">{errors.gender}</p>
-                    ) : null}
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isSubmitting}
-                  >
-                    저장
-                  </Button>
-                </form>
+                <ProfileForm
+                  nickname={nickname}
+                  birthDate={birthDate}
+                  gender={gender}
+                  errors={errors}
+                  onChangeNickname={handleChangeNickname}
+                  onChangeBirthDate={handleChangeBirthDate}
+                  onChangeGender={handleChangeGender}
+                  isSubmitting={isSubmitting}
+                  onSubmit={handleSubmit}
+                />
               ) : (
-                <div className="space-y-6">
-                  <div className="h-100">설명 내용</div>
-                  {/* 하단 컨트롤 */}
-                  <div className="grid grid-cols-3 items-center">
-                    {/* 왼쪽 */}
-                    <div className="justify-self-start">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={introStep === 0}
-                        onClick={goPrev}
-                      >
-                        이전
-                      </Button>
-                    </div>
-
-                    {/* 중앙 */}
-                    <div className="justify-self-center">
-                      <div
-                        className="flex items-center justify-center gap-2"
-                        aria-label="온보딩 진행 상태"
-                      >
-                        {introSteps.map((_, index) => {
-                          const active = introStep === index;
-                          return (
-                            <span
-                              key={index}
-                              aria-current={active ? 'step' : undefined}
-                              className={cn(
-                                'h-2 w-2 rounded-full transition-colors',
-                                active ? 'bg-primary' : 'bg-gray-200'
-                              )}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* 오른쪽 */}
-                    <div className="justify-self-end">
-                      {isLastIntro ? (
-                        <Button type="button" onClick={finishOnboarding}>
-                          시작하기
-                        </Button>
-                      ) : (
-                        <Button type="button" onClick={goNext}>
-                          다음
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <IntroPanel
+                  steps={introSteps}
+                  introStep={introStep}
+                  onPrev={goPrev}
+                  onNext={goNext}
+                  onExit={exitOnboarding}
+                />
               )}
             </CardContent>
           </Card>
