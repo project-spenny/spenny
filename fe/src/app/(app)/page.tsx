@@ -1,16 +1,13 @@
-import { DrawerBottom } from '@/components/DrawerBottom';
+import { DUMMY_TRANSACTIONS } from '@/constants/dummyData';
 import LogoutButton from '@/components/LogoutButton';
-import SheetSide from '@/components/SheetSide';
+import ResponsivePanel from '@/components/common/ResponsivePanel';
 
 export default function Home() {
   return (
     <div>
       Home
       <LogoutButton />
-      <div className="flex flex-col gap-2">
-        <DrawerBottom />
-        <SheetSide />
-      </div>
+      <ResponsivePanel data={DUMMY_TRANSACTIONS} />
     </div>
   );
 }
