@@ -1,4 +1,5 @@
 import { Button } from '../ui/button';
+import { CATEGORY_MAP } from '@/constants/dummyData';
 import { ChevronRight } from 'lucide-react';
 import { Transaction } from '@/types/testTransaction';
 import { cn } from '@/lib/utils';
@@ -23,7 +24,7 @@ const TransactionItem = ({ item }: { item: Transaction }) => {
         <div className="flex flex-col gap-2">
           <div className="text-lg font-bold">{item.title}</div>
           <div className="text-muted-foreground text-sm font-medium">
-            {item.category_id}
+            {CATEGORY_MAP[item.category_id]}
           </div>
         </div>
 

@@ -60,3 +60,12 @@ export const DUMMY_TRANSACTIONS: Transaction[] = [
     amount: 55000,
   },
 ];
+
+export const CATEGORY_MAP: Record<string, string> = {
+  'cat-001': '식비',
+  'cat-002': '교통비',
+  'cat-003': '쇼핑',
+  'cat-004': '수입',
+  'cat-005': '금융',
+  'cat-006': '의류',
+};
