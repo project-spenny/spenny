@@ -99,7 +99,6 @@ export default function TransactionSubmitForm() {
                 })
                 .select()
 
-                console.log(data)
                 if (error) {
                     console.error('Insert error:', error)
                     toast.warning("저장 실패 \n" + error.message)
@@ -107,6 +106,15 @@ export default function TransactionSubmitForm() {
                 }
 
             alert("거래 내역이 저장되었습니다")
+
+            setTitle("")
+            setTransactionType("")
+            setAmount("")
+            setCategory("")
+            setDate(new Date())
+            setTagInput("")
+            setTags([])
+            setError(null)
 
         }catch(error){
             console.log('error')
