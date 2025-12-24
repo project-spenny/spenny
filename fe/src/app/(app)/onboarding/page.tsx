@@ -21,13 +21,15 @@ type FormErrors = Partial<{
 }>;
 
 export default function OnboardingPage() {
+  const [phase, setPhase] = useState<'form' | 'intro'>('form');
+  const [introStep, setIntroStep] = useState(0);
+
   const [nickname, setNickname] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [gender, setGender] = useState<Gender>('none');
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [step, setStep] = useState<'form' | number>('form');
 
   // 온보딩 설명 단계 내용
   const introSteps = [
@@ -48,8 +50,7 @@ export default function OnboardingPage() {
       description: '카테고리/월별 흐름을 보고 과소비를 확인할 수 있습니다.',
     },
   ] as const;
-  const isIntro = typeof step === 'number';
-  const isLastIntro = isIntro && step === introSteps.length - 1;
+  const isLastIntro = introStep === introSteps.length - 1;
 
   const clearError = (key: keyof FormErrors) => {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
@@ -103,12 +104,17 @@ export default function OnboardingPage() {
         return;
       }
 
-      // 다음 단계 이동
-      setStep(0);
+      // 온보딩 소개 단계로 전환
+      setIntroStep(0);
+      setPhase('intro');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const goPrev = () => setIntroStep((s) => Math.max(0, s - 1));
+  const goNext = () =>
+    setIntroStep((s) => Math.min(introSteps.length - 1, s + 1));
 
   return (
     <div className="fixed inset-0 z-50">
@@ -117,10 +123,9 @@ export default function OnboardingPage() {
 
       <div className="relative flex min-h-dvh items-center justify-center p-4">
         <div className="w-full max-w-lg">
-          {/* 기본 정보 입력 영역 */}
           <Card>
             <CardHeader className="space-y-2">
-              {step === 'form' ? (
+              {phase === 'form' ? (
                 <>
                   <CardTitle className="text-xl">기본 정보 설정</CardTitle>
                   <CardDescription>
@@ -130,17 +135,17 @@ export default function OnboardingPage() {
               ) : (
                 <>
                   <CardTitle className="text-xl">
-                    {introSteps[step].title}
+                    {introSteps[introStep].title}
                   </CardTitle>
                   <CardDescription>
-                    {introSteps[step].description}
+                    {introSteps[introStep].description}
                   </CardDescription>
                 </>
               )}
             </CardHeader>
 
             <CardContent>
-              {step === 'form' ? (
+              {phase === 'form' ? (
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="space-y-2">
                     <Label htmlFor="nickname">닉네임</Label>
@@ -221,14 +226,8 @@ export default function OnboardingPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        disabled={step === 0}
-                        onClick={() =>
-                          setStep((prev) =>
-                            typeof prev === 'number'
-                              ? Math.max(0, prev - 1)
-                              : prev
-                          )
-                        }
+                        disabled={introStep === 0}
+                        onClick={goPrev}
                       >
                         이전
                       </Button>
@@ -241,7 +240,7 @@ export default function OnboardingPage() {
                         aria-label="온보딩 진행 상태"
                       >
                         {introSteps.map((_, index) => {
-                          const active = step === index;
+                          const active = introStep === index;
                           return (
                             <span
                               key={index}
@@ -266,14 +265,7 @@ export default function OnboardingPage() {
                           시작하기
                         </Button>
                       ) : (
-                        <Button
-                          type="button"
-                          onClick={() =>
-                            setStep((prev) =>
-                              typeof prev === 'number' ? prev + 1 : prev
-                            )
-                          }
-                        >
+                        <Button type="button" onClick={goNext}>
                           다음
                         </Button>
                       )}
