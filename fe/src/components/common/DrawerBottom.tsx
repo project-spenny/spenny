@@ -13,7 +13,6 @@ import {
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Transaction } from '@/types/testTransaction';
 import TransactionSection from '@/components/common/TransactionSection';
 import { X } from 'lucide-react';
@@ -56,15 +55,13 @@ export function DrawerBottom({ data }: { data: Transaction[] }) {
         </DrawerHeader>
 
         {/* 콘텐츠 영역: 거래 내역 영역 */}
-        <ScrollArea className="flex-1 overflow-y-auto">
-          {totalCount > 0 ? (
-            <TransactionSection data={data} />
-          ) : (
-            <div className="text-muted-foreground text-center">
-              거래 내역이 없습니다.
-            </div>
-          )}
-        </ScrollArea>
+        {totalCount > 0 ? (
+          <TransactionSection data={data} />
+        ) : (
+          <div className="text-muted-foreground mt-4 text-center">
+            거래 내역이 없습니다.
+          </div>
+        )}
 
         {/* 푸터 영역: 이번 달 거래 내역 버튼 */}
         <DrawerFooter className="shrink-0 border-t p-6">

@@ -1,16 +1,19 @@
 import { Button } from '../ui/button';
 import { CATEGORY_MAP } from '@/constants/dummyData';
 import { ChevronRight } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Transaction } from '@/types/testTransaction';
 import { cn } from '@/lib/utils';
 
 const TransactionSection = ({ data }: { data: Transaction[] }) => {
   return (
-    <section className="flex flex-col gap-4 p-6">
-      {data.map((item) => (
-        <TransactionItem key={item.id} item={item} />
-      ))}
-    </section>
+    <ScrollArea className="flex-1 overflow-y-auto">
+      <section className="flex flex-col gap-4 p-6">
+        {data.map((item) => (
+          <TransactionItem key={item.id} item={item} />
+        ))}
+      </section>
+    </ScrollArea>
   );
 };
 
