@@ -19,24 +19,34 @@ export function DrawerBottom() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button variant="outline">Open Drawer Bottom</Button>
+        <div className="bg-primary text-background hover:bg-primary/80 cursor-pointer rounded-xl px-4 py-2">
+          Open Drawer Bottom
+        </div>
       </DrawerTrigger>
 
       <DrawerContent className="h-[85vh] outline-none">
         {/* 헤더 영역: 날짜 및 닫기 버튼 */}
-        <DrawerHeader className="flex shrink-0 flex-row items-center justify-between border-b px-6 py-4">
+        <DrawerHeader className="relative flex shrink-0 flex-row items-center justify-between border-b px-6 py-4">
+          <DrawerClose className="absolute top-0 right-0 mr-4" asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-full"
+            >
+              <X />
+            </Button>
+          </DrawerClose>
+
           <div className="text-left">
-            <DrawerTitle className="text-xl font-bold">
+            <DrawerTitle className="py-2 text-xl font-bold">
               12월 24일 수요일
             </DrawerTitle>
             <DrawerDescription>오늘 날짜 거래 내역</DrawerDescription>
           </div>
 
-          <DrawerClose asChild>
-            <Button variant="outline" size="icon" className="h-10 w-10">
-              <X />
-            </Button>
-          </DrawerClose>
+          <div className="flex h-full items-end">
+            <DrawerDescription>총 3개</DrawerDescription>
+          </div>
         </DrawerHeader>
 
         {/* 콘텐츠 영역: 거래 내역 영역 */}
@@ -59,7 +69,7 @@ export function DrawerBottom() {
                 <div>
                   <Button
                     variant="outline"
-                    className="bg-background/60 h-15 w-15 cursor-pointer rounded-full shadow-md"
+                    className="bg-background/60 h-12 w-12 cursor-pointer rounded-full shadow-md"
                   >
                     <ChevronRight />
                   </Button>
