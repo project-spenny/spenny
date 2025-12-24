@@ -15,7 +15,7 @@ import { Button } from './ui/button';
 import { ChevronsRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Transaction } from '@/types/testTransaction';
-import TransactionContent from '@/components/common/TransactionContent';
+import TransactionSection from '@/components/common/TransactionSection';
 
 const SheetSide = ({ data }: { data: Transaction[] }) => {
   const totalCount = data.length;
@@ -59,7 +59,7 @@ const SheetSide = ({ data }: { data: Transaction[] }) => {
         {/* 콘텐츠 영역: 거래 내역 영역 */}
         <ScrollArea className="flex-1 overflow-y-auto">
           {totalCount > 0 ? (
-            <TransactionContent data={data} />
+            <TransactionSection data={data} />
           ) : (
             <div className="text-muted-foreground text-center">
               거래 내역이 없습니다.
