@@ -35,6 +35,7 @@ export default function TransactionSubmitForm() {
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [tagInput, setTagInput] = useState<string>("")
     const [tags, setTags] = useState<string[]>([])
+    const [error, setError]= useState<string | null>();
 
     const formatDate = (date: Date) => {
         const year = date.getFullYear()
@@ -43,6 +44,34 @@ export default function TransactionSubmitForm() {
         return `${year}년 ${month}월 ${day}일`
     }
 
+    const validateFormData =()=>{
+        setError(null);
+
+        if(!title.trim()){
+            setError("제목을 입력해주세요");
+            return false;
+        }else if(title.trim().length>20){
+            setError("제목은 20자 이내로  입력해주세요")
+            return false;
+        }
+
+        if(!transactionType){
+            setError("거래 유형을 선택해주세요");
+            return false;
+        }
+
+        if(!category){
+            setError("카테고리를 선택해주세요");
+            return false;
+        }
+
+        if(!amount || Number(amount)<=0){
+            setError("금액은 0보다 커야 합니다")
+            return false;
+        }
+        return true;
+
+    }
     const handleSubmit = async(e: React.FormEvent)=>{
         e.preventDefault();
 
