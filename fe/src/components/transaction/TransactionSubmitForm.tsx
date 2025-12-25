@@ -148,7 +148,7 @@ export default function TransactionSubmitForm({
 
             toast("가계부 작성을 완료했습니다")
 
-             setFormData({
+            setFormData({
                 title: "",
                 transactionType: "",
                 amount: "",
@@ -190,8 +190,14 @@ export default function TransactionSubmitForm({
     }
     return (
         <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
-            <Label htmlFor="transaction-type" className="text-xl">가계부 작성</Label>
-
+            <div className="flex justify-between items-center sticky top-0 bg-white pb-4 border-b">
+                <Label className="text-xl">
+                    {mode === 'create' ? '가계부 작성' : '가계부 수정'}
+                </Label>
+                <Button type="button" variant="ghost" onClick={onClose}>
+                    <X />
+                </Button>
+            </div>
             <div className="space-y-2">
                 <Label>타이틀</Label>
                 <Input
