@@ -11,13 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import ProfileForm from '@/components/onboarding/ProfileForm';
 import IntroPanel from '@/components/onboarding/IntroPanel';
-
-type Gender = 'male' | 'female' | 'none';
-type FormErrors = Partial<{
-  nickname: string;
-  birth_date: string;
-  gender: string;
-}>;
+import { FormErrors, Gender } from '@/types/onboarding';
 
 export default function OnboardingPage() {
   const router = useRouter();
