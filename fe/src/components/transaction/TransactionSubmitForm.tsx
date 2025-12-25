@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import { Input } from "../ui/input"
@@ -16,6 +16,27 @@ import {
 import { CalendarIcon } from "lucide-react"
 import { X } from "lucide-react"
 
+interface Transaction {
+  id: string
+  title: string
+  user_id : string
+  category_id: string
+  type: 'income' | 'expense'
+  date: string
+  amount: number
+  fixed_rule_id : string|null
+  memo : string | null
+  created_at : Date
+  updated_at : Date
+  tags : string[]
+}
+
+interface TransactionsSubmitFormProps {
+    mode : 'create' | 'edit'
+    transaction? : Transaction
+    onClose : ()=> void
+    onSuccess : ()=> void
+}
 const CATEGORIES = [
     { id: "3de48bfe-69d9-4dbb-9a5d-ecdb807212f2", name: "식비", type: "expense" },
     { id: "fd66cd8e-83bc-4720-8d71-34046524a849", name: "의료비", type: "expense" },
@@ -27,15 +48,19 @@ const CATEGORIES = [
     { id: "94b763c9-48cd-4435-b21b-d93a41dd49da", name: "교육비", type: "expense" },
     { id: "fb48697f-5cae-41e3-869b-0c4922523955", name: "기타", type: "expense" }
 ]
-export default function TransactionSubmitForm() {
-    const [title, setTitle] = useState<string>("")
-    const [transactionType, setTransactionType] = useState<string>("")
-    const [amount, setAmount] = useState<string>("")
-    const [date, setDate] = useState<Date>(new Date())
-    const [category, setCategory] = useState<string>("")
+export default function TransactionSubmitForm({
+    mode, transaction, onClose, onSuccess
+} : TransactionsSubmitFormProps) {
+    const [formData, setFormData] = useState({
+        title: "",
+        transactionType: "",
+        amount: "",
+        date: new Date(),
+        category: "",
+        tags: [] as string[]
+    })
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [tagInput, setTagInput] = useState<string>("")
-    const [tags, setTags] = useState<string[]>([])
     const [error, setError]= useState<string | null>();
 
     const formatDate = (date: Date) => {
@@ -46,25 +71,25 @@ export default function TransactionSubmitForm() {
     }
 
     const validateFormData =()=>{
-        if(!title.trim()){
+        if(!formData.title.trim()){
             const errorMsg = "제목을 입력해주세요";
             return errorMsg;
-        }else if(title.trim().length>20){
+        }else if(formData.title.trim().length>20){
             const errorMsg = "제목은 20자 이내로  입력해주세요"
             return errorMsg;
         }
 
-        if(!transactionType){
+        if(!formData.transactionType){
             const errorMsg = "거래 유형을 선택해주세요";
             return errorMsg;
         }
 
-        if(!category){
+        if(!formData.category){
             const errorMsg = "카테고리를 선택해주세요";
             return errorMsg;
         }
 
-        if(!amount || Number(amount)<=0){
+        if(!formData.amount || Number(formData.amount)<=0){
             const errorMsg = "금액은 0보다 커야 합니다"
             return errorMsg;
         }
@@ -76,7 +101,6 @@ export default function TransactionSubmitForm() {
 
         const errorMsg = validateFormData();
         if (errorMsg) {
-            toast.warning(errorMsg)
             return
         }
         try{
@@ -84,18 +108,18 @@ export default function TransactionSubmitForm() {
             if(!user||authError ){
                 toast.warning('로그인이 필요합니다')
             }
-            const formattedDate = date.toISOString().split('T')[0]
+            const formattedDate = formData.date.toISOString().split('T')[0]
 
             const { data, error } = await supabase
                 .from('transactions')
                 .insert({
                     user_id: user?.id,
-                    title: title.trim(),
-                    type: transactionType,
-                    amount: Number(amount),
+                    title: formData.title.trim(),
+                    type: formData.transactionType,
+                    amount: Number(formData.amount),
                     date: formattedDate,
-                    category_id: category,
-                    tags: tags.length > 0 ? tags : null
+                    category_id: formData.category,
+                    tags: formData.tags.length > 0 ? formData.tags : null
                 })
                 .select()
 
@@ -105,15 +129,17 @@ export default function TransactionSubmitForm() {
                     return
                 }
 
-            alert("거래 내역이 저장되었습니다")
+            toast("가계부 작성을 완료했습니다")
 
-            setTitle("")
-            setTransactionType("")
-            setAmount("")
-            setCategory("")
-            setDate(new Date())
+             setFormData({
+                title: "",
+                transactionType: "",
+                amount: "",
+                date: new Date(),
+                category: "",
+                tags: []
+            })
             setTagInput("")
-            setTags([])
             setError(null)
 
         }catch(error){
@@ -130,14 +156,20 @@ export default function TransactionSubmitForm() {
     
     const addTag = () => {
         const trimmedTag = tagInput.trim()
-        if (trimmedTag && !tags.includes(trimmedTag)) {
-            setTags([...tags, trimmedTag])
+        if (trimmedTag && !formData.tags.includes(trimmedTag)) {
+            setFormData(prev => ({
+                ...prev,
+                tags: [...prev.tags, trimmedTag]
+            }))
             setTagInput("")
         }
     }
     
     const removeTag = (tagToRemove: string) => {
-        setTags(tags.filter(tag => tag !== tagToRemove))
+        setFormData(prev => ({
+            ...prev,
+            tags: prev.tags.filter(tag => tag !== tagToRemove)
+        }))
     }
     return (
         <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
@@ -149,8 +181,8 @@ export default function TransactionSubmitForm() {
                     id="amount"
                     type="text"
                     placeholder="어떤 지출인가요"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
                 />
             </div>
 
@@ -160,10 +192,10 @@ export default function TransactionSubmitForm() {
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         type="button"
-                        onClick={() => setTransactionType('income')}
+                        onClick={() => setFormData(prev => ({...prev, transactionType: 'income'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            transactionType === 'income'
+                            formData.transactionType === 'income'
                                 ? "border-gray-500"
                                 : "border-gray-300 hover:border-gray-400"
                         )}
@@ -172,10 +204,10 @@ export default function TransactionSubmitForm() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setTransactionType('expense')}
+                        onClick={() => setFormData(prev => ({...prev, transactionType: 'expense'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            transactionType === 'expense'
+                            formData.transactionType === 'expense'
                                 ? "border-gray-500"
                                 : "border-gray-300 hover:border-gray-400"
                         )}
@@ -192,8 +224,8 @@ export default function TransactionSubmitForm() {
                     id="amount"
                     type="number"
                     placeholder="금액을 입력하세요"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={formData.amount}
+                    onChange={(e) => setFormData(prev => ({...prev, amount: e.target.value}))}
                     min="0"
                 />
             </div>
@@ -209,14 +241,14 @@ export default function TransactionSubmitForm() {
                             className="w-full justify-start text-left font-normal"
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formatDate(date)}
+                            {formatDate(formData.date)}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                             mode="single"
-                            selected={date}
-                            onSelect={(newDate) => newDate && setDate(newDate)}
+                            selected={formData.date}
+                            onSelect={(newDate) => newDate && setFormData(prev => ({...prev, date: newDate}))}
                         />
                     </PopoverContent>
                 </Popover>
@@ -238,14 +270,14 @@ export default function TransactionSubmitForm() {
                             {CATEGORIES.map((cat)=>(
                                 <div
                                     onClick={()=>{
-                                        setCategory(cat.id)
+                                        setFormData(prev => ({...prev, category: cat.id}))
                                         setCategoryOpen(false)}}
                                     className="text-center w-16 h-16 cursor-pointer" key={cat.id}>{cat.name}</div>
                             ))}
                         </div>
                     </PopoverContent>
                 </Popover>
-                <div>{category}</div>
+                <div>{formData.category}</div>
 
                 {/* 태그 */}
                 <div className="space-y-2">
@@ -268,9 +300,9 @@ export default function TransactionSubmitForm() {
                         추가
                     </Button>
                 </div>
-                {tags.length > 0 && (
+                {formData.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {tags.map((tag, index) => (
+                        {formData.tags.map((tag, index) => (
                             <div
                                 key={index}
                                 className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
