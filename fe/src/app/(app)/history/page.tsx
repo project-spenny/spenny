@@ -4,7 +4,8 @@ export default function page() {
   return(
       <>
           <TransactionList/>
-          {/* <TransactionSubmitForm/> */}
+          <TransactionSubmitForm mode='create'/>
+          <TransactionSubmitForm mode='edit'/>
       </>
   )
 }

@@ -7,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Button } from "../ui/button"
 import { supabase } from "@/utils/supabase/client"
 import { toast } from "sonner"
+import { Trash } from "lucide-react"
 CalendarIcon
 import {
   Popover,
@@ -34,8 +35,8 @@ interface Transaction {
 interface TransactionsSubmitFormProps {
     mode : 'create' | 'edit'
     transaction? : Transaction
-    onClose : ()=> void
-    onSuccess : ()=> void
+    onClose? : ()=> void
+    onSuccess? : ()=> void
 }
 const CATEGORIES = [
     { id: "3de48bfe-69d9-4dbb-9a5d-ecdb807212f2", name: "식비", type: "expense" },
@@ -51,18 +52,34 @@ const CATEGORIES = [
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
-    const [formData, setFormData] = useState({
-        title: "",
-        transactionType: "",
-        amount: "",
-        date: new Date(),
-        category: "",
-        tags: [] as string[]
-    })
+
+    const getInitialFormData = () => {
+        if (mode === 'edit' && transaction) {
+            return {
+                title: transaction.title,
+                transactionType: transaction.type,
+                amount: transaction.amount.toString(),
+                date: new Date(transaction.date),
+                category: transaction.category_id,
+                tags: transaction.tags || []
+            }
+        }
+        return {
+            title: "",
+            transactionType: "",
+            amount: "",
+            date: new Date(),
+            category: "",
+            tags: [] as string[]
+        }
+    }
+    const [formData, setFormData] = useState(getInitialFormData())
+
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [tagInput, setTagInput] = useState<string>("")
     const [error, setError]= useState<string | null>();
 
+    
     const formatDate = (date: Date) => {
         const year = date.getFullYear()
         const month = date.getMonth() + 1
@@ -320,10 +337,24 @@ export default function TransactionSubmitForm({
                     </div>
                 )}
             </div>
-
-            <Button type="submit" className="w-full">
-                제출
-            </Button>
+            <div className="flex gap-2 pt-4 sticky bottom-0 bg-background border-t pb-4">
+                {mode === 'edit' && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={()=>{}}
+                        className="w-10"
+                    >
+                        <Trash/>
+                    </Button>
+                )}
+                <Button
+                    type="submit"
+                    className="flex-1"
+                >
+                    {mode === 'create' ? '저장' : '수정'}
+                </Button>
+            </div>
             </div>
         </form>
     )
