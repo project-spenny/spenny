@@ -1,18 +1,13 @@
 import { DUMMY_TRANSACTIONS } from '@/constants/dummyData';
-import { DrawerBottom } from '@/components/common/DrawerBottom';
 import LogoutButton from '@/components/LogoutButton';
-import ResponsiveWrapper from '@/components/common/ResponsiveWrapper';
-import SheetSide from '@/components/common/SheetSide';
+import TransactionPanel from '@/components/common/TransactionPanel';
 
 export default function Home() {
   return (
-    <div>
-      Home
+    <main>
+      가계부 홈
       <LogoutButton />
-      <ResponsiveWrapper
-        mobile={<DrawerBottom data={DUMMY_TRANSACTIONS} />}
-        desktop={<SheetSide data={DUMMY_TRANSACTIONS} />}
-      />
-    </div>
+      <TransactionPanel data={DUMMY_TRANSACTIONS} />
+    </main>
   );
 }

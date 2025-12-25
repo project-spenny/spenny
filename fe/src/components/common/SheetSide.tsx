@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Sheet,
   SheetClose,
@@ -8,7 +6,6 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@/components/ui/sheet';
 
 import { Button } from '../ui/button';
@@ -17,15 +14,17 @@ import Link from 'next/link';
 import { Transaction } from '@/types/testTransaction';
 import TransactionSection from '@/components/common/TransactionSection';
 
-const SheetSide = ({ data }: { data: Transaction[] }) => {
+interface SheetSideProps {
+  data: Transaction[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const SheetSide = ({ data, open, onOpenChange }: SheetSideProps) => {
   const totalCount = data.length;
 
   return (
-    <Sheet>
-      <SheetTrigger>
-        <span className="cursor-pointer">Open Sheet Side</span>
-      </SheetTrigger>
-
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
         className="flex w-[540px] max-w-none flex-col outline-none sm:max-w-none"
@@ -43,6 +42,7 @@ const SheetSide = ({ data }: { data: Transaction[] }) => {
           </SheetClose>
 
           <div className="pl-2 text-left">
+            {/* TODO: 선택된 날짜 데이터(item.date) 연동 및 포맷팅 필요 */}
             <SheetTitle className="py-2 text-xl font-bold">
               12월 24일 수요일
             </SheetTitle>

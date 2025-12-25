@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Drawer,
   DrawerClose,
@@ -8,7 +6,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from '@/components/ui/drawer';
 
 import { Button } from '@/components/ui/button';
@@ -17,15 +14,17 @@ import { Transaction } from '@/types/testTransaction';
 import TransactionSection from '@/components/common/TransactionSection';
 import { X } from 'lucide-react';
 
-export function DrawerBottom({ data }: { data: Transaction[] }) {
+interface DrawerBottomProps {
+  data: Transaction[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function DrawerBottom({ data, open, onOpenChange }: DrawerBottomProps) {
   const totalCount = data.length;
 
   return (
-    <Drawer>
-      <DrawerTrigger>
-        <span className="cursor-pointer">Open Drawer Bottom</span>
-      </DrawerTrigger>
-
+    <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="h-[85vh] outline-none">
         {/* 헤더 영역: 날짜 및 닫기 버튼 */}
         <DrawerHeader className="relative flex shrink-0 flex-row items-center justify-between border-b px-6 py-4">
