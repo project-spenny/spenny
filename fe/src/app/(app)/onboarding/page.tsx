@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import ProfileForm from '@/components/onboarding/ProfileForm';
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { FormErrors, Gender } from '@/types/onboarding';
+import { INTRO_STEPS } from '@/constants/onboarding';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -25,26 +26,6 @@ export default function OnboardingPage() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // 온보딩 설명 단계 내용
-  const introSteps = [
-    {
-      title: 'spendy와 함께 소비 관리',
-      description: '간편한 소비 기록과 분석으로 현명한 소비 습관을 길러보세요.',
-    },
-    {
-      title: '캘린더로 빠르게 기록',
-      description: '날짜를 선택해서 거래를 바로 기록하고 확인할 수 있습니다.',
-    },
-    {
-      title: '전체 거래 내역 확인',
-      description: '모든 거래 내역을 한눈에 확인할 수 있습니다.',
-    },
-    {
-      title: '월간 분석으로 소비 점검',
-      description: '카테고리/월별 흐름을 보고 과소비를 확인할 수 있습니다.',
-    },
-  ] as const;
 
   const exitOnboarding = () => {
     router.replace('/');
@@ -113,7 +94,7 @@ export default function OnboardingPage() {
   // 온보딩 단계 이동 함수
   const goPrev = () => setIntroStep((s) => Math.max(0, s - 1));
   const goNext = () =>
-    setIntroStep((s) => Math.min(introSteps.length - 1, s + 1));
+    setIntroStep((s) => Math.min(INTRO_STEPS.length - 1, s + 1));
 
   // 입력값 변경 핸들러
   const handleChangeNickname = (v: string) => {
@@ -156,10 +137,10 @@ export default function OnboardingPage() {
                     건너뛰기
                   </Button>
                   <CardTitle className="text-xl">
-                    {introSteps[introStep].title}
+                    {INTRO_STEPS[introStep].title}
                   </CardTitle>
                   <CardDescription>
-                    {introSteps[introStep].description}
+                    {INTRO_STEPS[introStep].description}
                   </CardDescription>
                 </>
               )}
@@ -180,7 +161,7 @@ export default function OnboardingPage() {
                 />
               ) : (
                 <IntroPanel
-                  steps={introSteps}
+                  steps={INTRO_STEPS}
                   introStep={introStep}
                   onPrev={goPrev}
                   onNext={goNext}
