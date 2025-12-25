@@ -10,17 +10,16 @@ import {
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { PanelProps } from '@/types/panel';
 import { Transaction } from '@/types/testTransaction';
 import TransactionSection from '@/components/common/TransactionSection';
 import { X } from 'lucide-react';
 
-interface DrawerBottomProps {
-  data: Transaction[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export function DrawerBottom({ data, open, onOpenChange }: DrawerBottomProps) {
+const DrawerBottom = ({
+  data,
+  open,
+  onOpenChange,
+}: PanelProps<Transaction[]>) => {
   const totalCount = data.length;
 
   return (
@@ -75,4 +74,6 @@ export function DrawerBottom({ data, open, onOpenChange }: DrawerBottomProps) {
       </DrawerContent>
     </Drawer>
   );
-}
+};
+
+export default DrawerBottom;

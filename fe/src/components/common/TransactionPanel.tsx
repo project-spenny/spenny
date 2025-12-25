@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { DrawerBottom } from '@/components/common/DrawerBottom';
+import DrawerBottom from '@/components/common/DrawerBottom';
 import ResponsiveWrapper from '@/components/common/ResponsiveWrapper';
 import SheetSide from '@/components/common/SheetSide';
 import { Transaction } from '@/types/testTransaction';

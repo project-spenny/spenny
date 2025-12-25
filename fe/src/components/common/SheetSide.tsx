@@ -8,19 +8,14 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { ChevronsRight } from 'lucide-react';
 import Link from 'next/link';
+import { PanelProps } from '@/types/panel';
 import { Transaction } from '@/types/testTransaction';
 import TransactionSection from '@/components/common/TransactionSection';
 
-interface SheetSideProps {
-  data: Transaction[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-const SheetSide = ({ data, open, onOpenChange }: SheetSideProps) => {
+const SheetSide = ({ data, open, onOpenChange }: PanelProps<Transaction[]>) => {
   const totalCount = data.length;
 
   return (
