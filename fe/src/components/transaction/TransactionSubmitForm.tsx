@@ -35,8 +35,8 @@ interface Transaction {
 interface TransactionsSubmitFormProps {
     mode : 'create' | 'edit'
     transaction? : Transaction
-    onClose? : ()=> void
-    onSuccess? : ()=> void
+    onClose : ()=> void
+    onSuccess : ()=> void
 }
 const CATEGORIES = [
     { id: "3de48bfe-69d9-4dbb-9a5d-ecdb807212f2", name: "식비", type: "expense" },
@@ -53,33 +53,41 @@ export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
 
-    const getInitialFormData = () => {
-        if (mode === 'edit' && transaction) {
-            return {
-                title: transaction.title,
-                transactionType: transaction.type,
-                amount: transaction.amount.toString(),
-                date: new Date(transaction.date),
-                category: transaction.category_id,
-                tags: transaction.tags || []
-            }
-        }
-        return {
+    const [formData, setFormData] = useState({
             title: "",
             transactionType: "",
             amount: "",
             date: new Date(),
             category: "",
             tags: [] as string[]
-        }
-    }
-    const [formData, setFormData] = useState(getInitialFormData())
+    })
 
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [tagInput, setTagInput] = useState<string>("")
     const [error, setError]= useState<string | null>();
 
-    
+    useEffect(() => {
+        if (mode === 'edit' && transaction) {
+            setFormData({
+                title: transaction.title,
+                transactionType: transaction.type,
+                amount: transaction.amount.toString(),
+                date: new Date(transaction.date),
+                category: transaction.category_id,
+                tags: transaction.tags || []
+            })
+        } else {
+            // create 모드일 때는 초기화
+            setFormData({
+                title: "",
+                transactionType: "",
+                amount: "",
+                date: new Date(),
+                category: "",
+                tags: []
+            })
+        }
+    }, [mode, transaction])
     const formatDate = (date: Date) => {
         const year = date.getFullYear()
         const month = date.getMonth() + 1
@@ -124,29 +132,44 @@ export default function TransactionSubmitForm({
             const {data:{user}, error: authError } = await supabase.auth.getUser();
             if(!user||authError ){
                 toast.warning('로그인이 필요합니다')
+                return
             }
             const formattedDate = formData.date.toISOString().split('T')[0]
 
-            const { data, error } = await supabase
-                .from('transactions')
-                .insert({
-                    user_id: user?.id,
-                    title: formData.title.trim(),
-                    type: formData.transactionType,
-                    amount: Number(formData.amount),
-                    date: formattedDate,
-                    category_id: formData.category,
-                    tags: formData.tags.length > 0 ? formData.tags : null
-                })
-                .select()
+            const transactionData = {
+                user_id: user.id,
+                title: formData.title.trim(),
+                type: formData.transactionType,
+                amount: Number(formData.amount),
+                date: formattedDate,
+                category_id: formData.category,
+                tags: formData.tags.length > 0 ? formData.tags : null
+            }
 
-                if (error) {
-                    console.error('Insert error:', error)
-                    toast.warning("저장 실패 \n" + error.message)
+            if (mode === 'create') {
+                const { error } = await supabase
+                    .from('transactions')
+                    .insert(transactionData)
+                    .select()
+
+                if(error) {
+                    toast.warning("저장 실패")
                     return
                 }
 
-            toast("가계부 작성을 완료했습니다")
+                toast.success("가계부 작성을 완료했습니다")
+            } else {
+                const { error } = await supabase
+                    .from('transactions')
+                    .update(transactionData)
+                    .eq('id', transaction!.id)
+
+                if (error) {
+                    toast.warning("수정 실패")
+                    return
+                }
+                toast.success("가계부 수정을 완료했습니다")
+            }
 
             setFormData({
                 title: "",
@@ -158,7 +181,8 @@ export default function TransactionSubmitForm({
             })
             setTagInput("")
             setError(null)
-
+            onSuccess()
+            onClose()
         }catch(error){
             console.log('error')
         }

@@ -22,6 +22,14 @@ export default function Page() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>()
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const handleSelectTransaction = (transaction: Transaction) => {
+    console.log(transaction)
+    setSelectedTransaction(transaction)
+    setFormMode('edit')
+    setIsSidebarOpen(true)
+  }
 
   const handleCreateNew = () => {
     setSelectedTransaction(undefined)
@@ -33,10 +41,14 @@ export default function Page() {
     setIsSidebarOpen(false)
   }
 
+  const handleSuccess = () => {
+    setRefreshKey(prev => prev + 1)
+  }
+
   return(
       <div className="relative flex h-screen overflow-hidden">
         <div className="flex-1 overflow-auto">
-          <TransactionList />
+          <TransactionList key={refreshKey} onSelectTransaction={handleSelectTransaction} />
           
           <Button
             onClick={handleCreateNew}
@@ -65,6 +77,7 @@ export default function Page() {
             mode={formMode}
             transaction={selectedTransaction}
             onClose={handleClose}
+            onSuccess={handleSuccess}
           />
         </div>
     </div>

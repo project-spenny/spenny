@@ -28,6 +28,11 @@ interface Transaction {
   tags : string[]
 }
 
+interface TransactionListProps {
+  onSelectTransaction: (transaction: Transaction) => void
+  refreshKey?: number
+}
+
 const dummyTransactions = [
   { title:'점심 식사', category_id: 'cat-001', type: 'expense', date: '2024-12-23', amount: 15000 },
   { title:'출/퇴근 교통비', category_id: 'cat-002', type: 'expense', date: '2024-12-22', amount: 3500 },
@@ -39,8 +44,7 @@ const dummyTransactions = [
 ]
 
 
-export const TransactionList = () => {
-
+export const TransactionList = ({ onSelectTransaction, refreshKey }: TransactionListProps ) => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
 
     useEffect(()=>{
@@ -61,7 +65,7 @@ export const TransactionList = () => {
             }
         }
         fetchTransactions();
-    },[])
+    },[refreshKey])
 
 
 
@@ -80,7 +84,7 @@ export const TransactionList = () => {
                     </div>
                     <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
                     <ItemActions className="ml-auto">
-                        <Button className="cursor-pointer" size="sm">
+                        <Button className="cursor-pointer" size="sm" onClick={()=>onSelectTransaction(e)}>
                             <ChevronRight/>
                         </Button>
                     </ItemActions>
