@@ -5,6 +5,7 @@ import DrawerBottom from '@/components/common/DrawerBottom';
 import ResponsiveWrapper from '@/components/common/ResponsiveWrapper';
 import SheetSide from '@/components/common/SheetSide';
 import { Transaction } from '@/types/testTransaction';
+import TransactionSection from './TransactionSection';
 import { useState } from 'react';
 
 const TransactionPanel = ({ data }: { data: Transaction[] }) => {
@@ -15,11 +16,9 @@ const TransactionPanel = ({ data }: { data: Transaction[] }) => {
       <Button onClick={() => setIsPanelOpen(true)}>거래 내역 보기</Button>
       <ResponsiveWrapper
         mobile={
-          <DrawerBottom
-            data={data}
-            open={isPanelOpen}
-            onOpenChange={setIsPanelOpen}
-          />
+          <DrawerBottom open={isPanelOpen} onOpenChange={setIsPanelOpen}>
+            <TransactionSection data={data} />
+          </DrawerBottom>
         }
         desktop={
           <SheetSide

@@ -24,19 +24,20 @@ const SheetSide = ({ data, open, onOpenChange }: PanelProps<Transaction[]>) => {
         side="right"
         className="flex w-[540px] max-w-none flex-col outline-none sm:max-w-none"
       >
-        {/* 헤더 영역: 날짜 및 닫기 버튼 */}
-        <SheetHeader className="flex shrink-0 justify-between border-b p-4">
-          <SheetClose asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 cursor-pointer rounded-full"
-            >
-              <ChevronsRight size={20} />
-            </Button>
-          </SheetClose>
+        <SheetClose asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="m-4 h-10 w-10 cursor-pointer rounded-full"
+          >
+            <ChevronsRight size={20} />
+          </Button>
+        </SheetClose>
+        <SheetTitle />
 
-          <div className="pl-2 text-left">
+        {/* 헤더 영역 */}
+        <SheetHeader className="flex shrink-0 flex-row items-center justify-between border-b px-6 py-4">
+          <div className="text-left">
             {/* TODO: 선택된 날짜 데이터(item.date) 연동 및 포맷팅 필요 */}
             <SheetTitle className="py-2 text-xl font-bold">
               12월 24일 수요일
@@ -46,9 +47,9 @@ const SheetSide = ({ data, open, onOpenChange }: PanelProps<Transaction[]>) => {
             </SheetDescription>
           </div>
 
-          <SheetDescription className="text-right">
-            총 {totalCount}개
-          </SheetDescription>
+          <div className="flex h-full items-end">
+            <SheetDescription>총 {totalCount}개</SheetDescription>
+          </div>
         </SheetHeader>
 
         {/* 콘텐츠 영역: 거래 내역 영역 */}
