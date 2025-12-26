@@ -25,6 +25,7 @@ const DrawerBottom = ({ children, open, onOpenChange }: PanelProps) => {
             <X />
           </Button>
         </DrawerClose>
+
         {children}
       </DrawerContent>
     </Drawer>

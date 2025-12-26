@@ -1,10 +1,3 @@
-import {
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
-
 import { Button } from '../ui/button';
 import { CATEGORY_MAP } from '@/constants/dummyData';
 import { ChevronRight } from 'lucide-react';
@@ -21,18 +14,21 @@ const TransactionSection = ({ data }: { data: Transaction[] }) => {
   return (
     <>
       {/* 헤더 영역 */}
-      <DrawerHeader className="flex shrink-0 flex-row items-center justify-between border-b">
+      <div className="flex shrink-0 flex-row items-center justify-between border-b p-4">
         <div className="text-left">
-          <DrawerTitle className="py-2 text-xl font-bold">{title}</DrawerTitle>
-          <DrawerDescription>
+          {/* Title */}
+          <div className="text-foreground py-2 text-xl font-bold">{title}</div>
+          {/* SubTitle */}
+          <div className="text-muted-foreground text-sm">
             해당 날짜 거래 내역을 확인할 수 있습니다.
-          </DrawerDescription>
+          </div>
         </div>
 
         <div className="flex h-full items-end">
-          <DrawerDescription>총 {totalCount}개</DrawerDescription>
+          {/* 총 개수 */}
+          <div className="text-muted-foreground text-sm">총 {totalCount}개</div>
         </div>
-      </DrawerHeader>
+      </div>
 
       {/* 콘텐츠 영역: 거래 내역 영역 */}
       {totalCount > 0 ? (
@@ -50,7 +46,7 @@ const TransactionSection = ({ data }: { data: Transaction[] }) => {
       )}
 
       {/* 푸터 영역: 이번 달 거래 내역 버튼 */}
-      <DrawerFooter className="shrink-0 border-t p-6">
+      <div className="shrink-0 border-t p-6">
         <Button
           variant="outline"
           className="h-14 w-full cursor-pointer text-base"
@@ -58,7 +54,7 @@ const TransactionSection = ({ data }: { data: Transaction[] }) => {
         >
           <Link href="/history">이번 달 거래 내역 보러가기</Link>
         </Button>
-      </DrawerFooter>
+      </div>
     </>
   );
 };
