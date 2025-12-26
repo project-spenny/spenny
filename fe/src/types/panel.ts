@@ -6,5 +6,3 @@ export interface PanelProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-export type PanelType = 'Sheet' | 'Drawer';
