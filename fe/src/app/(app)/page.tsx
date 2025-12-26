@@ -1,5 +1,5 @@
 import { DUMMY_TRANSACTIONS } from '@/constants/dummyData';
-import LogoutButton from '@/components/LogoutButton';
+import LogoutButton from '@/components/my-info/LogoutButton';
 import TransactionPanel from '@/components/common/TransactionPanel';
 
 export default function Home() {
