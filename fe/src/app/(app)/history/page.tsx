@@ -48,7 +48,7 @@ export default function Page() {
   return(
       <div className="relative flex h-screen overflow-hidden">
         <div className="flex-1 overflow-auto">
-          <TransactionList key={refreshKey} onSelectTransaction={handleSelectTransaction} />
+          <TransactionList refreshKey={refreshKey} onSelectTransaction={handleSelectTransaction} />
           
           <Button
             onClick={handleCreateNew}
