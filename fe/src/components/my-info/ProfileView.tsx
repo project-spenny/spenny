@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { ProfileFormValues } from '@/schemas/profile';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 type ProfileViewProps = {
   profile: ProfileFormValues;
@@ -17,7 +18,10 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
     <section className="flex gap-4">
       {/* 왼쪽: 프로필 이미지 */}
       <div className="shrink-0">
-        <div className="bg-muted relative h-16 w-16 overflow-hidden rounded-full border"></div>
+        <Avatar className="h-16 w-16">
+          <AvatarImage src="" alt="프로필 이미지" />
+          <AvatarFallback>ME</AvatarFallback>
+        </Avatar>
       </div>
 
       {/* 오른쪽: 정보 */}
