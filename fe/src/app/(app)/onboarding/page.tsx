@@ -9,9 +9,10 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import ProfileForm, {
-  type ProfileFormValues,
-} from '@/components/onboarding/ProfileForm';
+
+import ProfileForm from '@/components/onboarding/ProfileForm';
+import { ProfileFormValues } from '@/schemas/profile';
+
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
 
@@ -21,7 +22,6 @@ export default function OnboardingPage() {
   const [phase, setPhase] = useState<'form' | 'intro'>('form');
   const [introStep, setIntroStep] = useState(0);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const exitOnboarding = () => {
@@ -29,28 +29,23 @@ export default function OnboardingPage() {
   };
 
   const handleProfileSubmit = async (values: ProfileFormValues) => {
-    try {
-      setIsSubmitting(true);
-      setServerError(null); // 서버 에러 상태 초기화
+    setServerError(null); // 서버 에러 상태 초기화
 
-      // 서버에 프로필 정보 저장
-      const res = await fetch('/api/onboarding/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
+    // 서버에 프로필 정보 저장
+    const res = await fetch('/api/onboarding/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
 
-      if (!res.ok) {
-        setServerError('저장에 실패했어요. 잠시 후 다시 시도해주세요.');
-        return;
-      }
-
-      // 온보딩 소개 단계로 전환
-      setIntroStep(0);
-      setPhase('intro');
-    } finally {
-      setIsSubmitting(false);
+    if (!res.ok) {
+      setServerError('저장에 실패했어요. 잠시 후 다시 시도해주세요.');
+      return;
     }
+
+    // 온보딩 소개 단계로 전환
+    setIntroStep(0);
+    setPhase('intro');
   };
 
   // 온보딩 단계 이동 함수
@@ -101,7 +96,11 @@ export default function OnboardingPage() {
 
               {phase === 'form' ? (
                 <ProfileForm
-                  isSubmitting={isSubmitting}
+                  defaultValues={{
+                    nickname: '',
+                    birth_date: '',
+                    gender: 'male',
+                  }}
                   onSubmit={handleProfileSubmit}
                 />
               ) : (
