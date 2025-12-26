@@ -1,4 +1,4 @@
-export type Gender = 'male' | 'female' | 'none';
+export type Gender = 'male' | 'female';
 
 export type FormErrors = Partial<{
   nickname: string;

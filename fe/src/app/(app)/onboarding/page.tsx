@@ -22,7 +22,7 @@ export default function OnboardingPage() {
 
   const [nickname, setNickname] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [gender, setGender] = useState<Gender>('none');
+  const [gender, setGender] = useState<Gender>('male');
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,7 +51,6 @@ export default function OnboardingPage() {
     if (!birthDate.trim()) next.birth_date = '생년월일을 입력해주세요.';
     else if (!isValidBirthDate(birthDate.trim()))
       next.birth_date = 'YYYY-MM-DD 형식으로 입력해주세요.';
-    if (gender === 'none') next.gender = '성별을 선택해주세요.';
 
     setErrors(next);
     return Object.keys(next).length === 0;
