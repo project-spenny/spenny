@@ -1,9 +1,9 @@
 'use client';
 
-import DrawerBottom from '@/components/common/DrawerBottom';
+import DrawerBottom from '@/components/panel/DrawerBottom';
 import { ResponsivePanelProps } from '@/types/panel';
-import ResponsiveWrapper from '@/components/common/ResponsiveWrapper';
-import SheetSide from '@/components/common/SheetSide';
+import ResponsiveWrapper from '@/components/panel/ResponsiveWrapper';
+import SheetSide from '@/components/panel/SheetSide';
 import { useState } from 'react';
 
 const ResponsivePanel = ({
