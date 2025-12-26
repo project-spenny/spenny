@@ -1,50 +1,64 @@
 'use client';
 
+import { z } from 'zod';
+import { useForm, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FormErrors, Gender } from '@/types/onboarding';
+
+const profileSchema = z.object({
+  nickname: z.string().trim().min(1, '닉네임을 입력이 필요합니다.'),
+  birth_date: z
+    .string()
+    .trim()
+    .min(1, '생년월일 입력이 필요합니다.')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'YYYY-MM-DD 형식으로 입력해주세요.'),
+  gender: z.enum(['male', 'female']),
+});
+
+export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 type ProfileFormProps = {
-  nickname: string;
-  birthDate: string;
-  gender: Gender;
-  errors: FormErrors;
   isSubmitting: boolean;
-
-  onChangeNickname: (v: string) => void;
-  onChangeBirthDate: (v: string) => void;
-  onChangeGender: (v: Gender) => void;
-
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (data: ProfileFormValues) => void;
 };
 
 export default function ProfileForm({
-  nickname,
-  birthDate,
-  gender,
-  errors,
   isSubmitting,
-  onChangeNickname,
-  onChangeBirthDate,
-  onChangeGender,
   onSubmit,
 }: ProfileFormProps) {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    formState: { errors },
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      nickname: '',
+      birth_date: '',
+      gender: 'male',
+    },
+  });
+
+  const gender = useWatch({ control, name: 'gender' });
+
   return (
-    <form className="space-y-6" onSubmit={onSubmit}>
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-2">
         <Label htmlFor="nickname">닉네임</Label>
         <Input
           id="nickname"
           placeholder="닉네임을 입력해주세요."
-          value={nickname}
-          onChange={(e) => {
-            onChangeNickname(e.target.value);
-          }}
+          {...register('nickname')}
         />
-        {errors.nickname ? (
-          <p className="text-sm text-red-500">{errors.nickname}</p>
+        {errors.nickname?.message ? (
+          <p className="text-sm text-red-500">{errors.nickname.message}</p>
         ) : null}
       </div>
 
@@ -53,13 +67,10 @@ export default function ProfileForm({
         <Input
           id="birth"
           placeholder="YYYY-MM-DD"
-          value={birthDate}
-          onChange={(e) => {
-            onChangeBirthDate(e.target.value);
-          }}
+          {...register('birth_date')}
         />
-        {errors.birth_date ? (
-          <p className="text-sm text-red-500">{errors.birth_date}</p>
+        {errors.birth_date?.message ? (
+          <p className="text-sm text-red-500">{errors.birth_date.message}</p>
         ) : null}
       </div>
 
@@ -68,9 +79,11 @@ export default function ProfileForm({
           <Label>성별</Label>
           <RadioGroup
             value={gender}
-            onValueChange={(v) => {
-              onChangeGender(v as Gender);
-            }}
+            onValueChange={(v) =>
+              setValue('gender', v as 'male' | 'female', {
+                shouldValidate: true,
+              })
+            }
             className="flex gap-6"
           >
             <div className="flex items-center space-x-2">
@@ -84,8 +97,8 @@ export default function ProfileForm({
             </div>
           </RadioGroup>
         </div>
-        {errors.gender ? (
-          <p className="text-sm text-red-500">{errors.gender}</p>
+        {errors.gender?.message ? (
+          <p className="text-sm text-red-500">{errors.gender.message}</p>
         ) : null}
       </div>
 
