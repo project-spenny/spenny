@@ -1,29 +1,36 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import DrawerBottom from '@/components/common/DrawerBottom';
 import ResponsiveWrapper from '@/components/common/ResponsiveWrapper';
 import SheetSide from '@/components/common/SheetSide';
-import { Transaction } from '@/types/testTransaction';
-import TransactionSection from './TransactionSection';
 import { useState } from 'react';
 
-const TransactionPanel = ({ data }: { data: Transaction[] }) => {
+interface ResponsivePanelProps {
+  trigger: React.ReactNode; // 패널을 열 버튼 등 트리거
+  children: React.ReactNode; // 패널 내부에 들어갈 내용
+}
+
+const ResponsivePanel = ({ trigger, children }: ResponsivePanelProps) => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <>
-      <Button onClick={() => setIsPanelOpen(true)}>거래 내역 보기</Button>
+      <div
+        className="inline-block cursor-pointer"
+        onClick={() => setIsPanelOpen(true)}
+      >
+        {trigger}
+      </div>
 
       <ResponsiveWrapper
         mobile={
           <DrawerBottom open={isPanelOpen} onOpenChange={setIsPanelOpen}>
-            <TransactionSection data={data} />
+            {children}
           </DrawerBottom>
         }
         desktop={
           <SheetSide open={isPanelOpen} onOpenChange={setIsPanelOpen}>
-            <TransactionSection data={data} />
+            {children}
           </SheetSide>
         }
       />
@@ -31,4 +38,4 @@ const TransactionPanel = ({ data }: { data: Transaction[] }) => {
   );
 };
 
-export default TransactionPanel;
+export default ResponsivePanel;
