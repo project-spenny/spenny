@@ -1,10 +1,13 @@
+import { DUMMY_TRANSACTIONS } from '@/constants/dummyData';
 import LogoutButton from '@/components/LogoutButton';
+import TransactionPanel from '@/components/common/TransactionPanel';
 
 export default function Home() {
   return (
-    <div>
-      Home
+    <main>
+      가계부 홈
       <LogoutButton />
-    </div>
+      <TransactionPanel data={DUMMY_TRANSACTIONS} />
+    </main>
   );
 }
