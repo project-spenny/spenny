@@ -22,18 +22,21 @@ export default function MyInfo() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex h-full flex-col p-4">
       {/* 사용자 정보 영역 */}
-      {isEditing ? (
-        <ProfileEdit profile={profile} onSave={handleSaveProfile} />
-      ) : (
-        <ProfileView profile={profile} onEdit={() => setIsEditing(true)} />
-      )}
+      <div className="flex flex-col gap-6 p-4">
+        {isEditing ? (
+          <ProfileEdit profile={profile} onSave={handleSaveProfile} />
+        ) : (
+          <ProfileView profile={profile} onEdit={() => setIsEditing(true)} />
+        )}
+      </div>
       <Separator />
+
       {/* 로그아웃 */}
-      <section className="flex flex-col gap-2">
+      <div className="mt-auto ml-auto">
         <LogoutButton />
-      </section>
+      </div>
     </div>
   );
 }
