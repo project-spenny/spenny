@@ -67,6 +67,7 @@ export default function ProfileForm({
             onValueChange={(v) =>
               setValue('gender', v as 'male' | 'female', {
                 shouldValidate: true,
+                shouldDirty: true,
               })
             }
             className="flex gap-6"
