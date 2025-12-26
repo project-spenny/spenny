@@ -71,7 +71,7 @@ export const TransactionList = ({ onSelectTransaction, refreshKey }: Transaction
 
 
     return (
-        <div className="space-y-6 max-w-md mx-auto p-6">
+        <div className="min-h-screen space-y-6 w-full max-w-lg mx-auto p-4 md:p-6 lg:p-8">
             <Label className="text-xl">가계부</Label>
             {transactions.map((e,index)=>(
             <Item variant="outline" key={index}>

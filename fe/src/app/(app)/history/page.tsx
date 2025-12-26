@@ -46,40 +46,30 @@ export default function Page() {
   }
 
   return(
-      <div className="relative flex h-screen overflow-hidden">
-        <div className="flex-1 overflow-auto">
-          <TransactionList refreshKey={refreshKey} onSelectTransaction={handleSelectTransaction} />
-          
-          <Button
-            onClick={handleCreateNew}
-            className="fixed bottom-6 right-6 rounded-full w-14 h-14 md:bottom-8 md:right-8 z-30"
-            size="icon"
-          >
-            <Plus/>
-          </Button>
-        </div>
+      <>
+        <div className="flex w-full h-screen overflow-hidden border-2">
+          <div className="flex-1 overflow-auto">
+            <Button
+              onClick={handleCreateNew}
+              className="rounded-full w-12 h-12 z-50 mr-4"
+              size="icon"
+            >
+              <Plus/>
+            </Button>
+            <TransactionList refreshKey={refreshKey} onSelectTransaction={handleSelectTransaction} />
+          </div>
 
-        {/* moblie */}
-        {isSidebarOpen && (
-          <div 
-            className="fixed bg-black z-20 md:hidden"
-            onClick={handleClose}
-          />
-        )}
-
-        <div
-          className={`fixed right-0 top-0 h-full bg-white z-10 w-full md:w-96
-            ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
-            border-l shadow-2xl
-          `}
-        >
-          <TransactionSubmitForm
-            mode={formMode}
-            transaction={selectedTransaction}
-            onClose={handleClose}
-            onSuccess={handleSuccess}
-          />
+          {isSidebarOpen && (
+            <div className="w-96 border-l shadow-2xl overflow-auto bg-white">
+              <TransactionSubmitForm
+                mode={formMode}
+                transaction={selectedTransaction}
+                onClose={handleClose}
+                onSuccess={handleSuccess}
+              />
+            </div>
+          )}
         </div>
-    </div>
+      </>
   )
 }
