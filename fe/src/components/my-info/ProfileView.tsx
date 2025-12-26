@@ -5,13 +5,14 @@ import { ProfileFormValues } from '@/schemas/profile';
 
 type ProfileViewProps = {
   profile: ProfileFormValues;
+  onEdit: () => void;
 };
 
 const genderLabel = (gender: ProfileFormValues['gender']) => {
   return gender === 'male' ? '남' : '여';
 };
 
-export default function ProfileView({ profile }: ProfileViewProps) {
+export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
   return (
     <section className="flex gap-4">
       {/* 왼쪽: 프로필 이미지 */}
@@ -28,12 +29,12 @@ export default function ProfileView({ profile }: ProfileViewProps) {
           {/* 생년월일 / 성별 */}
           <div className="text-muted-foreground flex flex-col gap-1 text-sm">
             <div className="flex gap-2">
-              <span className="shrink-0">생년월일</span>
+              <span className="shrink-0">생년월일 :</span>
               <span className="text-foreground/80">{profile.birth_date}</span>
             </div>
 
             <div className="flex gap-2">
-              <span className="shrink-0">성별</span>
+              <span className="shrink-0">성별 :</span>
               <span className="text-foreground/80">
                 {genderLabel(profile.gender)}
               </span>
@@ -43,7 +44,7 @@ export default function ProfileView({ profile }: ProfileViewProps) {
 
         {/* 수정 버튼 */}
         <div className="flex justify-end">
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={onEdit}>
             정보 수정
           </Button>
         </div>
