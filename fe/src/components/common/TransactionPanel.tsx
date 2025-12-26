@@ -14,6 +14,7 @@ const TransactionPanel = ({ data }: { data: Transaction[] }) => {
   return (
     <>
       <Button onClick={() => setIsPanelOpen(true)}>거래 내역 보기</Button>
+
       <ResponsiveWrapper
         mobile={
           <DrawerBottom open={isPanelOpen} onOpenChange={setIsPanelOpen}>
@@ -21,11 +22,9 @@ const TransactionPanel = ({ data }: { data: Transaction[] }) => {
           </DrawerBottom>
         }
         desktop={
-          <SheetSide
-            data={data}
-            open={isPanelOpen}
-            onOpenChange={setIsPanelOpen}
-          />
+          <SheetSide open={isPanelOpen} onOpenChange={setIsPanelOpen}>
+            <TransactionSection data={data} />
+          </SheetSide>
         }
       />
     </>
