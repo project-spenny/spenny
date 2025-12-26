@@ -184,7 +184,7 @@ export default function TransactionSubmitForm({
             onSuccess()
             onClose()
         }catch(error){
-            console.log('error')
+            toast.warning("수정 실패")
         }
     }
 
@@ -200,7 +200,6 @@ export default function TransactionSubmitForm({
                 .eq('id', transaction.id)
 
             if (error) {
-                console.log(error)
                 toast.warning("삭제에 실패했습니다")
                 return
             }
@@ -209,10 +208,10 @@ export default function TransactionSubmitForm({
             onSuccess()
             onClose()
         } catch (error) {
-            console.error(error)
             toast.error("오류가 발생했습니다")
         }
     }
+
     const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault()
@@ -406,6 +405,7 @@ export default function TransactionSubmitForm({
                 <Button
                     type="submit"
                     className="flex-1"
+                    onClick={(e)=>handleSubmit(e)}
                 >
                     {mode === 'create' ? '저장' : '수정'}
                 </Button>
