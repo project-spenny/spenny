@@ -8,7 +8,7 @@ import { Button } from "../ui/button"
 import { supabase } from "@/utils/supabase/client"
 import { toast } from "sonner"
 import { Trash } from "lucide-react"
-CalendarIcon
+import { CATEGORIES } from "@/constants/categories"
 import {
   Popover,
   PopoverContent,
@@ -38,21 +38,9 @@ interface TransactionsSubmitFormProps {
     onClose : ()=> void
     onSuccess : ()=> void
 }
-const CATEGORIES = [
-    { id: "3de48bfe-69d9-4dbb-9a5d-ecdb807212f2", name: "식비", type: "expense" },
-    { id: "fd66cd8e-83bc-4720-8d71-34046524a849", name: "의료비", type: "expense" },
-    { id: "d9f8e176-2594-4a5c-a089-d6cae2fd97ff", name: "쇼핑", type: "expense" },
-    { id: "2f7b8dc5-9c32-4065-ac70-0edc3a02502c", name: "주거비", type: "expense" },
-    { id: "0f93d6d5-5fd0-416a-b9b0-2e42539c0ad9", name: "교통비", type: "expense" },
-    { id: "bee38c89-2393-4f72-8d77-314ca2b9c7e6", name: "문화생활", type: "expense" },
-    { id: "92a9dabd-ca15-420e-be12-2b34ab37dfb3", name: "통신비", type: "expense" },
-    { id: "94b763c9-48cd-4435-b21b-d93a41dd49da", name: "교육비", type: "expense" },
-    { id: "fb48697f-5cae-41e3-869b-0c4922523955", name: "기타", type: "expense" }
-]
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
-
     const [formData, setFormData] = useState({
             title: "",
             transactionType: "",
@@ -287,6 +275,41 @@ export default function TransactionSubmitForm({
                     </button>
                 </div>
             </div>
+            {
+                formData.transactionType !=="" && (
+                    <div className="space-y-2">
+                        <Label>카테고리</Label>
+                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                >
+                                    {formData.category === "" 
+                                        ? "선택" 
+                                        : (formData.transactionType === "income" 
+                                            ? CATEGORIES.income 
+                                            : CATEGORIES.expense
+                                        ).find(cat => cat.category_key === formData.category)?.name_ko || "선택"
+                                    }
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <div className="grid grid-cols-3">
+                                    {(formData.transactionType==="income" ? CATEGORIES.income : CATEGORIES.expense).map((cat)=>(
+                                        <div
+                                            onClick={()=>{
+                                                setFormData(prev => ({...prev, category: cat.category_key}))
+                                                setCategoryOpen(false)}}
+                                            className="flex items-center justify-center text-center w-24 h-16 cursor-pointer text-sm hover:bg-gray-100" key={cat.category_key}>{cat.name_ko}</div>
+                                    ))}
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                )
+            }
+
 
             {/* 금액 입력 */}
             <div className="space-y-2">
@@ -325,31 +348,7 @@ export default function TransactionSubmitForm({
                 </Popover>
             </div>
 
-            <div className="space-y-2">
-                <Label>카테고리</Label>
-                <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                    <PopoverTrigger asChild>
-                        <Button
-                            type="button"
-                            variant="outline"
-                        >
-                            선택
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <div className="grid grid-cols-3">
-                            {CATEGORIES.map((cat)=>(
-                                <div
-                                    onClick={()=>{
-                                        setFormData(prev => ({...prev, category: cat.id}))
-                                        setCategoryOpen(false)}}
-                                    className="text-center w-16 h-16 cursor-pointer" key={cat.id}>{cat.name}</div>
-                            ))}
-                        </div>
-                    </PopoverContent>
-                </Popover>
-                <div>{formData.category}</div>
-
+            
                 {/* 태그 */}
                 <div className="space-y-2">
                 <Label>태그 (선택사항)</Label>
@@ -409,7 +408,6 @@ export default function TransactionSubmitForm({
                 >
                     {mode === 'create' ? '저장' : '수정'}
                 </Button>
-            </div>
             </div>
         </form>
     )
