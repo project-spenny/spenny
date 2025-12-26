@@ -188,6 +188,31 @@ export default function TransactionSubmitForm({
         }
     }
 
+    const handleDelete = async () => {
+        if(!transaction) return;
+
+        if (!confirm("삭제하시겠습니까?")) return
+
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .delete()
+                .eq('id', transaction.id)
+
+            if (error) {
+                console.log(error)
+                toast.warning("삭제에 실패했습니다")
+                return
+            }
+
+            toast.success("기록이 삭제되었습니다")
+            onSuccess()
+            onClose()
+        } catch (error) {
+            console.error(error)
+            toast.error("오류가 발생했습니다")
+        }
+    }
     const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault()
@@ -372,7 +397,7 @@ export default function TransactionSubmitForm({
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={()=>{}}
+                        onClick={()=>handleDelete()}
                         className="w-10"
                     >
                         <Trash/>
