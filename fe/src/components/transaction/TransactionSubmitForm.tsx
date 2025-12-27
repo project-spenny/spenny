@@ -1,11 +1,14 @@
 'use client'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import { Input } from "../ui/input"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "../ui/button"
-CalendarIcon
+import { supabase } from "@/utils/supabase/client"
+import { toast } from "sonner"
+import { Trash } from "lucide-react"
+import { CATEGORIES } from "@/constants/categories"
 import {
   Popover,
   PopoverContent,
@@ -14,27 +17,65 @@ import {
 import { CalendarIcon } from "lucide-react"
 import { X } from "lucide-react"
 
-const DUMMY_CATEGORIES = [
-    "식비",
-    "의료비",
-    "쇼핑",
-    "교통비",
-    "공과금",
-    "월세",
-    "이자",
-    "송금",
-    "기타"
-]
-export default function TransactionSubmitForm() {
-    const [title, setTitle] = useState<string>("")
-    const [transactionType, setTransactionType] = useState<string>("")
-    const [amount, setAmount] = useState<string>("")
-    const [date, setDate] = useState<Date>(new Date())
-    const [category, setCategory] = useState<string>("")
+interface Transaction {
+  id: string
+  title: string
+  user_id : string
+  category_id: string
+  type: 'income' | 'expense'
+  date: string
+  amount: number
+  fixed_rule_id : string|null
+  memo : string | null
+  created_at : Date
+  updated_at : Date
+  tags : string[]
+}
+
+interface TransactionsSubmitFormProps {
+    mode : 'create' | 'edit'
+    transaction? : Transaction
+    onClose : ()=> void
+    onSuccess : ()=> void
+}
+export default function TransactionSubmitForm({
+    mode, transaction, onClose, onSuccess
+} : TransactionsSubmitFormProps) {
+    const [formData, setFormData] = useState({
+            title: "",
+            transactionType: "",
+            amount: "",
+            date: new Date(),
+            category: "",
+            tags: [] as string[]
+    })
+
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [tagInput, setTagInput] = useState<string>("")
-    const [tags, setTags] = useState<string[]>([])
+    const [error, setError]= useState<string | null>();
 
+    useEffect(() => {
+        if (mode === 'edit' && transaction) {
+            setFormData({
+                title: transaction.title,
+                transactionType: transaction.type,
+                amount: transaction.amount.toString(),
+                date: new Date(transaction.date),
+                category: transaction.category_id,
+                tags: transaction.tags || []
+            })
+        } else {
+            // create 모드일 때는 초기화
+            setFormData({
+                title: "",
+                transactionType: "",
+                amount: "",
+                date: new Date(),
+                category: "",
+                tags: []
+            })
+        }
+    }, [mode, transaction])
     const formatDate = (date: Date) => {
         const year = date.getFullYear()
         const month = date.getMonth() + 1
@@ -42,12 +83,128 @@ export default function TransactionSubmitForm() {
         return `${year}년 ${month}월 ${day}일`
     }
 
-    const handleSubmit = ()=>{
-        console.log('submit')
+    const validateFormData =()=>{
+        if(!formData.title.trim()){
+            const errorMsg = "제목을 입력해주세요";
+            return errorMsg;
+        }else if(formData.title.trim().length>20){
+            const errorMsg = "제목은 20자 이내로  입력해주세요"
+            return errorMsg;
+        }
+
+        if(!formData.transactionType){
+            const errorMsg = "거래 유형을 선택해주세요";
+            return errorMsg;
+        }
+
+        if(!formData.category){
+            const errorMsg = "카테고리를 선택해주세요";
+            return errorMsg;
+        }
+
+        if(!formData.amount || Number(formData.amount)<=0){
+            const errorMsg = "금액은 0보다 커야 합니다"
+            return errorMsg;
+        }
+        return null;
+
+    }
+    const handleSubmit = async(e: React.FormEvent)=>{
+        e.preventDefault();
+        const errorMsg = validateFormData();
+        if (errorMsg) {
+            toast(errorMsg)
+            return
+        }
+        try{
+            const {data:{user}, error: authError } = await supabase.auth.getUser();
+            if(!user||authError ){
+                toast.warning('로그인이 필요합니다')
+                return
+            }
+            const formattedDate = formData.date.toISOString().split('T')[0]
+
+            const transactionData = {
+                user_id: user.id,
+                title: formData.title.trim(),
+                type: formData.transactionType,
+                amount: Number(formData.amount),
+                date: formattedDate,
+                category_id: formData.category,
+                tags: formData.tags.length > 0 ? formData.tags : null
+            }
+
+            if (mode === 'create') {
+                const { error } = await supabase
+                    .from('transactions')
+                    .insert(transactionData)
+                    .select()
+
+                if(error) {
+                    toast.warning("저장 실패")
+                    return
+                }
+
+                toast.success("가계부 작성을 완료했습니다")
+            } else {
+                const { error } = await supabase
+                    .from('transactions')
+                    .update(transactionData)
+                    .eq('id', transaction!.id)
+
+                if (error) {
+                    toast.warning("수정 실패")
+                    return
+                }
+                toast.success("가계부 수정을 완료했습니다")
+            }
+
+            setFormData({
+                title: "",
+                transactionType: "",
+                amount: "",
+                date: new Date(),
+                category: "",
+                tags: []
+            })
+            setTagInput("")
+            setError(null)
+            onSuccess()
+            onClose()
+        }catch(error){
+            toast.warning("수정 실패")
+        }
+    }
+
+    const handleDelete = async () => {
+        if(!transaction) return;
+
+        if (!confirm("삭제하시겠습니까?")) return
+
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .delete()
+                .eq('id', transaction.id)
+
+            if (error) {
+                toast.warning("삭제에 실패했습니다")
+                return
+            }
+
+            toast.success("기록이 삭제되었습니다")
+            onSuccess()
+            onClose()
+        } catch (error) {
+            toast.error("오류가 발생했습니다")
+        }
     }
 
     const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
+            if (e.nativeEvent.isComposing) {
+                return;
+            }   
             e.preventDefault()
             addTag()
         }
@@ -55,27 +212,39 @@ export default function TransactionSubmitForm() {
     
     const addTag = () => {
         const trimmedTag = tagInput.trim()
-        if (trimmedTag && !tags.includes(trimmedTag)) {
-            setTags([...tags, trimmedTag])
+        if (trimmedTag && !formData.tags.includes(trimmedTag)) {
+            setFormData(prev => ({
+                ...prev,
+                tags: [...prev.tags, trimmedTag]
+            }))
             setTagInput("")
         }
     }
     
     const removeTag = (tagToRemove: string) => {
-        setTags(tags.filter(tag => tag !== tagToRemove))
+        setFormData(prev => ({
+            ...prev,
+            tags: prev.tags.filter(tag => tag !== tagToRemove)
+        }))
     }
     return (
         <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
-            <Label htmlFor="transaction-type" className="text-xl">가계부 작성</Label>
-
+            <div className="flex justify-between items-center sticky top-0 bg-white pb-4 border-b">
+                <Label className="text-xl">
+                    {mode === 'create' ? '가계부 작성' : '가계부 수정'}
+                </Label>
+                <Button type="button" variant="ghost" onClick={onClose}>
+                    <X />
+                </Button>
+            </div>
             <div className="space-y-2">
                 <Label>타이틀</Label>
                 <Input
                     id="amount"
                     type="text"
                     placeholder="어떤 지출인가요"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
                 />
             </div>
 
@@ -85,10 +254,10 @@ export default function TransactionSubmitForm() {
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         type="button"
-                        onClick={() => setTransactionType('income')}
+                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'income'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            transactionType === 'income'
+                            formData.transactionType === 'income'
                                 ? "border-gray-500"
                                 : "border-gray-300 hover:border-gray-400"
                         )}
@@ -97,10 +266,10 @@ export default function TransactionSubmitForm() {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setTransactionType('expense')}
+                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'expense'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            transactionType === 'expense'
+                            formData.transactionType === 'expense'
                                 ? "border-gray-500"
                                 : "border-gray-300 hover:border-gray-400"
                         )}
@@ -109,6 +278,41 @@ export default function TransactionSubmitForm() {
                     </button>
                 </div>
             </div>
+            {
+                formData.transactionType !=="" && (
+                    <div className="space-y-2">
+                        <Label>카테고리</Label>
+                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                >
+                                    {formData.category === "" 
+                                        ? "선택" 
+                                        : (formData.transactionType === "income" 
+                                            ? CATEGORIES.income 
+                                            : CATEGORIES.expense
+                                        ).find(cat => cat.category_key === formData.category)?.name_ko || "선택"
+                                    }
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <div className="grid grid-cols-3">
+                                    {(formData.transactionType==="income" ? CATEGORIES.income : CATEGORIES.expense).map((cat)=>(
+                                        <div
+                                            onClick={()=>{
+                                                setFormData(prev => ({...prev, category: cat.category_key}))
+                                                setCategoryOpen(false)}}
+                                            className="flex items-center justify-center text-center w-24 h-16 cursor-pointer text-sm hover:bg-gray-100" key={cat.category_key}>{cat.name_ko}</div>
+                                    ))}
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                )
+            }
+
 
             {/* 금액 입력 */}
             <div className="space-y-2">
@@ -117,8 +321,8 @@ export default function TransactionSubmitForm() {
                     id="amount"
                     type="number"
                     placeholder="금액을 입력하세요"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={formData.amount}
+                    onChange={(e) => setFormData(prev => ({...prev, amount: e.target.value}))}
                     min="0"
                 />
             </div>
@@ -134,44 +338,20 @@ export default function TransactionSubmitForm() {
                             className="w-full justify-start text-left font-normal"
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formatDate(date)}
+                            {formatDate(formData.date)}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                             mode="single"
-                            selected={date}
-                            onSelect={(newDate) => newDate && setDate(newDate)}
+                            selected={formData.date}
+                            onSelect={(newDate) => newDate && setFormData(prev => ({...prev, date: newDate}))}
                         />
                     </PopoverContent>
                 </Popover>
             </div>
 
-            <div className="space-y-2">
-                <Label>카테고리</Label>
-                <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                    <PopoverTrigger asChild>
-                        <Button
-                            type="button"
-                            variant="outline"
-                        >
-                            선택
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <div className="grid grid-cols-3">
-                            {DUMMY_CATEGORIES.map((e,index)=>(
-                                <div
-                                    onClick={()=>{
-                                        setCategory(e)
-                                        setCategoryOpen(false)}}
-                                    className="text-center w-16 h-16 cursor-pointer" key={index}>{e}</div>
-                            ))}
-                        </div>
-                    </PopoverContent>
-                </Popover>
-                <div>{category}</div>
-
+            
                 {/* 태그 */}
                 <div className="space-y-2">
                 <Label>태그 (선택사항)</Label>
@@ -193,9 +373,9 @@ export default function TransactionSubmitForm() {
                         추가
                     </Button>
                 </div>
-                {tags.length > 0 && (
+                {formData.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
-                        {tags.map((tag, index) => (
+                        {formData.tags.map((tag, index) => (
                             <div
                                 key={index}
                                 className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
@@ -213,10 +393,24 @@ export default function TransactionSubmitForm() {
                     </div>
                 )}
             </div>
-
-            <Button type="submit" className="w-full">
-                제출
-            </Button>
+            <div className="flex gap-2 pt-4 sticky bottom-0 bg-background border-t pb-4">
+                {mode === 'edit' && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={()=>handleDelete()}
+                        className="w-10"
+                    >
+                        <Trash/>
+                    </Button>
+                )}
+                <Button
+                    type="submit"
+                    className="flex-1"
+                    onClick={(e)=>handleSubmit(e)}
+                >
+                    {mode === 'create' ? '저장' : '수정'}
+                </Button>
             </div>
         </form>
     )
