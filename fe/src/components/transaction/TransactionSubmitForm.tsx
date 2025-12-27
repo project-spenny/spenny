@@ -111,9 +111,9 @@ export default function TransactionSubmitForm({
     }
     const handleSubmit = async(e: React.FormEvent)=>{
         e.preventDefault();
-
         const errorMsg = validateFormData();
         if (errorMsg) {
+            toast(errorMsg)
             return
         }
         try{
