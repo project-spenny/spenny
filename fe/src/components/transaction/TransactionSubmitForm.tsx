@@ -251,7 +251,7 @@ export default function TransactionSubmitForm({
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         type="button"
-                        onClick={() => setFormData(prev => ({...prev, transactionType: 'income'}))}
+                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'income'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
                             formData.transactionType === 'income'
@@ -263,7 +263,7 @@ export default function TransactionSubmitForm({
                     </button>
                     <button
                         type="button"
-                        onClick={() => setFormData(prev => ({...prev, transactionType: 'expense'}))}
+                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'expense'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
                             formData.transactionType === 'expense'
