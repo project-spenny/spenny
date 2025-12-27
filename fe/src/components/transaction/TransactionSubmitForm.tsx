@@ -202,6 +202,9 @@ export default function TransactionSubmitForm({
 
     const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
+            if (e.nativeEvent.isComposing) {
+                return;
+            }   
             e.preventDefault()
             addTag()
         }
