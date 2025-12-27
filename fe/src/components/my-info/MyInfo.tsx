@@ -77,7 +77,11 @@ export default function MyInfo() {
       {/* 사용자 정보 영역 */}
       <div className="flex flex-col gap-6 p-4">
         {isEditing ? (
-          <ProfileEdit profile={profile} onSave={handleSave} />
+          <ProfileEdit
+            profile={profile}
+            onSave={handleSave}
+            onCancel={() => setIsEditing(false)}
+          />
         ) : (
           <ProfileView profile={profile} onEdit={() => setIsEditing(true)} />
         )}

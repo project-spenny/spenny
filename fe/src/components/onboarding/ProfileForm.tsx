@@ -13,11 +13,16 @@ import { profileSchema, type ProfileFormValues } from '@/schemas/profile';
 type ProfileFormProps = {
   defaultValues?: Partial<ProfileFormValues>;
   onSubmit: (data: ProfileFormValues) => void;
+  children?: (state: {
+    isDirty: boolean;
+    isSubmitting: boolean;
+  }) => React.ReactNode;
 };
 
 export default function ProfileForm({
   defaultValues,
   onSubmit,
+  children,
 }: ProfileFormProps) {
   const {
     register,
@@ -88,13 +93,17 @@ export default function ProfileForm({
         ) : null}
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isSubmitting || !isDirty}
-      >
-        저장
-      </Button>
+      {children ? (
+        children({ isDirty, isSubmitting })
+      ) : (
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting || !isDirty}
+        >
+          저장
+        </Button>
+      )}
     </form>
   );
 }
