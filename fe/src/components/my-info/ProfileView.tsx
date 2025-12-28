@@ -1,15 +1,15 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ProfileFormValues } from '@/schemas/profile';
+import { Profile } from '@/schemas/profile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 type ProfileViewProps = {
-  profile: ProfileFormValues;
+  profile: Profile;
   onEdit: () => void;
 };
 
-const genderLabel = (gender: ProfileFormValues['gender']) => {
+const genderLabel = (gender: Profile['gender']) => {
   return gender === 'male' ? '남' : '여';
 };
 
@@ -19,8 +19,13 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
       {/* 왼쪽: 프로필 이미지 */}
       <div className="shrink-0">
         <Avatar className="h-16 w-16">
-          <AvatarImage src="" alt="프로필 이미지" />
-          <AvatarFallback>ME</AvatarFallback>
+          <AvatarImage
+            src={profile.profile_image_url ?? undefined}
+            alt="프로필 이미지"
+          />
+          <AvatarFallback>
+            {profile.nickname?.[0]?.toUpperCase() ?? 'ME'}
+          </AvatarFallback>
         </Avatar>
       </div>
 
