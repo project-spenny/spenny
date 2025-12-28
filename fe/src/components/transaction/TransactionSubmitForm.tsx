@@ -63,7 +63,14 @@ export default function TransactionSubmitForm({
         }
     }, [mode, transaction])
 
-    const [formData, setFormData] = useState(initialFormData)
+    const [formData, setFormData] = useState<{
+        title: string;
+        transactionType: string;
+        amount: string;
+        date: Date;
+        category: string;
+        tags: string[];
+    }>(initialFormData)
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [tagInput, setTagInput] = useState<string>("")
     const [error, setError]= useState<string | null>();
