@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo} from "react"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import { Input } from "../ui/input"
@@ -41,41 +41,33 @@ interface TransactionsSubmitFormProps {
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
-    const [formData, setFormData] = useState({
-            title: "",
-            transactionType: "",
-            amount: "",
-            date: new Date(),
-            category: "",
-            tags: [] as string[]
-    })
-
-    const [categoryOpen, setCategoryOpen] = useState(false)
-    const [tagInput, setTagInput] = useState<string>("")
-    const [error, setError]= useState<string | null>();
-
-    useEffect(() => {
+    const initialFormData = useMemo(()=>{
         if (mode === 'edit' && transaction) {
-            setFormData({
+            return {
                 title: transaction.title,
                 transactionType: transaction.type,
                 amount: transaction.amount.toString(),
                 date: new Date(transaction.date),
                 category: transaction.category_id,
                 tags: transaction.tags || []
-            })
+            }
         } else {
-            // create 모드일 때는 초기화
-            setFormData({
+            return{
                 title: "",
                 transactionType: "",
                 amount: "",
                 date: new Date(),
                 category: "",
                 tags: []
-            })
+            }
         }
     }, [mode, transaction])
+
+    const [formData, setFormData] = useState(initialFormData)
+    const [categoryOpen, setCategoryOpen] = useState(false)
+    const [tagInput, setTagInput] = useState<string>("")
+    const [error, setError]= useState<string | null>();
+
     const formatDate = (date: Date) => {
         const year = date.getFullYear()
         const month = date.getMonth() + 1
