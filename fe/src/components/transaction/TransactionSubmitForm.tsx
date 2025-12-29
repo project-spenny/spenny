@@ -10,9 +10,9 @@ import { toast } from "sonner"
 import { Trash } from "lucide-react"
 import { CATEGORIES } from "@/constants/categories"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { X } from "lucide-react"

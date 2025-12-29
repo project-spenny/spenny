@@ -5,6 +5,8 @@ import { TransactionList } from "@/components/transaction/TransactionList"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { ITransaction } from "@/types/transactions"
+import ResponsivePanel from "@/components/panel/ResponsivePanel"
+
 export default function Page() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
@@ -34,6 +36,9 @@ export default function Page() {
 
   return(
       <>
+        <ResponsivePanel trigger={<Button>sdfd</Button>}>
+          <div>hi</div>
+        </ResponsivePanel>
         <div className="flex w-full h-screen overflow-hidden border-2">
           <div className="flex-1 overflow-auto">
             <Button
