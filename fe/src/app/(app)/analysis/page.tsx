@@ -63,7 +63,10 @@ const AnalysisPage = () => {
       </div>
 
       {/* 탭 리스트 */}
-      <Tabs defaultValue="지출" className="px-10 md:px-30">
+      <Tabs
+        defaultValue="지출"
+        className="mx-auto w-full max-w-4xl px-6 md:px-12"
+      >
         <TabsList className="flex h-12 w-full gap-2 p-2">
           {analysisTabs.map((tab) => (
             <TabsTrigger
