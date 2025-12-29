@@ -18,7 +18,7 @@ export async function GET() {
 
   const { data, error: selectError } = await supabase
     .from('profiles')
-    .select('nickname, birth_date, gender')
+    .select('nickname, birth_date, gender, profile_image_url')
     .eq('id', user.id)
     .single();
 
