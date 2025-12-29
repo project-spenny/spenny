@@ -101,7 +101,7 @@ export default function TransactionSubmitForm({
                 amount: Number(formData.amount),
                 date: formattedDate,
                 category_id: formData.category_id,
-                tags: formData.tags.length > 0 ? formData : null
+                tags: formData.tags.length > 0 ? formData.tags : null
             }
 
             if (mode === 'create') {
@@ -117,6 +117,7 @@ export default function TransactionSubmitForm({
 
                 toast.success("가계부 작성을 완료했습니다")
             } else {
+                console.log(transactionData)
                 const { error } = await supabase
                     .from('transactions')
                     .update(transactionData)
