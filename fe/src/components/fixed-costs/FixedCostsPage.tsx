@@ -1,13 +1,12 @@
-'use client';
+import FixedCostsList from './FixedCostsList';
 
 export default function FixedCostsPage() {
   return (
-    <div className="space-y-4">
-      <header className="flex">
-        <div className="space-y-1">
-          <h1 className="text-xl font-semibold">고정비 관리</h1>
-        </div>
+    <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
+      <header>
+        <h1 className="text-xl font-semibold">고정비 관리</h1>
       </header>
+      <FixedCostsList />
     </div>
   );
 }
