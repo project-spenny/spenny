@@ -63,6 +63,146 @@ const useTransactionForm = (initalData : ITransaction) =>{
         validateFormData1
     }
 }
+
+const TitleInput = ({value, onChange}: {value: string; onChange: () => void})=>{
+    return(
+        <div className="space-y-2">
+        <Label>타이틀</Label>
+            <Input
+                id="amount"
+                type="text"
+                placeholder="어떤 지출인가요"
+                value={value}
+                onChange={onChange}
+            />
+        </div>
+    )
+}
+
+const TypeSelector = ({value, onChange}: {value: string; onChange: (type: string) => void})=>{
+    return(
+        <div className="space-y-2">
+            <Label>거래 유형</Label>
+            <div className="grid grid-cols-2 gap-4">
+                <button
+                    type="button"
+                    onClick={() => onChange('income')}
+                    className={cn(
+                        "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
+                        value === 'income'
+                            ? "border-gray-500"
+                            : "border-gray-300 hover:border-gray-400"
+                    )}
+                >
+                    수입
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onChange('expense')}
+                    className={cn(
+                        "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
+                        value === 'expense'
+                            ? "border-gray-500"
+                            : "border-gray-300 hover:border-gray-400"
+                    )}
+                >
+                    지출
+                </button>
+            </div>
+        </div>
+    )
+}
+
+const AmountInput = ({value, onChange}: {value: string; onChange: (type: string) => void}) =>{
+    return(
+        <div className="space-y-2">
+            <Label>금액</Label>
+            <Input
+                id="amount"
+                type="number"
+                placeholder="금액을 입력하세요"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                min="0"
+            />
+        </div>
+    )
+}
+
+const formatDate = (date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    return `${year}년 ${month}월 ${day}일`
+}
+
+
+const TagInput = ({tags, onChange} : { tags : string[], onChange : (tags:string[])=>void})=>{
+    const [tagInput, setTagInput] = useState<string>("")
+    const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            if (e.nativeEvent.isComposing) {
+                return;
+            }   
+            e.preventDefault()
+            addTag()
+        }
+    }
+    
+    const addTag = () => {
+        const trimmedTag = tagInput.trim()
+        if (trimmedTag && !tags.includes(trimmedTag)) {
+            onChange([...tags, trimmedTag])
+            setTagInput("")
+        }
+    }
+    
+    const removeTag = (tagToRemove: string) => {
+        onChange(tags.filter(tag => tag !== tagToRemove))
+    }
+    return(
+        <div className="space-y-2">
+                <Label>태그 (선택사항)</Label>
+                <div className="flex gap-2">
+                    <Input
+                        id="tags"
+                        type="text"
+                        placeholder="태그를 입력하세요"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={handleTagInputKeyDown}
+                        maxLength={20}
+                    />
+                    <Button
+                        type="button"
+                        onClick={addTag}
+                        variant="outline"
+                    >
+                        추가
+                    </Button>
+                </div>
+                {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {tags.map((tag, index) => (
+                            <div
+                                key={index}
+                                className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
+                            >
+                                {tag}
+                                <button
+                                    type="button"
+                                    onClick={() => removeTag(tag)}
+                                    className="hover:bg-gray-200 rounded-full p-0.5"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+    )
+}
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
@@ -99,13 +239,6 @@ export default function TransactionSubmitForm({
     const [categoryOpen, setCategoryOpen] = useState(false)
     const [tagInput, setTagInput] = useState<string>("")
     const [error, setError]= useState<string | null>();
-
-    const formatDate = (date: Date) => {
-        const year = date.getFullYear()
-        const month = date.getMonth() + 1
-        const day = date.getDate()
-        return `${year}년 ${month}월 ${day}일`
-    }
 
     const validateFormData =()=>{
         if(!formData.title.trim()){
