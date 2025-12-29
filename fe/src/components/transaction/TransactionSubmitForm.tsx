@@ -25,45 +25,6 @@ interface TransactionsSubmitFormProps {
     onSuccess : ()=> void
 }
 
-const useTransactionForm = (initalData : ITransaction) =>{
-    const [formData1, setFormData1] = useState(initalData);
-    const [categoryOpen1, setCategoryOpen1] = useState(false);
-
-    const validateFormData1 =()=>{
-        if(!formData1.title.trim()){
-            const errorMsg = "제목을 입력해주세요";
-            return errorMsg;
-        }else if(formData1.title.trim().length>20){
-            const errorMsg = "제목은 20자 이내로  입력해주세요"
-            return errorMsg;
-        }
-
-        if(!formData1.type){
-            const errorMsg = "거래 유형을 선택해주세요";
-            return errorMsg;
-        }
-
-        if(!formData1.category_id){
-            const errorMsg = "카테고리를 선택해주세요";
-            return errorMsg;
-        }
-
-        if(!formData1.amount || Number(formData1.amount)<=0){
-            const errorMsg = "금액은 0보다 커야 합니다"
-            return errorMsg;
-        }
-        return null;
-
-    }
-    return {
-        formData1,
-        setFormData1,
-        categoryOpen1,
-        setCategoryOpen1,
-        validateFormData1
-    }
-}
-
 const TitleInput = ({value, onChange}: {value: string; onChange: () => void})=>{
     return(
         <div className="space-y-2">
