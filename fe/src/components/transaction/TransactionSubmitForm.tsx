@@ -61,7 +61,9 @@ export default function TransactionSubmitForm({
         setFormData,
         categoryOpen,
         setCategoryOpen,
-        validateFormData} = useTransactionForm(initialFormData);
+        validateFormData,
+        UpdateField
+    } = useTransactionForm(initialFormData);
 
     const [tags, setTags] = useState<string[]>(
         mode === 'edit' && transaction ? (transaction.tags || []) : []

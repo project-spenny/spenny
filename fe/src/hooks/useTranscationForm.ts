@@ -47,11 +47,16 @@ export const useTransactionForm = (initialData? : IFormData) =>{
         return null;
         
     }
+
+    const UpdateField = (field : keyof FormData, value : unknown)=>{
+        setFormData(prev => ({...prev, [field] : value}))
+    }
     return {
         formData,
         setFormData,
         categoryOpen,
         setCategoryOpen,
-        validateFormData
+        validateFormData,
+        UpdateField
     }
 }
