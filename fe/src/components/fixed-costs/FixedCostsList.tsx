@@ -5,6 +5,7 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 
@@ -40,7 +41,11 @@ export default function FixedCostsList() {
   return (
     <div className="space-y-2">
       {MOCK_FIXED_COSTS.map((e) => (
-        <Item variant="outline" key={e.id}>
+        <Item
+          variant="outline"
+          key={e.id}
+          className={cn(!e.isActive && 'opacity-50')}
+        >
           <ItemContent className="flex flex-row items-center">
             <div className="flex w-24 flex-col gap-1">
               <span className="text-muted-foreground text-xs">
@@ -58,6 +63,7 @@ export default function FixedCostsList() {
             </div>
             <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
             <ItemActions className="ml-auto">
+              <Switch checked={e.isActive} />
               <Button className="cursor-pointer" size="sm">
                 <ChevronRight />
               </Button>
