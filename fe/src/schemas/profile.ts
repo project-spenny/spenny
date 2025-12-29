@@ -11,3 +11,7 @@ export const profileSchema = z.object({
 });
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
+
+export type Profile = ProfileFormValues & {
+  profile_image_url: string | null;
+};

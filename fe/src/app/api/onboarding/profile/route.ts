@@ -48,6 +48,17 @@ export async function POST(req: Request) {
     );
   }
 
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('profile_image_url')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const profile_image_url =
+    existing?.profile_image_url ??
+    (user.user_metadata?.avatar_url as string | undefined) ??
+    null;
+
   // profiles 저장
   const { error } = await supabase.from('profiles').upsert(
     {
@@ -55,6 +66,7 @@ export async function POST(req: Request) {
       nickname,
       gender,
       birth_date,
+      profile_image_url,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'id' }
