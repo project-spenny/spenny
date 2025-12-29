@@ -14,7 +14,6 @@ export default function Page() {
   const [refreshKey, setRefreshKey] = useState(0)
 
   const handleSelectTransaction = (transaction: ITransaction) => {
-    console.log(transaction)
     setSelectedTransaction(transaction)
     setFormMode('edit')
     setIsSidebarOpen(true)
