@@ -12,7 +12,7 @@ interface IFormData{
 const getInitialFormData = (initialData? :IFormData) : IFormData =>({
         title: initialData?.title || "",
         type: initialData?.type || "",
-        amount: initialData?.amount.toString() || "",
+        amount: initialData?.amount || "",
         date: initialData?.date || new Date(),
         category_id: initialData?.category_id  || "",
         tags: initialData?.tags || [] 
