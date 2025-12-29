@@ -10,7 +10,6 @@ const Navigation = () => {
     { label: '내역', href: '/history' },
     { label: '분석', href: '/analysis' },
     { label: '고정비', href: '/fixed-costs' },
-    { label: '마이페이지', href: '/mypage' },
   ];
 
   return (

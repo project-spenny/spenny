@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Profile, ProfileFormValues } from '@/schemas/profile';
+import { Profile, ProfilePatchValues } from '@/schemas/profile';
 import { Separator } from '@/components/ui/separator';
 import LogoutButton from './LogoutButton';
 import ProfileEdit from './ProfileEdit';
@@ -17,9 +17,7 @@ async function fetchProfile(): Promise<Profile> {
 }
 
 // 프로필 수정 함수
-async function updateProfile(
-  values: ProfileFormValues
-): Promise<ProfileFormValues> {
+async function updateProfile(values: ProfilePatchValues): Promise<Profile> {
   const res = await fetch('/api/profile', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -55,7 +53,7 @@ export default function MyInfo() {
   });
 
   // 프로필 저장 핸들러
-  const handleSave = async (values: ProfileFormValues) => {
+  const handleSave = async (values: ProfilePatchValues) => {
     await mutateAsync(values);
     setIsEditing(false);
   };
