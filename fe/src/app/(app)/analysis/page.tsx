@@ -1,28 +1,65 @@
+'use client';
+
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Button } from '@/components/ui/button';
-
-const ANALYSIS_TABS = [
-  { value: '지출', content: '지출 분석 컴포넌트' },
-  { value: '수입', content: '수입 분석 컴포넌트' },
-  { value: '예산', content: '예산 분석 컴포넌트' },
-];
+import ExpenseAnalysis from '@/components/analysis/ExpenseAnalysis';
+import { useState } from 'react';
 
 const AnalysisPage = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const handlePrevMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
+    );
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
+    );
+  };
+
+  const ANALYSIS_TABS = [
+    { value: '지출', content: <ExpenseAnalysis selectedDate={currentDate} /> },
+    { value: '수입', content: '수입 분석 컴포넌트' },
+    { value: '예산', content: '예산 분석 컴포넌트' },
+  ];
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       {/* 달 선택 */}
-      <div className="flex items-center justify-center gap-3 py-6">
-        <Button variant="ghost" className="cursor-pointer">
-          <ChevronLeft />
-        </Button>
 
-        <span className="text-2xl font-bold">12월</span>
+      <div className="flex flex-col items-center justify-center py-6 md:py-10">
+        <span className="text-muted-foreground text-sm font-bold md:text-base">
+          {currentDate.getFullYear()}
+        </span>
 
-        <Button variant="ghost" className="cursor-pointer">
-          <ChevronRight />
-        </Button>
+        <div className="flex items-center justify-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-pointer"
+            onClick={handlePrevMonth}
+          >
+            <ChevronLeft />
+          </Button>
+
+          <span className="text-2xl font-bold">
+            {currentDate.getMonth() + 1}월
+          </span>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-pointer"
+            onClick={handleNextMonth}
+          >
+            <ChevronRight />
+          </Button>
+        </div>
       </div>
 
       {/* 탭 리스트 */}
