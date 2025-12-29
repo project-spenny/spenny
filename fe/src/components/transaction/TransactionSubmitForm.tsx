@@ -25,22 +25,6 @@ interface TransactionsSubmitFormProps {
     onSuccess : ()=> void
 }
 
-const AmountInput = ({value, onChange}: {value: string; onChange: (type: string) => void}) =>{
-    return(
-        <div className="space-y-2">
-            <Label>금액</Label>
-            <Input
-                id="amount"
-                type="number"
-                placeholder="금액을 입력하세요"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                min="0"
-            />
-        </div>
-    )
-}
-
 const formatDate = (date: Date) => {
     const year = date.getFullYear()
     const month = date.getMonth() + 1
