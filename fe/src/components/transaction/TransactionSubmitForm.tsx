@@ -182,7 +182,7 @@ export default function TransactionSubmitForm({
 
             <TitleInput
                 value={formData.title}
-                onChange={()=> UpdateField('title', formData.title)}
+                onChange={(title)=> UpdateField('title', title)}
             />
 
             <TypeSelector
