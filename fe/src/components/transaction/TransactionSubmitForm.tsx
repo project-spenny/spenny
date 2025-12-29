@@ -25,21 +25,6 @@ interface TransactionsSubmitFormProps {
     onSuccess : ()=> void
 }
 
-const TitleInput = ({value, onChange}: {value: string; onChange: () => void})=>{
-    return(
-        <div className="space-y-2">
-        <Label>타이틀</Label>
-            <Input
-                id="amount"
-                type="text"
-                placeholder="어떤 지출인가요"
-                value={value}
-                onChange={onChange}
-            />
-        </div>
-    )
-}
-
 const TypeSelector = ({value, onChange}: {value: string; onChange: (type: string) => void})=>{
     return(
         <div className="space-y-2">
