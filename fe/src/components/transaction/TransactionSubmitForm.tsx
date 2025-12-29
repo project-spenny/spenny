@@ -24,6 +24,7 @@ import { DatePicker } from "./common/DatePicker"
 import { TagInput } from "./common/TagInput"
 import { TitleInput } from "./common/TitleInput"
 import { TypeSelector } from "./common/TypeSelector"
+import 
 
 interface TransactionsSubmitFormProps {
     mode : 'create' | 'edit'
@@ -204,40 +205,6 @@ export default function TransactionSubmitForm({
                 }}
             />
 
-            {
-                formData.type !=="" && (
-                    <div className="space-y-2">
-                        <Label>카테고리</Label>
-                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                >
-                                    {formData.category_id === "" 
-                                        ? "선택" 
-                                        : (formData.type === "income" 
-                                            ? CATEGORIES.income 
-                                            : CATEGORIES.expense
-                                        ).find(cat => cat.category_key === formData.category_id)?.name_ko || "선택"
-                                    }
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <div className="grid grid-cols-3">
-                                    {(formData.type==="income" ? CATEGORIES.income : CATEGORIES.expense).map((cat)=>(
-                                        <div
-                                            onClick={()=>{
-                                                setFormData(prev => ({...prev, category: cat.category_key}))
-                                                setCategoryOpen(false)}}
-                                            className="flex items-center justify-center text-center w-24 h-16 cursor-pointer text-sm hover:bg-gray-100" key={cat.category_key}>{cat.name_ko}</div>
-                                    ))}
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                )
-            }
 
             <AmountInput
                 value={formData.amount}
