@@ -163,33 +163,6 @@ export default function TransactionSubmitForm({
         }
     }
 
-    const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            if (e.nativeEvent.isComposing) {
-                return;
-            }   
-            e.preventDefault()
-            addTag()
-        }
-    }
-    
-    const addTag = () => {
-        const trimmedTag = tagInput.trim()
-        if (trimmedTag && !formData.tags.includes(trimmedTag)) {
-            setFormData(prev => ({
-                ...prev,
-                tags: [...prev.tags, trimmedTag]
-            }))
-            setTagInput("")
-        }
-    }
-    
-    const removeTag = (tagToRemove: string) => {
-        setFormData(prev => ({
-            ...prev,
-            tags: prev.tags.filter(tag => tag !== tagToRemove)
-        }))
-    }
     return (
         <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
             <div className="flex justify-between items-center sticky top-0 bg-white pb-4 border-b">
