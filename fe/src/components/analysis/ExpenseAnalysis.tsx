@@ -61,10 +61,17 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
     fetchExpenses();
   }, [selectedDate]);
 
+  const totalAmount =
+    expenses?.reduce((sum, item) => sum + (item.amount || 0), 0) || 0;
+
   return (
-    <div>
-      <div>{selectedDate.getMonth() + 1}월</div>
-      <div>총 지출 0원</div>
+    <div className="px-4 py-2">
+      <div className="text-xl font-bold">
+        총 지출
+        <div>
+          <span className="text-red-400">{totalAmount.toLocaleString()}</span>원
+        </div>
+      </div>
     </div>
   );
 };
