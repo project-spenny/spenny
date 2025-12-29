@@ -1,21 +1,11 @@
 'use client'
-import { useState, useEffect, useMemo} from "react"
+import { useMemo} from "react"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
-import { Input } from "../ui/input"
-import { Calendar } from "@/components/ui/calendar"
 import { Button } from "../ui/button"
 import { supabase } from "@/utils/supabase/client"
 import { toast } from "sonner"
 import { Trash } from "lucide-react"
-import { CATEGORIES } from "@/constants/categories"
 import { useTransactionForm } from "@/hooks/useTranscationForm"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
 import { X } from "lucide-react"
 import { ITransaction } from "@/types/transactions"
 
@@ -33,12 +23,6 @@ interface TransactionsSubmitFormProps {
     onSuccess : ()=> void
 }
 
-const formatDate = (date: Date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    return `${year}년 ${month}월 ${day}일`
-}
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
