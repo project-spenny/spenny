@@ -31,6 +31,7 @@ export const profilePatchSchema = z.object({
   gender: genderSchema.optional(),
 });
 
-export type ProfilePatchValues = z.infer<typeof profilePatchSchema> & {
+export type ProfilePatchValues = z.infer<typeof profilePatchSchema>;
+export type Profile = OnboardingProfileValues & {
   profile_image_url: string | null;
 };
