@@ -11,7 +11,7 @@ const formatDate = (date: Date) => {
     return `${year}년 ${month}월 ${day}일`
 }
 
-export const DatePicker = ({value, onChange}: {value: Date; onChange: (type: Date) => void}) =>{
+export const DatePicker = ({value, onChange}: {value: Date; onChange: (date: Date) => void}) =>{
     return(
         <div className="space-y-2">
             <Label>날짜</Label>
