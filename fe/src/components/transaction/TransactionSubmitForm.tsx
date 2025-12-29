@@ -19,6 +19,12 @@ import { CalendarIcon } from "lucide-react"
 import { X } from "lucide-react"
 import { ITransaction } from "@/types/transactions"
 
+import { AmountInput } from "./common/AmountInput"
+import { DatePicker } from "./common/DatePicker"
+import { TagInput } from "./common/TagInput"
+import { TitleInput } from "./common/TitleInput"
+import { TypeSelector } from "./common/TypeSelector"
+
 interface TransactionsSubmitFormProps {
     mode : 'create' | 'edit'
     transaction? : ITransaction
@@ -173,6 +179,12 @@ export default function TransactionSubmitForm({
                     <X />
                 </Button>
             </div>
+
+            <TitleInput
+                value={formData.title}
+                onChange={()=> UpdateField('title', formData.title)}
+            />
+            
             <div className="space-y-2">
                 <Label>타이틀</Label>
                 <Input
@@ -184,36 +196,14 @@ export default function TransactionSubmitForm({
                 />
             </div>
 
-            {/* 거래유형 선택 */}
-            <div className="space-y-2">
-                <Label>거래 유형</Label>
-                <div className="grid grid-cols-2 gap-4">
-                    <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'income'}))}
-                        className={cn(
-                            "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            formData.type === 'income'
-                                ? "border-gray-500"
-                                : "border-gray-300 hover:border-gray-400"
-                        )}
-                    >
-                        수입
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'expense'}))}
-                        className={cn(
-                            "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            formData.type === 'expense'
-                                ? "border-gray-500"
-                                : "border-gray-300 hover:border-gray-400"
-                        )}
-                    >
-                        지출
-                    </button>
-                </div>
-            </div>
+            <TypeSelector
+                value={formData.type}
+                onChange={(type) => {
+                UpdateField('type', type)
+                UpdateField('category_id', '')
+                }}
+            />
+
             {
                 formData.type !=="" && (
                     <div className="space-y-2">
@@ -249,86 +239,18 @@ export default function TransactionSubmitForm({
                 )
             }
 
+            <AmountInput
+                value={formData.amount}
+                onChange={(value) => UpdateField('amount', value)}
+            />
 
-            {/* 금액 입력 */}
-            <div className="space-y-2">
-                <Label>금액</Label>
-                <Input
-                    id="amount"
-                    type="number"
-                    placeholder="금액을 입력하세요"
-                    value={formData.amount}
-                    onChange={(e) => setFormData(prev => ({...prev, amount: e.target.value}))}
-                    min="0"
-                />
-            </div>
+            <DatePicker
+                value={formData.date}
+                onChange={(date) => UpdateField('date', date)}
+            />
 
-            {/* 날짜 선택 */}
-            <div className="space-y-2">
-                <Label>날짜</Label>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                        >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formatDate(formData.date)}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={formData.date}
-                            onSelect={(newDate) => newDate && setFormData(prev => ({...prev, date: newDate}))}
-                        />
-                    </PopoverContent>
-                </Popover>
-            </div>
-
+            <TagInput tags={tags} onChange={setTags} />
             
-                {/* 태그 */}
-                <div className="space-y-2">
-                <Label>태그 (선택사항)</Label>
-                <div className="flex gap-2">
-                    <Input
-                        id="tags"
-                        type="text"
-                        placeholder="태그를 입력하세요"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={handleTagInputKeyDown}
-                        maxLength={20}
-                    />
-                    <Button
-                        type="button"
-                        onClick={addTag}
-                        variant="outline"
-                    >
-                        추가
-                    </Button>
-                </div>
-                {formData.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {formData.tags.map((tag, index) => (
-                            <div
-                                key={index}
-                                className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
-                            >
-                                {tag}
-                                <button
-                                    type="button"
-                                    onClick={() => removeTag(tag)}
-                                    className="hover:bg-gray-200 rounded-full p-0.5"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
             <div className="flex gap-2 pt-4 sticky bottom-0 bg-background border-t pb-4">
                 {mode === 'edit' && (
                     <Button
