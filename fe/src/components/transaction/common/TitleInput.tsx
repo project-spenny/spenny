@@ -5,7 +5,7 @@ export const TitleInput = ({value, onChange}: {value: string; onChange: (type: s
         <div className="space-y-2">
         <Label>타이틀</Label>
             <Input
-                id="amount"
+                id="title"
                 type="text"
                 placeholder="어떤 지출인가요"
                 value={value}
