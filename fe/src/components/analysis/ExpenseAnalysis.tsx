@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { ITransaction } from '@/types/transactions';
+import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
@@ -15,15 +16,7 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
       try {
         setIsLoading(true);
 
-        const year = selectedDate.getFullYear();
-        const month = selectedDate.getMonth() + 1;
-
-        const formatMonth = String(month).padStart(2, '0');
-        const lastDay = new Date(year, month, 0).getDate(); // 해당 월의 마지막 날짜(숫자)
-
-        // 'YYYY-MM-DD' 형식의 문자열 생성
-        const startDate = `${year}-${formatMonth}-01`;
-        const endDate = `${year}-${formatMonth}-${lastDay}`;
+        const { startDate, endDate } = getMonthRange(selectedDate);
 
         // Supabase에서 현재 로그인한 유저 정보 가져오기
         const {
