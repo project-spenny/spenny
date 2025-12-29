@@ -121,7 +121,10 @@ export default function TransactionSubmitForm({
                 toast.warning('로그인이 필요합니다')
                 return
             }
-            const formattedDate = formData.date.toISOString().split('T')[0]
+            const year = formData.date.getFullYear();
+            const month = String(formData.date.getMonth()+1).padStart(2,'0');
+            const day = String(formData.date.getDate()).padStart(2,'0');
+            const formattedDate = `${year}-${month}-${day}`
 
             const transactionData = {
                 user_id: user.id,
