@@ -7,7 +7,7 @@ import SheetSide from '@/components/panel/SheetSide';
 import { useState } from 'react';
 
 // 외부 제어 모드 일 경우의 optional props
-interface ExternalResposivePanelProps extends ResponsivePanelProps{
+interface ExternalResponsivePanelProps extends ResponsivePanelProps{
   isOpen? : boolean;
   setIsOpen ? : (oepn : boolean) => void
 }
