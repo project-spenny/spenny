@@ -101,7 +101,7 @@ export default function TransactionSubmitForm({
                 amount: Number(formData.amount),
                 date: formattedDate,
                 category_id: formData.category_id,
-                tags: tags.length > 0 ? formData : null
+                tags: formData.tags.length > 0 ? formData : null
             }
 
             if (mode === 'create') {
@@ -183,17 +183,6 @@ export default function TransactionSubmitForm({
                 value={formData.title}
                 onChange={()=> UpdateField('title', formData.title)}
             />
-            
-            <div className="space-y-2">
-                <Label>타이틀</Label>
-                <Input
-                    id="amount"
-                    type="text"
-                    placeholder="어떤 지출인가요"
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
-                />
-            </div>
 
             <TypeSelector
                 value={formData.type}
