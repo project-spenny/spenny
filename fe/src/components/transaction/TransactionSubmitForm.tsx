@@ -16,28 +16,15 @@ import {
 } from "@/components/ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { X } from "lucide-react"
-
-interface Transaction {
-  id: string
-  title: string
-  user_id : string
-  category_id: string
-  type: 'income' | 'expense'
-  date: string
-  amount: number
-  fixed_rule_id : string|null
-  memo : string | null
-  created_at : Date
-  updated_at : Date
-  tags : string[]
-}
+import { ITransaction } from "@/types/transactions"
 
 interface TransactionsSubmitFormProps {
     mode : 'create' | 'edit'
-    transaction? : Transaction
+    transaction? : ITransaction
     onClose : ()=> void
     onSuccess : ()=> void
 }
+
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
