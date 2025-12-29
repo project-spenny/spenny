@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 import ProfileForm from '@/components/onboarding/ProfileForm';
-import { ProfileFormValues } from '@/schemas/profile';
+import { OnboardingProfileValues } from '@/schemas/profile';
 
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
@@ -28,12 +28,12 @@ export default function OnboardingPage() {
     router.replace('/');
   };
 
-  const handleProfileSubmit = async (values: ProfileFormValues) => {
+  const handleProfileSubmit = async (values: OnboardingProfileValues) => {
     setServerError(null); // 서버 에러 상태 초기화
 
     // 서버에 프로필 정보 저장
-    const res = await fetch('/api/onboarding/profile', {
-      method: 'POST',
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
     });
