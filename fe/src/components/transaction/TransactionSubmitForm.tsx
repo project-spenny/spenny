@@ -24,7 +24,7 @@ import { DatePicker } from "./common/DatePicker"
 import { TagInput } from "./common/TagInput"
 import { TitleInput } from "./common/TitleInput"
 import { TypeSelector } from "./common/TypeSelector"
-import 
+import { CategorySelector } from "./common/CategorySelector"
 
 interface TransactionsSubmitFormProps {
     mode : 'create' | 'edit'
@@ -69,12 +69,10 @@ export default function TransactionSubmitForm({
         categoryOpen,
         setCategoryOpen,
         validateFormData,
+        addTag,
+        removeTag,
         UpdateField
     } = useTransactionForm(initialFormData);
-
-    const [tags, setTags] = useState<string[]>(
-        mode === 'edit' && transaction ? (transaction.tags || []) : []
-    )
 
     const handleSubmit = async(e: React.FormEvent)=>{
         e.preventDefault();
@@ -137,8 +135,8 @@ export default function TransactionSubmitForm({
                 amount: "",
                 date: new Date(),
                 category_id: "",
+                tags :[]
             })
-            setTags([])
             onSuccess()
             onClose()
         }catch(error){
@@ -205,6 +203,13 @@ export default function TransactionSubmitForm({
                 }}
             />
 
+            <CategorySelector
+                transactionType={formData.type}
+                value={formData.category_id}
+                open={categoryOpen}
+                onOpenChange={setCategoryOpen}
+                onChange={(category) => UpdateField('category_id', category)}
+            />
 
             <AmountInput
                 value={formData.amount}
@@ -216,7 +221,7 @@ export default function TransactionSubmitForm({
                 onChange={(date) => UpdateField('date', date)}
             />
 
-            <TagInput tags={tags} onChange={setTags} />
+            <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
             
             <div className="flex gap-2 pt-4 sticky bottom-0 bg-background border-t pb-4">
                 {mode === 'edit' && (

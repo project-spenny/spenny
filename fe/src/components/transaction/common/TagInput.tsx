@@ -3,30 +3,32 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+interface TagInputProps {
+    tags: string[]
+    addTag: (tag: string) => void
+    removeTag: (tag: string) => void
+}
 
-export const TagInput = ({tags, onChange} : { tags : string[], onChange : (tags:string[])=>void})=>{
+export const TagInput = ({ tags, addTag, removeTag }: TagInputProps)=>{
     const [tagInput, setTagInput] = useState<string>("")
+    
     const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             if (e.nativeEvent.isComposing) {
                 return;
             }   
             e.preventDefault()
-            addTag()
+            handleAddTag()
         }
     }
-    
-    const addTag = () => {
-        const trimmedTag = tagInput.trim()
-        if (trimmedTag && !tags.includes(trimmedTag)) {
-            onChange([...tags, trimmedTag])
+
+    const handleAddTag = () => {
+        if (tagInput.trim()) {
+            addTag(tagInput)
             setTagInput("")
         }
     }
     
-    const removeTag = (tagToRemove: string) => {
-        onChange(tags.filter(tag => tag !== tagToRemove))
-    }
     return(
         <div className="space-y-2">
                 <Label>태그 (선택사항)</Label>
@@ -42,7 +44,7 @@ export const TagInput = ({tags, onChange} : { tags : string[], onChange : (tags:
                     />
                     <Button
                         type="button"
-                        onClick={addTag}
+                        onClick={handleAddTag}
                         variant="outline"
                     >
                         추가

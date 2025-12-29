@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 interface IFormData{
     title : string
@@ -6,18 +6,24 @@ interface IFormData{
     amount : string
     date : Date,
     category_id : string
+    tags : string[]
 }
 
-export const useTransactionForm = (initialData? : IFormData) =>{
-
-    const [categoryOpen, setCategoryOpen] = useState(false);
-    const [formData, setFormData] = useState<IFormData>({
+const getInitialFormData = (initialData? :IFormData) : IFormData =>({
         title: initialData?.title || "",
         type: initialData?.type || "",
         amount: initialData?.amount.toString() || "",
         date: initialData?.date || new Date(),
         category_id: initialData?.category_id  || "",
-    })
+        tags: initialData?.tags || [] 
+})
+export const useTransactionForm = (initialData? : IFormData) =>{
+    const [categoryOpen, setCategoryOpen] = useState(false);
+    const [formData, setFormData] = useState<IFormData>(getInitialFormData(initialData))
+
+    useEffect(() => {
+        setFormData(getInitialFormData(initialData))
+    }, [initialData])
 
     const validateFormData =()=>{
         if(!formData.title.trim()){
@@ -48,6 +54,17 @@ export const useTransactionForm = (initialData? : IFormData) =>{
         
     }
 
+    const addTag = (tag: string) => {
+        const trimmedTag = tag.trim()
+        if (trimmedTag && !formData.tags.includes(trimmedTag)) {
+            UpdateField('tags',[...formData.tags, trimmedTag])
+        }
+    }
+    
+    const removeTag = (tagToRemove: string) => {
+        UpdateField('tags',formData.tags.filter(tag => tag !== tagToRemove))
+    }
+
     const UpdateField = (field : keyof IFormData, value : unknown)=>{
         setFormData(prev => ({...prev, [field] : value}))
     }
@@ -57,6 +74,8 @@ export const useTransactionForm = (initialData? : IFormData) =>{
         categoryOpen,
         setCategoryOpen,
         validateFormData,
-        UpdateField
+        UpdateField,
+        addTag,
+        removeTag
     }
 }
