@@ -1,18 +1,32 @@
 'use client';
 
-import { ProfileFormValues } from '@/schemas/profile';
+import { Profile, ProfilePatchValues } from '@/schemas/profile';
 import ProfileForm from '../onboarding/ProfileForm';
 import { Button } from '@/components/ui/button';
 
 type Props = {
-  profile: ProfileFormValues; // 기존 프로필 값
-  onSave: (values: ProfileFormValues) => void;
+  profile: Profile; // 기존 프로필 값
+  onSave: (values: ProfilePatchValues) => void;
   onCancel: () => void;
 };
 
 export default function ProfileEdit({ profile, onSave, onCancel }: Props) {
   return (
-    <ProfileForm defaultValues={profile} onSubmit={onSave}>
+    <ProfileForm
+      defaultValues={{
+        nickname: profile.nickname,
+        birth_date: profile.birth_date,
+        gender: profile.gender,
+      }}
+      onSubmit={(data, dirtyFields) => {
+        const payload: ProfilePatchValues = {
+          ...(dirtyFields.nickname ? { nickname: data.nickname } : {}),
+          ...(dirtyFields.birth_date ? { birth_date: data.birth_date } : {}),
+          ...(dirtyFields.gender ? { gender: data.gender } : {}),
+        };
+        onSave(payload);
+      }}
+    >
       {({ isDirty, isSubmitting }) => (
         <div className="flex gap-2">
           <Button
