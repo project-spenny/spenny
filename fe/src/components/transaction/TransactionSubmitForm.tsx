@@ -9,6 +9,7 @@ import { supabase } from "@/utils/supabase/client"
 import { toast } from "sonner"
 import { Trash } from "lucide-react"
 import { CATEGORIES } from "@/constants/categories"
+import { useTransactionForm } from "@/hooks/useTranscationForm"
 import {
     Popover,
     PopoverContent,
@@ -56,47 +57,21 @@ export default function TransactionSubmitForm({
         }
     }, [mode, transaction])
 
-    const [formData, setFormData] = useState<{
-        title: string;
-        type: string;
-        amount: string;
-        date: Date;
-        category_id: string;
-        tags: string[];
-    }>(initialFormData)
-    const [categoryOpen, setCategoryOpen] = useState(false)
-    const [tagInput, setTagInput] = useState<string>("")
-    const [error, setError]= useState<string | null>();
+    const {formData,
+        setFormData,
+        categoryOpen,
+        setCategoryOpen,
+        validateFormData} = useTransactionForm(initialFormData);
 
-    const validateFormData =()=>{
-        if(!formData.title.trim()){
-            const errorMsg = "제목을 입력해주세요";
-            return errorMsg;
-        }else if(formData.title.trim().length>20){
-            const errorMsg = "제목은 20자 이내로  입력해주세요"
-            return errorMsg;
-        }
+    const [tags, setTags] = useState<string[]>(
+        mode === 'edit' && transaction ? (transaction.tags || []) : []
+    )
 
-        if(!formData.type){
-            const errorMsg = "거래 유형을 선택해주세요";
-            return errorMsg;
-        }
-
-        if(!formData.category_id){
-            const errorMsg = "카테고리를 선택해주세요";
-            return errorMsg;
-        }
-
-        if(!formData.amount || Number(formData.amount)<=0){
-            const errorMsg = "금액은 0보다 커야 합니다"
-            return errorMsg;
-        }
-        return null;
-
-    }
     const handleSubmit = async(e: React.FormEvent)=>{
         e.preventDefault();
+
         const errorMsg = validateFormData();
+
         if (errorMsg) {
             toast(errorMsg)
             return
@@ -119,7 +94,7 @@ export default function TransactionSubmitForm({
                 amount: Number(formData.amount),
                 date: formattedDate,
                 category_id: formData.category_id,
-                tags: formData.tags.length > 0 ? formData.tags : null
+                tags: tags.length > 0 ? formData : null
             }
 
             if (mode === 'create') {
@@ -153,10 +128,8 @@ export default function TransactionSubmitForm({
                 amount: "",
                 date: new Date(),
                 category_id: "",
-                tags: []
             })
-            setTagInput("")
-            setError(null)
+            setTags([])
             onSuccess()
             onClose()
         }catch(error){
