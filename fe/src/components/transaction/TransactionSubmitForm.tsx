@@ -25,6 +25,44 @@ interface TransactionsSubmitFormProps {
     onSuccess : ()=> void
 }
 
+const useTransactionForm = (initalData : ITransaction) =>{
+    const [formData1, setFormData1] = useState(initalData);
+    const [categoryOpen1, setCategoryOpen1] = useState(false);
+
+    const validateFormData1 =()=>{
+        if(!formData1.title.trim()){
+            const errorMsg = "제목을 입력해주세요";
+            return errorMsg;
+        }else if(formData1.title.trim().length>20){
+            const errorMsg = "제목은 20자 이내로  입력해주세요"
+            return errorMsg;
+        }
+
+        if(!formData1.type){
+            const errorMsg = "거래 유형을 선택해주세요";
+            return errorMsg;
+        }
+
+        if(!formData1.category_id){
+            const errorMsg = "카테고리를 선택해주세요";
+            return errorMsg;
+        }
+
+        if(!formData1.amount || Number(formData1.amount)<=0){
+            const errorMsg = "금액은 0보다 커야 합니다"
+            return errorMsg;
+        }
+        return null;
+
+    }
+    return {
+        formData1,
+        setFormData1,
+        categoryOpen1,
+        setCategoryOpen1,
+        validateFormData1
+    }
+}
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
@@ -32,19 +70,19 @@ export default function TransactionSubmitForm({
         if (mode === 'edit' && transaction) {
             return {
                 title: transaction.title,
-                transactionType: transaction.type,
+                type: transaction.type,
                 amount: transaction.amount.toString(),
                 date: new Date(transaction.date),
-                category: transaction.category_id,
+                category_id: transaction.category_id,
                 tags: transaction.tags || []
             }
         } else {
             return{
                 title: "",
-                transactionType: "",
+                type: "",
                 amount: "",
                 date: new Date(),
-                category: "",
+                category_id: "",
                 tags: []
             }
         }
@@ -52,10 +90,10 @@ export default function TransactionSubmitForm({
 
     const [formData, setFormData] = useState<{
         title: string;
-        transactionType: string;
+        type: string;
         amount: string;
         date: Date;
-        category: string;
+        category_id: string;
         tags: string[];
     }>(initialFormData)
     const [categoryOpen, setCategoryOpen] = useState(false)
@@ -78,12 +116,12 @@ export default function TransactionSubmitForm({
             return errorMsg;
         }
 
-        if(!formData.transactionType){
+        if(!formData.type){
             const errorMsg = "거래 유형을 선택해주세요";
             return errorMsg;
         }
 
-        if(!formData.category){
+        if(!formData.category_id){
             const errorMsg = "카테고리를 선택해주세요";
             return errorMsg;
         }
@@ -116,10 +154,10 @@ export default function TransactionSubmitForm({
             const transactionData = {
                 user_id: user.id,
                 title: formData.title.trim(),
-                type: formData.transactionType,
+                type: formData.type,
                 amount: Number(formData.amount),
                 date: formattedDate,
-                category_id: formData.category,
+                category_id: formData.category_id,
                 tags: formData.tags.length > 0 ? formData.tags : null
             }
 
@@ -150,10 +188,10 @@ export default function TransactionSubmitForm({
 
             setFormData({
                 title: "",
-                transactionType: "",
+                type: "",
                 amount: "",
                 date: new Date(),
-                category: "",
+                category_id: "",
                 tags: []
             })
             setTagInput("")
@@ -246,7 +284,7 @@ export default function TransactionSubmitForm({
                         onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'income'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            formData.transactionType === 'income'
+                            formData.type === 'income'
                                 ? "border-gray-500"
                                 : "border-gray-300 hover:border-gray-400"
                         )}
@@ -258,7 +296,7 @@ export default function TransactionSubmitForm({
                         onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'expense'}))}
                         className={cn(
                             "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            formData.transactionType === 'expense'
+                            formData.type === 'expense'
                                 ? "border-gray-500"
                                 : "border-gray-300 hover:border-gray-400"
                         )}
@@ -268,7 +306,7 @@ export default function TransactionSubmitForm({
                 </div>
             </div>
             {
-                formData.transactionType !=="" && (
+                formData.type !=="" && (
                     <div className="space-y-2">
                         <Label>카테고리</Label>
                         <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
@@ -277,18 +315,18 @@ export default function TransactionSubmitForm({
                                     type="button"
                                     variant="outline"
                                 >
-                                    {formData.category === "" 
+                                    {formData.category_id === "" 
                                         ? "선택" 
-                                        : (formData.transactionType === "income" 
+                                        : (formData.type === "income" 
                                             ? CATEGORIES.income 
                                             : CATEGORIES.expense
-                                        ).find(cat => cat.category_key === formData.category)?.name_ko || "선택"
+                                        ).find(cat => cat.category_key === formData.category_id)?.name_ko || "선택"
                                     }
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0" align="start">
                                 <div className="grid grid-cols-3">
-                                    {(formData.transactionType==="income" ? CATEGORIES.income : CATEGORIES.expense).map((cat)=>(
+                                    {(formData.type==="income" ? CATEGORIES.income : CATEGORIES.expense).map((cat)=>(
                                         <div
                                             onClick={()=>{
                                                 setFormData(prev => ({...prev, category: cat.category_key}))
