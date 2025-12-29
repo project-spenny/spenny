@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 interface IFormData{
     title : string
-    type : string
+    type : 'income' | 'expense' | ''
     amount : string
     date : Date,
     category_id : string
