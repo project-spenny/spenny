@@ -30,24 +30,26 @@ export const TagInput = ({ tags, addTag, removeTag }: TagInputProps) => {
   };
 
   return (
-    <div className="flex items-center">
-      <Label className="w-28 pr-2">태그(선택)</Label>
-      <div className="flex w-full gap-2">
-        <Input
-          id="tags"
-          type="text"
-          placeholder="태그를 입력하세요"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyDown={handleTagInputKeyDown}
-          maxLength={20}
-        />
-        <Button type="button" onClick={handleAddTag} variant="outline">
-          추가
-        </Button>
+    <div className="space-y-2">
+      <div className="flex items-center">
+        <Label className="w-28 pr-2">태그(선택)</Label>
+        <div className="flex w-full gap-2">
+          <Input
+            id="tags"
+            type="text"
+            placeholder="태그를 입력하세요"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagInputKeyDown}
+            maxLength={20}
+          />
+          <Button type="button" onClick={handleAddTag} variant="outline">
+            추가
+          </Button>
+        </div>
       </div>
       {tags.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 pl-24">
           {tags.map((tag, index) => (
             <div
               key={index}
