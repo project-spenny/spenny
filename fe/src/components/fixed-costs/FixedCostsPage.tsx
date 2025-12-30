@@ -16,16 +16,23 @@ export default function FixedCostsPage() {
 
   const filteredItems =
     tab === 'active'
-      ? MOCK_FIXED_COSTS.filter((i) => i.isActive)
+      ? items.filter((i) => i.isActive)
       : tab === 'inactive'
-        ? MOCK_FIXED_COSTS.filter((i) => !i.isActive)
-        : MOCK_FIXED_COSTS;
+        ? items.filter((i) => !i.isActive)
+        : items;
 
   const counts = {
     all: items.length,
     active: items.filter((i) => i.isActive).length,
     inactive: items.filter((i) => !i.isActive).length,
   };
+
+  const emptyMessage =
+    tab === 'all'
+      ? '등록된 고정비가 없습니다. \n\n상단의 + 버튼을 눌러 고정비를 추가해 주세요.'
+      : tab === 'active'
+        ? '활성화된 고정비가 없습니다.'
+        : '비활성화된 고정비가 없습니다.';
 
   const handleToggleActive = (id: string) => {
     setItems((prev) =>
@@ -75,6 +82,7 @@ export default function FixedCostsPage() {
           <FixedCostsList
             items={filteredItems}
             onToggleActive={handleToggleActive}
+            emptyMessage={emptyMessage}
           />
         </TabsContent>
       </Tabs>

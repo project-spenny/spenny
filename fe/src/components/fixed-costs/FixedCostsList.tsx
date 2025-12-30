@@ -13,12 +13,22 @@ import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
 type FixedCostsListProps = {
   items: FixedCostListItem[];
   onToggleActive: (id: string) => void;
+  emptyMessage: string;
 };
 
 export default function FixedCostsList({
   items,
   onToggleActive,
+  emptyMessage,
 }: FixedCostsListProps) {
+  if (items.length === 0) {
+    return (
+      <div className="text-muted-foreground rounded-md border p-6 text-center text-sm whitespace-pre-line">
+        {emptyMessage}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       {items.map((e) => (
