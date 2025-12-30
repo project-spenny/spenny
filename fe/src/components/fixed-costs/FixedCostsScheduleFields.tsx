@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import type { IFixedCostFormData } from '@/hooks/useFixedCostForm';
 
 type Props = {
@@ -35,6 +36,31 @@ export default function FixedCostScheduleFields({
           onChange={(date) => UpdateField('start_date', date)}
           hideLabel
         />
+      </div>
+
+      {/* 종료일 */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label>종료일 (선택)</Label>
+          <Switch
+            checked={formData.end_date !== null}
+            onCheckedChange={(checked) => {
+              UpdateField('end_date', checked ? new Date() : null);
+            }}
+          />
+        </div>
+
+        {formData.end_date && (
+          <DatePicker
+            value={formData.end_date}
+            onChange={(date) => UpdateField('end_date', date)}
+            hideLabel
+          />
+        )}
+
+        <p className="text-muted-foreground text-xs">
+          종료일을 설정하려면 오른쪽 스위치를 켜세요.
+        </p>
       </div>
 
       {/* 반복 주기 */}
