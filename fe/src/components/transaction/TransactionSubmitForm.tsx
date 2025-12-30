@@ -5,7 +5,7 @@ import { Button } from "../ui/button"
 import { supabase } from "@/utils/supabase/client"
 import { toast } from "sonner"
 import { Trash } from "lucide-react"
-import { useTransactionForm } from "@/hooks/useTranscationForm"
+import { useTransactionForm } from "@/hooks/useTransactionForm"
 import { X } from "lucide-react"
 import { ITransaction } from "@/types/transactions"
 
@@ -200,14 +200,14 @@ export default function TransactionSubmitForm({
                         type="button"
                         variant="outline"
                         onClick={()=>handleDelete()}
-                        className="w-10"
+                        className="w-12 h-12"
                     >
                         <Trash/>
                     </Button>
                 )}
                 <Button
                     type="submit"
-                    className="flex-1"
+                    className="flex-1 h-12"
                     onClick={(e)=>handleSubmit(e)}
                 >
                     {mode === 'create' ? '저장' : '수정'}
