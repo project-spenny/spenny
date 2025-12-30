@@ -1,68 +1,66 @@
-'use client'
-import { useState } from "react"
-import TransactionSubmitForm from "@/components/transaction/TransactionSubmitForm"
-import { TransactionList } from "@/components/transaction/TransactionList"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import { ITransaction } from "@/types/transactions"
-import ResponsivePanel from "@/components/panel/ResponsivePanel"
+'use client';
+import { useState } from 'react';
+import TransactionSubmitForm from '@/components/transaction/TransactionSubmitForm';
+import { TransactionList } from '@/components/transaction/TransactionList';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { ITransaction } from '@/types/transactions';
+import ResponsivePanel from '@/components/panel/ResponsivePanel';
 
 export default function Page() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
-  const [selectedTransaction, setSelectedTransaction] = useState<ITransaction | undefined>()
-  const [refreshKey, setRefreshKey] = useState(0)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [selectedTransaction, setSelectedTransaction] = useState<
+    ITransaction | undefined
+  >();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleSelectTransaction = (transaction: ITransaction) => {
-    setSelectedTransaction(transaction)
-    setFormMode('edit')
-    setIsSidebarOpen(true)
-  }
+    setSelectedTransaction(transaction);
+    setFormMode('edit');
+    setIsSidebarOpen(true);
+  };
 
   const handleCreateNew = () => {
-    setSelectedTransaction(undefined)
-    setFormMode('create')
-    setIsSidebarOpen(true)
-  }
+    setSelectedTransaction(undefined);
+    setFormMode('create');
+    setIsSidebarOpen(true);
+  };
 
   const handleClose = () => {
-    setIsSidebarOpen(false)
-  }
+    setIsSidebarOpen(false);
+  };
 
   const handleSuccess = () => {
-    setRefreshKey(prev => prev + 1)
-  }
+    setRefreshKey((prev) => prev + 1);
+  };
 
-  return(
-      <>
-        <div className="flex w-full h-screen">
-          <div className="flex-1 overflow-auto">
-            <Button
-              onClick={handleCreateNew}
-              className="rounded-full w-12 h-12 z-50 m-4"
-              size="icon"
-            >
-              <Plus/>
-
-            </Button>
-            <TransactionList 
-              refreshKey={refreshKey} 
-              onSelectTransaction={handleSelectTransaction} 
-            />
-          </div>
-
-          <ResponsivePanel 
-            isOpen={isSidebarOpen}
-            setIsOpen={setIsSidebarOpen}
+  return (
+    <>
+      <div className="flex h-screen w-full">
+        <div className="flex-1 overflow-auto">
+          <Button
+            onClick={handleCreateNew}
+            className="z-50 m-4 h-12 w-12 rounded-full"
+            size="icon"
           >
-            <TransactionSubmitForm
-                mode={formMode}
-                transaction={selectedTransaction}
-                onClose={handleClose}
-                onSuccess={handleSuccess}
-              />
-          </ResponsivePanel>
+            <Plus />
+          </Button>
+          <TransactionList
+            refreshKey={refreshKey}
+            onSelectTransaction={handleSelectTransaction}
+          />
         </div>
-      </>
-  )
+
+        <ResponsivePanel isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen}>
+          <TransactionSubmitForm
+            mode={formMode}
+            transaction={selectedTransaction}
+            onClose={handleClose}
+            onSuccess={handleSuccess}
+          />
+        </ResponsivePanel>
+      </div>
+    </>
+  );
 }

@@ -16,7 +16,7 @@ const AppLayout = ({
         <main className="flex flex-1 items-center justify-center md:pl-28">
           {children}
         </main>
-        <Toaster/>
+        <Toaster />
       </div>
 
       <Footer />
