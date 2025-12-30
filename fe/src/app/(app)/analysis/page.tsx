@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Button } from '@/components/ui/button';
 import ExpenseAnalysis from '@/components/analysis/ExpenseAnalysis';
+import IncomeAnalysis from '@/components/analysis/IncomeAnalysis';
 import { useState } from 'react';
 
 const AnalysisPage = () => {
@@ -24,7 +25,7 @@ const AnalysisPage = () => {
 
   const analysisTabs = [
     { value: '지출', content: <ExpenseAnalysis selectedDate={currentDate} /> },
-    { value: '수입', content: '수입 분석 컴포넌트' },
+    { value: '수입', content: <IncomeAnalysis selectedDate={currentDate} /> },
     { value: '예산', content: '예산 분석 컴포넌트' },
   ];
 

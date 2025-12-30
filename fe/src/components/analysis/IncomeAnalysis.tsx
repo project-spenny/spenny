@@ -4,27 +4,22 @@ import { useEffect, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import { CalendarDays } from 'lucide-react';
-import { ITransaction } from '@/types/transactions';
+import { ExpenseState } from './ExpenseAnalysis';
+import { PiggyBank } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
-export type ExpenseState = {
-  current: ITransaction[];
-  prev: ITransaction[];
-};
-
-const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
-  const [expenseData, setExpenseData] = useState<ExpenseState>({
+const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
+  const [incomeData, setIncomeData] = useState<ExpenseState>({
     current: [],
     prev: [],
   });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchExpenses = async () => {
+    const fetchIncome = async () => {
       try {
         setIsLoading(true);
 
@@ -55,14 +50,14 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
             .from('transactions')
             .select('*')
             .eq('user_id', user.id)
-            .eq('type', 'expense')
+            .eq('type', 'income')
             .gte('date', startDate)
             .lte('date', endDate),
           supabase
             .from('transactions')
             .select('*')
             .eq('user_id', user.id)
-            .eq('type', 'expense')
+            .eq('type', 'income')
             .gte('date', prevStart)
             .lte('date', prevEnd),
         ]);
@@ -70,7 +65,7 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
         if (currentMonthRes.error) throw currentMonthRes.error;
         if (lastMonthRes.error) throw lastMonthRes.error;
 
-        setExpenseData({
+        setIncomeData({
           current: currentMonthRes.data || [],
           prev: lastMonthRes.data || [],
         });
@@ -84,10 +79,10 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
       }
     };
 
-    fetchExpenses();
+    fetchIncome();
   }, [selectedDate]);
 
-  const { current, prev } = expenseData;
+  const { current, prev } = incomeData;
 
   const totalAmount = current.reduce(
     (sum, item) => sum + (item.amount || 0),
@@ -101,48 +96,40 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
 
   return (
     <AnalysisSection
-      title="월별 지출"
-      icon={<CalendarDays className="text-red-400" />}
+      title="월별 수입"
+      icon={<PiggyBank className="text-blue-400" />}
     >
       <div className="px-2 py-4">
         {isLoading ? (
-          // 로딩 중
           <div className="space-y-3">
             <Skeleton className="bg-accent-foreground/10 h-7 w-36" />
             <Skeleton className="bg-accent-foreground/10 h-5 w-48" />
           </div>
         ) : current.length === 0 ? (
-          // 이번 달 지출이 없는 경우
           <AnalysisEmpty
-            title="이번 달은 지출 내역이 없어요!"
-            description="지출을 기록하고 소비 습관을 파악해 보세요."
+            title="이번 달은 수입 내역이 없어요!"
+            description="월급이나 부수입을 기록해 보세요."
           />
         ) : (
-          // 이번 달 지출이 있는 경우
           <>
-            {/* 이번 달 총 지출 */}
             <div className="text-lg font-bold">
-              총 지출{' '}
-              <span className="text-red-400">
+              총 수입{' '}
+              <span className="text-blue-400">
                 {totalAmount.toLocaleString()}
               </span>
               원
             </div>
-
-            {/* 지난 달과 비교 */}
             <div className="mt-2 text-base font-medium">
               {prev.length === 0 ? (
-                // 지난 달 지출이 없는 경우
-                <p>이전 달 지출 내역이 없어요!</p>
+                <p>이전 달 수입 내역이 없어요!</p>
               ) : (
-                // 두 달 모두 지출이 있는 경우
                 <p>
                   지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
                   {diff > 0
-                    ? '더 썼어요'
+                    ? '더 벌었어요!'
                     : diff < 0
-                      ? '아꼈어요'
-                      : '똑같이 썼어요'}
+                      ? '적게 벌었어요'
+                      : '똑같아요'}
                 </p>
               )}
             </div>
@@ -153,4 +140,4 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   );
 };
 
-export default ExpenseAnalysis;
+export default IncomeAnalysis;
