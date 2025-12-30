@@ -51,14 +51,30 @@ export const useAnalysisData = (
         const [currentMonthRes, prevMonthRes] = await Promise.all([
           supabase
             .from('transactions')
-            .select('*')
+            .select(
+              `
+                *,
+                categories!category_id (
+                  name_ko,
+                  category_key
+                )
+              `
+            )
             .eq('user_id', user.id)
             .eq('type', type)
             .gte('date', startDate)
             .lte('date', endDate),
           supabase
             .from('transactions')
-            .select('*')
+            .select(
+              `
+                *,
+                categories!category_id (
+                  name_ko,
+                  category_key
+                )
+              `
+            )
             .eq('user_id', user.id)
             .eq('type', type)
             .gte('date', prevStart)
@@ -68,6 +84,7 @@ export const useAnalysisData = (
         if (currentMonthRes.error) throw currentMonthRes.error;
         if (prevMonthRes.error) throw prevMonthRes.error;
 
+        console.log(currentMonthRes.data);
         setData({
           current: currentMonthRes.data || [],
           prev: prevMonthRes.data || [],
