@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
-import { MOCK_FIXED_COSTS } from '@/constants/fixed-costs.mock';
 import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
 
-export default function FixedCostsList() {
-  const items: FixedCostListItem[] = MOCK_FIXED_COSTS;
+type FixedCostsListProps = {
+  items: FixedCostListItem[];
+};
 
+export default function FixedCostsList({ items }: FixedCostsListProps) {
   return (
     <div className="space-y-2">
       {items.map((e) => (
