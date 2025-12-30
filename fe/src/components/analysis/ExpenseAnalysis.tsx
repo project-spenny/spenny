@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { Button } from '../ui/button';
+import AnalysisEmpty from '@/components/analysis/AnalysisEmpty';
 import { ITransaction } from '@/types/transactions';
-import Link from 'next/link';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
@@ -101,14 +100,10 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
     <div className="p-4">
       {current.length === 0 ? (
         // 이번 달 지출이 없는 경우
-        <div className="flex flex-col items-center justify-center">
-          <p className="text-lg font-semibold">
-            이번 달은 아직 지출 내역이 없어요!
-          </p>
-          <Button asChild className="mt-4 w-auto">
-            <Link href={'/'}>기록하러 가기</Link>
-          </Button>
-        </div>
+        <AnalysisEmpty
+          title="이번 달은 아직 지출 내역이 없어요!"
+          description="지출을 기록하고 소비 습관을 파악해 보세요."
+        />
       ) : (
         // 이번 달 지출이 있는 경우
         <>
