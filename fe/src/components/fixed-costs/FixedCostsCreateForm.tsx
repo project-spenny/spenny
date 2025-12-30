@@ -6,7 +6,7 @@ import { TitleInput } from '../transaction/common/TitleInput';
 import { TypeSelector } from '../transaction/common/TypeSelector';
 import { CategorySelector } from '../transaction/common/CategorySelector';
 import { AmountInput } from '../transaction/common/AmountInput';
-import { useTransactionForm } from '@/hooks/useTranscationForm';
+import { useFixedCostForm } from '@/hooks/useFixedCostForm';
 import { toast } from 'sonner';
 
 export default function FixedCostCreateForm() {
@@ -16,7 +16,7 @@ export default function FixedCostCreateForm() {
     setCategoryOpen,
     UpdateField,
     validateFormData,
-  } = useTransactionForm();
+  } = useFixedCostForm();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
