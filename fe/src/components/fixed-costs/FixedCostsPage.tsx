@@ -17,6 +17,7 @@ export default function FixedCostsPage() {
   const [tab, setTab] = useState<TabValue>('all');
   const [items, setItems] = useState<IFixedRule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -35,6 +36,11 @@ export default function FixedCostsPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleCreateSuccess = async () => {
+    await fetchData();
+    setIsPanelOpen(false);
+  };
 
   const filteredItems =
     tab === 'active'
@@ -73,8 +79,9 @@ export default function FixedCostsPage() {
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
-      <ResponsivePanel trigger={<FixedCostsAddButton />}>
-        <FixedCostCreateForm onSuccess={fetchData} />
+      <FixedCostsAddButton onClick={() => setIsPanelOpen(true)} />
+      <ResponsivePanel isOpen={isPanelOpen} setIsOpen={setIsPanelOpen}>
+        <FixedCostCreateForm onSuccess={handleCreateSuccess} />
       </ResponsivePanel>
 
       <header>
