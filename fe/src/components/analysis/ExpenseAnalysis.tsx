@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import AnalysisEmpty from '@/components/analysis/AnalysisEmpty';
+import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import { CalendarDays } from 'lucide-react';
 import { ITransaction } from '@/types/transactions';
