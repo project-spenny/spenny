@@ -14,7 +14,7 @@ const AnalysisEmpty = ({ title, description }: AnalysisEmptyProps) => {
         <ReceiptText className="text-muted-foreground/80 h-8 w-8" />
       </div>
 
-      <div className="text-muted-foreground space-y-1">
+      <div className="text-muted-foreground space-y-1 text-center">
         <p className="text-lg font-semibold tracking-tight">{title}</p>
         {description && <p className="text-sm">{description}</p>}
       </div>
