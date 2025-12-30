@@ -1,32 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FixedCostsAddButton from './FixedCostsAddButton';
 import FixedCostsList from './FixedCostsList';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { MOCK_FIXED_COSTS } from '@/constants/fixed-costs.mock';
-import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import FixedCostCreateForm from './FixedCostsCreateForm';
+import { IFixedRule } from '@/types/fixed-costs';
+import { fetchFixedRules } from '@/services/fixed-costs';
+import { toast } from 'sonner';
 
 type TabValue = 'all' | 'active' | 'inactive';
 
 export default function FixedCostsPage() {
   const [tab, setTab] = useState<TabValue>('all');
-  const [items, setItems] = useState<FixedCostListItem[]>(MOCK_FIXED_COSTS);
+  const [items, setItems] = useState<IFixedRule[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchFixedRules();
+        setItems(data);
+      } catch (err) {
+        console.error('[고정비 목록 조회 실패]', err);
+        toast.error(
+          '고정비 목록을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const filteredItems =
     tab === 'active'
-      ? items.filter((i) => i.isActive)
+      ? items.filter((i) => i.is_active)
       : tab === 'inactive'
-        ? items.filter((i) => !i.isActive)
+        ? items.filter((i) => !i.is_active)
         : items;
 
   const counts = {
     all: items.length,
-    active: items.filter((i) => i.isActive).length,
-    inactive: items.filter((i) => !i.isActive).length,
+    active: items.filter((i) => i.is_active).length,
+    inactive: items.filter((i) => !i.is_active).length,
   };
 
   const emptyMessage =
@@ -39,7 +60,7 @@ export default function FixedCostsPage() {
   const handleToggleActive = (id: string) => {
     setItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, isActive: !item.isActive } : item
+        item.id === id ? { ...item, is_active: !item.is_active } : item
       )
     );
   };
@@ -85,7 +106,7 @@ export default function FixedCostsPage() {
         <TabsContent value={tab} className="mt-4">
           <FixedCostsList
             items={filteredItems}
-            onToggleActive={handleToggleActive}
+            isLoading={isLoading}
             emptyMessage={emptyMessage}
           />
         </TabsContent>

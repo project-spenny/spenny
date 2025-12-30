@@ -8,19 +8,27 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
-import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
+import { IFixedRule } from '@/types/fixed-costs';
 
 type FixedCostsListProps = {
-  items: FixedCostListItem[];
-  onToggleActive: (id: string) => void;
+  items: IFixedRule[];
+  isLoading: boolean;
   emptyMessage: string;
 };
 
 export default function FixedCostsList({
   items,
-  onToggleActive,
+  isLoading,
   emptyMessage,
 }: FixedCostsListProps) {
+  if (isLoading) {
+    return (
+      <div className="text-muted-foreground py-8 text-center text-sm">
+        고정비 목록을 불러오는 중입니다…
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="text-muted-foreground rounded-md border p-6 text-center text-sm whitespace-pre-line">
@@ -35,7 +43,7 @@ export default function FixedCostsList({
         <Item
           variant="outline"
           key={e.id}
-          className={cn(!e.isActive && 'opacity-50')}
+          className={cn(!e.is_active && 'opacity-50')}
         >
           <ItemContent className="flex flex-row items-center">
             <div className="flex w-24 flex-col gap-1">
@@ -55,7 +63,7 @@ export default function FixedCostsList({
             <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
             <ItemActions className="ml-auto">
               <Switch
-                checked={e.isActive}
+                checked={e.is_active}
                 onCheckedChange={() => onToggleActive(e.id)}
               />
               <Button className="cursor-pointer" size="sm">
