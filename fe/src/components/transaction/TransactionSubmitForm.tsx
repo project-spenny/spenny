@@ -19,7 +19,6 @@ import { CategorySelector } from './common/CategorySelector';
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';
   transaction?: ITransaction;
-  ㅏ;
   onClose: () => void;
   onSuccess: () => void;
 }
