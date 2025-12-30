@@ -64,36 +64,38 @@ export const TransactionList = ({
   }, [refreshKey]);
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
-      <Label className="text-xl">가계부</Label>
-      {transactions.map((e, index) => (
-        <Item variant="outline" key={index}>
-          <ItemContent className="flex flex-row items-center">
-            <div className="flex w-24 flex-col gap-1">
-              <span className="text-muted-foreground text-xs">{e.date}</span>
-              <span
-                className={cn(
-                  'text-sm font-bold',
-                  e.type === 'income' ? 'text-blue-400' : 'text-red-400'
-                )}
-              >
-                {e.type === 'income' ? '+' : '-'}
-                {e.amount.toLocaleString()}원
-              </span>
-            </div>
-            <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
-            <ItemActions className="ml-auto">
-              <Button
-                className="cursor-pointer"
-                size="sm"
-                onClick={() => onSelectTransaction(e)}
-              >
-                <ChevronRight />
-              </Button>
-            </ItemActions>
-          </ItemContent>
-        </Item>
-      ))}
+    <div className="w-full space-y-6 p-4 md:p-6 lg:p-8">
+      <div className="w-full max-w-xl space-y-6">
+        <Label className="text-xl">가계부</Label>
+        {transactions.map((e, index) => (
+          <Item variant="outline" key={index}>
+            <ItemContent className="flex flex-row items-center">
+              <div className="flex w-24 flex-col gap-1">
+                <span className="text-muted-foreground text-xs">{e.date}</span>
+                <span
+                  className={cn(
+                    'text-sm font-bold',
+                    e.type === 'income' ? 'text-blue-400' : 'text-red-400'
+                  )}
+                >
+                  {e.type === 'income' ? '+' : '-'}
+                  {e.amount.toLocaleString()}원
+                </span>
+              </div>
+              <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
+              <ItemActions className="ml-auto">
+                <Button
+                  className="cursor-pointer"
+                  size="sm"
+                  onClick={() => onSelectTransaction(e)}
+                >
+                  <ChevronRight />
+                </Button>
+              </ItemActions>
+            </ItemContent>
+          </Item>
+        ))}
+      </div>
     </div>
   );
 };
