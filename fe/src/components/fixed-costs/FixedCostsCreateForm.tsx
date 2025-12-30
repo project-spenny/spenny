@@ -90,6 +90,7 @@ export default function FixedCostCreateForm() {
           <DatePicker
             value={formData.start_date}
             onChange={(date) => UpdateField('start_date', date)}
+            hideLabel
           />
         </div>
 
