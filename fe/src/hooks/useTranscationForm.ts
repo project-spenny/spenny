@@ -23,7 +23,7 @@ export const useTransactionForm = (initialData? : IFormData) =>{
 
     useEffect(() => {
         setFormData(getInitialFormData(initialData))
-    }, [JSON.stringify(initialData)])
+    }, [initialData])
 
     const validateFormData =()=>{
         if(!formData.title.trim()){
