@@ -1,26 +1,17 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import FixedCostsAddButton from './FixedCostsAddButton';
 import FixedCostsList from './FixedCostsList';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { MOCK_FIXED_COSTS } from '@/constants/fixed-costs.mock';
+import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
 
 type TabValue = 'all' | 'active' | 'inactive';
 
 export default function FixedCostsPage() {
   const [tab, setTab] = useState<TabValue>('all');
-
-  const counts = useMemo(() => {
-    const active = MOCK_FIXED_COSTS.filter((i) => i.isActive).length;
-    const inactive = MOCK_FIXED_COSTS.length - active;
-
-    return {
-      all: MOCK_FIXED_COSTS.length,
-      active,
-      inactive,
-    };
-  }, []);
+  const [items, setItems] = useState<FixedCostListItem[]>(MOCK_FIXED_COSTS);
 
   const filteredItems =
     tab === 'active'
@@ -28,6 +19,20 @@ export default function FixedCostsPage() {
       : tab === 'inactive'
         ? MOCK_FIXED_COSTS.filter((i) => !i.isActive)
         : MOCK_FIXED_COSTS;
+
+  const counts = {
+    all: items.length,
+    active: items.filter((i) => i.isActive).length,
+    inactive: items.filter((i) => !i.isActive).length,
+  };
+
+  const handleToggleActive = (id: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, isActive: !item.isActive } : item
+      )
+    );
+  };
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
@@ -45,7 +50,10 @@ export default function FixedCostsPage() {
         </TabsList>
 
         <TabsContent value={tab} className="mt-4">
-          <FixedCostsList items={filteredItems} />
+          <FixedCostsList
+            items={filteredItems}
+            onToggleActive={handleToggleActive}
+          />
         </TabsContent>
       </Tabs>
     </div>

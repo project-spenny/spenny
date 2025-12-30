@@ -12,9 +12,13 @@ import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
 
 type FixedCostsListProps = {
   items: FixedCostListItem[];
+  onToggleActive: (id: string) => void;
 };
 
-export default function FixedCostsList({ items }: FixedCostsListProps) {
+export default function FixedCostsList({
+  items,
+  onToggleActive,
+}: FixedCostsListProps) {
   return (
     <div className="space-y-2">
       {items.map((e) => (
@@ -40,7 +44,10 @@ export default function FixedCostsList({ items }: FixedCostsListProps) {
             </div>
             <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
             <ItemActions className="ml-auto">
-              <Switch checked={e.isActive} />
+              <Switch
+                checked={e.isActive}
+                onCheckedChange={() => onToggleActive(e.id)}
+              />
               <Button className="cursor-pointer" size="sm">
                 <ChevronRight />
               </Button>
