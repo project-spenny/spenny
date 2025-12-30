@@ -1,98 +1,14 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import { ExpenseState } from './ExpenseAnalysis';
 import { PiggyBank } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getMonthRange } from '@/utils/date';
-import { supabase } from '@/utils/supabase/client';
-import { toast } from 'sonner';
+import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
-  const [incomeData, setIncomeData] = useState<ExpenseState>({
-    current: [],
-    prev: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchIncome = async () => {
-      try {
-        setIsLoading(true);
-
-        const { startDate, endDate } = getMonthRange(selectedDate);
-        const lastMonthDate = new Date(
-          selectedDate.getFullYear(),
-          selectedDate.getMonth() - 1,
-          1
-        );
-        const { startDate: prevStart, endDate: prevEnd } =
-          getMonthRange(lastMonthDate);
-
-        // Supabase에서 현재 로그인한 유저 정보 가져오기
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (!user || authError) {
-          toast.warning('로그인이 필요합니다');
-          setIsLoading(false);
-          return;
-        }
-
-        // 지출(expense) 타입이고, 해당 기간 내에 작성된 현재 유저의 기록만 조회
-        const [currentMonthRes, lastMonthRes] = await Promise.all([
-          supabase
-            .from('transactions')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('type', 'income')
-            .gte('date', startDate)
-            .lte('date', endDate),
-          supabase
-            .from('transactions')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('type', 'income')
-            .gte('date', prevStart)
-            .lte('date', prevEnd),
-        ]);
-
-        if (currentMonthRes.error) throw currentMonthRes.error;
-        if (lastMonthRes.error) throw lastMonthRes.error;
-
-        setIncomeData({
-          current: currentMonthRes.data || [],
-          prev: lastMonthRes.data || [],
-        });
-      } catch (err) {
-        console.error('[지출 내역 조회 실패]', err);
-        toast.error(
-          '지출 내역을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchIncome();
-  }, [selectedDate]);
-
-  const { current, prev } = incomeData;
-
-  const totalAmount = current.reduce(
-    (sum, item) => sum + (item.amount || 0),
-    0
+  const { current, prev, totalAmount, diff, isLoading } = useAnalysisData(
+    selectedDate,
+    'income'
   );
-  const lastMonthTotal = prev.reduce(
-    (sum, item) => sum + (item.amount || 0),
-    0
-  );
-  const diff = totalAmount - lastMonthTotal;
 
   return (
     <AnalysisSection
@@ -107,7 +23,7 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
           </div>
         ) : current.length === 0 ? (
           <AnalysisEmpty
-            title="이번 달은 수입 내역이 없어요!"
+            title="이번 달 수입이 없어요!"
             description="월급이나 부수입을 기록해 보세요."
           />
         ) : (
