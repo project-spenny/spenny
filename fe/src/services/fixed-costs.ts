@@ -1,5 +1,6 @@
 import { supabase } from '@/utils/supabase/client';
-import type { IFixedRule } from '@/types/fixed-costs';
+import type { CreateFixedRuleInput, IFixedRule } from '@/types/fixed-costs';
+import { use } from 'react';
 
 const requireUserId = async () => {
   const {
@@ -34,6 +35,25 @@ export const setFixedRuleActive = async (id: string, isActive: boolean) => {
     .update({ is_active: isActive })
     .eq('id', id)
     .eq('user_id', userId)
+    .select('*')
+    .single();
+
+  if (error) throw error;
+  return data as IFixedRule;
+};
+
+// 고정비 항목 생성
+export const createFixedRule = async (input: CreateFixedRuleInput) => {
+  const userId = await requireUserId();
+
+  const payload = {
+    user_id: userId,
+    ...input,
+  };
+
+  const { data, error } = await supabase
+    .from('fixed_rules')
+    .insert(payload)
     .select('*')
     .single();
 
