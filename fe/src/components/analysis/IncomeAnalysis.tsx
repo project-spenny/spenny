@@ -10,21 +10,25 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   );
 
   return (
-    <AnalysisSection
-      title="월별 수입"
-      icon={<TrendingUp className="text-blue-400" />}
-    >
-      <div className="px-2 py-4">
-        <MonthlyAmount
-          type="income"
-          isLoading={isLoading}
-          currentCount={current.length}
-          prevCount={prev.length}
-          totalAmount={totalAmount}
-          diff={diff}
-        />
-      </div>
-    </AnalysisSection>
+    <div className="space-y-4">
+      <AnalysisSection
+        title="월별 수입"
+        icon={<TrendingUp className="text-blue-400" />}
+      >
+        <div className="px-2 py-4">
+          <MonthlyAmount
+            type="income"
+            isLoading={isLoading}
+            currentCount={current.length}
+            prevCount={prev.length}
+            totalAmount={totalAmount}
+            diff={diff}
+          />
+        </div>
+      </AnalysisSection>
+
+      <AnalysisSection title="카테고리별 수입">카테고리별 수입</AnalysisSection>
+    </div>
   );
 };
 

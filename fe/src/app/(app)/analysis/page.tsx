@@ -83,7 +83,9 @@ const AnalysisPage = () => {
         {/* 탭 콘텐츠 영역 */}
         {analysisTabs.map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
-            <div className="animate-in fade-in duration-300">{tab.content}</div>
+            <div className="animate-in fade-in pt-2 duration-300">
+              {tab.content}
+            </div>
           </TabsContent>
         ))}
       </Tabs>
