@@ -6,6 +6,7 @@ import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import { CalendarDays } from 'lucide-react';
 import { ITransaction } from '@/types/transactions';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
@@ -99,9 +100,15 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   const diff = totalAmount - lastMonthTotal;
 
   return (
-    <AnalysisSection title="월별 지출 분석" icon={<CalendarDays />}>
+    <AnalysisSection title="월별 지출" icon={<CalendarDays />}>
       <div className="px-2 py-4">
-        {current.length === 0 ? (
+        {isLoading ? (
+          // 로딩 중
+          <div className="space-y-3">
+            <Skeleton className="bg-accent-foreground/10 h-7 w-36" />
+            <Skeleton className="bg-accent-foreground/10 h-5 w-48" />
+          </div>
+        ) : current.length === 0 ? (
           // 이번 달 지출이 없는 경우
           <AnalysisEmpty
             title="이번 달은 아직 지출 내역이 없어요!"
