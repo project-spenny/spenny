@@ -62,7 +62,7 @@ export default function FixedCostsPage() {
       await setFixedRuleActive(id, nextActive);
       setItems((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, is_active: !nextActive } : item
+          item.id === id ? { ...item, is_active: nextActive } : item
         )
       );
     } catch (err) {
