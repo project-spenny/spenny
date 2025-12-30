@@ -11,6 +11,7 @@ const requireUserId = async () => {
   return user.id;
 };
 
+// 고정비 목록 조회
 export const fetchFixedRules = async () => {
   const userId = await requireUserId();
 
@@ -22,4 +23,20 @@ export const fetchFixedRules = async () => {
 
   if (error) throw error;
   return (data ?? []) as IFixedRule[];
+};
+
+// 고정비 활성화/비활성화 설정
+export const setFixedRuleActive = async (id: string, isActive: boolean) => {
+  const userId = await requireUserId();
+
+  const { data, error } = await supabase
+    .from('fixed_rules')
+    .update({ is_active: isActive })
+    .eq('id', id)
+    .eq('user_id', userId)
+    .select('*')
+    .single();
+
+  if (error) throw error;
+  return data as IFixedRule;
 };

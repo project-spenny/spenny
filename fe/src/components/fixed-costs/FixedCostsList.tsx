@@ -14,12 +14,14 @@ type FixedCostsListProps = {
   items: IFixedRule[];
   isLoading: boolean;
   emptyMessage: string;
+  onToggleActive: (id: string, nextActive: boolean) => void;
 };
 
 export default function FixedCostsList({
   items,
   isLoading,
   emptyMessage,
+  onToggleActive,
 }: FixedCostsListProps) {
   if (isLoading) {
     return (
@@ -64,7 +66,7 @@ export default function FixedCostsList({
             <ItemActions className="ml-auto">
               <Switch
                 checked={e.is_active}
-                onCheckedChange={() => onToggleActive(e.id)}
+                onCheckedChange={(v) => onToggleActive(e.id, v)}
               />
               <Button className="cursor-pointer" size="sm">
                 <ChevronRight />

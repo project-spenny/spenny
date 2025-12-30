@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import FixedCostCreateForm from './FixedCostsCreateForm';
 import { IFixedRule } from '@/types/fixed-costs';
-import { fetchFixedRules } from '@/services/fixed-costs';
+import { fetchFixedRules, setFixedRuleActive } from '@/services/fixed-costs';
 import { toast } from 'sonner';
 
 type TabValue = 'all' | 'active' | 'inactive';
@@ -57,12 +57,20 @@ export default function FixedCostsPage() {
         ? '활성화된 고정비가 없습니다.'
         : '비활성화된 고정비가 없습니다.';
 
-  const handleToggleActive = (id: string) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, is_active: !item.is_active } : item
-      )
-    );
+  const handleToggleActive = async (id: string, nextActive: boolean) => {
+    try {
+      await setFixedRuleActive(id, nextActive);
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, is_active: !nextActive } : item
+        )
+      );
+    } catch (err) {
+      console.error('[고정비 활성화 상태 변경 실패]', err);
+      toast.error(
+        '고정비 활성화 상태 변경 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+      );
+    }
   };
 
   return (
@@ -108,6 +116,7 @@ export default function FixedCostsPage() {
             items={filteredItems}
             isLoading={isLoading}
             emptyMessage={emptyMessage}
+            onToggleActive={handleToggleActive}
           />
         </TabsContent>
       </Tabs>
