@@ -35,23 +35,27 @@ export default function Page() {
 
   return(
       <>
-        <ResponsivePanel trigger={<Button>sdfd</Button>}>
-          <div>hi</div>
-        </ResponsivePanel>
-        <div className="flex w-full h-screen overflow-hidden border-2">
+        <div className="flex w-full h-screen">
           <div className="flex-1 overflow-auto">
             <Button
               onClick={handleCreateNew}
-              className="rounded-full w-12 h-12 z-50 mr-4"
+              className="rounded-full w-12 h-12 z-50 m-4"
               size="icon"
             >
               <Plus/>
+
             </Button>
-            <TransactionList refreshKey={refreshKey} onSelectTransaction={handleSelectTransaction} />
+            <TransactionList 
+              refreshKey={refreshKey} 
+              onSelectTransaction={handleSelectTransaction} 
+            />
           </div>
 
-          {isSidebarOpen && (
-            <div className="w-96 border-l shadow-2xl overflow-auto bg-white">
+          <ResponsivePanel 
+            isOpen={isSidebarOpen}
+            setIsOpen={setIsSidebarOpen}
+          >
+            <div className="w-96 overflow-auto bg-white">
               <TransactionSubmitForm
                 mode={formMode}
                 transaction={selectedTransaction}
@@ -59,7 +63,7 @@ export default function Page() {
                 onSuccess={handleSuccess}
               />
             </div>
-          )}
+          </ResponsivePanel>
         </div>
       </>
   )
