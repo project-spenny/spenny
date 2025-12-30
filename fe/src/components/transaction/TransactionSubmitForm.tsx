@@ -1,117 +1,68 @@
 'use client'
-import { useState, useEffect } from "react"
+import { useMemo} from "react"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
-import { Input } from "../ui/input"
-import { Calendar } from "@/components/ui/calendar"
 import { Button } from "../ui/button"
 import { supabase } from "@/utils/supabase/client"
 import { toast } from "sonner"
 import { Trash } from "lucide-react"
-import { CATEGORIES } from "@/constants/categories"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
+import { useTransactionForm } from "@/hooks/useTranscationForm"
 import { X } from "lucide-react"
+import { ITransaction } from "@/types/transactions"
 
-interface Transaction {
-  id: string
-  title: string
-  user_id : string
-  category_id: string
-  type: 'income' | 'expense'
-  date: string
-  amount: number
-  fixed_rule_id : string|null
-  memo : string | null
-  created_at : Date
-  updated_at : Date
-  tags : string[]
-}
+import { AmountInput } from "./common/AmountInput"
+import { DatePicker } from "./common/DatePicker"
+import { TagInput } from "./common/TagInput"
+import { TitleInput } from "./common/TitleInput"
+import { TypeSelector } from "./common/TypeSelector"
+import { CategorySelector } from "./common/CategorySelector"
 
 interface TransactionsSubmitFormProps {
     mode : 'create' | 'edit'
-    transaction? : Transaction
+    transaction? : ITransaction
     onClose : ()=> void
     onSuccess : ()=> void
 }
+
 export default function TransactionSubmitForm({
     mode, transaction, onClose, onSuccess
 } : TransactionsSubmitFormProps) {
-    const [formData, setFormData] = useState({
-            title: "",
-            transactionType: "",
-            amount: "",
-            date: new Date(),
-            category: "",
-            tags: [] as string[]
-    })
-
-    const [categoryOpen, setCategoryOpen] = useState(false)
-    const [tagInput, setTagInput] = useState<string>("")
-    const [error, setError]= useState<string | null>();
-
-    useEffect(() => {
+    const initialFormData = useMemo(()=>{
         if (mode === 'edit' && transaction) {
-            setFormData({
+            return {
                 title: transaction.title,
-                transactionType: transaction.type,
+                type: transaction.type,
                 amount: transaction.amount.toString(),
                 date: new Date(transaction.date),
-                category: transaction.category_id,
+                category_id: transaction.category_id,
                 tags: transaction.tags || []
-            })
+            }
         } else {
-            // create 모드일 때는 초기화
-            setFormData({
+            return{
                 title: "",
-                transactionType: "",
+                type: "",
                 amount: "",
                 date: new Date(),
-                category: "",
+                category_id: "",
                 tags: []
-            })
+            }
         }
     }, [mode, transaction])
-    const formatDate = (date: Date) => {
-        const year = date.getFullYear()
-        const month = date.getMonth() + 1
-        const day = date.getDate()
-        return `${year}년 ${month}월 ${day}일`
-    }
 
-    const validateFormData =()=>{
-        if(!formData.title.trim()){
-            const errorMsg = "제목을 입력해주세요";
-            return errorMsg;
-        }else if(formData.title.trim().length>20){
-            const errorMsg = "제목은 20자 이내로  입력해주세요"
-            return errorMsg;
-        }
+    const {formData,
+        setFormData,
+        categoryOpen,
+        setCategoryOpen,
+        validateFormData,
+        addTag,
+        removeTag,
+        UpdateField
+    } = useTransactionForm(initialFormData);
 
-        if(!formData.transactionType){
-            const errorMsg = "거래 유형을 선택해주세요";
-            return errorMsg;
-        }
-
-        if(!formData.category){
-            const errorMsg = "카테고리를 선택해주세요";
-            return errorMsg;
-        }
-
-        if(!formData.amount || Number(formData.amount)<=0){
-            const errorMsg = "금액은 0보다 커야 합니다"
-            return errorMsg;
-        }
-        return null;
-
-    }
     const handleSubmit = async(e: React.FormEvent)=>{
         e.preventDefault();
+
         const errorMsg = validateFormData();
+
         if (errorMsg) {
             toast(errorMsg)
             return
@@ -122,15 +73,18 @@ export default function TransactionSubmitForm({
                 toast.warning('로그인이 필요합니다')
                 return
             }
-            const formattedDate = formData.date.toISOString().split('T')[0]
+            const year = formData.date.getFullYear();
+            const month = String(formData.date.getMonth()+1).padStart(2,'0');
+            const day = String(formData.date.getDate()).padStart(2,'0');
+            const formattedDate = `${year}-${month}-${day}`
 
             const transactionData = {
                 user_id: user.id,
                 title: formData.title.trim(),
-                type: formData.transactionType,
+                type: formData.type,
                 amount: Number(formData.amount),
                 date: formattedDate,
-                category_id: formData.category,
+                category_id: formData.category_id,
                 tags: formData.tags.length > 0 ? formData.tags : null
             }
 
@@ -147,6 +101,7 @@ export default function TransactionSubmitForm({
 
                 toast.success("가계부 작성을 완료했습니다")
             } else {
+                console.log(transactionData)
                 const { error } = await supabase
                     .from('transactions')
                     .update(transactionData)
@@ -161,14 +116,12 @@ export default function TransactionSubmitForm({
 
             setFormData({
                 title: "",
-                transactionType: "",
+                type: "",
                 amount: "",
                 date: new Date(),
-                category: "",
-                tags: []
+                category_id: "",
+                tags :[]
             })
-            setTagInput("")
-            setError(null)
             onSuccess()
             onClose()
         }catch(error){
@@ -200,33 +153,6 @@ export default function TransactionSubmitForm({
         }
     }
 
-    const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            if (e.nativeEvent.isComposing) {
-                return;
-            }   
-            e.preventDefault()
-            addTag()
-        }
-    }
-    
-    const addTag = () => {
-        const trimmedTag = tagInput.trim()
-        if (trimmedTag && !formData.tags.includes(trimmedTag)) {
-            setFormData(prev => ({
-                ...prev,
-                tags: [...prev.tags, trimmedTag]
-            }))
-            setTagInput("")
-        }
-    }
-    
-    const removeTag = (tagToRemove: string) => {
-        setFormData(prev => ({
-            ...prev,
-            tags: prev.tags.filter(tag => tag !== tagToRemove)
-        }))
-    }
     return (
         <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
             <div className="flex justify-between items-center sticky top-0 bg-white pb-4 border-b">
@@ -237,162 +163,40 @@ export default function TransactionSubmitForm({
                     <X />
                 </Button>
             </div>
-            <div className="space-y-2">
-                <Label>타이틀</Label>
-                <Input
-                    id="amount"
-                    type="text"
-                    placeholder="어떤 지출인가요"
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
-                />
-            </div>
 
-            {/* 거래유형 선택 */}
-            <div className="space-y-2">
-                <Label>거래 유형</Label>
-                <div className="grid grid-cols-2 gap-4">
-                    <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'income'}))}
-                        className={cn(
-                            "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            formData.transactionType === 'income'
-                                ? "border-gray-500"
-                                : "border-gray-300 hover:border-gray-400"
-                        )}
-                    >
-                        수입
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({...prev, category:"", transactionType: 'expense'}))}
-                        className={cn(
-                            "px-6 py-3 rounded-lg border-2 transition-all font-medium cursor-pointer",
-                            formData.transactionType === 'expense'
-                                ? "border-gray-500"
-                                : "border-gray-300 hover:border-gray-400"
-                        )}
-                    >
-                        지출
-                    </button>
-                </div>
-            </div>
-            {
-                formData.transactionType !=="" && (
-                    <div className="space-y-2">
-                        <Label>카테고리</Label>
-                        <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                >
-                                    {formData.category === "" 
-                                        ? "선택" 
-                                        : (formData.transactionType === "income" 
-                                            ? CATEGORIES.income 
-                                            : CATEGORIES.expense
-                                        ).find(cat => cat.category_key === formData.category)?.name_ko || "선택"
-                                    }
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                                <div className="grid grid-cols-3">
-                                    {(formData.transactionType==="income" ? CATEGORIES.income : CATEGORIES.expense).map((cat)=>(
-                                        <div
-                                            onClick={()=>{
-                                                setFormData(prev => ({...prev, category: cat.category_key}))
-                                                setCategoryOpen(false)}}
-                                            className="flex items-center justify-center text-center w-24 h-16 cursor-pointer text-sm hover:bg-gray-100" key={cat.category_key}>{cat.name_ko}</div>
-                                    ))}
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                )
-            }
+            <TitleInput
+                value={formData.title}
+                onChange={(title)=> UpdateField('title', title)}
+            />
 
+            <TypeSelector
+                value={formData.type}
+                onChange={(type) => {
+                UpdateField('type', type)
+                UpdateField('category_id', '')
+                }}
+            />
 
-            {/* 금액 입력 */}
-            <div className="space-y-2">
-                <Label>금액</Label>
-                <Input
-                    id="amount"
-                    type="number"
-                    placeholder="금액을 입력하세요"
-                    value={formData.amount}
-                    onChange={(e) => setFormData(prev => ({...prev, amount: e.target.value}))}
-                    min="0"
-                />
-            </div>
+            <CategorySelector
+                transactionType={formData.type}
+                value={formData.category_id}
+                open={categoryOpen}
+                onOpenChange={setCategoryOpen}
+                onChange={(category) => UpdateField('category_id', category)}
+            />
 
-            {/* 날짜 선택 */}
-            <div className="space-y-2">
-                <Label>날짜</Label>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                        >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {formatDate(formData.date)}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={formData.date}
-                            onSelect={(newDate) => newDate && setFormData(prev => ({...prev, date: newDate}))}
-                        />
-                    </PopoverContent>
-                </Popover>
-            </div>
+            <AmountInput
+                value={formData.amount}
+                onChange={(value) => UpdateField('amount', value)}
+            />
 
+            <DatePicker
+                value={formData.date}
+                onChange={(date) => UpdateField('date', date)}
+            />
+
+            <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
             
-                {/* 태그 */}
-                <div className="space-y-2">
-                <Label>태그 (선택사항)</Label>
-                <div className="flex gap-2">
-                    <Input
-                        id="tags"
-                        type="text"
-                        placeholder="태그를 입력하세요"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={handleTagInputKeyDown}
-                        maxLength={20}
-                    />
-                    <Button
-                        type="button"
-                        onClick={addTag}
-                        variant="outline"
-                    >
-                        추가
-                    </Button>
-                </div>
-                {formData.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {formData.tags.map((tag, index) => (
-                            <div
-                                key={index}
-                                className="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
-                            >
-                                {tag}
-                                <button
-                                    type="button"
-                                    onClick={() => removeTag(tag)}
-                                    className="hover:bg-gray-200 rounded-full p-0.5"
-                                >
-                                    <X className="w-3 h-3" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
             <div className="flex gap-2 pt-4 sticky bottom-0 bg-background border-t pb-4">
                 {mode === 'edit' && (
                     <Button

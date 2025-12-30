@@ -4,28 +4,16 @@ import TransactionSubmitForm from "@/components/transaction/TransactionSubmitFor
 import { TransactionList } from "@/components/transaction/TransactionList"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-interface Transaction {
-  id: string
-  title: string
-  user_id: string
-  category_id: string
-  type: 'income' | 'expense'
-  date: string
-  amount: number
-  fixed_rule_id: string | null
-  memo: string | null
-  created_at: Date
-  updated_at: Date
-  tags: string[]
-}
+import { ITransaction } from "@/types/transactions"
+import ResponsivePanel from "@/components/panel/ResponsivePanel"
+
 export default function Page() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>()
+  const [selectedTransaction, setSelectedTransaction] = useState<ITransaction | undefined>()
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const handleSelectTransaction = (transaction: Transaction) => {
-    console.log(transaction)
+  const handleSelectTransaction = (transaction: ITransaction) => {
     setSelectedTransaction(transaction)
     setFormMode('edit')
     setIsSidebarOpen(true)
@@ -47,6 +35,9 @@ export default function Page() {
 
   return(
       <>
+        <ResponsivePanel trigger={<Button>sdfd</Button>}>
+          <div>hi</div>
+        </ResponsivePanel>
         <div className="flex w-full h-screen overflow-hidden border-2">
           <div className="flex-1 overflow-auto">
             <Button
