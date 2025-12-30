@@ -8,39 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
-
-type FixedCostListItem = {
-  id: string;
-  title: string;
-  type: 'income' | 'expense';
-  amount: number;
-  displayCycle?: string;
-  isActive: boolean;
-};
-
-const MOCK_FIXED_COSTS: FixedCostListItem[] = [
-  {
-    id: '1',
-    title: '넷플릭스',
-    type: 'expense',
-    displayCycle: '매달 25일',
-    amount: 17000,
-    isActive: true,
-  },
-  {
-    id: '2',
-    title: '헬스장',
-    type: 'expense',
-    displayCycle: '매주 월요일',
-    amount: 45000,
-    isActive: false,
-  },
-];
+import { MOCK_FIXED_COSTS } from '@/constants/fixed-costs.mock';
+import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
 
 export default function FixedCostsList() {
+  const items: FixedCostListItem[] = MOCK_FIXED_COSTS;
+
   return (
     <div className="space-y-2">
-      {MOCK_FIXED_COSTS.map((e) => (
+      {items.map((e) => (
         <Item
           variant="outline"
           key={e.id}
