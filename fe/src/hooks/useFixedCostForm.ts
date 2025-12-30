@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { FixedCostType, FixedCostCycle } from '@/types/fixed-costs';
 
 export interface IFixedCostFormData {
   title: string;
-  type: 'income' | 'expense' | '';
+  type: FixedCostType;
   amount: string;
   category_id: string;
 
-  cycle: 'WEEKLY' | 'MONTHLY' | '';
+  cycle: FixedCostCycle;
   weekday: number | null; // WEEKLY일 때 필수 (1~7)
   monthday: number | null; // MONTHLY일 때 필수 (1~31)
 
