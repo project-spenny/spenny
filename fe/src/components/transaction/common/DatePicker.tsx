@@ -29,27 +29,29 @@ export const DatePicker = ({
   hideLabel = false,
 }: DatePickerProps) => {
   return (
-    <div className="space-y-2">
-      {!hideLabel && <Label>{label}</Label>}
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full justify-start text-left font-normal"
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {formatDate(value)}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={value}
-            onSelect={(newDate) => newDate && onChange(newDate)}
-          />
-        </PopoverContent>
-      </Popover>
+    <div className="flex items-center">
+      {!hideLabel && <Label className="w-28 pr-2">{label}</Label>}
+      <div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full justify-start text-left font-normal"
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {formatDate(value)}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={value}
+              onSelect={(newDate) => newDate && onChange(newDate)}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 };

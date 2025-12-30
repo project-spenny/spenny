@@ -9,9 +9,9 @@ type Props = {
 
 export const TypeSelector = ({ value, onChange }: Props) => {
   return (
-    <div className="space-y-2">
-      <Label>거래 유형</Label>
-      <div className="grid grid-cols-2 gap-4">
+    <div className="flex items-center">
+      <Label className="w-28 pr-2">거래 유형</Label>
+      <div className="grid w-full grid-cols-2 gap-4">
         <button
           type="button"
           onClick={() => onChange('income')}
