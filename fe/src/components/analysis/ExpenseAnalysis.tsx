@@ -19,18 +19,17 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  const lastMonthDate = new Date(
-    selectedDate.getFullYear(),
-    selectedDate.getMonth() - 1,
-    1
-  );
-
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
         setIsLoading(true);
 
         const { startDate, endDate } = getMonthRange(selectedDate);
+        const lastMonthDate = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth() - 1,
+          1
+        );
         const { startDate: prevStart, endDate: prevEnd } =
           getMonthRange(lastMonthDate);
 
@@ -72,8 +71,10 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
           prev: lastMonthRes.data || [],
         });
       } catch (err) {
-        console.error('데이터 호출 중 오류 발생', err);
-        toast('데이터를 불러오는 데 실패했습니다');
+        console.error('[지출 내역 조회 실패]', err);
+        toast.error(
+          '지출 내역을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+        );
       } finally {
         setIsLoading(false);
       }
