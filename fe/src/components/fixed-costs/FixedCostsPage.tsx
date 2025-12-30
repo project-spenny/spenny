@@ -23,8 +23,7 @@ export default function FixedCostsPage() {
       setIsLoading(true);
       const data = await fetchFixedRules();
       setItems(data);
-    } catch (err) {
-      console.error('[고정비 목록 조회 실패]', err);
+    } catch {
       toast.error(
         '고정비 목록을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
       );
@@ -65,8 +64,7 @@ export default function FixedCostsPage() {
           item.id === id ? { ...item, is_active: nextActive } : item
         )
       );
-    } catch (err) {
-      console.error('[고정비 활성화 상태 변경 실패]', err);
+    } catch {
       toast.error(
         '고정비 활성화 상태 변경 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
       );

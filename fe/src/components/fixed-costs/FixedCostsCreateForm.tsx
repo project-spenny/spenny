@@ -57,8 +57,7 @@ export default function FixedCostCreateForm({
       await createFixedRule(payload);
       toast.success('고정비가 추가되었습니다.');
       onSuccess(); // 고정비 목록 갱신
-    } catch (err) {
-      console.error('[고정비 추가 실패]', err);
+    } catch {
       toast.error('고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
