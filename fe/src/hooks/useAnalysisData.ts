@@ -19,6 +19,7 @@ export const useAnalysisData = (
     prev: [],
   });
   const [isLoading, setIsLoading] = useState(true);
+  const typeLabel = type === 'expense' ? '지출' : '수입';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,9 +73,9 @@ export const useAnalysisData = (
           prev: prevMonthRes.data || [],
         });
       } catch (err) {
-        console.error(`[${type} 내역 조회 실패]`, err);
+        console.error(`[${typeLabel} 내역 조회 실패]`, err);
         toast.error(
-          `${type} 내역을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.`
+          `${typeLabel} 내역을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.`
         );
       } finally {
         setIsLoading(false);
