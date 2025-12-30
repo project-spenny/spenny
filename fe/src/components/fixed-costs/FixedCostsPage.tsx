@@ -7,6 +7,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { MOCK_FIXED_COSTS } from '@/constants/fixed-costs.mock';
 import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
+import ResponsivePanel from '../panel/ResponsivePanel';
+import FixedCostCreateForm from './FixedCostsCreateForm';
 
 type TabValue = 'all' | 'active' | 'inactive';
 
@@ -44,7 +46,9 @@ export default function FixedCostsPage() {
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
-      <FixedCostsAddButton />
+      <ResponsivePanel trigger={<FixedCostsAddButton />}>
+        <FixedCostCreateForm />
+      </ResponsivePanel>
 
       <header>
         <h1 className="text-xl font-semibold">고정비 관리</h1>
