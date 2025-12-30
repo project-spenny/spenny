@@ -9,8 +9,17 @@ import { AmountInput } from '../transaction/common/AmountInput';
 import { useFixedCostForm } from '@/hooks/useFixedCostForm';
 import { toast } from 'sonner';
 import FixedCostScheduleFields from './FixedCostsScheduleFields';
+import { CreateFixedRuleInput } from '@/types/fixed-costs';
+import { formatDateYYYYMMDD } from '@/utils/date';
+import { createFixedRule } from '@/services/fixed-costs';
 
-export default function FixedCostCreateForm() {
+type FixedCostCreateFormProps = {
+  onSuccess: () => void;
+};
+
+export default function FixedCostCreateForm({
+  onSuccess,
+}: FixedCostCreateFormProps) {
   const {
     formData,
     categoryOpen,
@@ -19,7 +28,7 @@ export default function FixedCostCreateForm() {
     validateFormData,
   } = useFixedCostForm();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const errorMsg = validateFormData();
@@ -27,7 +36,31 @@ export default function FixedCostCreateForm() {
       toast(errorMsg);
       return;
     }
-    console.log('submit payload', formData);
+
+    const payload: CreateFixedRuleInput = {
+      title: formData.title.trim(),
+      type: formData.type as 'income' | 'expense',
+      amount: Number(formData.amount),
+      category_id: formData.category_id,
+
+      cycle: formData.cycle as 'WEEKLY' | 'MONTHLY',
+      weekday: formData.weekday,
+      monthday: formData.monthday,
+
+      start_date: formatDateYYYYMMDD(formData.start_date),
+      end_date: formData.end_date
+        ? formatDateYYYYMMDD(formData.end_date)
+        : null,
+    };
+
+    try {
+      await createFixedRule(payload);
+      toast.success('고정비가 추가되었습니다.');
+      onSuccess(); // 고정비 목록 갱신
+    } catch (err) {
+      console.error('[고정비 추가 실패]', err);
+      toast.error('고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
   };
 
   return (

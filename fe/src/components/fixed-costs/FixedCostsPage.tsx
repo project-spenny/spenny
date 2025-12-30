@@ -18,22 +18,22 @@ export default function FixedCostsPage() {
   const [items, setItems] = useState<IFixedRule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const data = await fetchFixedRules();
-        setItems(data);
-      } catch (err) {
-        console.error('[고정비 목록 조회 실패]', err);
-        toast.error(
-          '고정비 목록을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchFixedRules();
+      setItems(data);
+    } catch (err) {
+      console.error('[고정비 목록 조회 실패]', err);
+      toast.error(
+        '고정비 목록을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -76,7 +76,7 @@ export default function FixedCostsPage() {
   return (
     <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
       <ResponsivePanel trigger={<FixedCostsAddButton />}>
-        <FixedCostCreateForm />
+        <FixedCostCreateForm onSuccess={fetchData} />
       </ResponsivePanel>
 
       <header>

@@ -1,6 +1,5 @@
 import { supabase } from '@/utils/supabase/client';
 import type { CreateFixedRuleInput, IFixedRule } from '@/types/fixed-costs';
-import { use } from 'react';
 
 const requireUserId = async () => {
   const {
