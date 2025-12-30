@@ -18,7 +18,7 @@ const ResponsivePanel = ({
   isFull = false,
   isOpen : externalIsOpen,
   setIsOpen : externalSetIsOpen
-}: ExternalResposivePanelProps) => {
+}: ExternalResponsivePanelProps) => {
   const [internalOpen, setInternalOpen] = useState(false); 
   
   const isExternalControlled = externalIsOpen !== undefined;
