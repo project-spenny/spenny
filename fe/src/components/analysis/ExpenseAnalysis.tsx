@@ -7,9 +7,16 @@ import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
+type ExpenseState = {
+  current: ITransaction[];
+  prev: ITransaction[];
+};
+
 const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
-  const [expenses, setExpenses] = useState<ITransaction[]>([]);
-  const [prevExpenses, setPrevExpenses] = useState<ITransaction[]>([]);
+  const [expenseData, setExpenseData] = useState<ExpenseState>({
+    current: [],
+    prev: [],
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   const lastMonthDate = new Date(
@@ -60,8 +67,10 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
         if (currentMonthRes.error) throw currentMonthRes.error;
         if (lastMonthRes.error) throw lastMonthRes.error;
 
-        setExpenses(currentMonthRes.data || []);
-        setPrevExpenses(lastMonthRes.data || []);
+        setExpenseData({
+          current: currentMonthRes.data || [],
+          prev: lastMonthRes.data || [],
+        });
       } catch (err) {
         console.error('데이터 호출 중 오류 발생', err);
         toast('데이터를 불러오는 데 실패했습니다');
@@ -73,9 +82,13 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
     fetchExpenses();
   }, [selectedDate]);
 
-  const totalAmount =
-    expenses.reduce((sum, item) => sum + (item.amount || 0), 0) || 0;
-  const lastMonthTotal = prevExpenses.reduce(
+  const { current, prev } = expenseData;
+
+  const totalAmount = current.reduce(
+    (sum, item) => sum + (item.amount || 0),
+    0
+  );
+  const lastMonthTotal = prev.reduce(
     (sum, item) => sum + (item.amount || 0),
     0
   );
