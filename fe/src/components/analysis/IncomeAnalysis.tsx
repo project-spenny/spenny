@@ -1,7 +1,7 @@
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import { PiggyBank } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TrendingUp } from 'lucide-react';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
@@ -13,7 +13,7 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   return (
     <AnalysisSection
       title="월별 수입"
-      icon={<PiggyBank className="text-blue-400" />}
+      icon={<TrendingUp className="text-blue-400" />}
     >
       <div className="px-2 py-4">
         {isLoading ? (

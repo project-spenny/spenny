@@ -1,7 +1,7 @@
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import { CalendarDays } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TrendingDown } from 'lucide-react';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
@@ -13,7 +13,7 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   return (
     <AnalysisSection
       title="월별 지출"
-      icon={<CalendarDays className="text-red-400" />}
+      icon={<TrendingDown className="text-red-400" />}
     >
       <div className="px-2 py-4">
         {isLoading ? (
