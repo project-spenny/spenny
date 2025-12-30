@@ -6,7 +6,6 @@ import { TitleInput } from '../transaction/common/TitleInput';
 import { TypeSelector } from '../transaction/common/TypeSelector';
 import { CategorySelector } from '../transaction/common/CategorySelector';
 import { AmountInput } from '../transaction/common/AmountInput';
-import { TagInput } from '../transaction/common/TagInput';
 import { useTransactionForm } from '@/hooks/useTranscationForm';
 import { toast } from 'sonner';
 
@@ -16,8 +15,6 @@ export default function FixedCostCreateForm() {
     categoryOpen,
     setCategoryOpen,
     UpdateField,
-    addTag,
-    removeTag,
     validateFormData,
   } = useTransactionForm();
 
@@ -66,8 +63,6 @@ export default function FixedCostCreateForm() {
         />
 
         {/* 고정비 영역 */}
-
-        <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
 
         <div className="mt-auto border-t pt-4 pb-4">
           <Button type="submit" className="w-full">
