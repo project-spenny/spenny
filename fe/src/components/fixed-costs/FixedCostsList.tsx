@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { IFixedRule } from '@/types/fixed-costs';
+import { formatFixedRuleCycle } from '@/utils/fixed-costs';
 
 type FixedCostsListProps = {
   items: IFixedRule[];
@@ -50,7 +51,7 @@ export default function FixedCostsList({
           <ItemContent className="flex flex-row items-center">
             <div className="flex w-24 flex-col gap-1">
               <span className="text-muted-foreground text-xs">
-                {e.displayCycle}
+                {formatFixedRuleCycle(e)}
               </span>
               <span
                 className={cn(
