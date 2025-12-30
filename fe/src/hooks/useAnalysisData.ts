@@ -5,14 +5,16 @@ import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
+type AnalysisState = {
+  current: ITransaction[];
+  prev: ITransaction[];
+};
+
 export const useAnalysisData = (
   selectedDate: Date,
   type: 'expense' | 'income'
 ) => {
-  const [data, setData] = useState<{
-    current: ITransaction[];
-    prev: ITransaction[];
-  }>({
+  const [data, setData] = useState<AnalysisState>({
     current: [],
     prev: [],
   });
