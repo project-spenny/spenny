@@ -98,36 +98,50 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   const diff = totalAmount - lastMonthTotal;
 
   return (
-    <div className="px-4 py-2">
-      {/* 이번 달 총 지출 */}
-      <div className="text-xl font-bold">
-        총 지출
-        <div>
-          <span className="text-red-400">{totalAmount.toLocaleString()}</span>원
-        </div>
-      </div>
-
-      {/* 지난 달과 비교 */}
-      <div className="mt-2 text-base font-medium">
-        {current.length === 0 ? (
-          // 이번 달 지출이 없을 경우
-          <>
-            <p>이번 달은 아직 지출 내역이 없어요! </p>
-            <Button asChild className="mt-2">
-              <Link href={'/'}>기록하러 가기</Link>
-            </Button>
-          </>
-        ) : prev.length === 0 ? (
-          // 이번 달 지출은 있지만, 지난 달 지출 데이터가 없을 경우
-          <p>이전 달 지출 내역이 없어요!</p>
-        ) : (
-          // 두 달 모두 지출 데이터가 있을 경우
-          <p>
-            지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
-            {diff > 0 ? '더 썼어요' : diff < 0 ? '아꼈어요' : '똑같이 썼어요'}
+    <div className="p-4">
+      {current.length === 0 ? (
+        // 이번 달 지출이 없는 경우
+        <div className="flex flex-col items-center justify-center">
+          <p className="text-lg font-semibold">
+            이번 달은 아직 지출 내역이 없어요!
           </p>
-        )}
-      </div>
+          <Button asChild className="mt-4 w-auto">
+            <Link href={'/'}>기록하러 가기</Link>
+          </Button>
+        </div>
+      ) : (
+        // 이번 달 지출이 있는 경우
+        <>
+          {/* 이번 달 총 지출 */}
+          <div className="text-xl font-bold">
+            총 지출
+            <div>
+              <span className="text-red-400">
+                {totalAmount.toLocaleString()}
+              </span>
+              원
+            </div>
+          </div>
+
+          {/* 지난 달과 비교 */}
+          <div className="mt-2 text-base font-medium">
+            {prev.length === 0 ? (
+              // 지난 달 지출이 없는 경우
+              <p>이전 달 지출 내역이 없어요!</p>
+            ) : (
+              // 두 달 모두 지출이 있는 경우
+              <p>
+                지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
+                {diff > 0
+                  ? '더 썼어요'
+                  : diff < 0
+                    ? '아꼈어요'
+                    : '똑같이 썼어요'}
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
