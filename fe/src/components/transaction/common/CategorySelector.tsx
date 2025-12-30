@@ -30,32 +30,34 @@ export const CategorySelector = ({
   return (
     <div className="flex items-center">
       <Label className="w-28 pr-2">카테고리</Label>
-      <Popover open={open} onOpenChange={onOpenChange}>
-        <PopoverTrigger asChild>
-          <Button type="button" variant="outline" className="w-48">
-            {value === ''
-              ? '선택'
-              : categories.find((cat) => cat.category_key === value)?.name_ko ||
-                '선택'}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <div className="grid grid-cols-3">
-            {categories.map((cat) => (
-              <div
-                onClick={() => {
-                  onChange(cat.category_key);
-                  onOpenChange(false);
-                }}
-                className="flex h-16 w-24 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
-                key={cat.category_key}
-              >
-                {cat.name_ko}
-              </div>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
+      <div className="w-full">
+        <Popover open={open} onOpenChange={onOpenChange}>
+          <PopoverTrigger asChild>
+            <Button type="button" variant="outline" className="w-full">
+              {value === ''
+                ? '선택'
+                : categories.find((cat) => cat.category_key === value)
+                    ?.name_ko || '선택'}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <div className="grid grid-cols-3">
+              {categories.map((cat) => (
+                <div
+                  onClick={() => {
+                    onChange(cat.category_key);
+                    onOpenChange(false);
+                  }}
+                  className="flex h-16 w-24 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
+                  key={cat.category_key}
+                >
+                  {cat.name_ko}
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 };

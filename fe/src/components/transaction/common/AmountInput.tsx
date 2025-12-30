@@ -8,8 +8,8 @@ export const AmountInput = ({
   onChange: (type: string) => void;
 }) => {
   return (
-    <div className="space-y-2">
-      <Label>금액</Label>
+    <div className="flex items-center">
+      <Label className="w-28 pr-2">금액</Label>
       <Input
         id="amount"
         type="number"

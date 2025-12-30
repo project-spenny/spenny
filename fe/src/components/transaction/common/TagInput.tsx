@@ -30,9 +30,9 @@ export const TagInput = ({ tags, addTag, removeTag }: TagInputProps) => {
   };
 
   return (
-    <div className="space-y-2">
-      <Label>태그 (선택사항)</Label>
-      <div className="flex gap-2">
+    <div className="flex items-center">
+      <Label className="w-28 pr-2">태그(선택)</Label>
+      <div className="flex w-full gap-2">
         <Input
           id="tags"
           type="text"
