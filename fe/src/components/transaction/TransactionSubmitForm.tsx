@@ -154,14 +154,11 @@ export default function TransactionSubmitForm({
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-6">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-6 w-full h-full mx-auto p-10 pt-2">
             <div className="flex justify-between items-center sticky top-0 bg-white pb-4 border-b">
                 <Label className="text-xl">
                     {mode === 'create' ? '가계부 작성' : '가계부 수정'}
                 </Label>
-                <Button type="button" variant="ghost" onClick={onClose}>
-                    <X />
-                </Button>
             </div>
 
             <TitleInput
@@ -197,7 +194,7 @@ export default function TransactionSubmitForm({
 
             <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
             
-            <div className="flex gap-2 pt-4 sticky bottom-0 bg-background border-t pb-4">
+            <div className="flex gap-2 p-4 border-t mt-auto">
                 {mode === 'edit' && (
                     <Button
                         type="button"

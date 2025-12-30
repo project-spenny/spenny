@@ -55,14 +55,12 @@ export default function Page() {
             isOpen={isSidebarOpen}
             setIsOpen={setIsSidebarOpen}
           >
-            <div className="w-96 overflow-auto bg-white">
-              <TransactionSubmitForm
+            <TransactionSubmitForm
                 mode={formMode}
                 transaction={selectedTransaction}
                 onClose={handleClose}
                 onSuccess={handleSuccess}
               />
-            </div>
           </ResponsivePanel>
         </div>
       </>
