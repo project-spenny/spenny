@@ -4,6 +4,7 @@ import { useState } from 'react';
 import FixedCostsAddButton from './FixedCostsAddButton';
 import FixedCostsList from './FixedCostsList';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { MOCK_FIXED_COSTS } from '@/constants/fixed-costs.mock';
 import { FixedCostListItem } from '@/types/fixed-costs.mock.types';
 
@@ -44,9 +45,30 @@ export default function FixedCostsPage() {
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as TabValue)}>
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">전체 {counts.all}</TabsTrigger>
-          <TabsTrigger value="active">활성 {counts.active}</TabsTrigger>
-          <TabsTrigger value="inactive">비활성 {counts.inactive}</TabsTrigger>
+          <TabsTrigger value="all">
+            <span className="flex items-center gap-2">
+              전체
+              <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
+                {counts.all}
+              </Badge>
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="active">
+            <span className="flex items-center gap-2">
+              활성
+              <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
+                {counts.active}
+              </Badge>
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="inactive">
+            <span className="flex items-center gap-2">
+              비활성
+              <Badge className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
+                {counts.inactive}
+              </Badge>
+            </span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value={tab} className="mt-4">
