@@ -33,58 +33,6 @@ interface TransactionListProps {
   refreshKey?: number;
 }
 
-const dummyTransactions = [
-  {
-    title: '점심 식사',
-    category_id: 'cat-001',
-    type: 'expense',
-    date: '2024-12-23',
-    amount: 15000,
-  },
-  {
-    title: '출/퇴근 교통비',
-    category_id: 'cat-002',
-    type: 'expense',
-    date: '2024-12-22',
-    amount: 3500,
-  },
-  {
-    title: '장갑 구매',
-    category_id: 'cat-003',
-    type: 'expense',
-    date: '2024-12-21',
-    amount: 45000,
-  },
-  {
-    title: '월급',
-    category_id: 'cat-004',
-    type: 'income',
-    date: '2024-12-20',
-    amount: 3000000,
-  },
-  {
-    title: '간식',
-    category_id: 'cat-001',
-    type: 'expense',
-    date: '2024-12-20',
-    amount: 8500,
-  },
-  {
-    title: '대출 이자',
-    category_id: 'cat-005',
-    type: 'expense',
-    date: '2024-12-19',
-    amount: 120000,
-  },
-  {
-    title: '티셔츠 구매',
-    category_id: 'cat-006',
-    type: 'expense',
-    date: '2024-12-18',
-    amount: 55000,
-  },
-];
-
 export const TransactionList = ({
   onSelectTransaction,
   refreshKey,
