@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/AnalysisEmpty';
+import AnalysisSection from '@/components/analysis/common/AnalysisSection';
+import { CalendarDays } from 'lucide-react';
 import { ITransaction } from '@/types/transactions';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
@@ -97,47 +99,47 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   const diff = totalAmount - lastMonthTotal;
 
   return (
-    <div className="p-4">
-      {current.length === 0 ? (
-        // 이번 달 지출이 없는 경우
-        <AnalysisEmpty
-          title="이번 달은 아직 지출 내역이 없어요!"
-          description="지출을 기록하고 소비 습관을 파악해 보세요."
-        />
-      ) : (
-        // 이번 달 지출이 있는 경우
-        <>
-          {/* 이번 달 총 지출 */}
-          <div className="text-xl font-bold">
-            총 지출
-            <div>
+    <AnalysisSection title="월별 지출 분석" icon={<CalendarDays />}>
+      <div className="px-2 py-4">
+        {current.length === 0 ? (
+          // 이번 달 지출이 없는 경우
+          <AnalysisEmpty
+            title="이번 달은 아직 지출 내역이 없어요!"
+            description="지출을 기록하고 소비 습관을 파악해 보세요."
+          />
+        ) : (
+          // 이번 달 지출이 있는 경우
+          <>
+            {/* 이번 달 총 지출 */}
+            <div className="text-lg font-bold">
+              총 지출{' '}
               <span className="text-red-400">
                 {totalAmount.toLocaleString()}
               </span>
               원
             </div>
-          </div>
 
-          {/* 지난 달과 비교 */}
-          <div className="mt-2 text-base font-medium">
-            {prev.length === 0 ? (
-              // 지난 달 지출이 없는 경우
-              <p>이전 달 지출 내역이 없어요!</p>
-            ) : (
-              // 두 달 모두 지출이 있는 경우
-              <p>
-                지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
-                {diff > 0
-                  ? '더 썼어요'
-                  : diff < 0
-                    ? '아꼈어요'
-                    : '똑같이 썼어요'}
-              </p>
-            )}
-          </div>
-        </>
-      )}
-    </div>
+            {/* 지난 달과 비교 */}
+            <div className="mt-2 text-base font-medium">
+              {prev.length === 0 ? (
+                // 지난 달 지출이 없는 경우
+                <p>이전 달 지출 내역이 없어요!</p>
+              ) : (
+                // 두 달 모두 지출이 있는 경우
+                <p>
+                  지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
+                  {diff > 0
+                    ? '더 썼어요'
+                    : diff < 0
+                      ? '아꼈어요'
+                      : '똑같이 썼어요'}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    </AnalysisSection>
   );
 };
 
