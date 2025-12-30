@@ -21,12 +21,6 @@ const MonthlyAmount = ({
   const typeLabel = type === 'expense' ? '지출' : '수입';
   const typeColor = type === 'expense' ? 'text-red-400' : 'text-blue-500';
 
-  const getDiffText = () => {
-    if (diff > 0) return type === 'expense' ? '더 썼어요' : '더 벌었어요';
-    if (diff < 0) return type === 'expense' ? '아꼈어요' : '적게 벌었어요';
-    return '지난 달과 똑같아요';
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -58,11 +52,19 @@ const MonthlyAmount = ({
 
       <div className="mt-2 text-base font-medium">
         {prevCount === 0 ? (
-          <p>이전 달 수입 내역이 없어요!</p>
+          <p>이전 달 {typeLabel} 내역이 없어요!</p>
+        ) : diff === 0 ? (
+          <p>지난 달과 총 {typeLabel} 금액이 똑같아요!</p>
         ) : (
           <p>
             지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
-            {getDiffText()}
+            {diff > 0
+              ? type === 'expense'
+                ? '더 썼어요'
+                : '더 벌었어요'
+              : type === 'expense'
+                ? '아꼈어요'
+                : '적게 벌었어요'}
           </p>
         )}
       </div>
