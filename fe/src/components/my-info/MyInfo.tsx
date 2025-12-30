@@ -3,23 +3,21 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { ProfileFormValues } from '@/schemas/profile';
+import { Profile, ProfilePatchValues } from '@/schemas/profile';
 import { Separator } from '@/components/ui/separator';
 import LogoutButton from './LogoutButton';
 import ProfileEdit from './ProfileEdit';
 import ProfileView from './ProfileView';
 
 // 프로필 조회 함수
-async function fetchProfile(): Promise<ProfileFormValues> {
+async function fetchProfile(): Promise<Profile> {
   const res = await fetch('/api/profile', { method: 'GET' });
   if (!res.ok) throw new Error('프로필 조회 실패');
   return res.json();
 }
 
 // 프로필 수정 함수
-async function updateProfile(
-  values: ProfileFormValues
-): Promise<ProfileFormValues> {
+async function updateProfile(values: ProfilePatchValues): Promise<Profile> {
   const res = await fetch('/api/profile', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -55,7 +53,7 @@ export default function MyInfo() {
   });
 
   // 프로필 저장 핸들러
-  const handleSave = async (values: ProfileFormValues) => {
+  const handleSave = async (values: ProfilePatchValues) => {
     await mutateAsync(values);
     setIsEditing(false);
   };

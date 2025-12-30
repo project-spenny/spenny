@@ -1,6 +1,10 @@
 'use client';
 
-import { useForm, useWatch } from 'react-hook-form';
+import {
+  useForm,
+  useWatch,
+  type FieldNamesMarkedBoolean,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -8,15 +12,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-import { profileSchema, type ProfileFormValues } from '@/schemas/profile';
+import {
+  onboardingProfileSchema,
+  type OnboardingProfileValues,
+} from '@/schemas/profile';
+
+type ProfileFormState = {
+  isDirty: boolean;
+  isSubmitting: boolean;
+  dirtyFields: FieldNamesMarkedBoolean<OnboardingProfileValues>;
+};
 
 type ProfileFormProps = {
-  defaultValues?: Partial<ProfileFormValues>;
-  onSubmit: (data: ProfileFormValues) => void;
-  children?: (state: {
-    isDirty: boolean;
-    isSubmitting: boolean;
-  }) => React.ReactNode;
+  defaultValues?: Partial<OnboardingProfileValues>;
+  onSubmit: (
+    data: OnboardingProfileValues,
+    dirtyFields: FieldNamesMarkedBoolean<OnboardingProfileValues>
+  ) => void;
+  children?: (state: ProfileFormState) => React.ReactNode;
 };
 
 export default function ProfileForm({
@@ -29,9 +42,9 @@ export default function ProfileForm({
     handleSubmit,
     setValue,
     control,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
+    formState: { errors, isSubmitting, isDirty, dirtyFields },
+  } = useForm<OnboardingProfileValues>({
+    resolver: zodResolver(onboardingProfileSchema),
     mode: 'onSubmit',
     defaultValues,
   });
@@ -39,7 +52,10 @@ export default function ProfileForm({
   const gender = useWatch({ control, name: 'gender' });
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <form
+      className="space-y-6"
+      onSubmit={handleSubmit((data) => onSubmit(data, dirtyFields))}
+    >
       <div className="space-y-2">
         <Label htmlFor="nickname">닉네임</Label>
         <Input
@@ -94,7 +110,7 @@ export default function ProfileForm({
       </div>
 
       {children ? (
-        children({ isDirty, isSubmitting })
+        children({ isDirty, isSubmitting, dirtyFields })
       ) : (
         <Button
           type="submit"
