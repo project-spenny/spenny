@@ -7,28 +7,30 @@ import SheetSide from '@/components/panel/SheetSide';
 import { useState } from 'react';
 
 // 외부 제어 모드 일 경우의 optional props
-interface ExternalResponsivePanelProps extends ResponsivePanelProps{
-  isOpen? : boolean;
-  setIsOpen ? : (oepn : boolean) => void
+interface ExternalResponsivePanelProps extends ResponsivePanelProps {
+  isOpen?: boolean;
+  setIsOpen?: (oepn: boolean) => void;
 }
 
 const ResponsivePanel = ({
   trigger,
   children,
   isFull = false,
-  isOpen : externalIsOpen,
-  setIsOpen : externalSetIsOpen
-}: ExternalResposivePanelProps) => {
-  const [internalOpen, setInternalOpen] = useState(false); 
-  
+  isOpen: externalIsOpen,
+  setIsOpen: externalSetIsOpen,
+}: ExternalResponsivePanelProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+
   const isExternalControlled = externalIsOpen !== undefined;
-  
+
   const isPanelOpen = isExternalControlled ? externalIsOpen : internalOpen;
-  const setIsPanelOpen = isExternalControlled ?(externalSetIsOpen || (()=>{})): setInternalOpen
+  const setIsPanelOpen = isExternalControlled
+    ? externalSetIsOpen || (() => {})
+    : setInternalOpen;
 
   return (
     <>
-      {trigger &&(
+      {trigger && (
         <div
           className="inline-block cursor-pointer"
           onClick={() => setIsPanelOpen(true)}
