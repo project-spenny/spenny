@@ -6,7 +6,7 @@ import FixedCostsList from './FixedCostsList';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import ResponsivePanel from '../panel/ResponsivePanel';
-import FixedCostCreateForm from './FixedCostsCreateForm';
+import FixedCostSubmitForm from './FixedCostSubmitForm';
 import { IFixedRule } from '@/types/fixed-costs';
 import { fetchFixedRules, setFixedRuleActive } from '@/services/fixed-costs';
 import { toast } from 'sonner';
@@ -81,7 +81,7 @@ export default function FixedCostsPage() {
     <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
       <FixedCostsAddButton onClick={() => setIsPanelOpen(true)} />
       <ResponsivePanel isOpen={isPanelOpen} setIsOpen={setIsPanelOpen}>
-        <FixedCostCreateForm onSuccess={handleCreateSuccess} />
+        <FixedCostSubmitForm onSuccess={handleCreateSuccess} />
       </ResponsivePanel>
 
       <header>

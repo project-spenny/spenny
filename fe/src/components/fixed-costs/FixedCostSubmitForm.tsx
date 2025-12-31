@@ -13,13 +13,13 @@ import { CreateFixedRuleInput } from '@/types/fixed-costs';
 import { formatDateYYYYMMDD } from '@/utils/date';
 import { createFixedRule } from '@/services/fixed-costs';
 
-type FixedCostCreateFormProps = {
+type FixedCostSubmitFormProps = {
   onSuccess: () => void;
 };
 
-export default function FixedCostCreateForm({
+export default function FixedCostSubmitForm({
   onSuccess,
-}: FixedCostCreateFormProps) {
+}: FixedCostSubmitFormProps) {
   const {
     formData,
     categoryOpen,
