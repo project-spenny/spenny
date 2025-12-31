@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import FixedCostScheduleFields from './FixedCostsScheduleFields';
 import { CreateFixedRuleInput } from '@/types/fixed-costs';
 import { formatLocalDate } from '@/utils/date';
-import { createFixedRule } from '@/services/fixed-costs';
+import { createFixedRule, updateFixedRule } from '@/services/fixed-costs';
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 
@@ -78,6 +78,22 @@ export default function FixedCostSubmitForm({
     }
   };
 
+  const handleApplyFuture = async () => {
+    if (!ruleId || !pendingPayload) return;
+
+    try {
+      await updateFixedRule(ruleId, pendingPayload);
+      toast.success('고정비가 수정되었습니다.');
+
+      setConfirmOpen(false);
+      setPendingPayload(null);
+
+      onSuccess();
+    } catch {
+      toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+  };
+
   return (
     <div className="flex h-full flex-col px-6">
       <form onSubmit={handleSubmit} className="flex h-full flex-col space-y-6">
@@ -132,9 +148,7 @@ export default function FixedCostSubmitForm({
         onApplyThisMonth={() => {
           toast('이번 달만 적용');
         }}
-        onApplyFuture={() => {
-          toast('다음 달부터 적용');
-        }}
+        onApplyFuture={handleApplyFuture}
       />
     </div>
   );
