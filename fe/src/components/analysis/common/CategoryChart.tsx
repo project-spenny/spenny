@@ -6,7 +6,6 @@ import {
   ChartEvent,
   Chart as ChartJS,
   ChartOptions,
-  Colors,
   Legend,
   Tooltip,
 } from 'chart.js';
@@ -17,7 +16,12 @@ import { Doughnut } from 'react-chartjs-2';
 import { useTheme } from 'next-themes';
 
 // Chart.js에 필요한 요소들을 등록
-ChartJS.register(ArcElement, Tooltip, Legend, Colors);
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+// 상위 5개 색상
+const TOP_COLORS = ['#6366f1', '#10b981', '#3b82f6', '#f59e0b', '#f43f5e'];
+// 나머지를 위한 회색
+const GRAY_COLOR = '#d4d4d4';
 
 type CategoryChartProps = {
   data: CategoryAnalysis[];
@@ -26,6 +30,7 @@ type CategoryChartProps = {
 const CategoryChart = ({ data }: CategoryChartProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   // 데이터가 로드되면 가장 큰 금액을 가진 항목을 기본으로 선택
   useEffect(() => {
@@ -40,9 +45,15 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
       {
         label: '금액',
         data: data.map((item) => item.amount),
-        borderWidth: data.map((_, i) => (i === selectedIndex ? 2 : 0)),
-        borderColor: theme === 'dark' ? '#ffffff' : '#9e9e9e',
-        offset: data.map((_, i) => (i === selectedIndex ? 20 : 0)), // 선택된 인덱스만 튀어나오도록
+        backgroundColor: data.map((_, i) =>
+          i < 5 ? TOP_COLORS[i] : GRAY_COLOR
+        ),
+        hoverBackgroundColor: data.map((_, i) =>
+          i < 5 ? TOP_COLORS[i] : GRAY_COLOR
+        ),
+        borderWidth: data.map((_, i) => (i === selectedIndex ? 2 : 1)),
+        borderColor: isDark ? '#ffffff' : '#3b3b3b',
+        offset: data.map((_, i) => (i === selectedIndex ? 25 : 0)), // 선택된 인덱스만 튀어나오도록
         hoverOffset: 15, // 마우스 올렸을 때 튀어나오는 효과
       },
     ],
