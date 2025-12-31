@@ -71,7 +71,7 @@ export const TransactionList = ({
         {transactions.map((e, index) => (
           <Item variant="outline" key={index}>
             <ItemContent className="flex flex-row items-center">
-              <div className="flex w-24 flex-col gap-1">
+              <div className="flex w-32 flex-col gap-1">
                 <span className="text-muted-foreground text-xs">
                   {formatDateKR(new Date(e.date))}
                 </span>
