@@ -19,19 +19,16 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     useState<ITransaction | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  // 생성 모드 + 열기
   const openCreate = () => {
     setSelectedTransaction(null);
     setIsOpen(true);
   };
 
-  // 수정모드 + 열기
   const openEdit = (transaction: ITransaction) => {
     setSelectedTransaction(transaction);
     setIsOpen(true);
   };
 
-  // 닫기
   const close = () => {
     setIsOpen(false);
   };
