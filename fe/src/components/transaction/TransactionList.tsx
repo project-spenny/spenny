@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/utils/supabase/client';
 import { formatDateKR } from '@/utils/date';
+import { CATEGORIES } from '@/constants/categories';
 
 interface Transaction {
   id: string;
@@ -85,7 +86,16 @@ export const TransactionList = ({
                   {e.amount.toLocaleString()}원
                 </span>
               </div>
-              <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
+              <div>
+                <ItemTitle className="text-muted-foreground pl-2 text-left text-xs">
+                  {
+                    CATEGORIES[e.type].find(
+                      (cat) => cat.category_key === e.category_id
+                    )?.name_ko
+                  }
+                </ItemTitle>
+                <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
+              </div>
               <ItemActions className="ml-auto">
                 <Button
                   className="cursor-pointer"
