@@ -6,7 +6,7 @@ import { TitleInput } from '../transaction/common/TitleInput';
 import { TypeSelector } from '../transaction/common/TypeSelector';
 import { CategorySelector } from '../transaction/common/CategorySelector';
 import { AmountInput } from '../transaction/common/AmountInput';
-import { useFixedCostForm } from '@/hooks/useFixedCostForm';
+import { IFixedCostFormData, useFixedCostForm } from '@/hooks/useFixedCostForm';
 import { toast } from 'sonner';
 import FixedCostScheduleFields from './FixedCostsScheduleFields';
 import { CreateFixedRuleInput } from '@/types/fixed-costs';
@@ -14,10 +14,14 @@ import { formatDateYYYYMMDD } from '@/utils/date';
 import { createFixedRule } from '@/services/fixed-costs';
 
 type FixedCostSubmitFormProps = {
+  mode: 'create' | 'edit';
+  initialData?: Partial<IFixedCostFormData>;
   onSuccess: () => void;
 };
 
 export default function FixedCostSubmitForm({
+  mode,
+  initialData,
   onSuccess,
 }: FixedCostSubmitFormProps) {
   const {
@@ -26,7 +30,7 @@ export default function FixedCostSubmitForm({
     setCategoryOpen,
     UpdateField,
     validateFormData,
-  } = useFixedCostForm();
+  } = useFixedCostForm(initialData);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,11 +58,19 @@ export default function FixedCostSubmitForm({
     };
 
     try {
-      await createFixedRule(payload);
-      toast.success('고정비가 추가되었습니다.');
+      if (mode === 'create') {
+        await createFixedRule(payload);
+        toast.success('고정비가 추가되었습니다.');
+      } else {
+        toast.success('고정비가 수정되었습니다.');
+      }
       onSuccess(); // 고정비 목록 갱신
     } catch {
-      toast.error('고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      toast.error(
+        mode === 'create'
+          ? '고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+          : '고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+      );
     }
   };
 
@@ -66,7 +78,9 @@ export default function FixedCostSubmitForm({
     <div className="flex h-full flex-col px-6">
       <form onSubmit={handleSubmit} className="flex h-full flex-col space-y-6">
         <div className="border-b pb-4">
-          <Label className="text-xl">고정비 추가</Label>
+          <Label className="text-xl">
+            {mode === 'create' ? '고정비 추가' : '고정비 수정'}
+          </Label>
         </div>
 
         <TitleInput
@@ -103,7 +117,7 @@ export default function FixedCostSubmitForm({
 
         <div className="mt-auto border-t pt-4 pb-4">
           <Button type="submit" className="w-full">
-            저장
+            {mode === 'create' ? '저장' : '수정'}
           </Button>
         </div>
       </form>
