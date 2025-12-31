@@ -8,8 +8,8 @@ interface PageProps {
   searchParams: Promise<{
     type?: string;
     category_id?: string;
-    startDate?: string;
-    endDate?: string;
+    start_date?: string;
+    end_date?: string;
     queryString?: string;
   }>;
 }
@@ -19,8 +19,8 @@ export default async function Page({ searchParams }: PageProps) {
   const filters: TransactionFilters = {
     type: params.type as 'income' | 'expense' | undefined,
     category_id: params.category_id,
-    startDate: params.startDate,
-    endDate: params.endDate,
+    start_date: params.start_date,
+    end_date: params.end_date,
     searchQuery: params.queryString,
   };
   return (

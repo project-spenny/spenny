@@ -5,12 +5,13 @@ import { revalidatePath } from 'next/cache';
 export interface TransactionFilters {
   type?: 'income' | 'expense';
   category_id?: string;
-  startDate?: string;
-  endDate?: string;
+  start_date?: string;
+  end_date?: string;
   searchQuery?: string;
 }
 
 export const getTransaction = async (filters?: TransactionFilters) => {
+  console.log('📊 Received filters:', filters);
   const supabase = await createClient();
 
   const {
@@ -33,12 +34,12 @@ export const getTransaction = async (filters?: TransactionFilters) => {
     query = query.eq('category_id', filters.category_id);
   }
 
-  if (filters?.startDate) {
-    query = query.gte('date', filters.startDate);
+  if (filters?.start_date) {
+    query = query.gte('date', filters.start_date);
   }
 
-  if (filters?.endDate) {
-    query = query.lte('date', filters.endDate);
+  if (filters?.end_date) {
+    query = query.lte('date', filters.end_date);
   }
 
   if (filters?.searchQuery) {
