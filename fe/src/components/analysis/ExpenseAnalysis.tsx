@@ -14,16 +14,14 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
         title="월별 지출"
         icon={<TrendingDown className="text-red-400" />}
       >
-        <div className="px-2 py-4">
-          <MonthlyAmount
-            type="expense"
-            isLoading={isLoading}
-            currentCount={current.length}
-            prevCount={prev.length}
-            totalAmount={totalAmount}
-            diff={diff}
-          />
-        </div>
+        <MonthlyAmount
+          type="expense"
+          isLoading={isLoading}
+          currentCount={current.length}
+          prevCount={prev.length}
+          totalAmount={totalAmount}
+          diff={diff}
+        />
       </AnalysisSection>
 
       <AnalysisSection title="카테고리별 지출">

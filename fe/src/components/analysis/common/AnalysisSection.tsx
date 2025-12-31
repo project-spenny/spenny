@@ -14,7 +14,7 @@ const AnalysisSection = ({ title, children, icon }: AnalysisSectionProps) => {
         </div>
       )}
 
-      <div className="w-full">{children}</div>
+      <div className="w-full px-2 py-4">{children}</div>
     </section>
   );
 };
