@@ -1,15 +1,16 @@
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-export const TypeSelector = ({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (type: string) => void;
-}) => {
+import type { FixedCostType } from '@/types/fixed-costs';
+
+type Props = {
+  value: FixedCostType;
+  onChange: (type: Exclude<FixedCostType, ''>) => void; // ''은 선택 결과로 나오면 안 됨
+};
+
+export const TypeSelector = ({ value, onChange }: Props) => {
   return (
     <div className="flex items-center">
-      <Label className="w-28 pr-2">거래유형</Label>
+      <Label className="w-28 pr-2">거래 유형</Label>
       <div className="grid w-full grid-cols-2 gap-4">
         <button
           type="button"

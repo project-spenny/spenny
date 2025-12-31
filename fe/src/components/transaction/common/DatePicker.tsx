@@ -15,17 +15,23 @@ const formatDate = (date: Date) => {
   return `${year}년 ${month}월 ${day}일`;
 };
 
+type DatePickerProps = {
+  value: Date;
+  onChange: (date: Date) => void;
+  label?: string;
+  hideLabel?: boolean;
+};
+
 export const DatePicker = ({
   value,
   onChange,
-}: {
-  value: Date;
-  onChange: (date: Date) => void;
-}) => {
+  label = '날짜',
+  hideLabel = false,
+}: DatePickerProps) => {
   return (
     <div className="flex items-center">
-      <Label className="w-28 pr-2">날짜</Label>
-      <div className="w-full">
+      {!hideLabel && <Label className="w-28 pr-2">{label}</Label>}
+      <div>
         <Popover>
           <PopoverTrigger asChild>
             <Button

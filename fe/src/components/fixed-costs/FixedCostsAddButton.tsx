@@ -1,9 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
-export default function FixedCostsAddButton() {
+type Props = { onClick: () => void };
+
+export default function FixedCostsAddButton({ onClick }: Props) {
   return (
-    <Button className="z-50 mr-4 h-12 w-12 rounded-full" size="icon">
+    <Button
+      type="button"
+      className="z-50 mr-4 h-12 w-12 rounded-full"
+      size="icon"
+      onClick={onClick}
+    >
       <Plus />
     </Button>
   );
