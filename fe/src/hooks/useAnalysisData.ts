@@ -5,9 +5,21 @@ import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
+interface ITransactionWithCategory extends ITransaction {
+  categories: {
+    name_ko: string;
+    category_key: string;
+  } | null;
+}
+
 type AnalysisState = {
-  current: ITransaction[];
-  prev: ITransaction[];
+  current: ITransactionWithCategory[];
+  prev: ITransactionWithCategory[];
+};
+
+// 카테고리 명: 값(합계 금액)
+type CategoryGroup = {
+  [key: string]: number;
 };
 
 export const useAnalysisData = (
@@ -111,6 +123,21 @@ export const useAnalysisData = (
     0
   );
   const diff = totalAmount - prevAmount;
+
+  // 카테고리별 그룹화 및 합계 계산
+  const grouped = data.current.reduce<CategoryGroup>((acc, item) => {
+    const categoryName = item.categories?.name_ko || '기타';
+
+    // 카테고리가 첫 등장이면 0으로 초기화
+    if (!acc[categoryName]) acc[categoryName] = 0;
+
+    // 거래 금액 합산 (누적)
+    acc[categoryName] += item.amount || 0;
+
+    return acc;
+  }, {});
+
+  console.log(grouped);
 
   return {
     current: data.current,
