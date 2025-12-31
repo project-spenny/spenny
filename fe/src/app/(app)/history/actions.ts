@@ -34,11 +34,11 @@ export const getTransaction = async (filters?: TransactionFilters) => {
   }
 
   if (filters?.startDate) {
-    query = query.eq('startDate', filters.startDate);
+    query = query.gte('date', filters.startDate);
   }
 
   if (filters?.endDate) {
-    query = query.eq('endDate', filters.endDate);
+    query = query.lte('date', filters.endDate);
   }
 
   if (filters?.searchQuery) {
@@ -48,7 +48,7 @@ export const getTransaction = async (filters?: TransactionFilters) => {
   const { data, error } = await query;
   if (error) throw error;
 
-  return data;
+  return data || [];
 };
 
 export async function revalidateTransactions() {
