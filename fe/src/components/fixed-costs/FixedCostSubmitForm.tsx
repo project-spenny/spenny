@@ -13,6 +13,7 @@ import { CreateFixedRuleInput } from '@/types/fixed-costs';
 import { formatLocalDate } from '@/utils/date';
 import { createFixedRule } from '@/services/fixed-costs';
 import { useState } from 'react';
+import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -124,6 +125,17 @@ export default function FixedCostSubmitForm({
           </Button>
         </div>
       </form>
+
+      <FixedCostEditConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        onApplyThisMonth={() => {
+          toast('이번 달만 적용');
+        }}
+        onApplyFuture={() => {
+          toast('다음 달부터 적용');
+        }}
+      />
     </div>
   );
 }
