@@ -1,5 +1,6 @@
 'use client';
 
+import { PieChart, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import AnalysisEmpty from './common/AnalysisEmpty';
@@ -8,7 +9,6 @@ import CategoryAnalysisList from './common/CategoryAnalysisList';
 import CategoryChart from './common/CategoryChart';
 import MonthlyAmount from './common/MonthlyAmount';
 import { Separator } from '../ui/separator';
-import { TrendingUp } from 'lucide-react';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
@@ -41,7 +41,10 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
         />
       </AnalysisSection>
 
-      <AnalysisSection title="카테고리별 수입">
+      <AnalysisSection
+        title="카테고리별 수입"
+        icon={<PieChart className="text-blue-400" />}
+      >
         {isLoading ? (
           <div>데이터 불러오는 중...</div>
         ) : categoryData.length > 0 ? (
