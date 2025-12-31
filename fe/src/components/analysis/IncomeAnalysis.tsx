@@ -9,6 +9,7 @@ import CategoryAnalysisList from './common/CategoryAnalysisList';
 import CategoryChart from './common/CategoryChart';
 import MonthlyAmount from './common/MonthlyAmount';
 import { Separator } from '../ui/separator';
+import { THEME_COLOR } from '@/constants/colors';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
@@ -29,7 +30,7 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
     <div className="space-y-4">
       <AnalysisSection
         title="월별 수입"
-        icon={<TrendingUp className="text-blue-400" />}
+        icon={<TrendingUp className={THEME_COLOR.INCOME} />}
       >
         <MonthlyAmount
           type="income"
@@ -43,7 +44,7 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
 
       <AnalysisSection
         title="카테고리별 수입"
-        icon={<PieChart className="text-blue-400" />}
+        icon={<PieChart className={THEME_COLOR.INCOME} />}
       >
         {isLoading ? (
           <div>데이터 불러오는 중...</div>
