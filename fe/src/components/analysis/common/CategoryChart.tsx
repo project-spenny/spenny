@@ -6,17 +6,14 @@ import {
   Tooltip,
 } from 'chart.js';
 
+import { CategoryAnalysis } from '@/types/analysis';
 import { Doughnut } from 'react-chartjs-2';
 
 // Chart.js에 필요한 요소들을 등록
 ChartJS.register(ArcElement, Tooltip, Legend, Colors);
 
 type CategoryChartProps = {
-  data: {
-    name: string;
-    amount: number;
-    percentage: number;
-  }[];
+  data: CategoryAnalysis[];
 };
 
 const CategoryChart = ({ data }: CategoryChartProps) => {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { CategoryAnalysis } from '@/types/analysis';
 import { ITransaction } from '@/types/transactions';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
@@ -143,7 +144,7 @@ export const useAnalysisData = (
   });
 
   // 정렬 및 비율 계산
-  const categoryData = categoryList
+  const categoryData: CategoryAnalysis[] = categoryList
     .sort((a, b) => b.amount - a.amount) // 내림차순
     .map((item) => ({
       ...item,
