@@ -13,7 +13,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="sticky top-16 w-full border-b p-2 md:fixed md:h-full md:w-28 md:border-r">
+    <nav className="bg-background sticky top-16 w-full border-b p-2 md:fixed md:h-full md:w-28 md:border-r">
       <div className="flex flex-wrap items-center justify-center gap-2 text-sm md:flex-col">
         {navItems.map((item) => (
           <NavItem
