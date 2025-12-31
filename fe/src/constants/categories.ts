@@ -1,4 +1,15 @@
-export const CATEGORIES = {
+interface ICATEGORIES {
+  income: Category[];
+  expense: Category[];
+}
+
+type Category = {
+  category_key: string;
+  name_en: string;
+  name_ko: string;
+};
+
+export const CATEGORIES: ICATEGORIES = {
   income: [
     {
       category_key: 'SALARY',
