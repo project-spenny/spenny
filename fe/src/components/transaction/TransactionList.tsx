@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/item';
 import { toast } from 'sonner';
 import { supabase } from '@/utils/supabase/client';
+import { formatDateKR } from '@/utils/date';
 
 interface Transaction {
   id: string;
@@ -71,7 +72,9 @@ export const TransactionList = ({
           <Item variant="outline" key={index}>
             <ItemContent className="flex flex-row items-center">
               <div className="flex w-24 flex-col gap-1">
-                <span className="text-muted-foreground text-xs">{e.date}</span>
+                <span className="text-muted-foreground text-xs">
+                  {formatDateKR(new Date(e.date))}
+                </span>
                 <span
                   className={cn(
                     'text-sm font-bold',
