@@ -37,7 +37,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="flex h-screen w-full">
+      <div className="flex h-screen w-full flex-col">
         <Button
           onClick={handleCreateNew}
           className="fixed right-0 bottom-0 z-50 m-4 h-16 w-16 rounded-full"
@@ -45,7 +45,7 @@ export default function Page() {
         >
           <Plus size={20} />
         </Button>
-        <div className="flex-1 overflow-auto">
+        <div className="w-full flex-1 overflow-auto">
           <TransactionList
             refreshKey={refreshKey}
             onSelectTransaction={handleSelectTransaction}

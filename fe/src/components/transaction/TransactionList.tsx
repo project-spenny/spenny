@@ -64,7 +64,7 @@ export const TransactionList = ({
   }, [refreshKey]);
 
   return (
-    <div className="w-full space-y-6 p-4 md:p-6 lg:p-8">
+    <div className="flex w-full flex-col items-center space-y-6 p-4 md:p-6 lg:p-8">
       <div className="w-full max-w-xl space-y-6">
         <Label className="text-xl">가계부</Label>
         {transactions.map((e, index) => (
