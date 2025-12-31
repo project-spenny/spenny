@@ -30,7 +30,7 @@ const AnalysisPage = () => {
   ];
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
+    <div className="flex min-h-screen w-full flex-col py-4">
       {/* 달 선택 */}
 
       <div className="flex flex-col items-center justify-center py-6 md:py-10">
