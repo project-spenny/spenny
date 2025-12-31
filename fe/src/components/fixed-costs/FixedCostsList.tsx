@@ -16,6 +16,7 @@ type FixedCostsListProps = {
   isLoading: boolean;
   emptyMessage: string;
   onToggleActive: (id: string, nextActive: boolean) => void;
+  onEdit: (rule: IFixedRule) => void;
 };
 
 export default function FixedCostsList({
@@ -23,6 +24,7 @@ export default function FixedCostsList({
   isLoading,
   emptyMessage,
   onToggleActive,
+  onEdit,
 }: FixedCostsListProps) {
   if (isLoading) {
     return (
@@ -69,7 +71,11 @@ export default function FixedCostsList({
                 checked={e.is_active}
                 onCheckedChange={(v) => onToggleActive(e.id, v)}
               />
-              <Button className="cursor-pointer" size="sm">
+              <Button
+                className="cursor-pointer"
+                size="sm"
+                onClick={() => onEdit(e)}
+              >
                 <ChevronRight />
               </Button>
             </ItemActions>
