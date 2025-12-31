@@ -2,6 +2,7 @@ import AnalysisEmpty from './common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import CategoryChart from './common/CategoryChart';
 import MonthlyAmount from './common/MonthlyAmount';
+import { Separator } from '../ui/separator';
 import { TrendingDown } from 'lucide-react';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
@@ -30,19 +31,38 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
           <div>데이터 불러오는 중...</div>
         ) : categoryData.length > 0 ? (
           <>
+            {/* 카테고리 차트 */}
             <div className="flex items-center justify-center p-4">
               <CategoryChart data={categoryData} />
             </div>
 
-            <div>
-              {categoryData.map((item) => (
-                <div key={item.name}>
-                  <div className="flex items-center justify-between text-base">
-                    <span>{item.name}</span>
+            <Separator />
 
-                    <div className="space-x-2">
-                      <span>{item.amount.toLocaleString()}원</span>
-                      <span>({item.percentage.toFixed(1)}%)</span>
+            {/* 카테고리 리스트 */}
+            <div className="md: space-y-6 px-2 pt-6">
+              {categoryData.map((item) => (
+                <div key={item.name} className="group">
+                  <div className="flex items-center justify-between">
+                    {/* 왼쪽: 차트 색상 매칭 + 이름 + 퍼센트 */}
+                    <div className="flex items-center gap-4">
+                      {/* TODO: 추후 차트 색생과 매칭 예정 */}
+                      <div className="bg-primary/40 group-hover:bg-primary h-4 w-2 rounded-full transition-colors" />
+
+                      <div className="flex flex-col md:flex-row md:items-center md:gap-2">
+                        <span className="text-primary/90 text-sm font-medium md:text-base">
+                          {item.name}
+                        </span>
+                        <span className="text-muted-foreground text-xs font-medium md:text-sm">
+                          {item.percentage.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 오른쪽: 금액 */}
+                    <div className="flex flex-col items-end">
+                      <span className="text-primary/90 text-sm md:text-base">
+                        {item.amount.toLocaleString()}원
+                      </span>
                     </div>
                   </div>
                 </div>
