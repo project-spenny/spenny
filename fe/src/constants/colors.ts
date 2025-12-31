@@ -1,4 +1,12 @@
 /**
+ * 프로젝트 전역에서 사용하는 수입/지출 테마 컬러
+ */
+export const THEME_COLOR = {
+  EXPENSE: 'text-red-400',
+  INCOME: 'text-blue-400',
+} as const;
+
+/**
  * 차트 시각화를 위한 색상 팔레트
  * - TOP_5: 지출/수입 비중이 높은 상위 5개 항목용 색상
  * - GRAY: 비중이 낮은 기타 항목용 회색 (라이트/다크 대응)
@@ -14,4 +22,4 @@ export const CHART_COLORS = {
     LIGHT: '#e9e9e9',
     DARK: '#4d4d4d',
   },
-};
+} as const;
