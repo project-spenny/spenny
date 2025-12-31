@@ -11,7 +11,6 @@ export interface TransactionFilters {
 }
 
 export const getTransaction = async (filters?: TransactionFilters) => {
-  console.log('📊 Received filters:', filters);
   const supabase = await createClient();
 
   const {
