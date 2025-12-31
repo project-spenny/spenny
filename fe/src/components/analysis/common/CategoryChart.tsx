@@ -11,17 +11,13 @@ import {
 } from 'chart.js';
 import { useEffect, useState } from 'react';
 
+import { CHART_COLORS } from '@/constants/colors';
 import { CategoryAnalysis } from '@/types/analysis';
 import { Doughnut } from 'react-chartjs-2';
 import { useTheme } from 'next-themes';
 
 // Chart.js에 필요한 요소들을 등록
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-// 상위 5개 색상
-const TOP_COLORS = ['#6366f1', '#10b981', '#3b82f6', '#f59e0b', '#f43f5e'];
-// 나머지를 위한 회색
-const GRAY_COLOR = '#d4d4d4';
 
 type CategoryChartProps = {
   data: CategoryAnalysis[];
@@ -46,13 +42,19 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
         label: '금액',
         data: data.map((item) => item.amount),
         backgroundColor: data.map((_, i) =>
-          i < 5 ? TOP_COLORS[i] : GRAY_COLOR
+          i < 5
+            ? CHART_COLORS.TOP_5[i]
+            : isDark
+              ? CHART_COLORS.GRAY.DARK
+              : CHART_COLORS.GRAY.LIGHT
         ),
         hoverBackgroundColor: data.map((_, i) =>
-          i < 5 ? TOP_COLORS[i] : GRAY_COLOR
+          i < 5 ? CHART_COLORS.TOP_5[i] : CHART_COLORS.GRAY.LIGHT
         ),
         borderWidth: data.map((_, i) => (i === selectedIndex ? 2 : 1)),
-        borderColor: isDark ? '#ffffff' : '#3b3b3b',
+        borderColor: isDark
+          ? CHART_COLORS.BORDER.DARK
+          : CHART_COLORS.BORDER.LIGHT,
         offset: data.map((_, i) => (i === selectedIndex ? 25 : 0)), // 선택된 인덱스만 튀어나오도록
         hoverOffset: 15, // 마우스 올렸을 때 튀어나오는 효과
       },
