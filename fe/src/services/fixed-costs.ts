@@ -59,3 +59,22 @@ export const createFixedRule = async (input: CreateFixedRuleInput) => {
   if (error) throw error;
   return data as IFixedRule;
 };
+
+// 고정비 항목 수정
+export const updateFixedRule = async (
+  id: string,
+  input: CreateFixedRuleInput
+) => {
+  const userId = await requireUserId();
+
+  const { data, error } = await supabase
+    .from('fixed_rules')
+    .update(input)
+    .eq('id', id)
+    .eq('user_id', userId)
+    .select('*')
+    .single();
+
+  if (error) throw error;
+  return data as IFixedRule;
+};
