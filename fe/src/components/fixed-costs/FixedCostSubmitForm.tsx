@@ -16,12 +16,14 @@ import { createFixedRule } from '@/services/fixed-costs';
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
   initialData?: Partial<IFixedCostFormData>;
+  ruleId?: string;
   onSuccess: () => void;
 };
 
 export default function FixedCostSubmitForm({
   mode,
   initialData,
+  ruleId,
   onSuccess,
 }: FixedCostSubmitFormProps) {
   const {

@@ -98,6 +98,7 @@ export default function FixedCostsPage() {
       <ResponsivePanel isOpen={isPanelOpen} setIsOpen={setIsPanelOpen}>
         <FixedCostSubmitForm
           mode={formMode}
+          ruleId={editingRule?.id}
           initialData={
             editingRule ? mapFixedRuleToFormData(editingRule) : undefined
           }
