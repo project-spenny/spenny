@@ -11,7 +11,7 @@ export const CHART_COLORS = {
     DARK: '#aaaaaa',
   },
   BORDER: {
-    LIGHT: '#3b3b3b',
-    DARK: '#ffffff',
+    LIGHT: '#666666',
+    DARK: '#dfdfdf',
   },
 };
