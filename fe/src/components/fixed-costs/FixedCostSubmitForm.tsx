@@ -6,27 +6,43 @@ import { TitleInput } from '../transaction/common/TitleInput';
 import { TypeSelector } from '../transaction/common/TypeSelector';
 import { CategorySelector } from '../transaction/common/CategorySelector';
 import { AmountInput } from '../transaction/common/AmountInput';
-import { useFixedCostForm } from '@/hooks/useFixedCostForm';
+import { IFixedCostFormData, useFixedCostForm } from '@/hooks/useFixedCostForm';
 import { toast } from 'sonner';
 import FixedCostScheduleFields from './FixedCostsScheduleFields';
 import { CreateFixedRuleInput } from '@/types/fixed-costs';
-import { formatDateYYYYMMDD } from '@/utils/date';
-import { createFixedRule } from '@/services/fixed-costs';
+import { formatLocalDate } from '@/utils/date';
+import {
+  createFixedRule,
+  updateFixedRule,
+  updateFixedRuleThisMonth,
+} from '@/services/fixed-costs';
+import { useState } from 'react';
+import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 
-type FixedCostCreateFormProps = {
+type FixedCostSubmitFormProps = {
+  mode: 'create' | 'edit';
+  initialData?: Partial<IFixedCostFormData>;
+  ruleId?: string;
   onSuccess: () => void;
 };
 
-export default function FixedCostCreateForm({
+export default function FixedCostSubmitForm({
+  mode,
+  initialData,
+  ruleId,
   onSuccess,
-}: FixedCostCreateFormProps) {
+}: FixedCostSubmitFormProps) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingPayload, setPendingPayload] =
+    useState<CreateFixedRuleInput | null>(null);
+
   const {
     formData,
     categoryOpen,
     setCategoryOpen,
     UpdateField,
     validateFormData,
-  } = useFixedCostForm();
+  } = useFixedCostForm(initialData);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,11 +63,15 @@ export default function FixedCostCreateForm({
       weekday: formData.weekday,
       monthday: formData.monthday,
 
-      start_date: formatDateYYYYMMDD(formData.start_date),
-      end_date: formData.end_date
-        ? formatDateYYYYMMDD(formData.end_date)
-        : null,
+      start_date: formatLocalDate(formData.start_date),
+      end_date: formData.end_date ? formatLocalDate(formData.end_date) : null,
     };
+
+    if (mode === 'edit') {
+      setPendingPayload(payload);
+      setConfirmOpen(true);
+      return;
+    }
 
     try {
       await createFixedRule(payload);
@@ -62,11 +82,57 @@ export default function FixedCostCreateForm({
     }
   };
 
+  const handleApplyFuture = async () => {
+    if (!ruleId || !pendingPayload) return;
+
+    try {
+      await updateFixedRule(ruleId, pendingPayload);
+      toast.success('고정비가 수정되었습니다.');
+
+      setConfirmOpen(false);
+      setPendingPayload(null);
+
+      onSuccess();
+    } catch {
+      toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+  };
+
+  const handleApplyThisMonth = async () => {
+    if (!ruleId || !pendingPayload) return;
+
+    try {
+      const updated = await updateFixedRuleThisMonth(ruleId, {
+        title: pendingPayload.title,
+        type: pendingPayload.type,
+        amount: pendingPayload.amount,
+        category_id: pendingPayload.category_id,
+      });
+
+      if (updated.length === 0) {
+        toast('이번 달에 생성된 고정비 거래가 없습니다.');
+      } else {
+        toast.success('이번 달 고정비 거래가 수정되었습니다.');
+      }
+
+      setConfirmOpen(false);
+      setPendingPayload(null);
+
+      onSuccess();
+    } catch {
+      toast.error(
+        '이번 달 고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+      );
+    }
+  };
+
   return (
     <div className="flex h-full flex-col px-6">
       <form onSubmit={handleSubmit} className="flex h-full flex-col space-y-6">
         <div className="border-b pb-4">
-          <Label className="text-xl">고정비 추가</Label>
+          <Label className="text-xl">
+            {mode === 'create' ? '고정비 추가' : '고정비 수정'}
+          </Label>
         </div>
 
         <TitleInput
@@ -103,10 +169,17 @@ export default function FixedCostCreateForm({
 
         <div className="mt-auto border-t pt-4 pb-4">
           <Button type="submit" className="w-full">
-            저장
+            {mode === 'create' ? '저장' : '수정'}
           </Button>
         </div>
       </form>
+
+      <FixedCostEditConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        onApplyThisMonth={handleApplyThisMonth}
+        onApplyFuture={handleApplyFuture}
+      />
     </div>
   );
 }
