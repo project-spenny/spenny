@@ -137,7 +137,21 @@ export const useAnalysisData = (
     return acc;
   }, {});
 
-  console.log(grouped);
+  // 객체를 배열 형태로 바꾸기
+  const categoryList = Object.entries(grouped).map(([name, amount]) => {
+    return { name, amount };
+  });
+
+  // 정렬 및 비율 계산
+  const categoryData = categoryList
+    .sort((a, b) => b.amount - a.amount) // 내림차순
+    .map((item) => ({
+      ...item,
+      // 전체 금액 중 해당 카테고리가 차지하는 비율
+      percentage: totalAmount > 0 ? (item.amount / totalAmount) * 100 : 0,
+    }));
+
+  console.log(categoryData);
 
   return {
     current: data.current,
