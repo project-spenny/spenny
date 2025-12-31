@@ -6,7 +6,6 @@ import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { Trash } from 'lucide-react';
 import { useTransactionForm } from '@/hooks/useTransactionForm';
-import { X } from 'lucide-react';
 import { ITransaction } from '@/types/transactions';
 
 import { AmountInput } from './common/AmountInput';
@@ -18,7 +17,7 @@ import { CategorySelector } from './common/CategorySelector';
 
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';
-  transaction?: ITransaction;
+  transaction?: ITransaction | null;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -33,7 +32,7 @@ export default function TransactionSubmitForm({
     if (mode === 'edit' && transaction) {
       return {
         title: transaction.title,
-        type: transaction.type,
+        type: transaction.type as 'income' | 'expense',
         amount: transaction.amount.toString(),
         date: new Date(transaction.date),
         category_id: transaction.category_id,
@@ -42,11 +41,11 @@ export default function TransactionSubmitForm({
     } else {
       return {
         title: '',
-        type: '',
+        type: '' as '' | 'income' | 'expense',
         amount: '',
         date: new Date(),
         category_id: '',
-        tags: [],
+        tags: [] as string[],
       };
     }
   }, [mode, transaction]);

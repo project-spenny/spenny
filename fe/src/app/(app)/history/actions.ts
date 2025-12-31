@@ -1,9 +1,8 @@
 'use server';
-
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-interface TransactionFilters {
+export interface TransactionFilters {
   type?: 'income' | 'expense';
   category_id?: string;
   startDate?: string;
