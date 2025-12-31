@@ -151,13 +151,12 @@ export const useAnalysisData = (
       percentage: totalAmount > 0 ? (item.amount / totalAmount) * 100 : 0,
     }));
 
-  console.log(categoryData);
-
   return {
     current: data.current,
     prev: data.prev,
     totalAmount,
     diff,
     isLoading,
+    categoryData,
   };
 };
