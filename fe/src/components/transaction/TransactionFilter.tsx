@@ -91,12 +91,6 @@ export function TransactionFilter() {
       handleSearch();
     }
   };
-  const formatMonthDisplay = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    return `${year}.${String(month).padStart(2, '0')}`;
-  };
-
   const monthDisplay = (date: Date) => {
     const month = date.getMonth() + 1;
     return `${String(month)}월`;
