@@ -1,5 +1,3 @@
-'use client';
-
 import {
   ActiveElement,
   ArcElement,
@@ -9,7 +7,6 @@ import {
   Legend,
   Tooltip,
 } from 'chart.js';
-import { useEffect, useState } from 'react';
 
 import { CHART_COLORS } from '@/constants/colors';
 import { CategoryAnalysis } from '@/types/analysis';
@@ -21,19 +18,17 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 type CategoryChartProps = {
   data: CategoryAnalysis[];
+  selectedIndex: number;
+  onSelect: (index: number) => void;
 };
 
-const CategoryChart = ({ data }: CategoryChartProps) => {
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+const CategoryChart = ({
+  data,
+  selectedIndex,
+  onSelect,
+}: CategoryChartProps) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-
-  // 데이터가 로드되면 가장 큰 금액을 가진 항목을 기본으로 선택
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setSelectedIndex(0);
-    }
-  }, [data]);
 
   const chartData = {
     labels: data.map((item) => item.name),
@@ -70,7 +65,7 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
     // 클릭 시 해당 조각의 인덱스 저장
     onClick: (event: ChartEvent, elements: ActiveElement[]) => {
       if (elements.length > 0) {
-        setSelectedIndex(elements[0].index);
+        onSelect(elements[0].index);
       }
     },
   };
