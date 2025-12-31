@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 
 import { CategoryAnalysis } from '@/types/analysis';
 import { Doughnut } from 'react-chartjs-2';
+import { useTheme } from 'next-themes';
 
 // Chart.js에 필요한 요소들을 등록
 ChartJS.register(ArcElement, Tooltip, Legend, Colors);
@@ -24,6 +25,7 @@ type CategoryChartProps = {
 
 const CategoryChart = ({ data }: CategoryChartProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const { theme } = useTheme();
 
   // 데이터가 로드되면 가장 큰 금액을 가진 항목을 기본으로 선택
   useEffect(() => {
@@ -38,7 +40,9 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
       {
         label: '금액',
         data: data.map((item) => item.amount),
-        borderWidth: 2,
+        borderWidth: data.map((_, i) => (i === selectedIndex ? 2 : 0)),
+        borderColor: theme === 'dark' ? '#ffffff' : '#9e9e9e',
+        offset: data.map((_, i) => (i === selectedIndex ? 20 : 0)), // 선택된 인덱스만 튀어나오도록
         hoverOffset: 15, // 마우스 올렸을 때 튀어나오는 효과
       },
     ],
@@ -48,7 +52,7 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
   const options: ChartOptions<'doughnut'> = {
     plugins: {
       legend: { display: false },
-      tooltip: { enabled: true },
+      tooltip: { enabled: false },
     },
     // 클릭 시 해당 조각의 인덱스 저장
     onClick: (event: ChartEvent, elements: ActiveElement[]) => {
