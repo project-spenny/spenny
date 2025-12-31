@@ -12,6 +12,7 @@ import FixedCostScheduleFields from './FixedCostsScheduleFields';
 import { CreateFixedRuleInput } from '@/types/fixed-costs';
 import { formatLocalDate } from '@/utils/date';
 import { createFixedRule } from '@/services/fixed-costs';
+import { useState } from 'react';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -26,6 +27,10 @@ export default function FixedCostSubmitForm({
   ruleId,
   onSuccess,
 }: FixedCostSubmitFormProps) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingPayload, setPendingPayload] =
+    useState<CreateFixedRuleInput | null>(null);
+
   const {
     formData,
     categoryOpen,
@@ -57,20 +62,18 @@ export default function FixedCostSubmitForm({
       end_date: formData.end_date ? formatLocalDate(formData.end_date) : null,
     };
 
+    if (mode === 'edit') {
+      setPendingPayload(payload);
+      setConfirmOpen(true);
+      return;
+    }
+
     try {
-      if (mode === 'create') {
-        await createFixedRule(payload);
-        toast.success('고정비가 추가되었습니다.');
-      } else {
-        toast.success('고정비가 수정되었습니다.');
-      }
+      await createFixedRule(payload);
+      toast.success('고정비가 추가되었습니다.');
       onSuccess(); // 고정비 목록 갱신
     } catch {
-      toast.error(
-        mode === 'create'
-          ? '고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-          : '고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-      );
+      toast.error('고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
