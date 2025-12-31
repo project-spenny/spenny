@@ -10,7 +10,7 @@ import { IFixedCostFormData, useFixedCostForm } from '@/hooks/useFixedCostForm';
 import { toast } from 'sonner';
 import FixedCostScheduleFields from './FixedCostsScheduleFields';
 import { CreateFixedRuleInput } from '@/types/fixed-costs';
-import { formatDateYYYYMMDD } from '@/utils/date';
+import { formatLocalDate } from '@/utils/date';
 import { createFixedRule } from '@/services/fixed-costs';
 
 type FixedCostSubmitFormProps = {
@@ -51,10 +51,8 @@ export default function FixedCostSubmitForm({
       weekday: formData.weekday,
       monthday: formData.monthday,
 
-      start_date: formatDateYYYYMMDD(formData.start_date),
-      end_date: formData.end_date
-        ? formatDateYYYYMMDD(formData.end_date)
-        : null,
+      start_date: formatLocalDate(formData.start_date),
+      end_date: formData.end_date ? formatLocalDate(formData.end_date) : null,
     };
 
     try {

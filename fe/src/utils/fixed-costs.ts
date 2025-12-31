@@ -1,5 +1,6 @@
 import { IFixedCostFormData } from '@/hooks/useFixedCostForm';
 import { IFixedRule } from '@/types/fixed-costs';
+import { parseLocalDate } from './date';
 
 const WEEKDAY_LABEL: Record<number, string> = {
   1: '월',
@@ -40,8 +41,8 @@ export const mapFixedRuleToFormData = (
   weekday: rule.weekday ?? null,
   monthday: rule.monthday ?? null,
 
-  start_date: new Date(rule.start_date),
-  end_date: rule.end_date ? new Date(rule.end_date) : null,
+  start_date: parseLocalDate(rule.start_date),
+  end_date: rule.end_date ? parseLocalDate(rule.end_date) : null,
 
   is_active: rule.is_active,
 });
