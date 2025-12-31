@@ -8,7 +8,7 @@ export const getMonthRange = (date: Date) => {
 
   // 'YYYY-MM-DD' 형식의 문자열 생성
   const startDate = `${year}-${formatMonth}-01`;
-  const endDate = `${year}-${formatMonth}-${lastDay}`;
+  const endDate = `${year}-${formatMonth}-${String(lastDay).padStart(2, '0')}`;
 
   return { startDate, endDate };
 };
