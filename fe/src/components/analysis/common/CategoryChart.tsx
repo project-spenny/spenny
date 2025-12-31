@@ -62,8 +62,15 @@ const CategoryChart = ({
       legend: { display: false },
       tooltip: { enabled: false },
     },
+    // 마우스 호버 시 커서 변경
+    onHover: (event, elements) => {
+      if (event.native && event.native.target instanceof HTMLElement) {
+        event.native.target.style.cursor =
+          elements.length > 0 ? 'pointer' : 'default';
+      }
+    },
     // 클릭 시 해당 조각의 인덱스 저장
-    onClick: (event: ChartEvent, elements: ActiveElement[]) => {
+    onClick: (event, elements) => {
       if (elements.length > 0) {
         onSelect(elements[0].index);
       }
