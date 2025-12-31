@@ -7,11 +7,11 @@
 export const CHART_COLORS = {
   TOP_5: ['#6366f1', '#10b981', '#3b82f6', '#f59e0b', '#f43f5e'],
   GRAY: {
-    LIGHT: '#d4d4d4',
+    LIGHT: '#cecece',
     DARK: '#aaaaaa',
   },
   BORDER: {
-    LIGHT: '#666666',
-    DARK: '#dfdfdf',
+    LIGHT: '#e9e9e9',
+    DARK: '#4d4d4d',
   },
 };

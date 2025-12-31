@@ -14,7 +14,7 @@ const CategoryAnalysisList = ({
   onSelect,
 }: CategoryAnalysisListProps) => {
   return (
-    <div className="space-y-6 px-2 pt-6">
+    <div className="space-y-2 px-2 pt-6">
       {data.map((item, i) => {
         const isSelected = i === selectedIndex;
         const color = i < 5 ? CHART_COLORS.TOP_5[i] : CHART_COLORS.GRAY.LIGHT;
