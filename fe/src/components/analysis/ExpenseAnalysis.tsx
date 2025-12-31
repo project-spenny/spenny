@@ -1,5 +1,6 @@
 import AnalysisEmpty from './common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
+import CategoryChart from './common/CategoryChart';
 import MonthlyAmount from './common/MonthlyAmount';
 import { TrendingDown } from 'lucide-react';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
@@ -28,18 +29,26 @@ const ExpenseAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
         {isLoading ? (
           <div>데이터 불러오는 중...</div>
         ) : categoryData.length > 0 ? (
-          categoryData.map((item) => (
-            <div key={item.name}>
-              <div className="flex items-center justify-between text-base">
-                <span>{item.name}</span>
-
-                <div className="space-x-2">
-                  <span>{item.amount.toLocaleString()}원</span>
-                  <span>({item.percentage.toFixed(1)}%)</span>
-                </div>
-              </div>
+          <>
+            <div className="flex items-center justify-center p-4">
+              <CategoryChart data={categoryData} />
             </div>
-          ))
+
+            <div>
+              {categoryData.map((item) => (
+                <div key={item.name}>
+                  <div className="flex items-center justify-between text-base">
+                    <span>{item.name}</span>
+
+                    <div className="space-x-2">
+                      <span>{item.amount.toLocaleString()}원</span>
+                      <span>({item.percentage.toFixed(1)}%)</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <AnalysisEmpty
             title={`이번 달 지출이 없어요!`}
