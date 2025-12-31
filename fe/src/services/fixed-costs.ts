@@ -1,5 +1,6 @@
 import { supabase } from '@/utils/supabase/client';
 import type { CreateFixedRuleInput, IFixedRule } from '@/types/fixed-costs';
+import { getMonthRange } from '@/utils/date';
 
 const requireUserId = async () => {
   const {
@@ -77,4 +78,35 @@ export const updateFixedRule = async (
 
   if (error) throw error;
   return data as IFixedRule;
+};
+
+type UpdateFixedThisMonthInput = Pick<
+  CreateFixedRuleInput,
+  'title' | 'type' | 'amount' | 'category_id'
+>;
+
+// 이번 달에 생성된 고정비 거래만 수정
+export const updateFixedRuleThisMonth = async (
+  fixedRuleId: string,
+  input: UpdateFixedThisMonthInput
+) => {
+  const userId = await requireUserId();
+  const { startDate, endDate } = getMonthRange(new Date());
+
+  const { data, error } = await supabase
+    .from('transactions')
+    .update({
+      title: input.title,
+      type: input.type,
+      amount: input.amount,
+      category_id: input.category_id,
+    })
+    .eq('user_id', userId)
+    .eq('fixed_rule_id', fixedRuleId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .select('id');
+
+  if (error) throw error;
+  return data ?? [];
 };
