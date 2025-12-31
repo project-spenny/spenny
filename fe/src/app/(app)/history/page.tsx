@@ -42,6 +42,6 @@ async function TransactionListWrapper({
 }: {
   filters: TransactionFilters;
 }) {
-  const transactions = await getTransaction(filters);
+  const transactions = await getTransaction(filters, true);
   return <TransactionList transactions={transactions} />;
 }

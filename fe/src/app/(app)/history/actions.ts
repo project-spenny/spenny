@@ -10,7 +10,10 @@ export interface TransactionFilters {
   searchQuery?: string;
 }
 
-export const getTransaction = async (filters?: TransactionFilters) => {
+export const getTransaction = async (
+  filters?: TransactionFilters,
+  defaultMonth: boolean = true
+) => {
   const supabase = await createClient();
 
   const {
@@ -19,26 +22,42 @@ export const getTransaction = async (filters?: TransactionFilters) => {
 
   if (!user) throw new Error('No User');
 
+  let startDate = filters?.start_date;
+  let endDate = filters?.end_date;
+
+  if ((!startDate || !endDate) && defaultMonth) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+
+    startDate = `${year}-${month}-01`;
+
+    const lastDay = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0
+    ).getDate();
+    endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+  }
+
   let query = supabase
     .from('transactions')
     .select('*')
     .eq('user_id', user.id)
     .order('date', { ascending: false });
 
+  if (startDate) {
+    query = query.gte('date', startDate);
+  }
+  if (endDate) {
+    query = query.lte('date', endDate);
+  }
   if (filters?.type) {
     query = query.eq('type', filters.type);
   }
 
   if (filters?.category_id) {
     query = query.eq('category_id', filters.category_id);
-  }
-
-  if (filters?.start_date) {
-    query = query.gte('date', filters.start_date);
-  }
-
-  if (filters?.end_date) {
-    query = query.lte('date', filters.end_date);
   }
 
   if (filters?.searchQuery) {
