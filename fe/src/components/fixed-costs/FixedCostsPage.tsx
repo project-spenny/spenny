@@ -10,6 +10,7 @@ import FixedCostSubmitForm from './FixedCostSubmitForm';
 import { IFixedRule } from '@/types/fixed-costs';
 import { fetchFixedRules, setFixedRuleActive } from '@/services/fixed-costs';
 import { toast } from 'sonner';
+import { mapFixedRuleToFormData } from '@/utils/fixed-costs';
 
 type TabValue = 'all' | 'active' | 'inactive';
 
@@ -18,6 +19,8 @@ export default function FixedCostsPage() {
   const [items, setItems] = useState<IFixedRule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [editingRule, setEditingRule] = useState<IFixedRule | null>(null);
 
   const fetchData = async () => {
     try {
@@ -36,6 +39,12 @@ export default function FixedCostsPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleCreateClick = () => {
+    setFormMode('create');
+    setEditingRule(null);
+    setIsPanelOpen(true);
+  };
 
   const handleCreateSuccess = async () => {
     await fetchData();
@@ -77,11 +86,23 @@ export default function FixedCostsPage() {
     }
   };
 
+  const handleEditClick = (rule: IFixedRule) => {
+    setFormMode('edit');
+    setEditingRule(rule);
+    setIsPanelOpen(true);
+  };
+
   return (
     <div className="mx-auto min-h-screen w-full max-w-lg space-y-6 p-4 md:p-6 lg:p-8">
-      <FixedCostsAddButton onClick={() => setIsPanelOpen(true)} />
+      <FixedCostsAddButton onClick={handleCreateClick} />
       <ResponsivePanel isOpen={isPanelOpen} setIsOpen={setIsPanelOpen}>
-        <FixedCostSubmitForm onSuccess={handleCreateSuccess} />
+        <FixedCostSubmitForm
+          mode={formMode}
+          initialData={
+            editingRule ? mapFixedRuleToFormData(editingRule) : undefined
+          }
+          onSuccess={handleCreateSuccess}
+        />
       </ResponsivePanel>
 
       <header>
@@ -122,6 +143,7 @@ export default function FixedCostsPage() {
             isLoading={isLoading}
             emptyMessage={emptyMessage}
             onToggleActive={handleToggleActive}
+            onEdit={handleEditClick}
           />
         </TabsContent>
       </Tabs>
