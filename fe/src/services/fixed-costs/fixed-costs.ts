@@ -2,7 +2,7 @@ import { supabase } from '@/utils/supabase/client';
 import type { CreateFixedRuleInput, IFixedRule } from '@/types/fixed-costs';
 import { getMonthRange } from '@/utils/date';
 
-const requireUserId = async () => {
+export const requireUserId = async () => {
   const {
     data: { user },
     error,
