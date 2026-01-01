@@ -7,7 +7,6 @@ import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import CategoryAnalysisList from '@/components/analysis/common/CategoryAnalysisList';
 import CategoryChart from '@/components/analysis/common/CategoryChart';
-import MonthlyAmount from '@/components/analysis/common/MonthlyAmount';
 import { PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
@@ -60,12 +59,24 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
         title={`월별 ${config.label}`}
         icon={<Icon className={config.color} />}
       >
-        <MonthlyAmount
-          type={type}
-          prevCount={prev.length}
-          totalAmount={totalAmount}
-          diff={diff}
-        />
+        {/* 월별 분석 */}
+        <div className="text-lg font-bold">
+          총 {config.label}{' '}
+          <span className={config.color}>{totalAmount.toLocaleString()}</span>원
+        </div>
+
+        <div className="mt-2 text-base font-medium">
+          {prev.length === 0 ? (
+            <p>이전 달 {config.label} 내역이 없어요!</p>
+          ) : diff === 0 ? (
+            <p>지난 달과 총 {config.label} 금액이 똑같아요!</p>
+          ) : (
+            <p>
+              지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
+              {diff > 0 ? config.increaseText : config.decreaseText}
+            </p>
+          )}
+        </div>
       </AnalysisSection>
 
       <AnalysisSection
