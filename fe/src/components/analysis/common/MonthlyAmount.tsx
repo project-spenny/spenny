@@ -1,5 +1,6 @@
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import { Skeleton } from '@/components/ui/skeleton';
+import { THEME_COLOR } from '@/constants/colors';
 
 type MonthlyAmountProps = {
   isLoading: boolean;
@@ -19,7 +20,8 @@ const MonthlyAmount = ({
   diff,
 }: MonthlyAmountProps) => {
   const typeLabel = type === 'expense' ? '지출' : '수입';
-  const typeColor = type === 'expense' ? 'text-red-400' : 'text-blue-500';
+  const typeColor =
+    type === 'expense' ? THEME_COLOR.EXPENSE : THEME_COLOR.INCOME;
 
   if (isLoading) {
     return (
