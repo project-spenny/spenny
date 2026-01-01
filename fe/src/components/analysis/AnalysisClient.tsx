@@ -16,22 +16,15 @@ const AnalysisClient = () => {
   const month = Number(searchParams.get('month')) || new Date().getMonth() + 1;
   const currentDate = new Date(year, month - 1);
 
-  // 날짜 변경 시 URL 업데이트 함수
-  const updateDate = (newDate: Date) => {
-    const params = new URLSearchParams();
+  // 월 이동 및 URL 반영
+  const moveMonth = (offset: number) => {
+    const newDate = new Date(year, month - 1 + offset);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('year', newDate.getFullYear().toString());
     params.set('month', (newDate.getMonth() + 1).toString());
 
     // URL 변경 (페이지 전체 새로고침 없이 URL만 바뀜)
     router.push(`/analysis?${params.toString()}`, { scroll: false });
-  };
-
-  const handlePrevMonth = () => {
-    updateDate(new Date(year, month - 2));
-  };
-
-  const handleNextMonth = () => {
-    updateDate(new Date(year, month));
   };
 
   const analysisTabs = [
@@ -59,7 +52,7 @@ const AnalysisClient = () => {
             variant="ghost"
             size="icon"
             className="cursor-pointer"
-            onClick={handlePrevMonth}
+            onClick={() => moveMonth(-1)}
           >
             <ChevronLeft />
           </Button>
@@ -70,7 +63,7 @@ const AnalysisClient = () => {
             variant="ghost"
             size="icon"
             className="cursor-pointer"
-            onClick={handleNextMonth}
+            onClick={() => moveMonth(1)}
           >
             <ChevronRight />
           </Button>
