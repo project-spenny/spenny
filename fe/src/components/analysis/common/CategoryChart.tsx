@@ -1,7 +1,5 @@
 import {
-  ActiveElement,
   ArcElement,
-  ChartEvent,
   Chart as ChartJS,
   ChartOptions,
   Legend,
