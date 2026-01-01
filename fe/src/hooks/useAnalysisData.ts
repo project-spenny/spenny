@@ -1,13 +1,26 @@
 import { useEffect, useState } from 'react';
 
+import { CategoryAnalysis } from '@/types/analysis';
 import { ITransaction } from '@/types/transactions';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 
+interface ITransactionWithCategory extends ITransaction {
+  categories: {
+    name_ko: string;
+    category_key: string;
+  } | null;
+}
+
 type AnalysisState = {
-  current: ITransaction[];
-  prev: ITransaction[];
+  current: ITransactionWithCategory[];
+  prev: ITransactionWithCategory[];
+};
+
+// 카테고리 명: 값(합계 금액)
+type CategoryGroup = {
+  [key: string]: number;
 };
 
 export const useAnalysisData = (
@@ -51,14 +64,30 @@ export const useAnalysisData = (
         const [currentMonthRes, prevMonthRes] = await Promise.all([
           supabase
             .from('transactions')
-            .select('*')
+            .select(
+              `
+                *,
+                categories!category_id (
+                  name_ko,
+                  category_key
+                )
+              `
+            )
             .eq('user_id', user.id)
             .eq('type', type)
             .gte('date', startDate)
             .lte('date', endDate),
           supabase
             .from('transactions')
-            .select('*')
+            .select(
+              `
+                *,
+                categories!category_id (
+                  name_ko,
+                  category_key
+                )
+              `
+            )
             .eq('user_id', user.id)
             .eq('type', type)
             .gte('date', prevStart)
@@ -68,6 +97,7 @@ export const useAnalysisData = (
         if (currentMonthRes.error) throw currentMonthRes.error;
         if (prevMonthRes.error) throw prevMonthRes.error;
 
+        console.log(currentMonthRes.data);
         setData({
           current: currentMonthRes.data || [],
           prev: prevMonthRes.data || [],
@@ -95,11 +125,39 @@ export const useAnalysisData = (
   );
   const diff = totalAmount - prevAmount;
 
+  // 카테고리별 그룹화 및 합계 계산
+  const grouped = data.current.reduce<CategoryGroup>((acc, item) => {
+    const categoryName = item.categories?.name_ko || '기타';
+
+    // 카테고리가 첫 등장이면 0으로 초기화
+    if (!acc[categoryName]) acc[categoryName] = 0;
+
+    // 거래 금액 합산 (누적)
+    acc[categoryName] += item.amount || 0;
+
+    return acc;
+  }, {});
+
+  // 객체를 배열 형태로 바꾸기
+  const categoryList = Object.entries(grouped).map(([name, amount]) => {
+    return { name, amount };
+  });
+
+  // 정렬 및 비율 계산
+  const categoryData: CategoryAnalysis[] = categoryList
+    .sort((a, b) => b.amount - a.amount) // 내림차순
+    .map((item) => ({
+      ...item,
+      // 전체 금액 중 해당 카테고리가 차지하는 비율
+      percentage: totalAmount > 0 ? (item.amount / totalAmount) * 100 : 0,
+    }));
+
   return {
     current: data.current,
     prev: data.prev,
     totalAmount,
     diff,
     isLoading,
+    categoryData,
   };
 };
