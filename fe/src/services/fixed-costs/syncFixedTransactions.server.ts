@@ -54,7 +54,11 @@ export const syncByMonthServer = async ({
       // 누락된 거래만 transactions에 insert
       insertTransactions: async ({ rows }) => {
         const { error } = await supabase.from('transactions').insert(rows);
-        if (error) throw error;
+        if (!error) return;
+
+        // 동시에 실행되어 이미 생성된 경우(유니크 충돌)는 무시
+        if (error.code === '23505') return;
+        throw error;
       },
     },
     { userId: user.id, monthDate, startDate, endDate }
