@@ -1,4 +1,4 @@
-import { THEME_COLOR } from '@/constants/colors';
+import { ANALYSIS_CONFIG } from '@/constants/analysis';
 
 type MonthlyAmountProps = {
   type: 'expense' | 'income';
@@ -13,32 +13,24 @@ const MonthlyAmount = ({
   totalAmount,
   diff,
 }: MonthlyAmountProps) => {
-  const typeLabel = type === 'expense' ? '지출' : '수입';
-  const typeColor =
-    type === 'expense' ? THEME_COLOR.EXPENSE : THEME_COLOR.INCOME;
+  const config = ANALYSIS_CONFIG[type];
 
   return (
     <>
       <div className="text-lg font-bold">
-        총 {typeLabel}{' '}
-        <span className={typeColor}>{totalAmount.toLocaleString()}</span>원
+        총 {config.label}{' '}
+        <span className={config.color}>{totalAmount.toLocaleString()}</span>원
       </div>
 
       <div className="mt-2 text-base font-medium">
         {prevCount === 0 ? (
-          <p>이전 달 {typeLabel} 내역이 없어요!</p>
+          <p>이전 달 {config.label} 내역이 없어요!</p>
         ) : diff === 0 ? (
-          <p>지난 달과 총 {typeLabel} 금액이 똑같아요!</p>
+          <p>지난 달과 총 {config.label} 금액이 똑같아요!</p>
         ) : (
           <p>
             지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
-            {diff > 0
-              ? type === 'expense'
-                ? '더 썼어요'
-                : '더 벌었어요'
-              : type === 'expense'
-                ? '적게 썼어요'
-                : '적게 벌었어요'}
+            {diff > 0 ? config.increaseText : config.decreaseText}
           </p>
         )}
       </div>

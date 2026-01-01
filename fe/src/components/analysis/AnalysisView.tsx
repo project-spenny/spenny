@@ -1,15 +1,15 @@
 'use client';
 
-import { PieChart, TrendingDown, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { ANALYSIS_CONFIG } from '@/constants/analysis';
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import CategoryAnalysisList from '@/components/analysis/common/CategoryAnalysisList';
 import CategoryChart from '@/components/analysis/common/CategoryChart';
 import MonthlyAmount from '@/components/analysis/common/MonthlyAmount';
+import { PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { THEME_COLOR } from '@/constants/colors';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 type AnalysisViewProps = {
@@ -18,9 +18,8 @@ type AnalysisViewProps = {
 };
 
 const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
-  const typeLabel = type === 'expense' ? '지출' : '수입';
-  const typeColor =
-    type === 'expense' ? THEME_COLOR.EXPENSE : THEME_COLOR.INCOME;
+  const config = ANALYSIS_CONFIG[type];
+  const Icon = config.icon;
 
   const { current, prev, totalAmount, diff, isLoading, categoryData } =
     useAnalysisData(selectedDate, type);
@@ -48,12 +47,8 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
     return (
       <div className="py-20">
         <AnalysisEmpty
-          title={`이번 달 ${typeLabel}이 없어요!`}
-          description={
-            type === 'expense'
-              ? `${typeLabel}을 기록하고 소비 습관을 파악해보세요`
-              : '월급이나 부수입을 기록해보세요'
-          }
+          title={`이번 달 ${config.label}이 없어요!`}
+          description={config.emptyDescription}
         />
       </div>
     );
@@ -62,14 +57,8 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
   return (
     <div className="space-y-4">
       <AnalysisSection
-        title={`월별 ${typeLabel}`}
-        icon={
-          type === 'expense' ? (
-            <TrendingDown className={typeColor} />
-          ) : (
-            <TrendingUp className={typeColor} />
-          )
-        }
+        title={`월별 ${config.label}`}
+        icon={<Icon className={config.color} />}
       >
         <MonthlyAmount
           type={type}
@@ -80,8 +69,8 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
       </AnalysisSection>
 
       <AnalysisSection
-        title={`카테고리별 ${typeLabel}`}
-        icon={<PieChart className={typeColor} />}
+        title={`카테고리별 ${config.label}`}
+        icon={<PieChart className={config.color} />}
       >
         {/* 카테고리 차트 */}
         <div className="flex items-center justify-center p-4">
