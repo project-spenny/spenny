@@ -21,18 +21,43 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
   const typeLabel = type === 'expense' ? '지출' : '수입';
   const typeColor =
     type === 'expense' ? THEME_COLOR.EXPENSE : THEME_COLOR.INCOME;
+
   const { current, prev, totalAmount, diff, isLoading, categoryData } =
     useAnalysisData(selectedDate, type);
 
   // 상태 끌어올리기
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-
   // 사용자가 달을 옮기면 '가장 많이 쓴 카테고리'부터 보여줌
   useEffect(() => {
     if (categoryData && categoryData.length > 0) {
       setSelectedIndex(0);
     }
   }, [selectedDate]);
+
+  // 로딩 상태 처리
+  if (isLoading) {
+    return (
+      <div className="text-muted-foreground flex h-[400px] items-center justify-center">
+        데이터를 불러오는 중입니다...
+      </div>
+    );
+  }
+
+  // 이번 달 내역(current)이 비어있으면 전체를 Empty 화면으로 교체
+  if (current.length === 0) {
+    return (
+      <div className="py-20">
+        <AnalysisEmpty
+          title={`이번 달 ${typeLabel}이 없어요!`}
+          description={
+            type === 'expense'
+              ? `${typeLabel}을 기록하고 소비 습관을 파악해보세요`
+              : '월급이나 부수입을 기록해보세요'
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -48,8 +73,6 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
       >
         <MonthlyAmount
           type={type}
-          isLoading={isLoading}
-          currentCount={current.length}
           prevCount={prev.length}
           totalAmount={totalAmount}
           diff={diff}
@@ -60,38 +83,23 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
         title={`카테고리별 ${typeLabel}`}
         icon={<PieChart className={typeColor} />}
       >
-        {isLoading ? (
-          <div>데이터 불러오는 중...</div>
-        ) : categoryData.length > 0 ? (
-          <>
-            {/* 카테고리 차트 */}
-            <div className="flex items-center justify-center p-4">
-              <CategoryChart
-                data={categoryData}
-                selectedIndex={selectedIndex}
-                onSelect={setSelectedIndex}
-              />
-            </div>
-
-            <Separator />
-
-            {/* 카테고리 리스트 */}
-            <CategoryAnalysisList
-              data={categoryData}
-              selectedIndex={selectedIndex}
-              onSelect={setSelectedIndex}
-            />
-          </>
-        ) : (
-          <AnalysisEmpty
-            title={`이번 달 ${typeLabel}이 없어요!`}
-            description={
-              type === 'expense'
-                ? `${typeLabel}을 기록하고 소비 습관을 파악해보세요`
-                : '월급이나 부수입을 기록해보세요'
-            }
+        {/* 카테고리 차트 */}
+        <div className="flex items-center justify-center p-4">
+          <CategoryChart
+            data={categoryData}
+            selectedIndex={selectedIndex}
+            onSelect={setSelectedIndex}
           />
-        )}
+        </div>
+
+        <Separator />
+
+        {/* 카테고리 리스트 */}
+        <CategoryAnalysisList
+          data={categoryData}
+          selectedIndex={selectedIndex}
+          onSelect={setSelectedIndex}
+        />
       </AnalysisSection>
     </div>
   );
