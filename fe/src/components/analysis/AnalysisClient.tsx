@@ -2,24 +2,36 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import AnalysisView from '@/components/analysis/AnalysisView';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 
 const AnalysisClient = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // URL에서 연도와 월 읽어오기 (없으면 현재 날짜 기준)
+  const year = Number(searchParams.get('year')) || new Date().getFullYear();
+  const month = Number(searchParams.get('month')) || new Date().getMonth() + 1;
+  const currentDate = new Date(year, month - 1);
+
+  // 날짜 변경 시 URL 업데이트 함수
+  const updateDate = (newDate: Date) => {
+    const params = new URLSearchParams();
+    params.set('year', newDate.getFullYear().toString());
+    params.set('month', (newDate.getMonth() + 1).toString());
+
+    // URL 변경 (페이지 전체 새로고침 없이 URL만 바뀜)
+    router.push(`/analysis?${params.toString()}`, { scroll: false });
+  };
 
   const handlePrevMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
-    );
+    updateDate(new Date(year, month - 2));
   };
 
   const handleNextMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
-    );
+    updateDate(new Date(year, month));
   };
 
   const analysisTabs = [
@@ -37,10 +49,9 @@ const AnalysisClient = () => {
   return (
     <div className="flex min-h-screen w-full flex-col py-4">
       {/* 달 선택 */}
-
       <div className="flex flex-col items-center justify-center py-6 md:py-10">
         <span className="text-muted-foreground text-sm font-bold md:text-base">
-          {currentDate.getFullYear()}
+          {year}
         </span>
 
         <div className="flex items-center justify-center gap-3">
@@ -53,9 +64,7 @@ const AnalysisClient = () => {
             <ChevronLeft />
           </Button>
 
-          <span className="text-2xl font-bold">
-            {currentDate.getMonth() + 1}월
-          </span>
+          <span className="text-2xl font-bold">{month}월</span>
 
           <Button
             variant="ghost"
