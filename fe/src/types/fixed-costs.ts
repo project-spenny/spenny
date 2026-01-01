@@ -33,3 +33,14 @@ export type CreateFixedRuleInput = {
   start_date: string;
   end_date: string | null;
 };
+
+// 고정비 규칙으로부터 생성되는 거래 insert 타입
+export type FixedTransactionInsert = {
+  user_id: string;
+  fixed_rule_id: string;
+  date: string;
+  title: string;
+  type: 'income' | 'expense';
+  amount: number;
+  category_id: string;
+};

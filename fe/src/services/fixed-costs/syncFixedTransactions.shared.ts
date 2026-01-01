@@ -1,4 +1,4 @@
-import type { IFixedRule } from '@/types/fixed-costs';
+import type { FixedTransactionInsert, IFixedRule } from '@/types/fixed-costs';
 import { getFixedRuleDates } from './getRuleDates';
 
 type SyncDeps = {
@@ -52,15 +52,7 @@ const buildMissingInserts = ({
   ruleDatesMap: Map<string, string[]>;
   existingSet: Set<string>;
 }) => {
-  const inserts: Array<{
-    user_id: string;
-    fixed_rule_id: string;
-    date: string;
-    title: string;
-    type: 'income' | 'expense';
-    amount: number;
-    category_id: string;
-  }> = [];
+  const inserts: FixedTransactionInsert[] = [];
 
   for (const rule of rules) {
     const dates = ruleDatesMap.get(rule.id);
