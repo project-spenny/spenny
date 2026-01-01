@@ -16,15 +16,7 @@ type SyncDeps = {
   }) => Promise<Set<string>>;
 
   insertTransactions: (args: {
-    rows: Array<{
-      user_id: string;
-      fixed_rule_id: string;
-      date: string;
-      title: string;
-      type: 'income' | 'expense';
-      amount: number;
-      category_id: string;
-    }>;
+    rows: FixedTransactionInsert[];
   }) => Promise<void>;
 };
 
