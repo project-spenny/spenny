@@ -1,20 +1,28 @@
 'use client';
 
-import { PieChart, TrendingUp } from 'lucide-react';
+import { PieChart, TrendingDown, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import AnalysisEmpty from './common/AnalysisEmpty';
+import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import CategoryAnalysisList from './common/CategoryAnalysisList';
-import CategoryChart from './common/CategoryChart';
-import MonthlyAmount from './common/MonthlyAmount';
-import { Separator } from '../ui/separator';
+import CategoryAnalysisList from '@/components/analysis/common/CategoryAnalysisList';
+import CategoryChart from '@/components/analysis/common/CategoryChart';
+import MonthlyAmount from '@/components/analysis/common/MonthlyAmount';
+import { Separator } from '@/components/ui/separator';
 import { THEME_COLOR } from '@/constants/colors';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
-const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
+type AnalysisViewProps = {
+  type: 'expense' | 'income';
+  selectedDate: Date;
+};
+
+const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
+  const typeLabel = type === 'expense' ? '지출' : '수입';
+  const typeColor =
+    type === 'expense' ? THEME_COLOR.EXPENSE : THEME_COLOR.INCOME;
   const { current, prev, totalAmount, diff, isLoading, categoryData } =
-    useAnalysisData(selectedDate, 'income');
+    useAnalysisData(selectedDate, type);
 
   // 상태 끌어올리기
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -29,11 +37,17 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   return (
     <div className="space-y-4">
       <AnalysisSection
-        title="월별 수입"
-        icon={<TrendingUp className={THEME_COLOR.INCOME} />}
+        title={`월별 ${typeLabel}`}
+        icon={
+          type === 'expense' ? (
+            <TrendingDown className={typeColor} />
+          ) : (
+            <TrendingUp className={typeColor} />
+          )
+        }
       >
         <MonthlyAmount
-          type="income"
+          type={type}
           isLoading={isLoading}
           currentCount={current.length}
           prevCount={prev.length}
@@ -43,8 +57,8 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
       </AnalysisSection>
 
       <AnalysisSection
-        title="카테고리별 수입"
-        icon={<PieChart className={THEME_COLOR.INCOME} />}
+        title={`카테고리별 ${typeLabel}`}
+        icon={<PieChart className={typeColor} />}
       >
         {isLoading ? (
           <div>데이터 불러오는 중...</div>
@@ -70,8 +84,12 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
           </>
         ) : (
           <AnalysisEmpty
-            title={`이번 달 수입이 없어요!`}
-            description={`월급이나 부수입을 기록해보세요`}
+            title={`이번 달 ${typeLabel}이 없어요!`}
+            description={
+              type === 'expense'
+                ? `${typeLabel}을 기록하고 소비 습관을 파악해보세요`
+                : '월급이나 부수입을 기록해보세요'
+            }
           />
         )}
       </AnalysisSection>
@@ -79,4 +97,4 @@ const IncomeAnalysis = ({ selectedDate }: { selectedDate: Date }) => {
   );
 };
 
-export default IncomeAnalysis;
+export default AnalysisView;
