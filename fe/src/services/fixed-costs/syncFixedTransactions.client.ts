@@ -2,6 +2,7 @@ import { supabase } from '@/utils/supabase/client';
 import { getMonthRange } from '@/utils/date';
 import { requireUserId } from './fixed-costs';
 import { syncByMonthShared } from './syncFixedTransactions.shared';
+import { PG_ERROR } from '@/constants/postgres';
 
 // 클라이언트 환경에서 고정비 규칙 기반 월별 거래 동기화
 export const syncByMonthClient = async (
@@ -49,7 +50,7 @@ export const syncByMonthClient = async (
         if (!error) return;
 
         // 동시에 실행되어 이미 생성된 경우(유니크 충돌)는 무시
-        if (error.code === '23505') return;
+        if (error.code === PG_ERROR.UNIQUE_VIOLATION) return;
         throw error;
       },
     },

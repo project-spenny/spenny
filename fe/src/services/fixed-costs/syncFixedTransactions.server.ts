@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { syncByMonthShared } from './syncFixedTransactions.shared';
+import { PG_ERROR } from '@/constants/postgres';
 
 // 서버 환경에서 고정비 규칙 기반 월별 거래 동기화
 export const syncByMonthServer = async ({
@@ -59,7 +60,7 @@ export const syncByMonthServer = async ({
         if (!error) return;
 
         // 동시에 실행되어 이미 생성된 경우(유니크 충돌)는 무시
-        if (error.code === '23505') return;
+        if (error.code === PG_ERROR.UNIQUE_VIOLATION) return;
         throw error;
       },
     },
