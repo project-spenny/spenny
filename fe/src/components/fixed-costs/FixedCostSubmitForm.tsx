@@ -14,8 +14,7 @@ import { formatLocalDate } from '@/utils/date';
 import {
   createFixedRule,
   deleteFixedRule,
-  updateFixedRule,
-  updateFixedRuleThisMonth,
+  updateFixedRuleWithScope,
 } from '@/services/fixed-costs/fixed-costs';
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
@@ -84,47 +83,44 @@ export default function FixedCostSubmitForm({
     }
   };
 
-  const handleApplyFuture = async () => {
+  const closeConfirm = () => {
+    setConfirmOpen(false);
+    setPendingPayload(null);
+  };
+
+  const handleApplyIncludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
 
     try {
-      await updateFixedRule(ruleId, pendingPayload);
+      await updateFixedRuleWithScope({
+        id: ruleId,
+        ruleInput: pendingPayload,
+        scope: 'INCLUDE_CURRENT',
+      });
+
       toast.success('고정비가 수정되었습니다.');
-
-      setConfirmOpen(false);
-      setPendingPayload(null);
-
+      closeConfirm();
       onSuccess();
     } catch {
       toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
-  const handleApplyThisMonth = async () => {
+  const handleApplyExcludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
 
     try {
-      const updated = await updateFixedRuleThisMonth(ruleId, {
-        title: pendingPayload.title,
-        type: pendingPayload.type,
-        amount: pendingPayload.amount,
-        category_id: pendingPayload.category_id,
+      await updateFixedRuleWithScope({
+        id: ruleId,
+        ruleInput: pendingPayload,
+        scope: 'EXCLUDE_CURRENT',
       });
 
-      if (updated.length === 0) {
-        toast('이번 달에 생성된 고정비 거래가 없습니다.');
-      } else {
-        toast.success('이번 달 고정비 거래가 수정되었습니다.');
-      }
-
-      setConfirmOpen(false);
-      setPendingPayload(null);
-
+      toast.success('고정비가 수정되었습니다.');
+      closeConfirm();
       onSuccess();
     } catch {
-      toast.error(
-        '이번 달 고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.'
-      );
+      toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
@@ -202,8 +198,9 @@ export default function FixedCostSubmitForm({
       <FixedCostEditConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        onApplyThisMonth={handleApplyThisMonth}
-        onApplyFuture={handleApplyFuture}
+        cycle={formData.cycle as 'WEEKLY' | 'MONTHLY'}
+        onApplyIncludeCurrent={handleApplyIncludeCurrent}
+        onApplyExcludeCurrent={handleApplyExcludeCurrent}
       />
     </div>
   );
