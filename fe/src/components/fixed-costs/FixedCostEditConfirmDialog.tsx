@@ -12,16 +12,20 @@ import { Button } from '@/components/ui/button';
 type FixedCostEditConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onApplyThisMonth: () => void;
-  onApplyFuture: () => void;
+  cycle: 'WEEKLY' | 'MONTHLY';
+  onApplyIncludeCurrent: () => void;
+  onApplyExcludeCurrent: () => void;
 };
 
 export default function FixedCostEditConfirmDialog({
   open,
   onOpenChange,
-  onApplyThisMonth,
-  onApplyFuture,
+  cycle,
+  onApplyIncludeCurrent,
+  onApplyExcludeCurrent,
 }: FixedCostEditConfirmDialogProps) {
+  const unit = cycle === 'WEEKLY' ? '이번주' : '이번달';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -33,11 +37,12 @@ export default function FixedCostEditConfirmDialog({
         </DialogHeader>
 
         <div className="mt-4 flex flex-col gap-2">
-          <Button variant="outline" onClick={onApplyThisMonth}>
-            이번 달만 적용
+          <Button variant="outline" onClick={onApplyIncludeCurrent}>
+            {unit} 포함 이후 전부 적용
           </Button>
-          <Button variant="outline" onClick={onApplyFuture}>
-            이후 전부 적용
+
+          <Button variant="outline" onClick={onApplyExcludeCurrent}>
+            {unit} 제외 이후 전부 적용
           </Button>
         </div>
       </DialogContent>
