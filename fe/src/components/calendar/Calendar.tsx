@@ -1,14 +1,36 @@
 'use client';
 import { useState } from 'react';
 import { Calendar as CalendarView } from '@/components/ui/calendar';
-import { DayProps } from 'react-day-picker';
+import { type DayButton } from 'react-day-picker';
+import { Button } from '../ui/button';
 
-const Day = (props: DayProps) => {
-  const dateKey = props.day.date.toISOString().split('T')[0];
+const CustomDay = ({
+  day,
+  modifiers,
+  ...props
+}: React.ComponentProps<typeof DayButton>) => {
   return (
-    <div className="relative flex h-24 w-24 flex-col items-center justify-center bg-yellow-200">
-      {dateKey}
-    </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      data-day={day.date.toLocaleDateString()}
+      data-selected-single={
+        modifiers.selected &&
+        !modifiers.range_start &&
+        !modifiers.range_end &&
+        !modifiers.range_middle
+      }
+      {...props}
+      className="h-24 w-24"
+    >
+      <div className="flex flex-col gap-2">
+        <span className="text-lg">{day.date.getDate()}</span>
+        <div className="flex flex-col text-xs">
+          <span className="text-red-400">+4000</span>
+          <span className="text-blue-400">-2000</span>
+        </div>
+      </div>
+    </Button>
   );
 };
 
@@ -16,13 +38,15 @@ export const Calendar = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   return (
-    <CalendarView
-      mode="single"
-      selected={date}
-      onSelect={setDate}
-      className="rounded-md border shadow-sm"
-      captionLayout="dropdown"
-      components={{ Day: Day }}
-    />
+    <div className="ml-4 w-full bg-red-300">
+      <CalendarView
+        mode="single"
+        selected={date}
+        onSelect={setDate}
+        className="rounded-md border shadow-sm"
+        captionLayout="dropdown"
+        components={{ DayButton: CustomDay }}
+      />
+    </div>
   );
 };
