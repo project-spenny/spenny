@@ -3,6 +3,7 @@ import { formatLocalDate, getMonthRange } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ITransaction } from '@/types/transactions';
+import { getCurrentUser } from '@/services/analysis/budgetService';
 import { supabase } from '@/utils/supabase/client';
 import { syncByMonthClient } from '@/services/fixed-costs/syncFixedTransactions.client';
 import { toast } from 'sonner';
@@ -38,6 +39,9 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
       try {
         setIsLoading(true);
 
+        // 현재 로그인한 유저 정보 가져오기
+        const user = await getCurrentUser();
+
         const { startDate, endDate } = getMonthRange(selectedDate);
         const lastMonthDate = new Date(
           selectedDate.getFullYear(),
@@ -46,18 +50,6 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         );
         const { startDate: prevStart, endDate: prevEnd } =
           getMonthRange(lastMonthDate);
-
-        // Supabase에서 현재 로그인한 유저 정보 가져오기
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (!user || authError) {
-          toast.warning('로그인이 필요합니다');
-          setIsLoading(false);
-          return;
-        }
 
         // 분석 데이터 조회 전에 해당 월의 고정비 거래를 먼저 동기화
         const today = formatLocalDate(new Date());
@@ -110,9 +102,12 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         });
       } catch (err) {
         console.error(`[${typeLabel} 내역 조회 실패]`, err);
-        toast.error(
-          `${typeLabel} 내역을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.`
-        );
+
+        const message =
+          err instanceof Error
+            ? err.message
+            : '내역을 불러오는 중 문제가 발생했습니다.';
+        toast.warning(message);
       } finally {
         setIsLoading(false);
       }
