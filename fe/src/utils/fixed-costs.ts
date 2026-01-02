@@ -1,6 +1,14 @@
 import { IFixedCostFormData } from '@/hooks/useFixedCostForm';
-import { IFixedRule } from '@/types/fixed-costs';
+import { ApplyScope, IFixedRule } from '@/types/fixed-costs';
 import { parseLocalDate } from './date';
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addMonths,
+  addWeeks,
+} from 'date-fns';
 
 const WEEKDAY_LABEL: Record<number, string> = {
   1: '월',
@@ -44,3 +52,46 @@ export const mapFixedRuleToFormData = (
   start_date: parseLocalDate(rule.start_date),
   end_date: rule.end_date ? parseLocalDate(rule.end_date) : null,
 });
+
+// 고정비 규칙 수정 시 적용 시작 기준 날짜 (오늘 기준)
+export const getRuleApplyStartDate = ({
+  cycle,
+  scope,
+  today = new Date(),
+}: {
+  cycle: 'MONTHLY' | 'WEEKLY';
+  scope: ApplyScope;
+  today?: Date;
+}): Date => {
+  if (cycle === 'MONTHLY') {
+    return scope === 'INCLUDE_CURRENT'
+      ? startOfMonth(today)
+      : startOfMonth(addMonths(today, 1));
+  }
+
+  // WEEKLY (월요일 시작)
+  return scope === 'INCLUDE_CURRENT'
+    ? startOfWeek(today, { weekStartsOn: 1 })
+    : startOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
+};
+
+// '포함' 옵션에서 기존 거래를 수정할 대상 기간 (오늘 기준)
+export const getRuleApplyRange = ({
+  cycle,
+  today = new Date(),
+}: {
+  cycle: 'MONTHLY' | 'WEEKLY';
+  today?: Date;
+}) => {
+  if (cycle === 'MONTHLY') {
+    return {
+      from: startOfMonth(today),
+      to: endOfMonth(today),
+    };
+  }
+
+  return {
+    from: startOfWeek(today, { weekStartsOn: 1 }),
+    to: endOfWeek(today, { weekStartsOn: 1 }),
+  };
+};
