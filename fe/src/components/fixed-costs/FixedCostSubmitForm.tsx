@@ -13,11 +13,13 @@ import { CreateFixedRuleInput } from '@/types/fixed-costs';
 import { formatLocalDate } from '@/utils/date';
 import {
   createFixedRule,
+  deleteFixedRule,
   updateFixedRule,
   updateFixedRuleThisMonth,
 } from '@/services/fixed-costs/fixed-costs';
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
+import FixedCostDeleteDialog from './FixedCostDeleteDialog';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -126,6 +128,20 @@ export default function FixedCostSubmitForm({
     }
   };
 
+  const handleDeleteRule = async () => {
+    if (!ruleId) return;
+
+    try {
+      await deleteFixedRule(ruleId);
+      toast.success('고정비 규칙이 삭제되었습니다.');
+      onSuccess();
+    } catch {
+      toast.error(
+        '고정비 규칙 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+      );
+    }
+  };
+
   return (
     <div className="flex h-full flex-col px-6">
       <form onSubmit={handleSubmit} className="flex h-full flex-col space-y-6">
@@ -168,9 +184,18 @@ export default function FixedCostSubmitForm({
         />
 
         <div className="mt-auto border-t pt-4 pb-4">
-          <Button type="submit" className="w-full">
-            {mode === 'create' ? '저장' : '수정'}
-          </Button>
+          {mode === 'create' ? (
+            <Button type="submit" className="w-full">
+              저장
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2">
+              {ruleId && <FixedCostDeleteDialog onDelete={handleDeleteRule} />}
+              <Button type="submit" className="flex-1">
+                수정
+              </Button>
+            </div>
+          )}
         </div>
       </form>
 
