@@ -1,6 +1,6 @@
+import { CategoryAnalysis, TransactionType } from '@/types/analysis';
 import { useEffect, useMemo, useState } from 'react';
 
-import { CategoryAnalysis } from '@/types/analysis';
 import { ITransaction } from '@/types/transactions';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
@@ -23,10 +23,7 @@ type CategoryGroup = {
   [key: string]: number;
 };
 
-export const useAnalysisData = (
-  selectedDate: Date,
-  type: 'expense' | 'income'
-) => {
+export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
   const [data, setData] = useState<AnalysisState>({
     current: [],
     prev: [],

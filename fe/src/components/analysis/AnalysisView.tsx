@@ -9,10 +9,11 @@ import CategoryAnalysisList from '@/components/analysis/common/CategoryAnalysisL
 import CategoryChart from '@/components/analysis/common/CategoryChart';
 import { PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { TransactionType } from '@/types/analysis';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 type AnalysisViewProps = {
-  type: 'expense' | 'income';
+  type: TransactionType;
   selectedDate: Date;
 };
 
