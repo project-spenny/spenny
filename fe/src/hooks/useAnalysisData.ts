@@ -1,11 +1,11 @@
 import { CategoryAnalysis, TransactionType } from '@/types/analysis';
+import { formatLocalDate, getMonthRange } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ITransaction } from '@/types/transactions';
-import { formatLocalDate, getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
-import { toast } from 'sonner';
 import { syncByMonthClient } from '@/services/fixed-costs/syncFixedTransactions.client';
+import { toast } from 'sonner';
 
 interface ITransactionWithCategory extends ITransaction {
   categories: {
@@ -104,7 +104,6 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         if (currentMonthRes.error) throw currentMonthRes.error;
         if (prevMonthRes.error) throw prevMonthRes.error;
 
-        console.log(currentMonthRes.data);
         setData({
           current: currentMonthRes.data || [],
           prev: prevMonthRes.data || [],
