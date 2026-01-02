@@ -10,10 +10,16 @@ import { Button } from '@/components/ui/button';
 const AnalysisClient = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const now = new Date();
 
-  // URL에서 연도와 월 읽어오기 (없으면 현재 날짜 기준)
-  const year = Number(searchParams.get('year')) || new Date().getFullYear();
-  const month = Number(searchParams.get('month')) || new Date().getMonth() + 1;
+  // URL에서 읽어오되, 결과가 NaN이거나 0이면 현재 연/월을 사용
+  const yearParam = Number(searchParams.get('year')) || now.getFullYear();
+  const monthParam = Number(searchParams.get('month')) || now.getMonth() + 1;
+
+  // 숫자 범위 제한
+  const year = Math.min(Math.max(yearParam, 1900), 2100);
+  const month = Math.min(Math.max(monthParam, 1), 12);
+
   const currentDate = new Date(year, month - 1);
 
   // 월 이동 및 URL 반영
