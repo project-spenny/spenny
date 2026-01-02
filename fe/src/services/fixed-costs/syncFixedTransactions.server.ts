@@ -24,13 +24,12 @@ export const syncByMonthServer = async ({
 
   return syncByMonthShared(
     {
-      // 해당 월에 유효한 활성 고정비 규칙 조회
+      // 해당 월에 유효한 고정비 규칙 조회
       fetchActiveRules: async ({ userId, startDate, endDate }) => {
         const { data, error } = await supabase
           .from('fixed_rules')
           .select('*')
           .eq('user_id', userId)
-          .eq('is_active', true)
           .lte('start_date', endDate)
           .or(`end_date.is.null,end_date.gte.${startDate}`);
 
