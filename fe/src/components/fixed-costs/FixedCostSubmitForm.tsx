@@ -18,6 +18,7 @@ import {
 } from '@/services/fixed-costs/fixed-costs';
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
+import FixedCostDeleteDialog from './FixedCostDeleteDialog';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -126,6 +127,10 @@ export default function FixedCostSubmitForm({
     }
   };
 
+  const handleDeleteRule = async () => {
+    console.log('delete rule');
+  };
+
   return (
     <div className="flex h-full flex-col px-6">
       <form onSubmit={handleSubmit} className="flex h-full flex-col space-y-6">
@@ -168,9 +173,18 @@ export default function FixedCostSubmitForm({
         />
 
         <div className="mt-auto border-t pt-4 pb-4">
-          <Button type="submit" className="w-full">
-            {mode === 'create' ? '저장' : '수정'}
-          </Button>
+          {mode === 'create' ? (
+            <Button type="submit" className="w-full">
+              저장
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <FixedCostDeleteDialog onDelete={handleDeleteRule} />
+              <Button type="submit" className="flex-1">
+                수정
+              </Button>
+            </div>
+          )}
         </div>
       </form>
 
