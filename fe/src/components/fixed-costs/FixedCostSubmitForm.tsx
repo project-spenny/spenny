@@ -15,7 +15,7 @@ import {
   createFixedRule,
   updateFixedRule,
   updateFixedRuleThisMonth,
-} from '@/services/fixed-costs';
+} from '@/services/fixed-costs/fixed-costs';
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 

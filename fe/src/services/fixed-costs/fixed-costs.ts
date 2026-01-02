@@ -2,7 +2,7 @@ import { supabase } from '@/utils/supabase/client';
 import type { CreateFixedRuleInput, IFixedRule } from '@/types/fixed-costs';
 import { getMonthRange } from '@/utils/date';
 
-const requireUserId = async () => {
+export const requireUserId = async () => {
   const {
     data: { user },
     error,
@@ -109,4 +109,21 @@ export const updateFixedRuleThisMonth = async (
 
   if (error) throw error;
   return data ?? [];
+};
+
+// 해당 월에 적용되는 활성 고정비 규칙 조회
+export const fetchActiveFixedRulesByMonth = async (monthDate: Date) => {
+  const userId = await requireUserId();
+  const { startDate, endDate } = getMonthRange(monthDate);
+
+  const { data, error } = await supabase
+    .from('fixed_rules')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .lte('start_date', endDate)
+    .or(`end_date.is.null,end_date.gte.${startDate}`);
+
+  if (error) throw error;
+  return (data ?? []) as IFixedRule[];
 };
