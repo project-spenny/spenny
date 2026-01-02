@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { CategoryAnalysis } from '@/types/analysis';
 import { ITransaction } from '@/types/transactions';
@@ -31,6 +31,7 @@ export const useAnalysisData = (
     current: [],
     prev: [],
   });
+  const { current, prev } = data;
   const [isLoading, setIsLoading] = useState(true);
   const typeLabel = type === 'expense' ? '지출' : '수입';
 
@@ -115,46 +116,47 @@ export const useAnalysisData = (
     fetchData();
   }, [selectedDate, type]);
 
-  const totalAmount = data.current.reduce(
-    (sum, item) => sum + (item.amount || 0),
-    0
-  );
-  const prevAmount = data.prev.reduce(
-    (sum, item) => sum + (item.amount || 0),
-    0
-  );
+  const { totalAmount, prevAmount, categoryData } = useMemo(() => {
+    // 현재/이전 달 총액 계산
+    const currentTotal = current.reduce(
+      (sum, item) => sum + (item.amount || 0),
+      0
+    );
+    const lastTotal = prev.reduce((sum, item) => sum + (item.amount || 0), 0);
+
+    // 카테고리별 그룹화 및 합계 계산
+    const grouped = current.reduce<CategoryGroup>((acc, item) => {
+      const categoryName = item.categories?.name_ko || '기타';
+
+      // 카테고리가 첫 등장이면 0으로 초기화
+      if (!acc[categoryName]) acc[categoryName] = 0;
+      // 거래 금액 합산 (누적)
+      acc[categoryName] += item.amount || 0;
+
+      return acc;
+    }, {});
+
+    // 배열 변환 및 정렬, 비율 계산
+    const sortedCategoryData: CategoryAnalysis[] = Object.entries(grouped)
+      .map(([name, amount]) => ({
+        name,
+        amount,
+        percentage: currentTotal > 0 ? (amount / currentTotal) * 100 : 0,
+      }))
+      .sort((a, b) => b.amount - a.amount);
+
+    return {
+      totalAmount: currentTotal,
+      prevAmount: lastTotal,
+      categoryData: sortedCategoryData,
+    };
+  }, [current, prev]);
+
   const diff = totalAmount - prevAmount;
 
-  // 카테고리별 그룹화 및 합계 계산
-  const grouped = data.current.reduce<CategoryGroup>((acc, item) => {
-    const categoryName = item.categories?.name_ko || '기타';
-
-    // 카테고리가 첫 등장이면 0으로 초기화
-    if (!acc[categoryName]) acc[categoryName] = 0;
-
-    // 거래 금액 합산 (누적)
-    acc[categoryName] += item.amount || 0;
-
-    return acc;
-  }, {});
-
-  // 객체를 배열 형태로 바꾸기
-  const categoryList = Object.entries(grouped).map(([name, amount]) => {
-    return { name, amount };
-  });
-
-  // 정렬 및 비율 계산
-  const categoryData: CategoryAnalysis[] = categoryList
-    .sort((a, b) => b.amount - a.amount) // 내림차순
-    .map((item) => ({
-      ...item,
-      // 전체 금액 중 해당 카테고리가 차지하는 비율
-      percentage: totalAmount > 0 ? (item.amount / totalAmount) * 100 : 0,
-    }));
-
   return {
-    current: data.current,
-    prev: data.prev,
+    current: current,
+    prev: prev,
     totalAmount,
     diff,
     isLoading,
