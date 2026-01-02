@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { ANALYSIS_CONFIG } from '@/constants/analysis';
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
+import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import CategoryAnalysisList from '@/components/analysis/common/CategoryAnalysisList';
 import CategoryChart from '@/components/analysis/common/CategoryChart';
@@ -36,8 +37,8 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
   // 로딩 상태 처리
   if (isLoading) {
     return (
-      <div className="text-muted-foreground flex h-[400px] items-center justify-center">
-        데이터를 불러오는 중입니다...
+      <div className="py-20">
+        <AnalysisLoading />
       </div>
     );
   }
