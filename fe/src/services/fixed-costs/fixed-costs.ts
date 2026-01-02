@@ -26,22 +26,6 @@ export const fetchFixedRules = async () => {
   return (data ?? []) as IFixedRule[];
 };
 
-// 고정비 활성화/비활성화 설정
-export const setFixedRuleActive = async (id: string, isActive: boolean) => {
-  const userId = await requireUserId();
-
-  const { data, error } = await supabase
-    .from('fixed_rules')
-    .update({ is_active: isActive })
-    .eq('id', id)
-    .eq('user_id', userId)
-    .select('*')
-    .single();
-
-  if (error) throw error;
-  return data as IFixedRule;
-};
-
 // 고정비 항목 생성
 export const createFixedRule = async (input: CreateFixedRuleInput) => {
   const userId = await requireUserId();
@@ -111,8 +95,8 @@ export const updateFixedRuleThisMonth = async (
   return data ?? [];
 };
 
-// 해당 월에 적용되는 활성 고정비 규칙 조회
-export const fetchActiveFixedRulesByMonth = async (monthDate: Date) => {
+// 해당 월에 적용되는 고정비 규칙 조회
+export const fetchFixedRulesByMonth = async (monthDate: Date) => {
   const userId = await requireUserId();
   const { startDate, endDate } = getMonthRange(monthDate);
 
@@ -120,10 +104,21 @@ export const fetchActiveFixedRulesByMonth = async (monthDate: Date) => {
     .from('fixed_rules')
     .select('*')
     .eq('user_id', userId)
-    .eq('is_active', true)
     .lte('start_date', endDate)
     .or(`end_date.is.null,end_date.gte.${startDate}`);
 
   if (error) throw error;
   return (data ?? []) as IFixedRule[];
+};
+
+export const deleteFixedRule = async (ruleId: string) => {
+  const userId = await requireUserId();
+
+  const { error } = await supabase
+    .from('fixed_rules')
+    .delete()
+    .eq('id', ruleId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
 };

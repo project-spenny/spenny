@@ -13,8 +13,6 @@ export interface IFixedCostFormData {
 
   start_date: Date;
   end_date: Date | null;
-
-  is_active: boolean;
 }
 
 const getInitialFormData = (
@@ -31,8 +29,6 @@ const getInitialFormData = (
 
   start_date: initialData?.start_date ?? new Date(),
   end_date: initialData?.end_date ?? null,
-
-  is_active: initialData?.is_active ?? true,
 });
 
 export const useFixedCostForm = (initialData?: Partial<IFixedCostFormData>) => {
