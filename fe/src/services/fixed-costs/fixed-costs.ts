@@ -127,3 +127,11 @@ export const fetchActiveFixedRulesByMonth = async (monthDate: Date) => {
   if (error) throw error;
   return (data ?? []) as IFixedRule[];
 };
+
+export const deleteFixedRule = async (ruleId: string) => {
+  const { error } = await supabase
+    .from('fixed_rules')
+    .delete()
+    .eq('id', ruleId);
+  if (error) throw error;
+};

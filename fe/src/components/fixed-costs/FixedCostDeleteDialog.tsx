@@ -58,13 +58,13 @@ export default function FixedCostDeleteDialog({ onDelete }: Props) {
           <li>• 삭제 이후에는 자동 거래 생성이 중단됩니다.</li>
         </ul>
 
-        <DialogFooter className="mt-2 flex">
+        <DialogFooter className="mt-2 flex gap-2">
           <Button
             type="button"
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={pending}
-            className="flex-1/2"
+            className="flex-1"
           >
             취소
           </Button>
@@ -73,7 +73,7 @@ export default function FixedCostDeleteDialog({ onDelete }: Props) {
             variant="destructive"
             onClick={handleConfirmDelete}
             disabled={pending}
-            className="flex-1/2"
+            className="flex-1"
           >
             삭제
           </Button>

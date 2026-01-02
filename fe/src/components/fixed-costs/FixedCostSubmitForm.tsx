@@ -13,6 +13,7 @@ import { CreateFixedRuleInput } from '@/types/fixed-costs';
 import { formatLocalDate } from '@/utils/date';
 import {
   createFixedRule,
+  deleteFixedRule,
   updateFixedRule,
   updateFixedRuleThisMonth,
 } from '@/services/fixed-costs/fixed-costs';
@@ -128,7 +129,17 @@ export default function FixedCostSubmitForm({
   };
 
   const handleDeleteRule = async () => {
-    console.log('delete rule');
+    if (!ruleId) return;
+
+    try {
+      await deleteFixedRule(ruleId);
+      toast.success('고정비 규칙이 삭제되었습니다.');
+      onSuccess();
+    } catch {
+      toast.error(
+        '고정비 규칙 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+      );
+    }
   };
 
   return (
@@ -179,7 +190,7 @@ export default function FixedCostSubmitForm({
             </Button>
           ) : (
             <div className="flex items-center gap-2">
-              <FixedCostDeleteDialog onDelete={handleDeleteRule} />
+              {ruleId && <FixedCostDeleteDialog onDelete={handleDeleteRule} />}
               <Button type="submit" className="flex-1">
                 수정
               </Button>
