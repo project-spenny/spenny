@@ -96,7 +96,7 @@ export const syncByMonthShared = async (
   const rules = await deps.fetchFixedRules({
     userId,
     startDate,
-    endDate: effectiveEndDate,
+    endDate,
   });
   if (rules.length === 0) return { createdCount: 0 };
 
