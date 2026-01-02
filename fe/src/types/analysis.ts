@@ -11,3 +11,16 @@ export type CategoryAnalysis = {
   amount: number;
   percentage: number;
 };
+
+/**
+ * 예산 타입
+ */
+export type Budget = {
+  id: string;
+  user_id: string;
+  category_id: string | null;
+  budget_month: string;
+  amount: number;
+  created_at: Date;
+  updated_at: Date;
+};

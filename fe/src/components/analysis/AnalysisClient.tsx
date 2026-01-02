@@ -43,7 +43,7 @@ const AnalysisClient = () => {
       value: '수입',
       content: <AnalysisView type="income" selectedDate={currentDate} />,
     },
-    { value: '예산', content: <BudgetView /> },
+    { value: '예산', content: <BudgetView selectedDate={currentDate} /> },
   ];
 
   return (
