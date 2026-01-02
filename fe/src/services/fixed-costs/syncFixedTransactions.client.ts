@@ -4,7 +4,10 @@ import { requireUserId } from './fixed-costs';
 import { syncByMonthShared } from './syncFixedTransactions.shared';
 
 // 클라이언트 환경에서 고정비 규칙 기반 월별 거래 동기화
-export const syncByMonthClient = async (monthDate: Date) => {
+export const syncByMonthClient = async (
+  monthDate: Date,
+  generateThroughDate?: string
+) => {
   const userId = await requireUserId();
   const { startDate, endDate } = getMonthRange(monthDate);
 
@@ -50,6 +53,6 @@ export const syncByMonthClient = async (monthDate: Date) => {
         throw error;
       },
     },
-    { userId, monthDate, startDate, endDate }
+    { userId, monthDate, startDate, endDate, generateThroughDate }
   );
 };

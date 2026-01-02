@@ -6,10 +6,12 @@ export const syncByMonthServer = async ({
   monthDate,
   startDate,
   endDate,
+  generateThroughDate,
 }: {
   monthDate: Date;
   startDate: string;
   endDate: string;
+  generateThroughDate?: string;
 }) => {
   const supabase = await createClient();
 
@@ -61,6 +63,6 @@ export const syncByMonthServer = async ({
         throw error;
       },
     },
-    { userId: user.id, monthDate, startDate, endDate }
+    { userId: user.id, monthDate, startDate, endDate, generateThroughDate }
   );
 };

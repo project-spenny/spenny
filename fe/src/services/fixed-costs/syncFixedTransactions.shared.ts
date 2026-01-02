@@ -38,11 +38,13 @@ const buildMissingInserts = ({
   rules,
   ruleDatesMap,
   existingSet,
+  endDate,
 }: {
   userId: string;
   rules: IFixedRule[];
   ruleDatesMap: Map<string, string[]>;
   existingSet: Set<string>;
+  endDate: string;
 }) => {
   const inserts: FixedTransactionInsert[] = [];
 
@@ -51,6 +53,8 @@ const buildMissingInserts = ({
     if (!dates) continue;
 
     for (const date of dates) {
+      if (date > endDate) continue;
+
       const key = `${rule.id}__${date}`;
       if (existingSet.has(key)) continue;
 
@@ -77,12 +81,23 @@ export const syncByMonthShared = async (
     monthDate: Date;
     startDate: string;
     endDate: string;
+    generateThroughDate?: string;
   }
 ) => {
-  const { userId, monthDate, startDate, endDate } = args;
+  const { userId, monthDate, startDate, endDate, generateThroughDate } = args;
+
+  // 생성 범위 상한 : 월말(endDate)과 generateThroughDate 중 더 이른 날짜
+  const effectiveEndDate =
+    generateThroughDate && generateThroughDate < endDate
+      ? generateThroughDate
+      : endDate;
 
   // 해당 월에 유효한 고정비 규칙 조회
-  const rules = await deps.fetchActiveRules({ userId, startDate, endDate });
+  const rules = await deps.fetchActiveRules({
+    userId,
+    startDate,
+    endDate: effectiveEndDate,
+  });
   if (rules.length === 0) return { createdCount: 0 };
 
   // 규칙별 월 발생 날짜 계산
@@ -95,7 +110,7 @@ export const syncByMonthShared = async (
     userId,
     ruleIds,
     startDate,
-    endDate,
+    endDate: effectiveEndDate,
   });
 
   // 누락된 날짜만 insert payload 생성
@@ -104,6 +119,7 @@ export const syncByMonthShared = async (
     rules,
     ruleDatesMap,
     existingSet,
+    endDate: effectiveEndDate,
   });
 
   if (inserts.length === 0) return { createdCount: 0 };
