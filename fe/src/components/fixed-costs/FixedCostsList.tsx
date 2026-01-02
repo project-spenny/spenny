@@ -5,25 +5,21 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { IFixedRule } from '@/types/fixed-costs';
 import { formatFixedRuleCycle } from '@/utils/fixed-costs';
+import { THEME_COLOR } from '@/constants/colors';
 
 type FixedCostsListProps = {
   items: IFixedRule[];
   isLoading: boolean;
-  emptyMessage: string;
-  onToggleActive: (id: string, nextActive: boolean) => void;
   onEdit: (rule: IFixedRule) => void;
 };
 
 export default function FixedCostsList({
   items,
   isLoading,
-  emptyMessage,
-  onToggleActive,
   onEdit,
 }: FixedCostsListProps) {
   if (isLoading) {
@@ -37,7 +33,10 @@ export default function FixedCostsList({
   if (items.length === 0) {
     return (
       <div className="text-muted-foreground rounded-md border p-6 text-center text-sm whitespace-pre-line">
-        {emptyMessage}
+        <p>
+          등록된 고정비가 없습니다. <br /> 상단의 + 버튼을 눌러 고정비를 추가해
+          주세요.
+        </p>
       </div>
     );
   }
@@ -45,11 +44,7 @@ export default function FixedCostsList({
   return (
     <div className="space-y-2">
       {items.map((e) => (
-        <Item
-          variant="outline"
-          key={e.id}
-          className={cn(!e.is_active && 'opacity-50')}
-        >
+        <Item variant="outline" key={e.id}>
           <ItemContent className="flex flex-row items-center">
             <div className="flex w-24 flex-col gap-1">
               <span className="text-muted-foreground text-xs">
@@ -58,7 +53,7 @@ export default function FixedCostsList({
               <span
                 className={cn(
                   'text-sm font-bold',
-                  e.type === 'income' ? 'text-blue-400' : 'text-red-400'
+                  e.type === 'income' ? THEME_COLOR.INCOME : THEME_COLOR.EXPENSE
                 )}
               >
                 {e.type === 'income' ? '+' : '-'}
@@ -67,10 +62,6 @@ export default function FixedCostsList({
             </div>
             <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
             <ItemActions className="ml-auto">
-              <Switch
-                checked={e.is_active}
-                onCheckedChange={(v) => onToggleActive(e.id, v)}
-              />
               <Button
                 className="cursor-pointer"
                 size="sm"

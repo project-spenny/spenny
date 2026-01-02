@@ -43,6 +43,4 @@ export const mapFixedRuleToFormData = (
 
   start_date: parseLocalDate(rule.start_date),
   end_date: rule.end_date ? parseLocalDate(rule.end_date) : null,
-
-  is_active: rule.is_active,
 });

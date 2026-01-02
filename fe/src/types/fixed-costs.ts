@@ -14,7 +14,6 @@ export interface IFixedRule {
   monthday: number | null;
   start_date: string;
   end_date: string | null;
-  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
