@@ -2,7 +2,7 @@ import type { FixedTransactionInsert, IFixedRule } from '@/types/fixed-costs';
 import { getFixedRuleDates } from './getRuleDates';
 
 type SyncDeps = {
-  fetchActiveRules: (args: {
+  fetchFixedRules: (args: {
     userId: string;
     startDate: string;
     endDate: string;
@@ -93,7 +93,7 @@ export const syncByMonthShared = async (
       : endDate;
 
   // 해당 월에 유효한 고정비 규칙 조회
-  const rules = await deps.fetchActiveRules({
+  const rules = await deps.fetchFixedRules({
     userId,
     startDate,
     endDate: effectiveEndDate,

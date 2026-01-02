@@ -15,7 +15,7 @@ export const syncByMonthClient = async (
   return syncByMonthShared(
     {
       // 해당 월에 유효한 고정비 규칙 조회
-      fetchActiveRules: async ({ userId, startDate, endDate }) => {
+      fetchFixedRules: async ({ userId, startDate, endDate }) => {
         const { data, error } = await supabase
           .from('fixed_rules')
           .select('*')

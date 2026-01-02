@@ -6,10 +6,7 @@ import FixedCostsList from './FixedCostsList';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import FixedCostSubmitForm from './FixedCostSubmitForm';
 import { IFixedRule } from '@/types/fixed-costs';
-import {
-  fetchFixedRules,
-  setFixedRuleActive,
-} from '@/services/fixed-costs/fixed-costs';
+import { fetchFixedRules } from '@/services/fixed-costs/fixed-costs';
 import { toast } from 'sonner';
 import { mapFixedRuleToFormData } from '@/utils/fixed-costs';
 
