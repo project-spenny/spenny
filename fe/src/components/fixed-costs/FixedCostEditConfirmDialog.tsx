@@ -36,14 +36,28 @@ export default function FixedCostEditConfirmDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 flex flex-col gap-2">
-          <Button variant="outline" onClick={onApplyIncludeCurrent}>
-            {unit} 포함 이후 전부 적용
-          </Button>
+        <div className="mt-3 flex flex-col gap-3">
+          <div className="rounded-md border p-3">
+            <Button className="w-full" onClick={onApplyIncludeCurrent}>
+              {unit} 포함 이후 전부 적용
+            </Button>
+            <p className="text-muted-foreground mt-1 text-sm">
+              이미 생성된 {unit} 거래도 새 규칙으로 수정됩니다.
+            </p>
+          </div>
 
-          <Button variant="outline" onClick={onApplyExcludeCurrent}>
-            {unit} 제외 이후 전부 적용
-          </Button>
+          <div className="rounded-md border p-3">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={onApplyExcludeCurrent}
+            >
+              {unit} 제외 이후 전부 적용
+            </Button>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {unit} 거래는 유지되고 다음 기간부터 적용됩니다.
+            </p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
