@@ -29,8 +29,8 @@ export default function FixedCostScheduleFields({
   return (
     <>
       {/* 시작일 */}
-      <div className="space-y-2">
-        <Label>시작일</Label>
+      <div className="flex">
+        <Label className="w-28 pr-2">시작일</Label>
         <DatePicker
           value={formData.start_date}
           onChange={(date) => UpdateField('start_date', date)}
@@ -49,7 +49,9 @@ export default function FixedCostScheduleFields({
             }}
           />
         </div>
-
+        <p className="text-muted-foreground text-xs">
+          종료일을 설정하려면 오른쪽 스위치를 켜세요.
+        </p>
         {formData.end_date && (
           <DatePicker
             value={formData.end_date}
@@ -57,16 +59,12 @@ export default function FixedCostScheduleFields({
             hideLabel
           />
         )}
-
-        <p className="text-muted-foreground text-xs">
-          종료일을 설정하려면 오른쪽 스위치를 켜세요.
-        </p>
       </div>
 
       {/* 반복 주기 */}
-      <div className="space-y-2">
-        <Label>반복 주기</Label>
-        <div className="grid grid-cols-2 gap-4">
+      <div className="flex items-center space-y-2">
+        <Label className="w-28 pr-2">반복 주기</Label>
+        <div className="grid w-full grid-cols-2 gap-4">
           <button
             type="button"
             onClick={() => {
@@ -105,8 +103,8 @@ export default function FixedCostScheduleFields({
 
       {/* 주간 : 요일 버튼 */}
       {formData.cycle === 'WEEKLY' && (
-        <div className="space-y-2">
-          <Label>반복 요일</Label>
+        <div className="space-y-5">
+          <Label className="w-28 pr-2">반복 요일</Label>
           <div className="grid grid-cols-7 gap-2">
             {WEEKDAYS.map((d) => (
               <button
@@ -129,28 +127,29 @@ export default function FixedCostScheduleFields({
 
       {/* 월간 : 날짜 Select */}
       {formData.cycle === 'MONTHLY' && (
-        <div className="space-y-2">
-          <Label>반복 날짜</Label>
-          <Select
-            value={formData.monthday ? String(formData.monthday) : ''}
-            onValueChange={(v) => UpdateField('monthday', Number(v))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="날짜를 선택해주세요" />
-            </SelectTrigger>
-            <SelectContent>
-              {MONTH_DAYS.map((d) => (
-                <SelectItem key={d} value={String(d)}>
-                  {d}일
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+        <>
+          <div className="flex items-center">
+            <Label className="w-28 pr-2">반복 날짜</Label>
+            <Select
+              value={formData.monthday ? String(formData.monthday) : ''}
+              onValueChange={(v) => UpdateField('monthday', Number(v))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="날짜를 선택해주세요" />
+              </SelectTrigger>
+              <SelectContent>
+                {MONTH_DAYS.map((d) => (
+                  <SelectItem key={d} value={String(d)}>
+                    {d}일
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <p className="text-muted-foreground text-xs">
             29~31일은 해당 월에 날짜가 없으면 말일로 자동 조정돼요.
           </p>
-        </div>
+        </>
       )}
     </>
   );
