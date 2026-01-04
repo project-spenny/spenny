@@ -1,9 +1,10 @@
+import { Calculator, ListPlus } from 'lucide-react';
+
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import BudgetSetupDialog from '@/components/analysis/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
-import { Calculator } from 'lucide-react';
 import ConfirmDialog from '@/components/analysis/common/ConfirmDialog';
 import { Progress } from '@/components/ui/progress';
 import { THEME_COLOR } from '@/constants/colors';
@@ -144,7 +145,28 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
             </div>
           </AnalysisSection>
 
-          <AnalysisSection title={'카테고리별 예산'}>카테고리</AnalysisSection>
+          {/* 카테고리별 예산 */}
+          <AnalysisSection title={'카테고리별 예산'}>
+            {categoryBudgets.length === 0 ? (
+              <AnalysisEmpty
+                title="카테고리별 예산을 설정해주세요"
+                description="식비, 교통비 등 항목별로 예산을 나누면 더 체계적으로 관리할 수 있어요."
+                icon={ListPlus}
+              >
+                <Button
+                  variant="ghost"
+                  className="bg-primary/5 hover:bg-primary/10 mt-2 cursor-pointer"
+                  onClick={() => {
+                    console.log('카테고리 예산 추가 클릭');
+                  }}
+                >
+                  카테고리 예산 추가하기
+                </Button>
+              </AnalysisEmpty>
+            ) : (
+              <div>카테고리</div>
+            )}
+          </AnalysisSection>
         </>
       )}
 
