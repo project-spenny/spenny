@@ -1,45 +1,53 @@
-import { useEffect, useState } from 'react';
+import { fetchBudgets, upsertBudgets } from '@/services/analysis/budgetService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { Budget } from '@/types/analysis';
-import { fetchBudgets } from '@/services/analysis/budgetService';
 import { toast } from 'sonner';
 
 const useBudgetData = (selectedDate: Date) => {
-  const [totalBudget, setTotalBudget] = useState<Budget | null>(null);
-  const [categoryBudgets, setCategoryBudgets] = useState<Budget[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const monthKey = selectedDate.toISOString().substring(0, 7);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
+  // 조회
+  const { data, isLoading } = useQuery({
+    // 연-월이 바뀔 때마다 자동으로 새로운 데이터 fetch
+    queryKey: ['budgets', monthKey],
+    queryFn: () => fetchBudgets(selectedDate),
+    select: (data) => {
+      const totalBudget =
+        data?.find((item) => item.category_id === null) || null;
+      const categoryBudgets =
+        data?.filter((item) => item.category_id !== null) || [];
 
-        const data = await fetchBudgets(selectedDate);
+      return { totalBudget, categoryBudgets };
+    },
+  });
 
-        if (data) {
-          // category_id가 null이면 총 예산
-          const total = data.find((item) => item.category_id === null);
-          // category_id가 null이 아니면 카테고리별 예산
-          const categories = data.filter((item) => item.category_id !== null);
+  // 저장/수정
+  const { mutate: saveBudget, isPending: isSaving } = useMutation({
+    mutationFn: ({
+      amount,
+      categoryId,
+    }: {
+      amount: number;
+      categoryId: string | null;
+    }) => upsertBudgets(selectedDate, amount, categoryId),
+    onSuccess: () => {
+      // 저장 성공 시 해당 달의 예산 쿼리 무효화
+      queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
+      toast.success('예산이 저장되었습니다.');
+    },
+    onError: () => {
+      toast.error('예산 저장 중 오류가 발생했습니다');
+    },
+  });
 
-          setTotalBudget(total || null);
-          setCategoryBudgets(categories);
-        }
-        console.log(data); // 테스트용
-      } catch (err) {
-        console.error('예산 불러오기 실패:', err);
-        const message =
-          err instanceof Error ? err.message : '예산을 불러오지 못했습니다.';
-        toast.warning(message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedDate]);
-
-  return { totalBudget, categoryBudgets, isLoading };
+  return {
+    totalBudget: data?.totalBudget ?? null,
+    categoryBudgets: data?.categoryBudgets ?? [],
+    isLoading,
+    isSaving,
+    saveBudget,
+  };
 };
 
 export default useBudgetData;
