@@ -38,7 +38,7 @@ const useBudgetData = (selectedDate: Date) => {
     onSuccess: () => {
       // 저장 성공 시 해당 달의 예산 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
-      toast.success('예산이 저장되었습니다.');
+      toast.success('예산이 저장 되었습니다.');
     },
     onError: () => {
       toast.error('예산 저장 중 오류가 발생했습니다');
@@ -51,10 +51,10 @@ const useBudgetData = (selectedDate: Date) => {
       deleteBudgets(selectedDate, categoryId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
-      toast.success('예산이 삭제되었습니다.');
+      toast.success('예산이 초기화 되었습니다.');
     },
     onError: () => {
-      toast.error('예산 삭제 중 오류가 발생했습니다.');
+      toast.error('예산 초기화 중 오류가 발생했습니다.');
     },
   });
 
