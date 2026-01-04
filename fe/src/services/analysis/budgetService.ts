@@ -27,3 +27,30 @@ export const fetchBudgets = async (date: Date) => {
   if (error) throw error;
   return data;
 };
+
+// 예산 데이터 저장 및 수정 (Upsert)
+export const upsertBudgets = async (
+  date: Date,
+  amount: number,
+  categoryId: string | null = null
+) => {
+  const user = await getCurrentUser();
+  const { startDate } = getMonthRange(date);
+
+  const { data, error } = await supabase.from('budgets').upsert(
+    [
+      {
+        user_id: user.id,
+        budget_month: startDate,
+        category_id: categoryId,
+        amount: amount,
+      },
+    ],
+    {
+      onConflict: 'user_id, budget_month, category_id',
+    }
+  );
+
+  if (error) throw error;
+  return data;
+};
