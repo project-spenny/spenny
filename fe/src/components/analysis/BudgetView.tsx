@@ -4,16 +4,37 @@ import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import BudgetSetupDialog from '@/components/analysis/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
 import { Calculator } from 'lucide-react';
-import ConfirmDialog from './common/ConfirmDialog';
+import ConfirmDialog from '@/components/analysis/common/ConfirmDialog';
+import { Progress } from '@/components/ui/progress';
+import { THEME_COLOR } from '@/constants/colors';
+import { cn } from '@/lib/utils';
+import { useAnalysisData } from '@/hooks/useAnalysisData';
 import useBudgetData from '@/hooks/useBudgetData';
 import { useState } from 'react';
 
 const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
-  const { totalBudget, categoryBudgets, removeBudget, isLoading, isDeleting } =
-    useBudgetData(selectedDate);
+  const {
+    totalBudget,
+    categoryBudgets,
+    removeBudget,
+    isLoading: isBudgetLoading,
+    isDeleting,
+  } = useBudgetData(selectedDate);
+
+  const { totalAmount: totalExpense, isLoading: isExpenseLoading } =
+    useAnalysisData(selectedDate, 'expense');
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const isLoading = isBudgetLoading || isExpenseLoading;
+
+  const budgetAmount = totalBudget?.amount || 0;
+  const remaining = budgetAmount - totalExpense;
+  const percentage = Math.min(
+    Math.round((totalExpense / budgetAmount) * 100),
+    100
+  );
 
   if (isLoading)
     return (
@@ -63,8 +84,8 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                 </Button>
               </div>
 
-              {/* 메인 콘텐츠: 중앙 집중 */}
-              <div className="space-y-1 text-center">
+              {/* 메인 콘텐츠 */}
+              <div className="text-center">
                 <p className="text-muted-foreground text-base font-medium">
                   이번 달 총 예산
                 </p>
@@ -76,8 +97,47 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                   </span>
                 </p>
               </div>
+
+              {/* 예산 사용 현황 */}
+              <div className="flex w-full items-center justify-center gap-10 py-4 text-center">
+                <div>
+                  <p className="text-muted-foreground">현재 지출</p>
+                  <p className={`text-lg font-semibold ${THEME_COLOR.EXPENSE}`}>
+                    {totalExpense.toLocaleString()}원
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-muted-foreground">남은 예산</p>
+                  <p
+                    className={cn(
+                      'text-lg font-semibold',
+                      remaining < 0 ? THEME_COLOR.EXPENSE : THEME_COLOR.INCOME
+                    )}
+                  >
+                    {remaining.toLocaleString()}원
+                  </p>
+                </div>
+              </div>
+
+              {/* 바 차트 */}
+              <div className="w-full max-w-md space-y-2">
+                <div className="text-muted-foreground flex justify-between text-sm">
+                  <span>예산 사용률</span>
+                  <span
+                    className={cn(
+                      'font-medium',
+                      percentage >= 90 ? THEME_COLOR.EXPENSE : 'text-foreground'
+                    )}
+                  >
+                    {percentage}%
+                  </span>
+                </div>
+                <Progress value={percentage} className="h-4" />
+              </div>
             </div>
           </AnalysisSection>
+
           <AnalysisSection title={'카테고리별 예산'}>카테고리</AnalysisSection>
         </>
       )}
