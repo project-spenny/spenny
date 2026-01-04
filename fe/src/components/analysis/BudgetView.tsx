@@ -4,14 +4,16 @@ import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import BudgetSetupDialog from '@/components/analysis/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
 import { Calculator } from 'lucide-react';
+import ConfirmDialog from './common/ConfirmDialog';
 import useBudgetData from '@/hooks/useBudgetData';
 import { useState } from 'react';
 
 const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
-  const { totalBudget, categoryBudgets, isLoading } =
+  const { totalBudget, categoryBudgets, removeBudget, isLoading, isDeleting } =
     useBudgetData(selectedDate);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   if (isLoading)
     return (
@@ -53,6 +55,14 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                 수정
               </Button>
 
+              <Button
+                variant="ghost"
+                className="text-destructive cursor-pointer"
+                onClick={() => setIsConfirmOpen(true)}
+              >
+                예산 초기화
+              </Button>
+
               <div className="p-4 text-center">
                 <p className="text-muted-foreground">이번 달 총 예산</p>
                 <p className="text-2xl font-bold">
@@ -71,6 +81,20 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
         onOpenChange={setIsDialogOpen}
         selectedDate={selectedDate}
         defaultAmount={totalBudget?.amount} // 기존 금액 전달
+      />
+
+      {/* 초기화 확인 모달창 */}
+      <ConfirmDialog
+        open={isConfirmOpen}
+        onOpenChange={setIsConfirmOpen}
+        onConfirm={() => {
+          removeBudget(null, {
+            onSuccess: () => {
+              setIsConfirmOpen(false); // 성공 후 닫기
+            },
+          });
+        }}
+        isLoading={isDeleting}
       />
     </div>
   );
