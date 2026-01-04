@@ -133,7 +133,13 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                     {percentage}%
                   </span>
                 </div>
-                <Progress value={percentage} className="h-4" />
+                <Progress
+                  value={percentage}
+                  className="h-4"
+                  indicatorClassName={
+                    percentage >= 90 ? 'bg-red-400' : 'bg-primary'
+                  }
+                />
               </div>
             </div>
           </AnalysisSection>
