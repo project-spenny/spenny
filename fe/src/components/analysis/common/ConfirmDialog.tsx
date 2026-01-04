@@ -25,7 +25,7 @@ const ConfirmDialog = ({
 }: ConfirmDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
           <DialogTitle>예산 초기화</DialogTitle>
           <DialogDescription className="py-2">

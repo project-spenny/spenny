@@ -55,7 +55,7 @@ const BudgetSetupDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="md:max-w-[425px]">
+      <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
           <DialogTitle className="text-xl">💰 월 예산 설정</DialogTitle>
           <DialogDescription>

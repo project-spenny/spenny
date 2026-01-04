@@ -23,7 +23,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     );
 
   return (
-    <div className="space-y-4">
+    <div className="relative space-y-4">
       {/* 예산이 없을 때 보여줄 화면 */}
       {!totalBudget ? (
         <div className="py-20">
@@ -45,28 +45,35 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
         <>
           {/* 예산이 있을 때 보여줄 화면  */}
           <AnalysisSection title={'총 예산'}>
-            <div className="relative flex flex-col items-center">
-              {/* 수정 버튼 */}
-              <Button
-                variant="ghost"
-                className="absolute top-0 right-0 cursor-pointer"
-                onClick={() => setIsDialogOpen(true)}
-              >
-                수정
-              </Button>
+            <div className="flex flex-col items-center py-6">
+              <div className="absolute top-8 right-8 flex gap-1">
+                <Button
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-foreground h-8 cursor-pointer px-2"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  수정
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive h-8 cursor-pointer px-2"
+                  onClick={() => setIsConfirmOpen(true)}
+                >
+                  초기화
+                </Button>
+              </div>
 
-              <Button
-                variant="ghost"
-                className="text-destructive cursor-pointer"
-                onClick={() => setIsConfirmOpen(true)}
-              >
-                예산 초기화
-              </Button>
-
-              <div className="p-4 text-center">
-                <p className="text-muted-foreground">이번 달 총 예산</p>
-                <p className="text-2xl font-bold">
-                  {totalBudget.amount.toLocaleString()}원
+              {/* 메인 콘텐츠: 중앙 집중 */}
+              <div className="space-y-1 text-center">
+                <p className="text-muted-foreground text-base font-medium">
+                  이번 달 총 예산
+                </p>
+                <p className="text-primary text-3xl font-bold tracking-tight">
+                  {totalBudget.amount.toLocaleString()}
+                  <span className="text-foreground text-lg font-normal">
+                    {' '}
+                    원
+                  </span>
                 </p>
               </div>
             </div>
