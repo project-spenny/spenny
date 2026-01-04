@@ -1,4 +1,8 @@
-import { fetchBudgets, upsertBudgets } from '@/services/analysis/budgetService';
+import {
+  deleteBudgets,
+  fetchBudgets,
+  upsertBudgets,
+} from '@/services/analysis/budgetService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from 'sonner';
@@ -41,12 +45,27 @@ const useBudgetData = (selectedDate: Date) => {
     },
   });
 
+  // 삭제
+  const { mutate: removeBudget, isPending: isDeleting } = useMutation({
+    mutationFn: (categoryId: string | null) =>
+      deleteBudgets(selectedDate, categoryId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
+      toast.success('예산이 삭제되었습니다.');
+    },
+    onError: () => {
+      toast.error('예산 삭제 중 오류가 발생했습니다.');
+    },
+  });
+
   return {
     totalBudget: data?.totalBudget ?? null,
     categoryBudgets: data?.categoryBudgets ?? [],
     isLoading,
     isSaving,
     saveBudget,
+    isDeleting,
+    removeBudget,
   };
 };
 

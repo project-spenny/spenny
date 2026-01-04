@@ -54,3 +54,30 @@ export const upsertBudgets = async (
   if (error) throw error;
   return data;
 };
+
+// 예산 삭제 (Delete)
+export const deleteBudgets = async (
+  date: Date,
+  categoryId: string | null = null
+) => {
+  const user = await getCurrentUser();
+  const { startDate } = getMonthRange(date);
+
+  let query = supabase
+    .from('budgets')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('budget_month', startDate);
+
+  if (categoryId === null) {
+    // 총 예산 삭제 시 (null 체크 .is() 사용 )
+    query = query.is('category_id', null);
+  } else {
+    // 특정 카테고리 삭제 시
+    query = query.eq('category_id', categoryId);
+  }
+
+  const { error } = await query;
+
+  if (error) throw error;
+};
