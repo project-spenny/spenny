@@ -15,6 +15,7 @@ import { Card, CardTitle, CardContent } from '../ui/card';
 import { MonthCaptionProps } from 'react-day-picker';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
+import { formatMonth } from '@/utils/date';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
