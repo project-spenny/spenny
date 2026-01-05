@@ -1,6 +1,5 @@
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -8,12 +7,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type ConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  title: string;
+  description: string;
   isLoading?: boolean;
 };
 
@@ -21,16 +23,24 @@ const ConfirmDialog = ({
   open,
   onOpenChange,
   onConfirm,
+  title,
+  description,
   isLoading,
 }: ConfirmDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>예산 초기화</DialogTitle>
-          <DialogDescription className="py-2">
-            정말 이번 달 예산을 초기화 하시겠습니까?
-          </DialogDescription>
+          <DialogTitle className="text-start">{title}</DialogTitle>
+
+          <div className="flex items-center gap-4 p-2 md:p-4">
+            <div className="flex">
+              <AlertTriangle className="h-8 w-8 text-amber-400" />
+            </div>
+            <DialogDescription className="text-start whitespace-pre-wrap">
+              {description}
+            </DialogDescription>
+          </div>
         </DialogHeader>
 
         <DialogFooter className="mt-2 flex gap-2">

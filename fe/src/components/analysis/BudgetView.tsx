@@ -29,7 +29,8 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
 
   const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
+  const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
 
   const isLoading = isBudgetLoading || isExpenseLoading;
 
@@ -80,10 +81,11 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                   >
                     수정
                   </Button>
+
                   <Button
                     variant="ghost"
                     className="text-destructive hover:text-destructive h-8 cursor-pointer px-2"
-                    onClick={() => setIsConfirmOpen(true)}
+                    onClick={() => setIsTotalConfirmOpen(true)}
                   >
                     초기화
                   </Button>
@@ -201,9 +203,11 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                         onSaveSuccess={() => setIsCategoryPanelOpen(false)}
                       />
                     </ResponsivePanel>
+
                     <Button
                       variant="ghost"
                       className="text-destructive hover:text-destructive h-8 cursor-pointer px-2"
+                      onClick={() => setIsCategoryConfirmOpen(true)}
                     >
                       초기화
                     </Button>
@@ -224,15 +228,33 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
         defaultAmount={totalBudget?.amount} // 기존 금액 전달
       />
 
-      {/* 초기화 확인 모달창 */}
+      {/* 총 예산 초기화 모달창 */}
       <ConfirmDialog
-        open={isConfirmOpen}
-        onOpenChange={setIsConfirmOpen}
+        open={isTotalConfirmOpen}
+        onOpenChange={setIsTotalConfirmOpen}
+        title="총 예산 초기화"
+        description={`총 예산을 초기화하면\n설정된 카테고리별 예산도 함께 삭제됩니다.\n정말 진행하시겠습니까?`}
         onConfirm={() => {
           removeBudget(null, {
             onSuccess: () => {
-              setIsConfirmOpen(false); // 성공 후 닫기
+              setIsTotalConfirmOpen(false); // 성공 후 닫기
             },
+          });
+        }}
+        isLoading={isDeleting}
+      />
+
+      {/* 카테고리 예산 초기화 모달창 */}
+      <ConfirmDialog
+        open={isCategoryConfirmOpen}
+        onOpenChange={setIsCategoryConfirmOpen}
+        title="카테고리 예산 초기화"
+        description={
+          '설정된 모든 카테고리별 예산이 삭제됩니다.\n정말 진행하시겠습니까?'
+        }
+        onConfirm={() => {
+          removeBudget('ALL_CATEGORIES', {
+            onSuccess: () => setIsCategoryConfirmOpen(false),
           });
         }}
         isLoading={isDeleting}

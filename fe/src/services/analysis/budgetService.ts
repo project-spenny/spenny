@@ -92,11 +92,13 @@ export const deleteBudgets = async (
     .eq('user_id', user.id)
     .eq('budget_month', startDate);
 
-  if (categoryId === null) {
-    // 총 예산 삭제 시 (null 체크 .is() 사용 )
-    query = query.is('category_id', null);
+  if (categoryId === 'ALL_CATEGORIES') {
+    // 카테고리 예산만 삭제 (null이 아닌 것들만 삭제)
+    query = query.not('category_id', 'is', null);
+  } else if (categoryId === null) {
+    // 총 예산 삭제 (총 예산 + 카테고리 예산 모두 삭제)
   } else {
-    // 특정 카테고리 삭제 시
+    // 특정 카테고리 하나만 삭제
     query = query.eq('category_id', categoryId);
   }
 
