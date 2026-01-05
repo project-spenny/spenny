@@ -10,7 +10,7 @@ import { useCalendar } from '@/context/CalendarContext';
 import { ITransaction } from '@/types/transactions';
 import { useMemo } from 'react';
 import { CaptionLabelProps } from 'react-day-picker';
-
+import { formatLocalDate } from '@/utils/date';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -108,12 +108,12 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   const selectedDayTransactions = useMemo(() => {
     if (!selectedDate) return [];
 
-    const dateKey = selectedDate.toISOString().split('T')[0];
+    const dateKey = formatLocalDate(selectedDate)
     return groupedTransaction[dateKey]?.transactions || [];
   }, [selectedDate, groupedTransaction]);
 
   const DayButtonWithData = (props: React.ComponentProps<typeof DayButton>) => {
-    const dateKey = props.day.date.toISOString().split('T')[0];
+    const dateKey = formatLocalDate(props.day.date)
     const dayData = groupedTransaction[dateKey];
 
     return <CustomDay {...props} dayData={dayData} />;
