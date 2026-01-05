@@ -2,6 +2,7 @@
 
 import { supabase } from '@/utils/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -74,17 +75,31 @@ export default function LoginPage() {
         type="button"
         onClick={() => signInWithProvider('google')}
         disabled={isLoading}
-        className="rounded-md border px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+        className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm border disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Google 로그인
+        <Image
+          src="/google_logo.svg"
+          alt="Google"
+          width={20}
+          height={20}
+          className="absolute left-3"
+        />
+        <span>구글로 시작하기</span>
       </button>
       <button
         type="button"
         onClick={() => signInWithProvider('kakao')}
         disabled={isLoading}
-        className="rounded-md border px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+        className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm bg-[#FEE500] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Kakao 로그인
+        <Image
+          src="/kakao_symbol.svg"
+          alt="Kakao"
+          width={20}
+          height={20}
+          className="absolute left-3"
+        />
+        <span>카카오로 시작하기</span>
       </button>
       <button
         type="button"
