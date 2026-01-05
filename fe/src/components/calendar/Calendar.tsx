@@ -44,7 +44,7 @@ const CustomDay = ({
         'data-[selected-single=true]:border-2',
         'flex flex-col items-center justify-start gap-0.5 pt-1',
         'aspect-square w-full',
-        'min-h-[60px] sm:min-h-[64px] md:min-h-[80px] lg:min-h-[120px]',
+        'min-h-[40px] sm:min-h-[80px] md:min-h-[60px] lg:min-h-[80px]',
         defaultClassNames.day
       )}
     >
@@ -130,18 +130,18 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   };
 
   return (
-    <div className="ml-4 w-full">
+    <div className="ml-4 w-full h-screen bg-amber-200 flex items-center flex-col">
       <CalendarView
         mode="single"
         selected={date}
         onSelect={setDate}
         onMonthChange={handleMonthChange}
         onDayClick={(day) => open(day)}
-        className="rounded-md border shadow-sm [&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden"
+        // className="rounded-md border shadow-sm [&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden"
         components={{ DayButton: DayButtonWithData,
-          CaptionLabel:CustomCaption
+          // CaptionLabel:CustomCaption
          }}
-        disableNavigation
+        // disableNavigation
       />
       <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
         <div className="space-y-4">
