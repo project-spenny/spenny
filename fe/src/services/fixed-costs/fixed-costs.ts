@@ -1,6 +1,10 @@
 import { supabase } from '@/utils/supabase/client';
-import type { CreateFixedRuleInput, IFixedRule } from '@/types/fixed-costs';
-import { getMonthRange } from '@/utils/date';
+import type {
+  ApplyScope,
+  CreateFixedRuleInput,
+  IFixedRule,
+} from '@/types/fixed-costs';
+import { getMonthRange, getWeekRange } from '@/utils/date';
 
 export const requireUserId = async () => {
   const {
@@ -12,7 +16,7 @@ export const requireUserId = async () => {
   return user.id;
 };
 
-// 고정비 목록 조회
+// 고정비 규칙 목록 조회
 export const fetchFixedRules = async () => {
   const userId = await requireUserId();
 
@@ -26,7 +30,7 @@ export const fetchFixedRules = async () => {
   return (data ?? []) as IFixedRule[];
 };
 
-// 고정비 항목 생성
+// 고정비 규칙 생성
 export const createFixedRule = async (input: CreateFixedRuleInput) => {
   const userId = await requireUserId();
 
@@ -45,7 +49,7 @@ export const createFixedRule = async (input: CreateFixedRuleInput) => {
   return data as IFixedRule;
 };
 
-// 고정비 항목 수정
+// 고정비 규칙 수정
 export const updateFixedRule = async (
   id: string,
   input: CreateFixedRuleInput
@@ -64,18 +68,34 @@ export const updateFixedRule = async (
   return data as IFixedRule;
 };
 
-type UpdateFixedThisMonthInput = Pick<
+type UpdateFixedRuleInPeriod = Pick<
   CreateFixedRuleInput,
   'title' | 'type' | 'amount' | 'category_id'
 >;
 
-// 이번 달에 생성된 고정비 거래만 수정
-export const updateFixedRuleThisMonth = async (
-  fixedRuleId: string,
-  input: UpdateFixedThisMonthInput
-) => {
+// cycle 기준으로 "이번 기간"의 날짜 범위를 반환
+function getCurrentPeriod(cycle: IFixedRule['cycle']) {
+  return cycle === 'MONTHLY'
+    ? getMonthRange(new Date()) // 이번달 범위
+    : getWeekRange(new Date()); // 이번주 범위
+}
+
+// '포함' 옵션일 때, 이번달/이번주에 생성된 고정비 거래를 새 규칙 값으로 동기화
+export const updateFixedRuleInPeriod = async ({
+  fixedRuleId,
+  cycle,
+  input,
+  scope,
+}: {
+  fixedRuleId: string;
+  cycle: IFixedRule['cycle'];
+  input: UpdateFixedRuleInPeriod;
+  scope: ApplyScope;
+}) => {
+  if (scope === 'EXCLUDE_CURRENT') return [];
+
   const userId = await requireUserId();
-  const { startDate, endDate } = getMonthRange(new Date());
+  const { startDate, endDate } = getCurrentPeriod(cycle);
 
   const { data, error } = await supabase
     .from('transactions')
@@ -95,6 +115,35 @@ export const updateFixedRuleThisMonth = async (
   return data ?? [];
 };
 
+// 고정비 규칙 수정 + 적용 범위에 따른 거래 동기화 처리
+export const updateFixedRuleWithScope = async ({
+  id,
+  ruleInput,
+  scope,
+}: {
+  id: string;
+  ruleInput: CreateFixedRuleInput;
+  scope: ApplyScope;
+}) => {
+  // 규칙 row 업데이트
+  const updatedRule = await updateFixedRule(id, ruleInput);
+
+  // 포함이면 이번 기간 거래 업데이트
+  await updateFixedRuleInPeriod({
+    fixedRuleId: id,
+    cycle: updatedRule.cycle,
+    input: {
+      title: updatedRule.title,
+      type: updatedRule.type,
+      amount: updatedRule.amount,
+      category_id: updatedRule.category_id,
+    },
+    scope,
+  });
+
+  return updatedRule;
+};
+
 // 해당 월에 적용되는 고정비 규칙 조회
 export const fetchFixedRulesByMonth = async (monthDate: Date) => {
   const userId = await requireUserId();
@@ -111,6 +160,7 @@ export const fetchFixedRulesByMonth = async (monthDate: Date) => {
   return (data ?? []) as IFixedRule[];
 };
 
+// 고정비 항목 삭제
 export const deleteFixedRule = async (ruleId: string) => {
   const userId = await requireUserId();
 

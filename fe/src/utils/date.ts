@@ -1,3 +1,5 @@
+import { startOfWeek, endOfWeek } from 'date-fns';
+
 /** 선택된 날짜를 바탕으로 해당 월의 시작일과 종료일을 YYYY-MM-DD 형식으로 반환 */
 export const getMonthRange = (date: Date) => {
   const year = date.getFullYear();
@@ -11,6 +13,17 @@ export const getMonthRange = (date: Date) => {
   const endDate = `${year}-${formatMonth}-${String(lastDay).padStart(2, '0')}`;
 
   return { startDate, endDate };
+};
+
+// 선택된 날짜 기준 주 범위 (월요일 시작)
+export const getWeekRange = (date: Date) => {
+  const start = startOfWeek(date, { weekStartsOn: 1 });
+  const end = endOfWeek(date, { weekStartsOn: 1 });
+
+  return {
+    startDate: start.toISOString().slice(0, 10),
+    endDate: end.toISOString().slice(0, 10),
+  };
 };
 
 // Date 객체를 'YYYY-MM-DD' 문자열로 변환
@@ -28,8 +41,8 @@ export const formatDateKR = (date: Date) => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}년 ${month}월 ${day}일`;
 };
-// 'YYYY-MM-DD' 문자열을 로컬 Date로 변환 (시간 00:00 고정)
 
+// 'YYYY-MM-DD' 문자열을 로컬 Date로 변환 (시간 00:00 고정)
 export const parseLocalDate = (value?: string | null): Date | undefined => {
   if (!value) return undefined;
 

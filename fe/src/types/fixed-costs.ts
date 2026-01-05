@@ -1,5 +1,6 @@
 export type FixedCostType = 'income' | 'expense' | '';
 export type FixedCostCycle = 'WEEKLY' | 'MONTHLY' | '';
+export type ApplyScope = 'INCLUDE_CURRENT' | 'EXCLUDE_CURRENT';
 
 // 고정비 테이블 항목 타입
 export interface IFixedRule {
