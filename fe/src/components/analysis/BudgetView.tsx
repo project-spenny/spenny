@@ -389,6 +389,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
       >
         <CategoryBudgetSetting
           selectedDate={selectedDate}
+          totalBudgetAmount={totalBudget?.amount || 0}
           initialCategoryKey={activeCategoryKey}
           onSaveSuccess={() => setIsCategoryPanelOpen(false)}
         />

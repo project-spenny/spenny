@@ -3,19 +3,24 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Progress } from '../ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { THEME_COLOR } from '@/constants/colors';
+import { cn } from '@/lib/utils';
 import useBudgetData from '@/hooks/useBudgetData';
 import useCategories from '@/hooks/useCategories';
 
 type CategoryBudgetSettingProps = {
   selectedDate: Date;
+  totalBudgetAmount: number;
   initialCategoryKey?: string | null;
   onSaveSuccess?: () => void;
 };
 
 const CategoryBudgetSetting = ({
   selectedDate,
+  totalBudgetAmount,
   initialCategoryKey,
   onSaveSuccess,
 }: CategoryBudgetSettingProps) => {
@@ -104,6 +109,16 @@ const CategoryBudgetSetting = ({
     inputRefs.current[categoryKey]?.focus(); // 초기화 후 다시 포커스
   };
 
+  // 현재 입력된 모든 카테고리 금액의 합계
+  const totalAllocated = Object.values(amounts).reduce(
+    (sum, val) => sum + (Number(val) || 0),
+    0
+  );
+
+  // 남은 금액 및 초과 여부
+  const remaining = totalBudgetAmount - totalAllocated;
+  const isOverBudget = remaining < 0;
+
   return (
     <div className="flex h-[80vh] flex-col px-8 py-6 md:h-[92vh] md:py-0">
       <div className="space-y-1 pb-4">
@@ -111,13 +126,65 @@ const CategoryBudgetSetting = ({
         <p className="text-muted-foreground text-sm font-medium">
           항목별 목표 금액을 정해보세요.
         </p>
+
+        <div
+          className={cn(
+            'mt-4 rounded-2xl p-5 transition-all',
+            isOverBudget ? 'bg-destructive/5' : 'bg-primary/5'
+          )}
+        >
+          <div className="mb-4 flex items-end justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-bold">총 예산</p>
+              <p className="text-2xl font-bold tracking-tight">
+                {totalAllocated.toLocaleString()}
+                <span className="text-muted-foreground ml-1 text-sm font-normal">
+                  / {totalBudgetAmount.toLocaleString()}원
+                </span>
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-muted-foreground text-xs font-medium">
+                남은 예산
+              </p>
+              <p
+                className={cn(
+                  'text-lg font-bold tracking-tight',
+                  isOverBudget ? THEME_COLOR.EXPENSE : 'text-primary'
+                )}
+              >
+                {isOverBudget
+                  ? `-${Math.abs(remaining).toLocaleString()}`
+                  : remaining.toLocaleString()}
+                원
+              </p>
+            </div>
+          </div>
+
+          {/* 프로그레스 바 */}
+          <div className="space-y-2">
+            <Progress
+              value={Math.min((totalAllocated / totalBudgetAmount) * 100, 100)}
+              className="h-2"
+              indicatorClassName={isOverBudget ? 'bg-red-400' : 'bg-primary'}
+            />
+
+            {isOverBudget && (
+              <p
+                className={cn('mt-2 text-sm font-medium', THEME_COLOR.EXPENSE)}
+              >
+                ⚠️ 설정된 카테고리 예산이 총 예산을 초과했습니다.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       <Separator />
 
       {/* 카테고리 예산 설정 */}
       <ScrollArea className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-5 px-4 py-4">
+        <div className="flex flex-col gap-5 px-2 py-4">
           {isCategoriesLoading ? (
             <div>카테고리 목록 불러오는 중</div>
           ) : (
@@ -127,7 +194,7 @@ const CategoryBudgetSetting = ({
               return (
                 <div
                   key={category.category_key}
-                  className="flex items-center gap-4 py-1"
+                  className="flex items-center gap-2 py-1"
                 >
                   {/* 아이콘 원형 배경 */}
                   <div className="bg-secondary text-secondary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
@@ -135,12 +202,23 @@ const CategoryBudgetSetting = ({
                   </div>
 
                   {/* 카테고리명 */}
-                  <div className="flex-1">
-                    <p className="text-sm">{category.name_ko}</p>
+                  <div className="flex flex-1 items-center gap-1">
+                    <p className="text-sm font-semibold">{category.name_ko}</p>
+                    {totalBudgetAmount > 0 &&
+                      amounts[category.category_key] && (
+                        <p className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs">
+                          {Math.round(
+                            (Number(amounts[category.category_key]) /
+                              totalBudgetAmount) *
+                              100
+                          )}
+                          %
+                        </p>
+                      )}
                   </div>
 
                   {/* 금액 입력부 */}
-                  <div className="relative w-40">
+                  <div className="relative w-36">
                     <Input
                       ref={(el) => {
                         inputRefs.current[category.category_key] = el;
@@ -190,7 +268,10 @@ const CategoryBudgetSetting = ({
       {/* 하단 버튼 영역 */}
       <div className="p-6">
         <Button
-          className="h-12 w-full text-base"
+          className={cn(
+            'h-12 w-full cursor-pointer text-base',
+            isOverBudget && 'bg-red-400 hover:bg-red-500'
+          )}
           onClick={handleSave}
           disabled={isSavingCategories}
         >
