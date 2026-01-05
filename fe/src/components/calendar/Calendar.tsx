@@ -27,7 +27,8 @@ interface DayData {
   transactions: ITransaction[];
 }
 
-const CALENDAR_CELL_HEIGHT = '[&_td]:!h-[60px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
+const CALENDAR_CELL_HEIGHT =
+  '[&_td]:!h-[60px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
 const CustomDay = ({
   day,
   modifiers,
@@ -47,9 +48,9 @@ const CustomDay = ({
       data-selected-single={modifiers.selected}
       {...props}
       className={cn(
-        'flex flex-col items-center justify-start gap-1 pt-1 p-2',
+        'flex flex-col items-center justify-start gap-1 p-2 pt-1',
         'aspect-square w-full',
-        'w-full h-full',
+        'h-full w-full',
         CALENDAR_CELL_HEIGHT,
         defaultClassNames.day
       )}
@@ -145,14 +146,14 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
     return <CustomDay {...props} dayData={dayData} />;
   };
 
-const handleMonthChange = (newMonth: Date) => {
-  setMonth(newMonth);
+  const handleMonthChange = (newMonth: Date) => {
+    setMonth(newMonth);
 
-  const params = new URLSearchParams(searchParams.toString());
-  params.set('month', formatMonth(newMonth));
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('month', formatMonth(newMonth));
 
-  router.push(`?${params.toString()}`);
-};
+    router.push(`?${params.toString()}`);
+  };
 
   const moveMonth = (offset: number) => {
     const newDate = new Date(month.getFullYear(), month.getMonth() + offset, 1);
@@ -213,15 +214,16 @@ const handleMonthChange = (newMonth: Date) => {
       </div>
 
       <CalendarView
+        month={month}
         mode="single"
         selected={date}
         onSelect={setDate}
         onMonthChange={handleMonthChange}
         onDayClick={(day) => open(day)}
-       className={cn(
-          "w-full rounded-md border shadow-sm",
-          "[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden",
-          "[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_td]:p-0",
+        className={cn(
+          'w-full rounded-md border shadow-sm',
+          '[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden',
+          '[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_td]:p-0',
           CALENDAR_CELL_HEIGHT
         )}
         components={{
@@ -242,9 +244,11 @@ const handleMonthChange = (newMonth: Date) => {
             </p>
           ) : (
             <div className="space-y-2">
-             <TransactionList compact={true} transactions={selectedDayTransactions}/>
+              <TransactionList
+                compact={true}
+                transactions={selectedDayTransactions}
+              />
             </div>
-
           )}
         </div>
       </ResponsivePanel>
