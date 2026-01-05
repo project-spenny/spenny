@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { Calendar as CalendarView } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { type DayButton, getDefaultClassNames } from 'react-day-picker';
+import { Day, type DayButton, getDefaultClassNames } from 'react-day-picker';
 import { Button } from '../ui/button';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import { useCalendar } from '@/context/CalendarContext';
@@ -11,6 +11,8 @@ import { ITransaction } from '@/types/transactions';
 import { useMemo } from 'react';
 import { CaptionLabelProps } from 'react-day-picker';
 import { formatLocalDate } from '@/utils/date';
+import { Card, CardTitle, CardContent } from '../ui/card';
+import { MonthCaptionProps } from 'react-day-picker';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -105,15 +107,31 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
     return grouped;
   }, [transactions]);
 
+  const TransactionSummary = useMemo(() => {
+    const summary = transactions.reduce(
+      (acc, transaction) => {
+        if (transaction.type === 'income') {
+          acc.income += transaction.amount;
+        } else if (transaction.type === 'expense') {
+          acc.expense += transaction.amount;
+        }
+        return acc;
+      },
+      { income: 0, expense: 0 }
+    );
+
+    return summary;
+  }, [transactions]);
+
   const selectedDayTransactions = useMemo(() => {
     if (!selectedDate) return [];
 
-    const dateKey = formatLocalDate(selectedDate)
+    const dateKey = formatLocalDate(selectedDate);
     return groupedTransaction[dateKey]?.transactions || [];
   }, [selectedDate, groupedTransaction]);
 
   const DayButtonWithData = (props: React.ComponentProps<typeof DayButton>) => {
-    const dateKey = formatLocalDate(props.day.date)
+    const dateKey = formatLocalDate(props.day.date);
     const dayData = groupedTransaction[dateKey];
 
     return <CustomDay {...props} dayData={dayData} />;
@@ -128,20 +146,40 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
 
     router.push(`?${params.toString()}`);
   };
+  const { income, expense } = TransactionSummary;
 
+  const CustomCaption=(props: MonthCaptionProps)=>{
+    return (
+      <div className="flex w-full gap-2 p-2 sm:flex-row sm:gap-4">
+        <Card className="w-full gap-2 items-center">
+          <CardTitle className="text-xs sm:text-base">이번 달 수입</CardTitle>
+          <CardContent className="text-xs text-blue-600 sm:text-base">
+            {income.toLocaleString()}원
+          </CardContent>
+        </Card>
+        <Card className="w-full gap-2 items-center">
+          <CardTitle className="text-xs sm:text-base">이번 달 지출</CardTitle>
+          <CardContent className="text-xs text-red-600 sm:text-base">
+            {expense.toLocaleString()}원
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   return (
-    <div className="ml-4 w-full h-screen bg-amber-200 flex items-center flex-col">
+    <div className="ml-4 flex h-screen w-full flex-col items-center">
       <CalendarView
         mode="single"
         selected={date}
         onSelect={setDate}
         onMonthChange={handleMonthChange}
         onDayClick={(day) => open(day)}
-        // className="rounded-md border shadow-sm [&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden"
-        components={{ DayButton: DayButtonWithData,
-          // CaptionLabel:CustomCaption
-         }}
-        // disableNavigation
+        className="rounded-md border shadow-sm [&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden"
+        components={{
+          DayButton: DayButtonWithData,
+          MonthCaption: CustomCaption,
+        }}
+        disableNavigation
       />
       <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
         <div className="space-y-4">
@@ -186,6 +224,4 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   );
 };
 
-function CustomCaption(props : CaptionLabelProps){
-  return <div/>
-}
+
