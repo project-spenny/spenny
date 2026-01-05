@@ -13,6 +13,7 @@ import { CaptionLabelProps } from 'react-day-picker';
 import { formatLocalDate } from '@/utils/date';
 import { Card, CardTitle, CardContent } from '../ui/card';
 import { MonthCaptionProps } from 'react-day-picker';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -24,6 +25,7 @@ interface DayData {
   transactions: ITransaction[];
 }
 
+const CALENDAR_CELL_HEIGHT = '[&_td]:!h-[60px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
 const CustomDay = ({
   day,
   modifiers,
@@ -43,10 +45,10 @@ const CustomDay = ({
       data-selected-single={modifiers.selected}
       {...props}
       className={cn(
-        'data-[selected-single=true]:border-2',
-        'flex flex-col items-center justify-start gap-0.5 pt-1',
+        'flex flex-col items-center justify-start gap-1 pt-1 p-2',
         'aspect-square w-full',
-        'min-h-[40px] sm:min-h-[80px] md:min-h-[60px] lg:min-h-[80px]',
+        'w-full h-full',
+        CALENDAR_CELL_HEIGHT,
         defaultClassNames.day
       )}
     >
@@ -55,7 +57,7 @@ const CustomDay = ({
           {day.date.getDate()}
         </span>
         {dayData && (dayData.income > 0 || dayData.expense > 0) && (
-          <div className="flex flex-col text-[10px] sm:text-xs md:text-sm">
+          <div className="flex flex-col text-[8px] sm:text-[10px] md:text-xs">
             {dayData.income > 0 && (
               <span className="text-blue-500">
                 +{dayData.income.toLocaleString()}
@@ -80,6 +82,10 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { selectedDate, isOpen, open, close } = useCalendar();
+
+  useEffect(() => {
+    setMonth(new Date(`${currentMonth}-01`));
+  }, [currentMonth]);
 
   const groupedTransaction = useMemo(() => {
     const grouped: Record<string, DayData> = {};
@@ -146,18 +152,27 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
 
     router.push(`?${params.toString()}`);
   };
+
+  const moveMonth = (offset: number) => {
+    const newDate = new Date(month.getFullYear(), month.getMonth() + offset, 1);
+    handleMonthChange(newDate);
+  };
+
   const { income, expense } = TransactionSummary;
 
-  const CustomCaption=(props: MonthCaptionProps)=>{
+  const year = month.getFullYear();
+  const displayMonth = month.getMonth() + 1;
+
+  const CustomCaption = (props: MonthCaptionProps) => {
     return (
       <div className="flex w-full gap-2 p-2 sm:flex-row sm:gap-4">
-        <Card className="w-full gap-2 items-center">
+        <Card className="w-full items-center gap-2">
           <CardTitle className="text-xs sm:text-base">이번 달 수입</CardTitle>
           <CardContent className="text-xs text-blue-600 sm:text-base">
             {income.toLocaleString()}원
           </CardContent>
         </Card>
-        <Card className="w-full gap-2 items-center">
+        <Card className="w-full items-center gap-2">
           <CardTitle className="text-xs sm:text-base">이번 달 지출</CardTitle>
           <CardContent className="text-xs text-red-600 sm:text-base">
             {expense.toLocaleString()}원
@@ -165,16 +180,49 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
         </Card>
       </div>
     );
-  }
+  };
   return (
-    <div className="ml-4 flex h-screen w-full flex-col items-center">
+    <div className="flex w-full flex-col items-center">
+      <div className="flex flex-col items-center justify-center py-6 md:py-10">
+        <span className="text-muted-foreground text-sm font-bold md:text-base">
+          {year}
+        </span>
+
+        <div className="flex items-center justify-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-pointer"
+            onClick={() => moveMonth(-1)}
+          >
+            <ChevronLeft />
+          </Button>
+
+          <span className="text-2xl font-bold">{displayMonth}월</span>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-pointer"
+            onClick={() => moveMonth(1)}
+          >
+            <ChevronRight />
+          </Button>
+        </div>
+      </div>
+
       <CalendarView
         mode="single"
         selected={date}
         onSelect={setDate}
         onMonthChange={handleMonthChange}
         onDayClick={(day) => open(day)}
-        className="rounded-md border shadow-sm [&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden"
+       className={cn(
+          "w-full rounded-md border shadow-sm",
+          "[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden",
+          "[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_td]:p-0",
+          CALENDAR_CELL_HEIGHT
+        )}
         components={{
           DayButton: DayButtonWithData,
           MonthCaption: CustomCaption,
@@ -223,5 +271,3 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
     </div>
   );
 };
-
-

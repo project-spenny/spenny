@@ -25,7 +25,7 @@ export default async function Home({ searchParams }: PageProps) {
   };
 
   return (
-    <div>
+    <div className='flex w-full max-w-6xl'>
       <CalendarProvider>
         <Suspense fallback={<div>skeleton</div>}>
           <DataCalendar
