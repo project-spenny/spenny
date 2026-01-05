@@ -226,35 +226,37 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                     {categoryBudgets.map((budget) => {
                       const categoryName =
                         budget.categories?.name_ko || '미지정';
-
                       const categoryKey = budget.categories?.category_key;
                       const categoryExpense = categoryKey
                         ? categoryTotalsByKey[categoryKey] || 0
                         : 0;
 
+                      const isOver = categoryExpense > budget.amount;
+                      const diff = Math.abs(budget.amount - categoryExpense);
                       const usagePercentage =
                         budget.amount > 0
-                          ? Math.min(
-                              Math.round(
-                                (categoryExpense / budget.amount) * 100
-                              ),
-                              100
-                            )
+                          ? Math.round((categoryExpense / budget.amount) * 100)
                           : 0;
 
                       return (
-                        <div key={budget.id} className="p-3">
-                          <div className="mb-3 flex items-center justify-between">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <span className="text-base font-bold">
+                        <div
+                          key={budget.id}
+                          className={cn(
+                            'border-muted-foreground/30 rounded-2xl border border-dashed p-5 transition-all',
+                            isOver ? 'bg-destructive/5' : 'bg-card'
+                          )}
+                        >
+                          <div className="mb-4 flex items-end justify-between">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1 text-sm">
+                                <span className="font-bold">
                                   {categoryName}
                                 </span>
                                 <span
                                   className={cn(
                                     'rounded-full px-2 py-0.5 text-xs',
                                     usagePercentage >= 90
-                                      ? `bg-destructive/10 ${THEME_COLOR.EXPENSE}`
+                                      ? 'bg-destructive/10 text-destructive'
                                       : 'bg-primary/10 text-primary'
                                   )}
                                 >
@@ -262,53 +264,68 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                                 </span>
                               </div>
 
-                              {/* 사용 금액과 남은 금액 */}
-                              <div className="flex items-baseline gap-2">
-                                <span className="text-lg font-bold tracking-tight">
-                                  {categoryExpense.toLocaleString()}원
+                              <div className="flex items-center gap-2 tracking-tight">
+                                <span className="text-2xl font-bold">
+                                  {categoryExpense.toLocaleString()}
                                 </span>
-                                <span
-                                  className={cn(
-                                    'text-sm font-medium',
-                                    usagePercentage >= 100
-                                      ? 'text-red-400'
-                                      : 'text-muted-foreground'
-                                  )}
-                                >
-                                  {usagePercentage >= 100
-                                    ? `(${(categoryExpense - budget.amount).toLocaleString()}원 초과)`
-                                    : `(${(budget.amount - categoryExpense).toLocaleString()}원 남음)`}
-                                </span>
+                                <div className="text-muted-foreground flex items-center text-sm">
+                                  /
+                                  <div
+                                    className="hover:text-primary flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 transition-colors hover:underline"
+                                    onClick={() =>
+                                      categoryKey &&
+                                      openCategorySetting(categoryKey)
+                                    }
+                                  >
+                                    {budget.amount.toLocaleString()}원
+                                    <Edit className="h-4 w-4" />
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
-                            {/* 클릭 시 예산 설정 */}
-                            <div
-                              className="text-muted-foreground hover:bg-primary/10 cursor-pointer rounded-lg px-3 py-2 text-right transition-colors"
-                              onClick={() =>
-                                categoryKey && openCategorySetting(categoryKey)
-                              }
-                            >
-                              <div className="flex items-center justify-between gap-2 pb-1">
-                                <p className="text-sm">{categoryName} 예산</p>
-                                <Edit className="h-4 w-4" />
-                              </div>
-
-                              <p className="text-sm font-semibold">
-                                {budget.amount.toLocaleString()}원
+                            <div className="text-right">
+                              <p className="text-muted-foreground text-xs font-medium">
+                                남은 예산
+                              </p>
+                              <p
+                                className={cn(
+                                  'text-lg font-bold tracking-tight',
+                                  isOver ? THEME_COLOR.EXPENSE : 'text-primary'
+                                )}
+                              >
+                                {isOver
+                                  ? `-${Math.abs(diff).toLocaleString()}`
+                                  : diff.toLocaleString()}
+                                원
                               </p>
                             </div>
                           </div>
 
-                          <Progress
-                            value={usagePercentage}
-                            className="h-2"
-                            indicatorClassName={cn(
-                              usagePercentage >= 90
-                                ? 'bg-red-400'
-                                : 'bg-primary'
+                          {/* 프로그레스 바 */}
+                          <div className="space-y-2">
+                            <Progress
+                              value={Math.min(usagePercentage, 100)}
+                              className="h-2"
+                              indicatorClassName={
+                                usagePercentage >= 90
+                                  ? 'bg-red-400'
+                                  : 'bg-primary'
+                              }
+                            />
+
+                            {isOver && (
+                              <p
+                                className={cn(
+                                  'mt-2 text-sm font-medium',
+                                  THEME_COLOR.EXPENSE
+                                )}
+                              >
+                                ⚠️ [{categoryName}] 카테고리 지출이 예산을
+                                초과했습니다.
+                              </p>
                             )}
-                          />
+                          </div>
                         </div>
                       );
                     })}
@@ -317,6 +334,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
               )}
               <Separator className="my-10" />
 
+              {/* 예산 미설정 지출 목록 */}
               <div className="flex w-full flex-col items-center">
                 {unbudgetedExpenses.length > 0 && (
                   <div className="mt-4 w-full max-w-lg">
@@ -328,7 +346,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                         </span>
                         <span
                           className={cn(
-                            'bg-muted rounded-full px-2 py-0.5 text-[10px] font-bold',
+                            'bg-destructive/10 rounded-full px-2 py-0.5 text-xs font-bold',
                             THEME_COLOR.EXPENSE
                           )}
                         >
@@ -336,7 +354,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                         </span>
                       </div>
                       <span className="text-muted-foreground text-xs md:mt-0">
-                        카테고리를 눌러 예산을 설정하세요
+                        설정하기를 눌러 예산을 설정해주세요
                       </span>
                     </div>
 
@@ -344,30 +362,39 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                       {unbudgetedExpenses.map((item) => (
                         <div
                           key={item.key}
-                          className="bg-destructive/5 flex flex-col gap-2 rounded-xl p-4"
+                          className="border-muted-foreground/30 bg-card rounded-xl border border-dashed p-5 transition-all"
                         >
                           <div className="flex items-center justify-between">
-                            <div className="space-y-2">
-                              <p className="text-foreground text-base font-bold">
-                                {item.name}
-                              </p>
-
-                              <p className="text-sm font-bold text-red-600">
-                                {item.amount.toLocaleString()}원 지출
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-foreground text-base font-bold transition-colors">
+                                  {item.name}
+                                </p>
+                                <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs">
+                                  미설정
+                                </span>
+                              </div>
+                              <p className="text-muted-foreground text-sm font-semibold">
+                                <span className="text-foreground">
+                                  {item.amount.toLocaleString()}원
+                                </span>{' '}
+                                지출됨
                               </p>
                             </div>
 
-                            {/* 클릭 시 예산 설정 */}
-                            <div
-                              className="hover:bg-primary/10 text-muted-foreground flex cursor-pointer items-center justify-end gap-2 rounded-lg px-3 py-2"
-                              onClick={() => openCategorySetting(item.key)}
-                            >
-                              <span className="text-sm">예산 설정</span>
-                              <Edit className="h-4 w-4" />
+                            {/* 오른쪽 액션 아이콘 */}
+                            <div className="flex flex-col items-end gap-1">
+                              <div
+                                className="text-muted-foreground hover:text-primary flex cursor-pointer items-center gap-1 hover:underline"
+                                onClick={() => openCategorySetting(item.key)}
+                              >
+                                <span className="text-xs font-bold">
+                                  설정하기
+                                </span>
+                                <Edit className="h-4 w-4 group-hover:hidden" />
+                              </div>
                             </div>
                           </div>
-
-                          <Progress value={0} className="h-2" />
                         </div>
                       ))}
                     </div>

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Progress } from '../ui/progress';
+import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { THEME_COLOR } from '@/constants/colors';
@@ -129,7 +129,7 @@ const CategoryBudgetSetting = ({
 
         <div
           className={cn(
-            'mt-4 rounded-2xl p-5 transition-all',
+            'border-muted-foreground/30 mt-4 rounded-2xl border border-dashed p-5 transition-all',
             isOverBudget ? 'bg-destructive/5' : 'bg-primary/5'
           )}
         >
