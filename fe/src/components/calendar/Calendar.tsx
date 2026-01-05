@@ -13,11 +13,12 @@ import { CaptionLabelProps } from 'react-day-picker';
 import { formatDateKR, formatLocalDate } from '@/utils/date';
 import { Card, CardTitle, CardContent } from '../ui/card';
 import { MonthCaptionProps } from 'react-day-picker';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
 import { formatMonth } from '@/utils/date';
 import TransactionSubmitForm from '../transaction/TransactionSubmitForm';
 import { revalidateTransactions } from '@/app/(app)/history/actions';
+import { Item, ItemContent } from '../ui/item';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -251,12 +252,23 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
           </h3>
 
           {panelState.view === 'list' && (
-            <div className="space-y-2">
+            <div>
+              <div className="space-y-2 p-4 md:p-6 lg:p-8">
+                <Item
+                  className="cursor-pointer hover:bg-gray-100"
+                  variant="outline"
+                  onClick={() => {
+                    setPanelState({ view: 'create' });
+                  }}
+                >
+                  <Plus />
+                  <ItemContent>가계부 작성하기</ItemContent>
+                </Item>
+              </div>
               <TransactionList
                 compact={true}
                 transactions={selectedDayTransactions}
                 onEdit={(tx) => {
-                  console.log('edit!');
                   setPanelState({ view: 'edit', editingTransaction: tx });
                 }}
                 onCreate={() => {
@@ -286,6 +298,31 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
                   setPanelState({ view: 'list' });
                 }}
                 mode="edit"
+              />
+            </div>
+          )}
+
+          {panelState.view === 'create' && (
+            <div className="space-y-2">
+              <Button
+                onClick={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                className="m-4 ml-6 flex"
+              >
+                <ChevronLeft />
+                목록으로
+              </Button>
+              <TransactionSubmitForm
+                defaultDate={selectedDate ?? undefined}
+                onSuccess={async () => {
+                  await revalidateTransactions();
+                  setPanelState({ view: 'list' });
+                }}
+                onClose={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                mode="create"
               />
             </div>
           )}

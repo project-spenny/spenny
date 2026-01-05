@@ -20,6 +20,7 @@ interface TransactionsSubmitFormProps {
   transaction?: ITransaction | null;
   onClose: () => void;
   onSuccess: () => void;
+  defaultDate?: Date;
 }
 
 export default function TransactionSubmitForm({
@@ -27,6 +28,7 @@ export default function TransactionSubmitForm({
   transaction,
   onClose,
   onSuccess,
+  defaultDate,
 }: TransactionsSubmitFormProps) {
   const initialFormData = useMemo(() => {
     if (mode === 'edit' && transaction) {
@@ -43,12 +45,12 @@ export default function TransactionSubmitForm({
         title: '',
         type: '' as '' | 'income' | 'expense',
         amount: '',
-        date: new Date(),
+        date: defaultDate ?? new Date(),
         category_id: '',
         tags: [] as string[],
       };
     }
-  }, [mode, transaction]);
+  }, [mode, transaction, defaultDate]);
 
   const {
     formData,
