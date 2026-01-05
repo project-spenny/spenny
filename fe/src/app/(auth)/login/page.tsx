@@ -105,10 +105,14 @@ export default function LoginPage() {
         type="button"
         onClick={signInAsGuest}
         disabled={isLoading}
-        className="rounded-md border px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex h-[45px] w-[300px] items-center justify-center rounded-sm border text-sm text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        게스트로 둘러보기
+        체험해보기
       </button>
+
+      <p className="mt-1 text-xs text-gray-400">
+        회원가입 없이 데모 계정으로 서비스를 체험할 수 있어요.
+      </p>
     </div>
   );
 }
