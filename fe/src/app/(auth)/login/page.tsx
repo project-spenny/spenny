@@ -70,49 +70,60 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <button
-        type="button"
-        onClick={() => signInWithProvider('google')}
-        disabled={isLoading}
-        className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm border disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        <Image
-          src="/google_logo.svg"
-          alt="Google"
-          width={20}
-          height={20}
-          className="absolute left-3"
-        />
-        <span>구글로 시작하기</span>
-      </button>
-      <button
-        type="button"
-        onClick={() => signInWithProvider('kakao')}
-        disabled={isLoading}
-        className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm bg-[#FEE500] disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        <Image
-          src="/kakao_symbol.svg"
-          alt="Kakao"
-          width={20}
-          height={20}
-          className="absolute left-3"
-        />
-        <span>카카오로 시작하기</span>
-      </button>
-      <button
-        type="button"
-        onClick={signInAsGuest}
-        disabled={isLoading}
-        className="flex h-[45px] w-[300px] items-center justify-center rounded-sm border text-sm text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        체험해보기
-      </button>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6">
+      <div className="flex flex-col gap-4">
+        <button
+          type="button"
+          onClick={() => signInWithProvider('google')}
+          disabled={isLoading}
+          className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm border disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <Image
+            src="/google_logo.svg"
+            alt="Google"
+            width={20}
+            height={20}
+            className="absolute left-3"
+          />
+          <span>구글로 시작하기</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => signInWithProvider('kakao')}
+          disabled={isLoading}
+          className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm bg-[#FEE500] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <Image
+            src="/kakao_symbol.svg"
+            alt="Kakao"
+            width={20}
+            height={20}
+            className="absolute left-3"
+          />
+          <span>카카오로 시작하기</span>
+        </button>
+      </div>
 
-      <p className="mt-1 text-xs text-gray-400">
-        회원가입 없이 데모 계정으로 서비스를 체험할 수 있어요.
-      </p>
+      <div className="flex items-center gap-2 text-xs text-gray-400">
+        <span className="h-px w-12 bg-gray-200" />
+        또는
+        <span className="h-px w-12 bg-gray-200" />
+      </div>
+
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={signInAsGuest}
+          disabled={isLoading}
+          className="flex h-[45px] w-[300px] items-center justify-center rounded-sm border text-sm text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          체험해보기
+        </button>
+
+        <p className="mt-1 text-xs text-gray-400">
+          회원가입 없이 데모 계정으로 서비스를 체험할 수 있어요.
+        </p>
+      </div>
     </div>
   );
 }
