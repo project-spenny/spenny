@@ -35,7 +35,7 @@ const BudgetSetupDialog = ({
     if (open) setAmount(defaultAmount ? defaultAmount.toLocaleString() : '');
   }, [open, defaultAmount]);
 
-  const handleSave = async () => {
+  const handleSave = () => {
     saveBudget(
       {
         amount: Number(amount.replace(/[^0-9]/g, '')),
