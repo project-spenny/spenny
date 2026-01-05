@@ -5,6 +5,7 @@ import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import BudgetSetupDialog from '@/components/analysis/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
+import CategoryBudgetPanel from './CategoryBudgetPanel';
 import ConfirmDialog from '@/components/analysis/common/ConfirmDialog';
 import { Progress } from '@/components/ui/progress';
 import { THEME_COLOR } from '@/constants/colors';
@@ -153,15 +154,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                 description="식비, 교통비 등 항목별로 예산을 나누면 더 체계적으로 관리할 수 있어요."
                 icon={ListPlus}
               >
-                <Button
-                  variant="ghost"
-                  className="bg-primary/5 hover:bg-primary/10 mt-2 cursor-pointer"
-                  onClick={() => {
-                    console.log('카테고리 예산 추가 클릭');
-                  }}
-                >
-                  카테고리 예산 추가하기
-                </Button>
+                <CategoryBudgetPanel selectedDate={selectedDate} />
               </AnalysisEmpty>
             ) : (
               <div>카테고리</div>
