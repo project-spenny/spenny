@@ -1,4 +1,4 @@
-import { Calculator, ListPlus } from 'lucide-react';
+import { Calculator, Edit, ListPlus } from 'lucide-react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
@@ -35,6 +35,9 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
   const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
+  const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(
+    null
+  );
 
   const isLoading = isBudgetLoading || isExpenseLoading;
 
@@ -60,6 +63,11 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     Math.round((totalExpense / budgetAmount) * 100),
     100
   );
+
+  const openCategorySetting = (key: string) => {
+    setActiveCategoryKey(key);
+    setIsCategoryPanelOpen(true);
+  };
 
   if (isLoading)
     return (
@@ -216,10 +224,14 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                         </Button>
                       }
                       isOpen={isCategoryPanelOpen}
-                      setIsOpen={setIsCategoryPanelOpen}
+                      setIsOpen={(open) => {
+                        setIsCategoryPanelOpen(open);
+                        if (!open) setActiveCategoryKey(null); // 닫힐 때 초기화
+                      }}
                     >
                       <CategoryBudgetSetting
                         selectedDate={selectedDate}
+                        initialCategoryKey={activeCategoryKey}
                         onSaveSuccess={() => setIsCategoryPanelOpen(false)}
                       />
                     </ResponsivePanel>
@@ -255,38 +267,63 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                           : 0;
 
                       return (
-                        <div key={budget.id} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="text-foreground text-base">
-                                {categoryName}
-                              </span>
-                              <span
-                                className={cn(
-                                  'text-sm',
-                                  usagePercentage >= 90
-                                    ? THEME_COLOR.EXPENSE
-                                    : 'text-foreground'
-                                )}
-                              >
-                                {usagePercentage}%
-                              </span>
+                        <div key={budget.id} className="p-3">
+                          <div className="mb-3 flex items-center justify-between">
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-base font-bold">
+                                  {categoryName}
+                                </span>
+                                <span
+                                  className={cn(
+                                    'rounded-full px-2 py-0.5 text-xs',
+                                    usagePercentage >= 90
+                                      ? `bg-destructive/10 ${THEME_COLOR.EXPENSE}`
+                                      : 'bg-primary/10 text-primary'
+                                  )}
+                                >
+                                  {usagePercentage}%
+                                </span>
+                              </div>
+
+                              {/* 사용 금액과 남은 금액 */}
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-lg font-bold tracking-tight">
+                                  {categoryExpense.toLocaleString()}원
+                                </span>
+                                <span
+                                  className={cn(
+                                    'text-sm font-medium',
+                                    usagePercentage >= 100
+                                      ? 'text-red-400'
+                                      : 'text-muted-foreground'
+                                  )}
+                                >
+                                  {usagePercentage >= 100
+                                    ? `(${(categoryExpense - budget.amount).toLocaleString()}원 초과)`
+                                    : `(${(budget.amount - categoryExpense).toLocaleString()}원 남음)`}
+                                </span>
+                              </div>
                             </div>
 
-                            <div className="text-sm font-medium">
-                              <span className="text-foreground font-semibold">
-                                {categoryExpense.toLocaleString()}
-                              </span>
-                              <span className="text-muted-foreground mx-1">
-                                /
-                              </span>
-                              <span className="text-muted-foreground">
+                            {/* 클릭 시 예산 설정 */}
+                            <div
+                              className="text-muted-foreground hover:bg-primary/10 cursor-pointer rounded-lg px-3 py-2 text-right transition-colors"
+                              onClick={() =>
+                                categoryKey && openCategorySetting(categoryKey)
+                              }
+                            >
+                              <div className="flex items-center justify-between gap-2 pb-1">
+                                <p className="text-sm">{categoryName} 예산</p>
+                                <Edit className="h-4 w-4" />
+                              </div>
+
+                              <p className="text-sm font-semibold">
                                 {budget.amount.toLocaleString()}원
-                              </span>
+                              </p>
                             </div>
                           </div>
 
-                          {/* 카테고리별 사용량 바 */}
                           <Progress
                             value={usagePercentage}
                             className="h-2"
@@ -303,49 +340,55 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                     <Separator className="my-10" />
 
                     {unbudgetedExpenses.length > 0 && (
-                      <div className="">
-                        <div className="mb-4 flex items-center justify-between">
-                          <div className="text-muted-foreground flex items-center gap-2 text-sm font-semibold">
-                            <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                            예산 미설정 지출
+                      <div className="mt-6">
+                        <div className="mb-4 flex flex-col justify-between px-1 md:flex-row md:items-center">
+                          <div className="flex items-center gap-2">
+                            <div className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                            <span className="text-foreground text-sm font-bold">
+                              예산 미설정 지출
+                            </span>
+                            <span
+                              className={cn(
+                                'bg-muted rounded-full px-2 py-0.5 text-[10px] font-bold',
+                                THEME_COLOR.EXPENSE
+                              )}
+                            >
+                              {unbudgetedExpenses.length}
+                            </span>
                           </div>
-                          <span className="text-muted-foreground text-xs">
-                            예산을 설정 해주세요
+                          <span className="text-muted-foreground text-xs md:mt-0">
+                            카테고리를 눌러 예산을 설정하세요
                           </span>
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="flex flex-col gap-3">
                           {unbudgetedExpenses.map((item) => (
-                            <div key={item.key} className="relative">
-                              <div className="mb-1 flex items-center justify-between space-y-2">
-                                <div className="flex items-center">
-                                  <span className="text-foreground">
+                            <div
+                              key={item.key}
+                              className="bg-destructive/5 flex flex-col gap-2 rounded-xl p-4"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="space-y-2">
+                                  <p className="text-foreground text-base font-bold">
                                     {item.name}
-                                  </span>
+                                  </p>
+
+                                  <p className="text-sm font-bold text-red-600">
+                                    {item.amount.toLocaleString()}원 지출
+                                  </p>
                                 </div>
 
-                                <div className="text-sm font-medium">
-                                  <span
-                                    className={cn(
-                                      'font-semibold',
-                                      THEME_COLOR.EXPENSE
-                                    )}
-                                  >
-                                    {item.amount.toLocaleString()}원
-                                  </span>
-                                  <span className="text-muted-foreground mx-1">
-                                    /
-                                  </span>
-                                  <span className="text-muted-foreground">
-                                    0원
-                                  </span>
+                                {/* 클릭 시 예산 설정 */}
+                                <div
+                                  className="hover:bg-primary/10 text-muted-foreground flex cursor-pointer items-center justify-end gap-2 rounded-lg px-3 py-2"
+                                  onClick={() => openCategorySetting(item.key)}
+                                >
+                                  <span className="text-sm">예산 설정</span>
+                                  <Edit className="h-4 w-4" />
                                 </div>
                               </div>
-                              <Progress
-                                value={100}
-                                className="h-2"
-                                indicatorClassName="bg-red-400"
-                              />
+
+                              <Progress value={0} className="h-2" />
                             </div>
                           ))}
                         </div>

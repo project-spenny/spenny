@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { HelpCircle } from 'lucide-react';
@@ -10,11 +10,13 @@ import useCategories from '@/hooks/useCategories';
 
 type CategoryBudgetSettingProps = {
   selectedDate: Date;
+  initialCategoryKey?: string | null;
   onSaveSuccess?: () => void;
 };
 
 const CategoryBudgetSetting = ({
   selectedDate,
+  initialCategoryKey,
   onSaveSuccess,
 }: CategoryBudgetSettingProps) => {
   const { categoryBudgets, saveCategoryBudgets, isSavingCategories } =
@@ -22,6 +24,23 @@ const CategoryBudgetSetting = ({
   const { data: allCategories, isLoading: isCategoriesLoading } =
     useCategories('expense');
   const [amounts, setAmounts] = useState<Record<string, string>>({});
+
+  // 각 카테고리 Input을 참조하기 위한 ref 객체
+  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  // 초기 포커스
+  useEffect(() => {
+    if (initialCategoryKey && !isCategoriesLoading) {
+      setTimeout(() => {
+        const targetInput = inputRefs.current[initialCategoryKey];
+
+        if (targetInput) {
+          targetInput.focus();
+          targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  }, [initialCategoryKey, isCategoriesLoading]);
 
   useEffect(() => {
     if (categoryBudgets && allCategories) {
@@ -103,6 +122,9 @@ const CategoryBudgetSetting = ({
                   {/* 금액 입력부 */}
                   <div className="relative w-40">
                     <Input
+                      ref={(el) => {
+                        inputRefs.current[category.category_key] = el;
+                      }}
                       type="text"
                       placeholder="0"
                       value={
