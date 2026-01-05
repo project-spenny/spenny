@@ -20,7 +20,13 @@ export const fetchBudgets = async (date: Date) => {
 
   const { data, error } = await supabase
     .from('budgets')
-    .select('*')
+    .select(
+      `*, 
+      categories!category_id (
+        name_ko,
+        category_key
+      )`
+    )
     .eq('user_id', user.id)
     .eq('budget_month', startDate);
 
