@@ -87,7 +87,7 @@ export const upsertCategoryBudgets = async (
 // 예산 삭제 (Delete)
 export const deleteBudgets = async (
   date: Date,
-  categoryId: string | null = null
+  categoryId: string | string[] | null = null
 ) => {
   const user = await getCurrentUser();
   const { startDate } = getMonthRange(date);
@@ -101,6 +101,9 @@ export const deleteBudgets = async (
   if (categoryId === 'ALL_CATEGORIES') {
     // 카테고리 예산만 삭제 (null이 아닌 것들만 삭제)
     query = query.not('category_id', 'is', null);
+  } else if (Array.isArray(categoryId)) {
+    // 여러 ID를 한 번에 삭제
+    query = query.in('category_id', categoryId);
   } else if (categoryId === null) {
     // 총 예산 삭제 (총 예산 + 카테고리 예산 모두 삭제)
   } else {

@@ -62,7 +62,7 @@ const useBudgetData = (selectedDate: Date) => {
 
   // 삭제
   const { mutate: removeBudget, isPending: isDeleting } = useMutation({
-    mutationFn: (categoryId: string | null) =>
+    mutationFn: (categoryId: string | string[] | null) =>
       deleteBudgets(selectedDate, categoryId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });

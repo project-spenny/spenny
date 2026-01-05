@@ -1,7 +1,7 @@
+import { HelpCircle, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { HelpCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -19,8 +19,12 @@ const CategoryBudgetSetting = ({
   initialCategoryKey,
   onSaveSuccess,
 }: CategoryBudgetSettingProps) => {
-  const { categoryBudgets, saveCategoryBudgets, isSavingCategories } =
-    useBudgetData(selectedDate);
+  const {
+    categoryBudgets,
+    saveCategoryBudgets,
+    isSavingCategories,
+    removeBudget,
+  } = useBudgetData(selectedDate);
   const { data: allCategories, isLoading: isCategoriesLoading } =
     useCategories('expense');
   const [amounts, setAmounts] = useState<Record<string, string>>({});
@@ -69,19 +73,35 @@ const CategoryBudgetSetting = ({
   const handleSave = () => {
     if (!allCategories) return;
 
-    // 객체를 배열로
-    const categoryData = Object.entries(amounts)
-      .map(([key, value]) => ({
-        categoryId: key,
-        amount: Number(value),
-      }))
-      .filter((item) => item.amount > 0); // 0원 초과인 항목만 저장
+    // 업데이트용 데이터 (금액 > 0)
+    const upsertData = Object.entries(amounts)
+      .filter(([_, value]) => value !== '' && Number(value) > 0)
+      .map(([key, value]) => ({ categoryId: key, amount: Number(value) }));
 
-    saveCategoryBudgets(categoryData, {
-      onSuccess: () => {
-        if (onSaveSuccess) onSaveSuccess();
-      },
-    });
+    // 삭제용 ID 목록 (기존 데이터 중 입력값이 0인 것)
+    const deleteData = categoryBudgets
+      .map((budget) => budget.category_id)
+      .filter((id) => {
+        const inputAmount = amounts[id];
+        return inputAmount === '' || Number(inputAmount) === 0;
+      });
+
+    // 삭제할 게 있다면 한 번에 처리
+    if (deleteData.length > 0) {
+      removeBudget(deleteData);
+    }
+
+    // 저장할 게 있다면 한 번에 처리
+    if (upsertData.length > 0) {
+      saveCategoryBudgets(upsertData);
+    }
+
+    if (onSaveSuccess) onSaveSuccess();
+  };
+
+  const handleResetCategory = (categoryKey: string) => {
+    setAmounts((prev) => ({ ...prev, [categoryKey]: '' }));
+    inputRefs.current[categoryKey]?.focus(); // 초기화 후 다시 포커스
   };
 
   return (
@@ -142,6 +162,18 @@ const CategoryBudgetSetting = ({
                       }
                       className="focus-visible:ring-primary h-9 pr-7 text-right"
                     />
+                    {amounts[category.category_key] && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive absolute top-1/2 left-0.5 h-8 w-8 shrink-0 -translate-y-1/2"
+                        onClick={() =>
+                          handleResetCategory(category.category_key)
+                        }
+                      >
+                        <X size={16} />
+                      </Button>
+                    )}
                     <span className="text-muted-foreground absolute top-1/2 right-2.5 -translate-y-1/2 text-xs">
                       원
                     </span>
