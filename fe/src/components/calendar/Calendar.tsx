@@ -187,5 +187,5 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
 };
 
 function CustomCaption(props : CaptionLabelProps){
-  return null
+  return <div/>
 }
