@@ -1,7 +1,8 @@
 import {
   deleteBudgets,
   fetchBudgets,
-  upsertBudgets,
+  upsertBudget,
+  upsertCategoryBudgets,
 } from '@/services/analysis/budgetService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -34,16 +35,30 @@ const useBudgetData = (selectedDate: Date) => {
     }: {
       amount: number;
       categoryId: string | null;
-    }) => upsertBudgets(selectedDate, amount, categoryId),
+    }) => upsertBudget(selectedDate, amount, categoryId),
     onSuccess: () => {
       // 저장 성공 시 해당 달의 예산 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
       toast.success('예산이 저장 되었습니다.');
     },
     onError: () => {
-      toast.error('예산 저장 중 오류가 발생했습니다');
+      toast.error('예산 저장 중 오류가 발생했습니다.');
     },
   });
+
+  // 카테고리별 예산 일괄 저장
+  const { mutate: saveCategoryBudgets, isPending: isSavingCategories } =
+    useMutation({
+      mutationFn: (categoryData: { categoryId: string; amount: number }[]) =>
+        upsertCategoryBudgets(selectedDate, categoryData),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
+        toast.success('카테고리별 예산이 모두 저장되었습니다.');
+      },
+      onError: () => {
+        toast.error('카테고리 예산 저장 중 오류가 발생했습니다.');
+      },
+    });
 
   // 삭제
   const { mutate: removeBudget, isPending: isDeleting } = useMutation({
@@ -66,6 +81,8 @@ const useBudgetData = (selectedDate: Date) => {
     saveBudget,
     isDeleting,
     removeBudget,
+    isSavingCategories,
+    saveCategoryBudgets,
   };
 };
 

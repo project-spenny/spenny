@@ -29,7 +29,7 @@ export const fetchBudgets = async (date: Date) => {
 };
 
 // 예산 데이터 저장 및 수정 (Upsert)
-export const upsertBudgets = async (
+export const upsertBudget = async (
   date: Date,
   amount: number,
   categoryId: string | null = null
@@ -50,6 +50,29 @@ export const upsertBudgets = async (
       onConflict: 'user_id, budget_month, category_id',
     }
   );
+
+  if (error) throw error;
+  return data;
+};
+
+// 카테고리 예산 일괄 저장 (배열)
+export const upsertCategoryBudgets = async (
+  date: Date,
+  categoryData: { categoryId: string; amount: number }[]
+) => {
+  const user = await getCurrentUser();
+  const { startDate } = getMonthRange(date);
+
+  const upsertRows = categoryData.map((item) => ({
+    user_id: user.id,
+    budget_month: startDate,
+    category_id: item.categoryId,
+    amount: item.amount,
+  }));
+
+  const { data, error } = await supabase
+    .from('budgets')
+    .upsert(upsertRows, { onConflict: 'user_id, budget_month, category_id' });
 
   if (error) throw error;
   return data;
