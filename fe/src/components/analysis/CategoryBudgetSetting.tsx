@@ -1,4 +1,4 @@
-import { HelpCircle, X } from 'lucide-react';
+import { Edit, HelpCircle, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ type CategoryBudgetSettingProps = {
   totalBudgetAmount: number;
   initialCategoryKey?: string | null;
   onSaveSuccess?: () => void;
+  onEditTotalBudget?: () => void;
 };
 
 const CategoryBudgetSetting = ({
@@ -23,6 +24,7 @@ const CategoryBudgetSetting = ({
   totalBudgetAmount,
   initialCategoryKey,
   onSaveSuccess,
+  onEditTotalBudget,
 }: CategoryBudgetSettingProps) => {
   const {
     categoryBudgets,
@@ -136,13 +138,24 @@ const CategoryBudgetSetting = ({
           <div className="mb-4 flex items-end justify-between">
             <div className="space-y-1">
               <p className="text-sm font-bold">총 예산</p>
-              <p className="text-2xl font-bold tracking-tight">
-                {totalAllocated.toLocaleString()}
-                <span className="text-muted-foreground ml-1 text-sm font-normal">
-                  / {totalBudgetAmount.toLocaleString()}원
+
+              <div className="flex items-center gap-2 tracking-tight">
+                <span className="text-2xl font-bold">
+                  {totalAllocated.toLocaleString()}
                 </span>
-              </p>
+                <div className="text-muted-foreground flex items-center text-sm">
+                  /
+                  <div
+                    className="hover:text-primary flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 transition-colors hover:underline"
+                    onClick={onEditTotalBudget}
+                  >
+                    {totalBudgetAmount.toLocaleString()}원
+                    <Edit className="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
             </div>
+
             <div className="text-right">
               <p className="text-muted-foreground text-xs font-medium">
                 남은 예산

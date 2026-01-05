@@ -419,6 +419,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
           totalBudgetAmount={totalBudget?.amount || 0}
           initialCategoryKey={activeCategoryKey}
           onSaveSuccess={() => setIsCategoryPanelOpen(false)}
+          onEditTotalBudget={() => setIsDialogOpen(true)}
         />
       </ResponsivePanel>
 
