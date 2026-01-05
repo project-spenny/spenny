@@ -9,6 +9,7 @@ import ResponsivePanel from '../panel/ResponsivePanel';
 import { useCalendar } from '@/context/CalendarContext';
 import { ITransaction } from '@/types/transactions';
 import { useMemo } from 'react';
+import { CaptionLabelProps } from 'react-day-picker';
 
 interface CalendarProps {
   currentMonth: string;
@@ -136,9 +137,11 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
         onSelect={setDate}
         onMonthChange={handleMonthChange}
         onDayClick={(day) => open(day)}
-        className="rounded-md border shadow-sm"
-        captionLayout="dropdown"
-        components={{ DayButton: DayButtonWithData }}
+        className="rounded-md border shadow-sm [&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden"
+        components={{ DayButton: DayButtonWithData,
+          CaptionLabel:CustomCaption
+         }}
+        disableNavigation
       />
       <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
         <div className="space-y-4">
@@ -182,3 +185,7 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
     </div>
   );
 };
+
+function CustomCaption(props : CaptionLabelProps){
+  return null
+}
