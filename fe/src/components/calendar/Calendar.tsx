@@ -173,6 +173,10 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   const year = month.getFullYear();
   const displayMonth = month.getMonth() + 1;
 
+  const handleClose = () => {
+    close();
+    setPanelState({ view: 'list' });
+  };
   const CustomCaption = (props: MonthCaptionProps) => {
     return (
       <div className="flex w-full gap-2 p-2 sm:flex-row sm:gap-4">
@@ -240,7 +244,7 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
         }}
         disableNavigation
       />
-      <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
+      <ResponsivePanel isOpen={isOpen} setIsOpen={handleClose}>
         <div className="space-y-4">
           <h3 className="pl-8 text-lg font-semibold">
             {selectedDate && formatDateKR(selectedDate)}
@@ -263,6 +267,15 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
           )}
           {panelState.view === 'edit' && (
             <div className="space-y-2">
+              <Button
+                onClick={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                className="m-4 ml-6 flex"
+              >
+                <ChevronLeft />
+                목록으로
+              </Button>
               <TransactionSubmitForm
                 transaction={panelState.editingTransaction}
                 onSuccess={async () => {
