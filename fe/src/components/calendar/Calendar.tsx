@@ -1,10 +1,18 @@
 'use client';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { Calendar as CalendarView } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { type DayButton, getDefaultClassNames } from 'react-day-picker';
 import { Button } from '../ui/button';
+import ResponsivePanel from '../panel/ResponsivePanel';
+import { useCalendar } from '@/context/CalendarContext';
+import { ITransaction } from '@/types/transactions';
 
+interface CalendarProps {
+  currentMonth: string;
+  transactions: ITransaction[];
+}
 const CustomDay = ({
   day,
   modifiers,
@@ -43,19 +51,39 @@ const CustomDay = ({
   );
 };
 
-export const Calendar = () => {
+export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
   const [date, setDate] = useState<Date | undefined>(new Date());
-  console.log(date);
+  const { selectedDate, isOpen, open, close } = useCalendar();
+
+  const handleMonthChange = (newMonth: Date) => {
+    setMonth(newMonth);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    const monthString = `${newMonth.getFullYear()}-${String(newMonth.getMonth() + 1).padStart(2, '0')}`;
+    params.set('month', monthString);
+    
+    router.push(`?${params.toString()}`);
+  };
+
   return (
     <div className="ml-4 w-full">
       <CalendarView
         mode="single"
         selected={date}
         onSelect={setDate}
+        onMonthChange={handleMonthChange}
+        onDayClick={(day) => open(day)}
         className="rounded-md border shadow-sm"
         captionLayout="dropdown"
         components={{ DayButton: CustomDay }}
       />
+      <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
+        hi
+      </ResponsivePanel>
     </div>
   );
 };
