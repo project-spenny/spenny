@@ -10,23 +10,27 @@ type Provider = 'google' | 'kakao';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-
   const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
 
   // OAuth 로그인 처리 함수
   const signInWithProvider = async (provider: Provider) => {
     if (isLoading) return; // 중복 클릭 방지
     setIsLoading(true);
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
-    });
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${location.origin}/auth/callback`,
+        },
+      });
 
-    if (error) {
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+    } finally {
       setIsLoading(false);
     }
   };
@@ -36,31 +40,32 @@ export default function LoginPage() {
     if (isLoading) return;
     setIsLoading(true);
 
-    const email = process.env.NEXT_PUBLIC_GUEST_EMAIL;
-    const password = process.env.NEXT_PUBLIC_GUEST_PASSWORD;
+    try {
+      const email = process.env.NEXT_PUBLIC_GUEST_EMAIL;
+      const password = process.env.NEXT_PUBLIC_GUEST_PASSWORD;
 
-    if (!email || !password) {
-      toast.error('현재 게스트 로그인을 사용할 수 없습니다.');
+      if (!email || !password) {
+        toast.error('현재 게스트 로그인을 사용할 수 없습니다.');
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      queryClient.removeQueries({ queryKey: ['profile'] });
+
+      router.replace('/');
+      router.refresh();
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setIsLoading(false);
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    queryClient.removeQueries({ queryKey: ['profile'] });
-
-    router.replace('/');
-    router.refresh();
   };
 
   return (
