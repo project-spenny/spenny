@@ -144,15 +144,14 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
     return <CustomDay {...props} dayData={dayData} />;
   };
 
-  const handleMonthChange = (newMonth: Date) => {
-    setMonth(newMonth);
+const handleMonthChange = (newMonth: Date) => {
+  setMonth(newMonth);
 
-    const params = new URLSearchParams(searchParams.toString());
-    const monthString = `${newMonth.getFullYear()}-${String(newMonth.getMonth() + 1).padStart(2, '0')}`;
-    params.set('month', monthString);
+  const params = new URLSearchParams(searchParams.toString());
+  params.set('month', formatMonth(newMonth));
 
-    router.push(`?${params.toString()}`);
-  };
+  router.push(`?${params.toString()}`);
+};
 
   const moveMonth = (offset: number) => {
     const newDate = new Date(month.getFullYear(), month.getMonth() + offset, 1);
