@@ -10,10 +10,11 @@ import { useCalendar } from '@/context/CalendarContext';
 import { ITransaction } from '@/types/transactions';
 import { useMemo } from 'react';
 import { CaptionLabelProps } from 'react-day-picker';
-import { formatLocalDate } from '@/utils/date';
+import { formatDateKR, formatLocalDate } from '@/utils/date';
 import { Card, CardTitle, CardContent } from '../ui/card';
 import { MonthCaptionProps } from 'react-day-picker';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { TransactionList } from '../transaction/TransactionList';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -41,7 +42,7 @@ const CustomDay = ({
     <Button
       variant="ghost"
       size="icon"
-      data-day={day.date.toLocaleDateString()}
+      data-day={formatLocalDate(day.date)}
       data-selected-single={modifiers.selected}
       {...props}
       className={cn(
@@ -231,8 +232,8 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
       />
       <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
-            {selectedDate?.toLocaleDateString('ko-KR')}
+          <h3 className="pl-8 text-lg font-semibold">
+            {selectedDate && formatDateKR(selectedDate)}
           </h3>
 
           {selectedDayTransactions.length === 0 ? (
@@ -241,30 +242,9 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
             </p>
           ) : (
             <div className="space-y-2">
-              {selectedDayTransactions.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs">
-                      {transaction.type === 'income' ? '수입' : '지출'}
-                    </span>
-                  </div>
-                  <span
-                    className={cn(
-                      'text-sm',
-                      transaction.type === 'income'
-                        ? 'text-blue-500'
-                        : 'text-red-500'
-                    )}
-                  >
-                    {transaction.type === 'income' ? '+' : '-'}
-                    {transaction.amount.toLocaleString()}원
-                  </span>
-                </div>
-              ))}
+             <TransactionList compact={true} transactions={selectedDayTransactions}/>
             </div>
+
           )}
         </div>
       </ResponsivePanel>

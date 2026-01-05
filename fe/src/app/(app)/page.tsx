@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { formatMonth } from '@/utils/date';
 import { getMonthRange } from '@/utils/date';
 import { CalendarProvider } from '@/context/CalendarContext';
+import { TransactionProvider } from './history/TransactionContext';
 interface PageProps {
   searchParams: Promise<{
     month?: string;
@@ -25,16 +26,18 @@ export default async function Home({ searchParams }: PageProps) {
   };
 
   return (
-    <div className='flex w-full max-w-6xl'>
-      <CalendarProvider>
-        <Suspense fallback={<div>skeleton</div>}>
-          <DataCalendar
-            filters={filters}
-            currentMonth={currentMonth}
-            selectedDate={params.selected_date}
-          />
-        </Suspense>
-      </CalendarProvider>
+    <div className="flex w-full max-w-6xl">
+      <TransactionProvider>
+        <CalendarProvider>
+          <Suspense fallback={<div>skeleton</div>}>
+            <DataCalendar
+              filters={filters}
+              currentMonth={currentMonth}
+              selectedDate={params.selected_date}
+            />
+          </Suspense>
+        </CalendarProvider>
+      </TransactionProvider>
     </div>
   );
 }
@@ -52,8 +55,5 @@ async function DataCalendar({
   console.log(transactions);
   console.log(currentMonth);
   console.log(selectedDate);
-  return <Calendar 
-      currentMonth={currentMonth}
-      transactions={transactions}
-    />;
+  return <Calendar currentMonth={currentMonth} transactions={transactions} />;
 }
