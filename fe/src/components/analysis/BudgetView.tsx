@@ -193,48 +193,24 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                   description="식비, 교통비 등 항목별로 예산을 나누면 더 체계적으로 관리할 수 있어요."
                   icon={ListPlus}
                 >
-                  <ResponsivePanel
-                    trigger={
-                      <Button
-                        variant="ghost"
-                        className="bg-primary/5 hover:bg-primary/10 mt-2 cursor-pointer"
-                      >
-                        카테고리 예산 설정하기
-                      </Button>
-                    }
-                    isOpen={isCategoryPanelOpen}
-                    setIsOpen={setIsCategoryPanelOpen}
+                  <Button
+                    variant="ghost"
+                    className="bg-primary/5 hover:bg-primary/10 mt-2 cursor-pointer"
+                    onClick={() => setIsCategoryPanelOpen(true)}
                   >
-                    <CategoryBudgetSetting
-                      selectedDate={selectedDate}
-                      onSaveSuccess={() => setIsCategoryPanelOpen(false)}
-                    />
-                  </ResponsivePanel>
+                    카테고리 예산 설정하기
+                  </Button>
                 </AnalysisEmpty>
               ) : (
                 <div className="flex flex-col items-center py-6">
                   <div className="absolute top-8 right-8 flex gap-1">
-                    <ResponsivePanel
-                      trigger={
-                        <Button
-                          variant="ghost"
-                          className="text-muted-foreground hover:text-foreground h-8 cursor-pointer px-2"
-                        >
-                          수정
-                        </Button>
-                      }
-                      isOpen={isCategoryPanelOpen}
-                      setIsOpen={(open) => {
-                        setIsCategoryPanelOpen(open);
-                        if (!open) setActiveCategoryKey(null); // 닫힐 때 초기화
-                      }}
+                    <Button
+                      variant="ghost"
+                      className="text-muted-foreground hover:text-foreground h-8 cursor-pointer px-2"
+                      onClick={() => setIsCategoryPanelOpen(true)}
                     >
-                      <CategoryBudgetSetting
-                        selectedDate={selectedDate}
-                        initialCategoryKey={activeCategoryKey}
-                        onSaveSuccess={() => setIsCategoryPanelOpen(false)}
-                      />
-                    </ResponsivePanel>
+                      수정
+                    </Button>
 
                     <Button
                       variant="ghost"
@@ -336,71 +312,87 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                         </div>
                       );
                     })}
-
-                    <Separator className="my-10" />
-
-                    {unbudgetedExpenses.length > 0 && (
-                      <div className="mt-6">
-                        <div className="mb-4 flex flex-col justify-between px-1 md:flex-row md:items-center">
-                          <div className="flex items-center gap-2">
-                            <div className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                            <span className="text-foreground text-sm font-bold">
-                              예산 미설정 지출
-                            </span>
-                            <span
-                              className={cn(
-                                'bg-muted rounded-full px-2 py-0.5 text-[10px] font-bold',
-                                THEME_COLOR.EXPENSE
-                              )}
-                            >
-                              {unbudgetedExpenses.length}
-                            </span>
-                          </div>
-                          <span className="text-muted-foreground text-xs md:mt-0">
-                            카테고리를 눌러 예산을 설정하세요
-                          </span>
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                          {unbudgetedExpenses.map((item) => (
-                            <div
-                              key={item.key}
-                              className="bg-destructive/5 flex flex-col gap-2 rounded-xl p-4"
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="space-y-2">
-                                  <p className="text-foreground text-base font-bold">
-                                    {item.name}
-                                  </p>
-
-                                  <p className="text-sm font-bold text-red-600">
-                                    {item.amount.toLocaleString()}원 지출
-                                  </p>
-                                </div>
-
-                                {/* 클릭 시 예산 설정 */}
-                                <div
-                                  className="hover:bg-primary/10 text-muted-foreground flex cursor-pointer items-center justify-end gap-2 rounded-lg px-3 py-2"
-                                  onClick={() => openCategorySetting(item.key)}
-                                >
-                                  <span className="text-sm">예산 설정</span>
-                                  <Edit className="h-4 w-4" />
-                                </div>
-                              </div>
-
-                              <Progress value={0} className="h-2" />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
+              <Separator className="my-10" />
+
+              <div className="flex w-full flex-col items-center">
+                {unbudgetedExpenses.length > 0 && (
+                  <div className="mt-4 w-full max-w-lg">
+                    <div className="mb-4 flex flex-col justify-between px-1 md:flex-row md:items-center">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                        <span className="text-foreground text-sm font-bold">
+                          예산 미설정 지출
+                        </span>
+                        <span
+                          className={cn(
+                            'bg-muted rounded-full px-2 py-0.5 text-[10px] font-bold',
+                            THEME_COLOR.EXPENSE
+                          )}
+                        >
+                          {unbudgetedExpenses.length}
+                        </span>
+                      </div>
+                      <span className="text-muted-foreground text-xs md:mt-0">
+                        카테고리를 눌러 예산을 설정하세요
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      {unbudgetedExpenses.map((item) => (
+                        <div
+                          key={item.key}
+                          className="bg-destructive/5 flex flex-col gap-2 rounded-xl p-4"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-2">
+                              <p className="text-foreground text-base font-bold">
+                                {item.name}
+                              </p>
+
+                              <p className="text-sm font-bold text-red-600">
+                                {item.amount.toLocaleString()}원 지출
+                              </p>
+                            </div>
+
+                            {/* 클릭 시 예산 설정 */}
+                            <div
+                              className="hover:bg-primary/10 text-muted-foreground flex cursor-pointer items-center justify-end gap-2 rounded-lg px-3 py-2"
+                              onClick={() => openCategorySetting(item.key)}
+                            >
+                              <span className="text-sm">예산 설정</span>
+                              <Edit className="h-4 w-4" />
+                            </div>
+                          </div>
+
+                          <Progress value={0} className="h-2" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </AnalysisSection>
           </div>
         </>
       )}
+
+      {/* ResponsivePanel을 공용으로 사용하기 위해 분리 */}
+      <ResponsivePanel
+        isOpen={isCategoryPanelOpen}
+        setIsOpen={(open) => {
+          setIsCategoryPanelOpen(open);
+          if (!open) setActiveCategoryKey(null);
+        }}
+      >
+        <CategoryBudgetSetting
+          selectedDate={selectedDate}
+          initialCategoryKey={activeCategoryKey}
+          onSaveSuccess={() => setIsCategoryPanelOpen(false)}
+        />
+      </ResponsivePanel>
 
       {/* 총 예산 설정 모달창 */}
       <BudgetSetupDialog
