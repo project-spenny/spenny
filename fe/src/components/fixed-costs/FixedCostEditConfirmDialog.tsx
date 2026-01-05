@@ -12,16 +12,20 @@ import { Button } from '@/components/ui/button';
 type FixedCostEditConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onApplyThisMonth: () => void;
-  onApplyFuture: () => void;
+  cycle: 'WEEKLY' | 'MONTHLY';
+  onApplyIncludeCurrent: () => void;
+  onApplyExcludeCurrent: () => void;
 };
 
 export default function FixedCostEditConfirmDialog({
   open,
   onOpenChange,
-  onApplyThisMonth,
-  onApplyFuture,
+  cycle,
+  onApplyIncludeCurrent,
+  onApplyExcludeCurrent,
 }: FixedCostEditConfirmDialogProps) {
+  const unit = cycle === 'WEEKLY' ? '이번주' : '이번달';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -32,13 +36,28 @@ export default function FixedCostEditConfirmDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 flex flex-col gap-2">
-          <Button variant="outline" onClick={onApplyThisMonth}>
-            이번 달만 적용
-          </Button>
-          <Button variant="outline" onClick={onApplyFuture}>
-            이후 전부 적용
-          </Button>
+        <div className="mt-3 flex flex-col gap-3">
+          <div className="rounded-md border p-3">
+            <Button className="w-full" onClick={onApplyIncludeCurrent}>
+              {unit} 포함 이후 전부 적용
+            </Button>
+            <p className="text-muted-foreground mt-1 text-sm">
+              이미 생성된 {unit} 거래도 새 규칙으로 수정됩니다.
+            </p>
+          </div>
+
+          <div className="rounded-md border p-3">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={onApplyExcludeCurrent}
+            >
+              {unit} 제외 이후 전부 적용
+            </Button>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {unit} 거래는 유지되고 다음 기간부터 적용됩니다.
+            </p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
