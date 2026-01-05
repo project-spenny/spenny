@@ -17,6 +17,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
 import { formatMonth } from '@/utils/date';
 import TransactionSubmitForm from '../transaction/TransactionSubmitForm';
+import { revalidateTransactions } from '@/app/(app)/history/actions';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -264,7 +265,8 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
             <div className="space-y-2">
               <TransactionSubmitForm
                 transaction={panelState.editingTransaction}
-                onSuccess={() => {
+                onSuccess={async () => {
+                  await revalidateTransactions();
                   setPanelState({ view: 'list' });
                 }}
                 onClose={() => {
