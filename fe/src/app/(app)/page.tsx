@@ -6,6 +6,7 @@ import { formatMonth } from '@/utils/date';
 import { getMonthRange } from '@/utils/date';
 import { CalendarProvider } from '@/context/CalendarContext';
 import { TransactionProvider } from './history/TransactionContext';
+import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
 interface PageProps {
   searchParams: Promise<{
     month?: string;
@@ -29,7 +30,7 @@ export default async function Home({ searchParams }: PageProps) {
     <div className="flex w-full max-w-6xl">
       <TransactionProvider>
         <CalendarProvider>
-          <Suspense fallback={<div>skeleton</div>}>
+          <Suspense fallback={<CalendarSkeleton />}>
             <DataCalendar
               filters={filters}
               currentMonth={currentMonth}
