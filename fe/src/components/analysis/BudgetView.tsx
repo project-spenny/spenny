@@ -9,6 +9,7 @@ import CategoryBudgetSetting from '@/components/analysis/CategoryBudgetSetting';
 import ConfirmDialog from '@/components/analysis/common/ConfirmDialog';
 import { Progress } from '@/components/ui/progress';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
+import { Separator } from '@/components/ui/separator';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
@@ -23,9 +24,12 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     isLoading: isBudgetLoading,
     isDeleting,
   } = useBudgetData(selectedDate);
-
-  const { totalAmount: totalExpense, isLoading: isExpenseLoading } =
-    useAnalysisData(selectedDate, 'expense');
+  const {
+    totalAmount: totalExpense,
+    isLoading: isExpenseLoading,
+    categoryTotalsByKey,
+    current: transactions,
+  } = useAnalysisData(selectedDate, 'expense');
 
   const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,6 +37,22 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
   const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
 
   const isLoading = isBudgetLoading || isExpenseLoading;
+
+  // 예산이 설정된 카테고리 키 목록 생성
+  const budgetKeys = new Set(
+    categoryBudgets.map((b) => b.categories?.category_key).filter(Boolean)
+  );
+  // 예산에는 없지만 지출이 발생한 항목들 필터링
+  const unbudgetedExpenses = Object.entries(categoryTotalsByKey)
+    .filter(([key]) => !budgetKeys.has(key))
+    .map(([key, amount]) => {
+      const categoryName =
+        transactions.find((t) => t.categories?.category_key === key)?.categories
+          ?.name_ko || key;
+
+      return { key, amount, name: categoryName };
+    })
+    .sort((a, b) => b.amount - a.amount);
 
   const budgetAmount = totalBudget?.amount || 0;
   const remaining = budgetAmount - totalExpense;
@@ -130,7 +150,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                 </div>
 
                 {/* 바 차트 */}
-                <div className="w-full max-w-md space-y-2">
+                <div className="w-full max-w-lg space-y-2">
                   <div className="text-muted-foreground flex justify-between text-sm">
                     <span>예산 사용률</span>
                     <span
@@ -184,7 +204,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                   </ResponsivePanel>
                 </AnalysisEmpty>
               ) : (
-                <div>
+                <div className="flex flex-col items-center py-6">
                   <div className="absolute top-8 right-8 flex gap-1">
                     <ResponsivePanel
                       trigger={
@@ -212,7 +232,126 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                       초기화
                     </Button>
                   </div>
-                  <div>카테고리</div>
+
+                  {/* 카테고리별 예산 리스트 */}
+                  <div className="w-full max-w-lg space-y-6">
+                    {categoryBudgets.map((budget) => {
+                      const categoryName =
+                        budget.categories?.name_ko || '미지정';
+
+                      const categoryKey = budget.categories?.category_key;
+                      const categoryExpense = categoryKey
+                        ? categoryTotalsByKey[categoryKey] || 0
+                        : 0;
+
+                      const usagePercentage =
+                        budget.amount > 0
+                          ? Math.min(
+                              Math.round(
+                                (categoryExpense / budget.amount) * 100
+                              ),
+                              100
+                            )
+                          : 0;
+
+                      return (
+                        <div key={budget.id} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-foreground text-base">
+                                {categoryName}
+                              </span>
+                              <span
+                                className={cn(
+                                  'text-sm',
+                                  usagePercentage >= 90
+                                    ? THEME_COLOR.EXPENSE
+                                    : 'text-foreground'
+                                )}
+                              >
+                                {usagePercentage}%
+                              </span>
+                            </div>
+
+                            <div className="text-sm font-medium">
+                              <span className="text-foreground font-semibold">
+                                {categoryExpense.toLocaleString()}
+                              </span>
+                              <span className="text-muted-foreground mx-1">
+                                /
+                              </span>
+                              <span className="text-muted-foreground">
+                                {budget.amount.toLocaleString()}원
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* 카테고리별 사용량 바 */}
+                          <Progress
+                            value={usagePercentage}
+                            className="h-2"
+                            indicatorClassName={cn(
+                              usagePercentage >= 90
+                                ? 'bg-red-400'
+                                : 'bg-primary'
+                            )}
+                          />
+                        </div>
+                      );
+                    })}
+
+                    <Separator className="my-10" />
+
+                    {unbudgetedExpenses.length > 0 && (
+                      <div className="">
+                        <div className="mb-4 flex items-center justify-between">
+                          <div className="text-muted-foreground flex items-center gap-2 text-sm font-semibold">
+                            <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                            예산 미설정 지출
+                          </div>
+                          <span className="text-muted-foreground text-xs">
+                            예산을 설정 해주세요
+                          </span>
+                        </div>
+
+                        <div className="space-y-6">
+                          {unbudgetedExpenses.map((item) => (
+                            <div key={item.key} className="relative">
+                              <div className="mb-1 flex items-center justify-between space-y-2">
+                                <div className="flex items-center">
+                                  <span className="text-foreground">
+                                    {item.name}
+                                  </span>
+                                </div>
+
+                                <div className="text-sm font-medium">
+                                  <span
+                                    className={cn(
+                                      'font-semibold',
+                                      THEME_COLOR.EXPENSE
+                                    )}
+                                  >
+                                    {item.amount.toLocaleString()}원
+                                  </span>
+                                  <span className="text-muted-foreground mx-1">
+                                    /
+                                  </span>
+                                  <span className="text-muted-foreground">
+                                    0원
+                                  </span>
+                                </div>
+                              </div>
+                              <Progress
+                                value={100}
+                                className="h-2"
+                                indicatorClassName="bg-red-400"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </AnalysisSection>

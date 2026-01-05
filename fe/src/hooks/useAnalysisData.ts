@@ -116,41 +116,52 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
     fetchData();
   }, [selectedDate, type]);
 
-  const { totalAmount, prevAmount, categoryData } = useMemo(() => {
-    // 현재/이전 달 총액 계산
-    const currentTotal = current.reduce(
-      (sum, item) => sum + (item.amount || 0),
-      0
-    );
-    const lastTotal = prev.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const { totalAmount, prevAmount, categoryData, categoryTotalsByKey } =
+    useMemo(() => {
+      // 현재/이전 달 총액 계산
+      const currentTotal = current.reduce(
+        (sum, item) => sum + (item.amount || 0),
+        0
+      );
+      const lastTotal = prev.reduce((sum, item) => sum + (item.amount || 0), 0);
 
-    // 카테고리별 그룹화 및 합계 계산
-    const grouped = current.reduce<CategoryGroup>((acc, item) => {
-      const categoryName = item.categories?.name_ko || '기타';
+      // 카테고리 ID별 합계를 담을 객체
+      const totalsByKey: Record<string, number> = {};
 
-      // 카테고리가 첫 등장이면 0으로 초기화
-      if (!acc[categoryName]) acc[categoryName] = 0;
-      // 거래 금액 합산 (누적)
-      acc[categoryName] += item.amount || 0;
+      // 카테고리별 그룹화 및 합계 계산
+      const grouped = current.reduce<CategoryGroup>((acc, item) => {
+        const categoryName = item.categories?.name_ko || '기타';
+        const categoryKey = item.categories?.category_key;
 
-      return acc;
-    }, {});
+        // 카테고리가 첫 등장이면 0으로 초기화
+        if (!acc[categoryName]) acc[categoryName] = 0;
+        // 거래 금액 합산 (누적)
+        acc[categoryName] += item.amount || 0;
 
-    // 배열 변환 및 정렬, 비율 계산
-    const sortedCategoryData: CategoryAnalysis[] = Object.entries(grouped)
-      .map(([name, amount]) => ({
-        name,
-        amount,
-        percentage: currentTotal > 0 ? (amount / currentTotal) * 100 : 0,
-      }))
-      .sort((a, b) => b.amount - a.amount);
+        if (categoryKey) {
+          totalsByKey[categoryKey] =
+            (totalsByKey[categoryKey] || 0) + (item.amount || 0);
+        }
 
-    return {
-      totalAmount: currentTotal,
-      prevAmount: lastTotal,
-      categoryData: sortedCategoryData,
-    };
-  }, [current, prev]);
+        return acc;
+      }, {});
+
+      // 배열 변환 및 정렬, 비율 계산
+      const sortedCategoryData: CategoryAnalysis[] = Object.entries(grouped)
+        .map(([name, amount]) => ({
+          name,
+          amount,
+          percentage: currentTotal > 0 ? (amount / currentTotal) * 100 : 0,
+        }))
+        .sort((a, b) => b.amount - a.amount);
+
+      return {
+        totalAmount: currentTotal,
+        prevAmount: lastTotal,
+        categoryData: sortedCategoryData,
+        categoryTotalsByKey: totalsByKey,
+      };
+    }, [current, prev]);
 
   const diff = totalAmount - prevAmount;
 
@@ -161,5 +172,6 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
     diff,
     isLoading,
     categoryData,
+    categoryTotalsByKey,
   };
 };
