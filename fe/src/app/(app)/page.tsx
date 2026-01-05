@@ -52,8 +52,5 @@ async function DataCalendar({
   selectedDate?: string;
 }) {
   const transactions = await getTransaction(filters, true);
-  console.log(transactions);
-  console.log(currentMonth);
-  console.log(selectedDate);
   return <Calendar currentMonth={currentMonth} transactions={transactions} />;
 }
