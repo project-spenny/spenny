@@ -16,6 +16,7 @@ import { MonthCaptionProps } from 'react-day-picker';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
 import { formatMonth } from '@/utils/date';
+import TransactionSubmitForm from '../transaction/TransactionSubmitForm';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -25,6 +26,10 @@ interface DayData {
   income: number;
   expense: number;
   transactions: ITransaction[];
+}
+interface PanelState {
+  view: 'list' | 'create' | 'edit';
+  editingTransaction?: ITransaction;
 }
 
 const CALENDAR_CELL_HEIGHT =
@@ -85,6 +90,8 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { selectedDate, isOpen, open, close } = useCalendar();
+
+  const [panelState, setPanelState] = useState<PanelState>({ view: 'list' });
 
   useEffect(() => {
     setMonth(new Date(`${currentMonth}-01`));
@@ -238,15 +245,32 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
             {selectedDate && formatDateKR(selectedDate)}
           </h3>
 
-          {selectedDayTransactions.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              거래 내역이 없습니다.
-            </p>
-          ) : (
+          {panelState.view === 'list' && (
             <div className="space-y-2">
               <TransactionList
                 compact={true}
                 transactions={selectedDayTransactions}
+                onEdit={(tx) => {
+                  console.log('edit!');
+                  setPanelState({ view: 'edit', editingTransaction: tx });
+                }}
+                onCreate={() => {
+                  setPanelState({ view: 'create' });
+                }}
+              />
+            </div>
+          )}
+          {panelState.view === 'edit' && (
+            <div className="space-y-2">
+              <TransactionSubmitForm
+                transaction={panelState.editingTransaction}
+                onSuccess={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                onClose={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                mode="edit"
               />
             </div>
           )}
