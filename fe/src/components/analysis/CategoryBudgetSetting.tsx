@@ -72,11 +72,6 @@ const CategoryBudgetSetting = ({
     }
   }, [categoryBudgets, allCategories]);
 
-  const handleAmountChange = (category: string, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, '');
-    setAmounts((prev) => ({ ...prev, [category]: numericValue }));
-  };
-
   // 현재 입력된 값 중 유효한(0보다 큰) 데이터만 추출
   const currentBudgets = Object.entries(amounts)
     .filter(([_, value]) => value !== '' && Number(value) > 0)
@@ -112,6 +107,11 @@ const CategoryBudgetSetting = ({
     if (upsertData.length > 0) saveCategoryBudgets(upsertData);
 
     if (onSaveSuccess) onSaveSuccess();
+  };
+
+  const handleAmountChange = (category: string, value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, '');
+    setAmounts((prev) => ({ ...prev, [category]: numericValue }));
   };
 
   const handleResetCategory = (categoryKey: string) => {
@@ -288,10 +288,11 @@ const CategoryBudgetSetting = ({
 
       {/* 하단 버튼 영역 */}
       <div className="space-y-4 p-4">
-        {/* 변경 사항이 없고, 기존에 설정된 예산 데이터가 있을 때만 메시지 노출 */}
-        {!isChanged && categoryBudgets.length > 0 && (
+        {!isChanged && (
           <p className="text-muted-foreground text-center text-sm">
-            기존에 설정된 금액과 동일합니다.
+            {categoryBudgets.length === 0
+              ? '카테고리별 예산 금액을 입력해주세요.'
+              : '기존에 설정된 금액과 동일합니다.'}
           </p>
         )}
 
