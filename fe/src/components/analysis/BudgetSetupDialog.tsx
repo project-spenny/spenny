@@ -38,6 +38,8 @@ const BudgetSetupDialog = ({
   // 유효성 검사
   const numericAmount = Number(amount.replace(/[^0-9]/g, ''));
   const isInvalid = numericAmount <= 0;
+  // 변경 여부 확인 (기존 값과 비교)
+  const isChanged = defaultAmount !== numericAmount;
 
   useEffect(() => {
     if (open) setAmount(defaultAmount ? defaultAmount.toLocaleString() : '');
@@ -92,11 +94,18 @@ const BudgetSetupDialog = ({
               onChange={handleAmountChange}
               className="text-lg font-semibold"
             />
+
             {isTouched && isInvalid && (
               <p className={`text-sm ${THEME_COLOR.EXPENSE}`}>
                 {amount === ''
                   ? '예산 금액을 입력해주세요.'
                   : '0보다 큰 숫자를 입력해야 합니다.'}
+              </p>
+            )}
+
+            {!isInvalid && !isChanged && defaultAmount !== undefined && (
+              <p className="text-muted-foreground text-sm">
+                기존에 설정된 금액과 동일합니다.
               </p>
             )}
           </div>
@@ -106,7 +115,7 @@ const BudgetSetupDialog = ({
           <Button
             className="w-full cursor-pointer"
             onClick={handleSave}
-            disabled={isSaving || isInvalid}
+            disabled={isSaving || isInvalid || !isChanged}
           >
             {isSaving ? '저장 중' : '저장하기'}
           </Button>
