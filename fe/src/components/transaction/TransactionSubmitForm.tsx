@@ -107,7 +107,6 @@ export default function TransactionSubmitForm({
 
         toast.success('가계부 작성을 완료했습니다');
       } else {
-        console.log(transactionData);
         const { error } = await supabase
           .from('transactions')
           .update(transactionData)

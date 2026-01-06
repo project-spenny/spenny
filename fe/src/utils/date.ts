@@ -34,6 +34,13 @@ export const formatLocalDate = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
+// Date 객체를 'YYYY-MM' 문자열로 변환
+export const formatMonth = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
 // 년-월-일 변환
 export const formatDateKR = (date: Date) => {
   const year = date.getFullYear();
