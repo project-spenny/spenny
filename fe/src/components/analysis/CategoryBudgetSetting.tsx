@@ -93,15 +93,8 @@ const CategoryBudgetSetting = ({
         return inputAmount === '' || Number(inputAmount) === 0;
       });
 
-    // 삭제할 게 있다면 한 번에 처리
-    if (deleteData.length > 0) {
-      removeBudget(deleteData);
-    }
-
-    // 저장할 게 있다면 한 번에 처리
-    if (upsertData.length > 0) {
-      saveCategoryBudgets(upsertData);
-    }
+    if (deleteData.length > 0) removeBudget(deleteData);
+    if (upsertData.length > 0) saveCategoryBudgets(upsertData);
 
     if (onSaveSuccess) onSaveSuccess();
   };
@@ -218,7 +211,7 @@ const CategoryBudgetSetting = ({
                   <div className="flex flex-1 items-center gap-1">
                     <p className="text-sm font-semibold">{category.name_ko}</p>
                     {totalBudgetAmount > 0 &&
-                      amounts[category.category_key] && (
+                      Number(amounts[category.category_key]) > 0 && (
                         <p className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs">
                           {Math.round(
                             (Number(amounts[category.category_key]) /
