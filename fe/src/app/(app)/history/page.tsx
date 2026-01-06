@@ -4,6 +4,7 @@ import { TransactionFilters } from './actions';
 import { getTransaction } from './actions';
 import { Suspense } from 'react';
 import { TransactionProvider } from './TransactionContext';
+import { TransactionListSkeleton } from '@/components/transaction/TransactionListSkeleton';
 interface PageProps {
   searchParams: Promise<{
     type?: string;
@@ -27,7 +28,7 @@ export default async function Page({ searchParams }: PageProps) {
     <>
       <TransactionProvider>
         <div className="flex h-screen w-full flex-col">
-          <Suspense fallback={<div>skeleton ui</div>}>
+          <Suspense fallback={<TransactionListSkeleton />}>
             <TransactionListWrapper filters={filters} />
           </Suspense>
           <TransactionClient />
