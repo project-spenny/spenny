@@ -42,6 +42,11 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  // 정적 이미지 파일은 인증 체크 제외
+  if (pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico)$/)) {
+    return supabaseResponse;
+  }
+
   const isAuthPath = pathname.startsWith('/auth');
   const isLoginPath = pathname.startsWith('/login');
   const isOnboardingPath = pathname.startsWith('/onboarding');
