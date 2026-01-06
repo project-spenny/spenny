@@ -60,8 +60,9 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
 
   const budgetAmount = totalBudget?.amount || 0;
   const remaining = budgetAmount - totalExpense - futureFixedAmount; // 고정비까지 고려
-  const percentage = Math.min(
-    Math.round((totalExpense / budgetAmount) * 100),
+  // (실제 지출 + 지출 예정 합산) 퍼센트
+  const totalPercentage = Math.min(
+    Math.round(((totalExpense + futureFixedAmount) / budgetAmount) * 100),
     100
   );
 
@@ -170,23 +171,31 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                 {/* 바 차트 */}
                 <div className="w-full max-w-lg space-y-2">
                   <div className="text-muted-foreground flex justify-between text-sm">
-                    <span>예산 사용률</span>
+                    <span>
+                      예산 사용률
+                      {futureFixedAmount > 0 && (
+                        <span className="text-muted-foreground rounded pl-1 text-sm">
+                          (지출 예정 포함)
+                        </span>
+                      )}
+                    </span>
                     <span
                       className={cn(
                         'font-medium',
-                        percentage >= 90
+                        totalPercentage >= 90
                           ? THEME_COLOR.EXPENSE
                           : 'text-foreground'
                       )}
                     >
-                      {percentage}%
+                      {totalPercentage}%
                     </span>
                   </div>
+
                   <Progress
-                    value={percentage}
+                    value={totalPercentage}
                     className="h-4"
                     indicatorClassName={
-                      percentage >= 90 ? 'bg-red-400' : 'bg-primary'
+                      totalPercentage >= 90 ? 'bg-red-400' : 'bg-primary'
                     }
                   />
                 </div>
