@@ -6,11 +6,12 @@ import {
 } from '@/services/analysis/budgetService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { formatMonth } from '@/utils/date';
 import { toast } from 'sonner';
 
 const useBudgetData = (selectedDate: Date) => {
   const queryClient = useQueryClient();
-  const monthKey = selectedDate.toISOString().substring(0, 7);
+  const monthKey = formatMonth(selectedDate); // 로컬 시간대 기준 'YYYY-MM' 문자열 생성
 
   // 조회
   const { data, isLoading } = useQuery({
