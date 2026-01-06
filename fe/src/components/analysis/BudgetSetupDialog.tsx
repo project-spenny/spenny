@@ -11,6 +11,8 @@ import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { THEME_COLOR } from '@/constants/colors';
+import { toast } from 'sonner';
 import useBudgetData from '@/hooks/useBudgetData';
 
 type BudgetSetupDialogProps = {
@@ -29,16 +31,29 @@ const BudgetSetupDialog = ({
   const [amount, setAmount] = useState<string>(
     defaultAmount ? defaultAmount.toLocaleString() : ''
   );
+  const [isTouched, setIsTouched] = useState(false); // 사용자가 입력창을 건드렸는지 여부
+
   const { saveBudget, isSaving } = useBudgetData(selectedDate);
+
+  // 유효성 검사
+  const numericAmount = Number(amount.replace(/[^0-9]/g, ''));
+  const isInvalid = numericAmount <= 0;
 
   useEffect(() => {
     if (open) setAmount(defaultAmount ? defaultAmount.toLocaleString() : '');
+
+    setIsTouched(false);
   }, [open, defaultAmount]);
 
   const handleSave = () => {
+    if (numericAmount <= 0) {
+      toast.error('예산은 0원보다 커야 합니다.');
+      return;
+    }
+
     saveBudget(
       {
-        amount: Number(amount.replace(/[^0-9]/g, '')),
+        amount: numericAmount,
         categoryId: null,
       },
       {
@@ -49,6 +64,8 @@ const BudgetSetupDialog = ({
 
   // 금액 입력 시 콤마(,) 포맷팅 함수
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isTouched) setIsTouched(true);
+
     const value = e.target.value.replace(/[^0-9]/g, '');
     setAmount(value ? Number(value).toLocaleString() : '');
   };
@@ -62,6 +79,7 @@ const BudgetSetupDialog = ({
             지출 계획을 세우기 위해 이번 달 총 예산을 입력해주세요.
           </DialogDescription>
         </DialogHeader>
+
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="total-amount">목표 금액 (원)</Label>
@@ -74,15 +92,23 @@ const BudgetSetupDialog = ({
               onChange={handleAmountChange}
               className="text-lg font-semibold"
             />
+            {isTouched && isInvalid && (
+              <p className={`text-sm ${THEME_COLOR.EXPENSE}`}>
+                {amount === ''
+                  ? '예산 금액을 입력해주세요.'
+                  : '0보다 큰 숫자를 입력해야 합니다.'}
+              </p>
+            )}
           </div>
         </div>
+
         <DialogFooter>
           <Button
             className="w-full cursor-pointer"
             onClick={handleSave}
-            disabled={isSaving}
+            disabled={isSaving || isInvalid}
           >
-            {isSaving ? '저장 중' : '설정 완료'}
+            {isSaving ? '저장 중' : '저장하기'}
           </Button>
         </DialogFooter>
       </DialogContent>
