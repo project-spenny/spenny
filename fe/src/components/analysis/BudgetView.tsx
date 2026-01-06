@@ -21,6 +21,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     totalBudget,
     categoryBudgets,
     removeBudget,
+    futureFixedAmount,
     isLoading: isBudgetLoading,
     isDeleting,
   } = useBudgetData(selectedDate);
@@ -58,7 +59,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     .sort((a, b) => b.amount - a.amount);
 
   const budgetAmount = totalBudget?.amount || 0;
-  const remaining = budgetAmount - totalExpense;
+  const remaining = budgetAmount - totalExpense - futureFixedAmount; // 고정비까지 고려
   const percentage = Math.min(
     Math.round((totalExpense / budgetAmount) * 100),
     100
@@ -100,7 +101,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
           <div className="relative">
             {/* 예산이 있을 때 보여줄 화면  */}
             <AnalysisSection title={'총 예산'}>
-              <div className="flex flex-col items-center py-6">
+              <div className="flex flex-col items-center gap-4 py-6">
                 <div className="absolute top-8 right-8 flex gap-1">
                   <Button
                     variant="ghost"
@@ -134,8 +135,8 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                 </div>
 
                 {/* 예산 사용 현황 */}
-                <div className="flex w-full items-center justify-center gap-10 py-4 text-center">
-                  <div>
+                <div className="flex w-full max-w-lg flex-col items-center justify-center gap-10 py-4 text-center sm:flex-row">
+                  <div className="flex-1">
                     <p className="text-muted-foreground">현재 지출</p>
                     <p
                       className={`text-lg font-semibold ${THEME_COLOR.EXPENSE}`}
@@ -144,7 +145,16 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                     </p>
                   </div>
 
-                  <div>
+                  {futureFixedAmount > 0 && (
+                    <div className="flex-1">
+                      <p className="text-muted-foreground">지출 예정</p>
+                      <p className="text-lg font-semibold text-[#5C7AFF]">
+                        {futureFixedAmount.toLocaleString()}원
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex-1">
                     <p className="text-muted-foreground">남은 예산</p>
                     <p
                       className={cn(

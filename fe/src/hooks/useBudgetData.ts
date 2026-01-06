@@ -4,17 +4,20 @@ import {
   upsertBudget,
   upsertCategoryBudgets,
 } from '@/services/analysis/budgetService';
+import { formatLocalDate, formatMonth } from '@/utils/date';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { formatMonth } from '@/utils/date';
+import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixed-costs';
+import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
 import { toast } from 'sonner';
+import { useMemo } from 'react';
 
 const useBudgetData = (selectedDate: Date) => {
   const queryClient = useQueryClient();
   const monthKey = formatMonth(selectedDate); // 로컬 시간대 기준 'YYYY-MM' 문자열 생성
 
   // 조회
-  const { data, isLoading } = useQuery({
+  const { data, isLoading: isBudgetLoading } = useQuery({
     // 연-월이 바뀔 때마다 자동으로 새로운 데이터 fetch
     queryKey: ['budgets', monthKey],
     queryFn: () => fetchBudgets(selectedDate),
@@ -27,6 +30,26 @@ const useBudgetData = (selectedDate: Date) => {
       return { totalBudget, categoryBudgets };
     },
   });
+
+  // 고정비 규칙 조회
+  const { data: fixedRules = [], isLoading: isFixedLoading } = useQuery({
+    queryKey: ['fixedRules', monthKey],
+    queryFn: () => fetchFixedRulesByMonth(selectedDate),
+  });
+
+  const futureFixedAmount = useMemo(() => {
+    const today = formatLocalDate(new Date()); // 오늘 날짜 문자열 (YYYY-MM-DD)
+
+    return fixedRules.reduce((total, rule) => {
+      // 해당 규칙의 이번 달 발생 날짜들 계산
+      const futureDates = getFixedRuleDates(rule, selectedDate).filter(
+        // 오늘 이후(미래) 날짜만 필터링
+        (date) => date > today
+      );
+
+      return total + rule.amount * futureDates.length; // (금액 * 미래 발생 횟수) 더하기
+    }, 0);
+  }, [fixedRules, selectedDate]);
 
   // 저장/수정
   const { mutate: saveBudget, isPending: isSaving } = useMutation({
@@ -77,7 +100,8 @@ const useBudgetData = (selectedDate: Date) => {
   return {
     totalBudget: data?.totalBudget ?? null,
     categoryBudgets: data?.categoryBudgets ?? [],
-    isLoading,
+    futureFixedAmount,
+    isLoading: isBudgetLoading || isFixedLoading,
     isSaving,
     saveBudget,
     isDeleting,
