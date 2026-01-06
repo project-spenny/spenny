@@ -174,7 +174,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                     <span>
                       예산 사용률
                       {futureFixedAmount > 0 && (
-                        <span className="text-muted-foreground rounded pl-1 text-sm">
+                        <span className="rounded pl-1 text-sm">
                           (지출 예정 포함)
                         </span>
                       )}
@@ -198,6 +198,27 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
                       totalPercentage >= 90 ? 'bg-red-400' : 'bg-primary'
                     }
                   />
+
+                  {totalPercentage >= 100 && (
+                    <p className="mt-4 text-center text-sm font-medium">
+                      이번 달 예산을{' '}
+                      <span
+                        className={cn('font-semibold', THEME_COLOR.EXPENSE)}
+                      >
+                        {Math.abs(remaining).toLocaleString()}원 초과
+                      </span>
+                      하여 지출하고 있어요!
+                    </p>
+                  )}
+                  {totalPercentage >= 90 && totalPercentage < 100 && (
+                    <p className="mt-4 text-center text-sm font-medium">
+                      이번 달 예산이{' '}
+                      <span className={cn('font-semibold', THEME_COLOR.INCOME)}>
+                        {remaining.toLocaleString()}원
+                      </span>
+                      밖에 남지 않았습니다.
+                    </p>
+                  )}
                 </div>
               </div>
             </AnalysisSection>
