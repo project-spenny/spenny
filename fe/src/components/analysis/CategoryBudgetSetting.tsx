@@ -77,21 +77,36 @@ const CategoryBudgetSetting = ({
     setAmounts((prev) => ({ ...prev, [category]: numericValue }));
   };
 
+  // 현재 입력된 값 중 유효한(0보다 큰) 데이터만 추출
+  const currentBudgets = Object.entries(amounts)
+    .filter(([_, value]) => value !== '' && Number(value) > 0)
+    .map(([categoryId, value]) => ({ categoryId, amount: Number(value) }));
+
+  // 개수 비교 결과
+  const hasCountChanged = currentBudgets.length !== categoryBudgets.length;
+
+  // 금액 비교 결과
+  const hasAmountChanged = currentBudgets.some((current) => {
+    const original = categoryBudgets.find(
+      (b) => b.category_id === current.categoryId
+    );
+    return original?.amount !== current.amount;
+  });
+
+  // 변경 여부 (기존 값과 비교)
+  const isChanged = hasCountChanged || hasAmountChanged;
+
   const handleSave = () => {
-    if (!allCategories) return;
+    if (!allCategories || !isChanged) return;
 
-    // 업데이트용 데이터 (금액 > 0)
-    const upsertData = Object.entries(amounts)
-      .filter(([_, value]) => value !== '' && Number(value) > 0)
-      .map(([key, value]) => ({ categoryId: key, amount: Number(value) }));
+    // 추가 및 수정할 데이터 (0원보다 큰 유효한 예산 리스트)
+    const upsertData = currentBudgets;
 
-    // 삭제용 ID 목록 (기존 데이터 중 입력값이 0인 것)
+    // 삭제할 데이터 (기존 예산 중 입력값이 0이 된 항목들)
+    const currentCategoryIds = currentBudgets.map((b) => b.categoryId);
     const deleteData = categoryBudgets
-      .map((budget) => budget.category_id)
-      .filter((id) => {
-        const inputAmount = amounts[id];
-        return inputAmount === '' || Number(inputAmount) === 0;
-      });
+      .map((b) => b.category_id)
+      .filter((id) => !currentCategoryIds.includes(id));
 
     if (deleteData.length > 0) removeBudget(deleteData);
     if (upsertData.length > 0) saveCategoryBudgets(upsertData);
@@ -105,8 +120,8 @@ const CategoryBudgetSetting = ({
   };
 
   // 현재 입력된 모든 카테고리 금액의 합계
-  const totalAllocated = Object.values(amounts).reduce(
-    (sum, val) => sum + (Number(val) || 0),
+  const totalAllocated = currentBudgets.reduce(
+    (sum, item) => sum + item.amount,
     0
   );
 
@@ -272,14 +287,21 @@ const CategoryBudgetSetting = ({
       <Separator />
 
       {/* 하단 버튼 영역 */}
-      <div className="p-6">
+      <div className="space-y-4 p-4">
+        {/* 변경 사항이 없고, 기존에 설정된 예산 데이터가 있을 때만 메시지 노출 */}
+        {!isChanged && categoryBudgets.length > 0 && (
+          <p className="text-muted-foreground text-center text-sm">
+            기존에 설정된 금액과 동일합니다.
+          </p>
+        )}
+
         <Button
           className={cn(
             'h-12 w-full cursor-pointer text-base',
             isOverBudget && 'bg-red-400 hover:bg-red-500'
           )}
           onClick={handleSave}
-          disabled={isSavingCategories}
+          disabled={isSavingCategories || !isChanged}
         >
           {isSavingCategories ? '저장 중' : '저장하기'}
         </Button>
