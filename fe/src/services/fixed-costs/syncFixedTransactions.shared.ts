@@ -1,5 +1,6 @@
 import type { FixedTransactionInsert, IFixedRule } from '@/types/fixed-costs';
 import { getFixedRuleDates } from './getRuleDates';
+import { minDate } from '@/utils/date';
 
 type SyncDeps = {
   fetchFixedRules: (args: {
@@ -87,10 +88,9 @@ export const syncByMonthShared = async (
   const { userId, monthDate, startDate, endDate, generateThroughDate } = args;
 
   // 생성 범위 상한 : 월말(endDate)과 generateThroughDate 중 더 이른 날짜
-  const effectiveEndDate =
-    generateThroughDate && generateThroughDate < endDate
-      ? generateThroughDate
-      : endDate;
+  const effectiveEndDate = generateThroughDate
+    ? minDate(generateThroughDate, endDate)
+    : endDate;
   if (startDate > effectiveEndDate) return { createdCount: 0 };
 
   // 해당 월에 유효한 고정비 규칙 조회
