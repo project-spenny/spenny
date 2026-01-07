@@ -87,4 +87,5 @@ export const getTransaction = async (
 
 export async function revalidateTransactions() {
   revalidatePath('/history');
+  revalidatePath('/');
 }

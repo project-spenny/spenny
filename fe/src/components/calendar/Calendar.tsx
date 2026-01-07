@@ -13,9 +13,12 @@ import { CaptionLabelProps } from 'react-day-picker';
 import { formatDateKR, formatLocalDate } from '@/utils/date';
 import { Card, CardTitle, CardContent } from '../ui/card';
 import { MonthCaptionProps } from 'react-day-picker';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
 import { formatMonth } from '@/utils/date';
+import TransactionSubmitForm from '../transaction/TransactionSubmitForm';
+import { revalidateTransactions } from '@/app/(app)/history/actions';
+import { Item, ItemContent } from '../ui/item';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -25,6 +28,10 @@ interface DayData {
   income: number;
   expense: number;
   transactions: ITransaction[];
+}
+interface PanelState {
+  view: 'list' | 'create' | 'edit';
+  editingTransaction?: ITransaction;
 }
 
 const CALENDAR_CELL_HEIGHT =
@@ -85,6 +92,8 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { selectedDate, isOpen, open, close } = useCalendar();
+
+  const [panelState, setPanelState] = useState<PanelState>({ view: 'list' });
 
   useEffect(() => {
     setMonth(new Date(`${currentMonth}-01`));
@@ -165,6 +174,10 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   const year = month.getFullYear();
   const displayMonth = month.getMonth() + 1;
 
+  const handleClose = () => {
+    close();
+    setPanelState({ view: 'list' });
+  };
   const CustomCaption = (props: MonthCaptionProps) => {
     return (
       <div className="flex w-full gap-2 p-2 sm:flex-row sm:gap-4">
@@ -232,21 +245,84 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
         }}
         disableNavigation
       />
-      <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
+      <ResponsivePanel isOpen={isOpen} setIsOpen={handleClose}>
         <div className="space-y-4">
           <h3 className="pl-8 text-lg font-semibold">
             {selectedDate && formatDateKR(selectedDate)}
           </h3>
 
-          {selectedDayTransactions.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              거래 내역이 없습니다.
-            </p>
-          ) : (
-            <div className="space-y-2">
+          {panelState.view === 'list' && (
+            <div>
+              <div className="space-y-2 p-4 md:p-6 lg:p-8">
+                <Item
+                  className="cursor-pointer hover:bg-gray-100"
+                  variant="outline"
+                  onClick={() => {
+                    setPanelState({ view: 'create' });
+                  }}
+                >
+                  <Plus />
+                  <ItemContent>가계부 작성하기</ItemContent>
+                </Item>
+              </div>
               <TransactionList
                 compact={true}
                 transactions={selectedDayTransactions}
+                onEdit={(tx) => {
+                  setPanelState({ view: 'edit', editingTransaction: tx });
+                }}
+                onCreate={() => {
+                  setPanelState({ view: 'create' });
+                }}
+              />
+            </div>
+          )}
+          {panelState.view === 'edit' && (
+            <div className="space-y-2">
+              <Button
+                onClick={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                className="m-4 ml-6 flex"
+              >
+                <ChevronLeft />
+                목록으로
+              </Button>
+              <TransactionSubmitForm
+                transaction={panelState.editingTransaction}
+                onSuccess={async () => {
+                  await revalidateTransactions();
+                  setPanelState({ view: 'list' });
+                }}
+                onClose={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                mode="edit"
+              />
+            </div>
+          )}
+
+          {panelState.view === 'create' && (
+            <div className="space-y-2">
+              <Button
+                onClick={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                className="m-4 ml-6 flex"
+              >
+                <ChevronLeft />
+                목록으로
+              </Button>
+              <TransactionSubmitForm
+                defaultDate={selectedDate ?? undefined}
+                onSuccess={async () => {
+                  await revalidateTransactions();
+                  setPanelState({ view: 'list' });
+                }}
+                onClose={() => {
+                  setPanelState({ view: 'list' });
+                }}
+                mode="create"
               />
             </div>
           )}

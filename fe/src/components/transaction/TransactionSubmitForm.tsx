@@ -20,6 +20,7 @@ interface TransactionsSubmitFormProps {
   transaction?: ITransaction | null;
   onClose: () => void;
   onSuccess: () => void;
+  defaultDate?: Date;
 }
 
 export default function TransactionSubmitForm({
@@ -27,6 +28,7 @@ export default function TransactionSubmitForm({
   transaction,
   onClose,
   onSuccess,
+  defaultDate,
 }: TransactionsSubmitFormProps) {
   const initialFormData = useMemo(() => {
     if (mode === 'edit' && transaction) {
@@ -43,12 +45,12 @@ export default function TransactionSubmitForm({
         title: '',
         type: '' as '' | 'income' | 'expense',
         amount: '',
-        date: new Date(),
+        date: defaultDate ?? new Date(),
         category_id: '',
         tags: [] as string[],
       };
     }
-  }, [mode, transaction]);
+  }, [mode, transaction, defaultDate]);
 
   const {
     formData,
@@ -163,7 +165,7 @@ export default function TransactionSubmitForm({
       onSubmit={handleSubmit}
       className="mx-auto flex h-full w-full flex-col space-y-6 p-10 pt-2"
     >
-      <div className="sticky top-0 flex items-center justify-between border-b bg-white pb-4">
+      <div className="sticky top-0 flex items-center justify-between border-b bg-background pb-4">
         <Label className="text-xl">
           {mode === 'create' ? '가계부 작성' : '가계부 수정'}
         </Label>

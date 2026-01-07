@@ -6,11 +6,15 @@ import { TransactionFilter } from './TransactionFilter';
 interface TransactionListProps {
   transactions: ITransaction[];
   compact?: boolean;
+  onEdit?: (tx: ITransaction) => void;
+  onCreate?: () => void;
 }
 
 export const TransactionList = ({
   transactions,
   compact = false,
+  onEdit,
+  onCreate,
 }: TransactionListProps) => {
   if (compact) {
     return (
@@ -22,7 +26,11 @@ export const TransactionList = ({
             </p>
           ) : (
             transactions.map((transaction) => (
-              <TransactionItem key={transaction.id} transaction={transaction} />
+              <TransactionItem
+                key={transaction.id}
+                transaction={transaction}
+                onEdit={onEdit}
+              />
             ))
           )}
         </div>

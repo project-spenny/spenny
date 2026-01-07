@@ -1,5 +1,5 @@
 import { CategoryAnalysis, TransactionType } from '@/types/analysis';
-import { formatLocalDate, getMonthRange } from '@/utils/date';
+import { formatLocalDate, getMonthRange, minDate } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ITransaction } from '@/types/transactions';
@@ -53,10 +53,11 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
 
         // 분석 데이터 조회 전에 해당 월의 고정비 거래를 먼저 동기화
         const today = formatLocalDate(new Date());
+        const lastMonthThrough = minDate(prevEnd, today);
 
         await Promise.all([
           syncByMonthClient(selectedDate, today), // 현재 달 : 오늘까지 생성
-          syncByMonthClient(lastMonthDate, prevEnd), // 이전 달 : 월말까지 생성
+          syncByMonthClient(lastMonthDate, lastMonthThrough), // 이전 달 : 오늘(or 월말)까지 생성
         ]);
 
         // 지출(expense) 또는 수입(income) 타입이고, 해당 기간 내에 작성된 현재 유저의 기록만 조회
