@@ -59,3 +59,22 @@ export const parseLocalDate = (value?: string | null): Date | undefined => {
 
 // YYYY-MM-DD 형식 문자열 날짜 비교 (사전순 비교 = 날짜 비교)
 export const minDate = (a: string, b: string) => (a < b ? a : b);
+
+// 월 기준 일자 통계
+export type MonthDayStats = {
+  daysInMonth: number; // 이번 달 총 일수
+  dayOfMonth: number; // 오늘이 이번 달의 몇 번째 날인지
+  elapsedDays: number; // 어제까지 경과한 일수
+  remainingDays: number; // 오늘 포함 남은 일수
+};
+
+export const getMonthDayStats = (today: Date): MonthDayStats => {
+  const year = today.getFullYear();
+  const monthIndex = today.getMonth();
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const dayOfMonth = today.getDate(); // (1~말일)
+  const elapsedDays = Math.max(dayOfMonth - 1, 0);
+  const remainingDays = Math.max(daysInMonth - dayOfMonth + 1, 1);
+
+  return { daysInMonth, dayOfMonth, elapsedDays, remainingDays };
+};
