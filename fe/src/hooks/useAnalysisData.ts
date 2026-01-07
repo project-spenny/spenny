@@ -3,8 +3,8 @@ import { formatLocalDate, getMonthRange, minDate } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ITransaction } from '@/types/transactions';
+import { fetchTransactionByRange } from '@/services/analysis/analysisService';
 import { getCurrentUser } from '@/services/analysis/budgetService';
-import { supabase } from '@/utils/supabase/client';
 import { syncByMonthClient } from '@/services/fixed-costs/syncFixedTransactions.client';
 import { toast } from 'sonner';
 
@@ -39,9 +39,9 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
       try {
         setIsLoading(true);
 
-        // 현재 로그인한 유저 정보 가져오기
-        const user = await getCurrentUser();
+        const user = await getCurrentUser(); // 현재 로그인한 유저 정보 가져오기
 
+        // 날짜 범위 계산
         const { startDate, endDate } = getMonthRange(selectedDate);
         const lastMonthDate = new Date(
           selectedDate.getFullYear(),
@@ -60,46 +60,15 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
           syncByMonthClient(lastMonthDate, lastMonthThrough), // 이전 달 : 오늘(or 월말)까지 생성
         ]);
 
-        // 지출(expense) 또는 수입(income) 타입이고, 해당 기간 내에 작성된 현재 유저의 기록만 조회
+        // 서비스 함수 호출
         const [currentMonthRes, prevMonthRes] = await Promise.all([
-          supabase
-            .from('transactions')
-            .select(
-              `
-                *,
-                categories!category_id (
-                  name_ko,
-                  category_key
-                )
-              `
-            )
-            .eq('user_id', user.id)
-            .eq('type', type)
-            .gte('date', startDate)
-            .lte('date', endDate),
-          supabase
-            .from('transactions')
-            .select(
-              `
-                *,
-                categories!category_id (
-                  name_ko,
-                  category_key
-                )
-              `
-            )
-            .eq('user_id', user.id)
-            .eq('type', type)
-            .gte('date', prevStart)
-            .lte('date', prevEnd),
+          fetchTransactionByRange(user.id, type, startDate, endDate),
+          fetchTransactionByRange(user.id, type, prevStart, prevEnd),
         ]);
 
-        if (currentMonthRes.error) throw currentMonthRes.error;
-        if (prevMonthRes.error) throw prevMonthRes.error;
-
         setData({
-          current: currentMonthRes.data || [],
-          prev: prevMonthRes.data || [],
+          current: currentMonthRes,
+          prev: prevMonthRes,
         });
       } catch (err) {
         console.error(`[${typeLabel} 내역 조회 실패]`, err);
@@ -107,7 +76,7 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         const message =
           err instanceof Error
             ? err.message
-            : '내역을 불러오는 중 문제가 발생했습니다.';
+            : `${typeLabel} 내역을 불러오는 중 문제가 발생했습니다.`;
         toast.warning(message);
       } finally {
         setIsLoading(false);
