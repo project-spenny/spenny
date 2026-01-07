@@ -12,11 +12,15 @@ import { cn } from '@/lib/utils';
 import { formatDateKR } from '@/utils/date';
 import { CATEGORIES } from '@/constants/categories';
 import { useSelected } from '@/app/(app)/history/TransactionContext';
+
+interface TransactionItemProps {
+  transaction: ITransaction;
+  onEdit?: (tx: ITransaction) => void;
+}
 export const TransactionItem = ({
   transaction,
-}: {
-  transaction: ITransaction;
-}) => {
+  onEdit,
+}: TransactionItemProps) => {
   const { openEdit } = useSelected();
   return (
     <Item variant="outline">
@@ -49,7 +53,12 @@ export const TransactionItem = ({
           <Button
             className="cursor-pointer"
             size="sm"
-            onClick={() => openEdit(transaction)}
+            onClick={() => {
+              if (onEdit) {
+                onEdit(transaction);
+              }
+              openEdit(transaction);
+            }}
           >
             <ChevronRight />
           </Button>

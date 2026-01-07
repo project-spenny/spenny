@@ -3,7 +3,7 @@ export interface ITransaction {
   title: string;
   user_id: string;
   category_id: string;
-  type: 'income' | 'expense';
+  type: 'income' | 'expense' | '';
   date: string;
   amount: number;
   fixed_rule_id: string | null;
