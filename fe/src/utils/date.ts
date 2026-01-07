@@ -21,8 +21,8 @@ export const getWeekRange = (date: Date) => {
   const end = endOfWeek(date, { weekStartsOn: 1 });
 
   return {
-    startDate: start.toISOString().slice(0, 10),
-    endDate: end.toISOString().slice(0, 10),
+    startDate: formatLocalDate(start),
+    endDate: formatLocalDate(end),
   };
 };
 
@@ -56,3 +56,6 @@ export const parseLocalDate = (value?: string | null): Date | undefined => {
   const [year, month, day] = value.split('-').map(Number);
   return new Date(year, (month ?? 1) - 1, day ?? 1, 0, 0, 0, 0);
 };
+
+// YYYY-MM-DD 형식 문자열 날짜 비교 (사전순 비교 = 날짜 비교)
+export const minDate = (a: string, b: string) => (a < b ? a : b);
