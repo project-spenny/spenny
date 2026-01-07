@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import ResponsivePanel from '../panel/ResponsivePanel';
+import { DailyRecPanel } from './DailyRecPanel';
 
 type Props = {
   amount: number; // 일일 권장 사용 금액
@@ -43,7 +44,7 @@ export const DailyRecBar = ({ amount, varRemaining, remainingDays }: Props) => {
             </Button>
           }
         >
-          <div>패널</div>
+          <DailyRecPanel />
         </ResponsivePanel>
       </div>
     </>
