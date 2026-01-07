@@ -1,7 +1,22 @@
+import { ITransaction } from '@/types/transactions';
+
 /**
  * 거래 내역의 타입 (지출 또는 수입)
  */
 export type TransactionType = 'expense' | 'income';
+
+/**
+ * 카테고리가 포함된 거래 내역 타입
+ */
+export type TransactionAnalysis = Pick<
+  ITransaction,
+  'amount' | 'date' | 'type' | 'category_id'
+> & {
+  category: {
+    name_ko: string;
+    category_key: string;
+  } | null;
+};
 
 /**
  * 카테고리별 통계 분석 데이터 타입

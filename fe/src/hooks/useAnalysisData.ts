@@ -1,23 +1,19 @@
-import { CategoryAnalysis, TransactionType } from '@/types/analysis';
+import {
+  CategoryAnalysis,
+  TransactionAnalysis,
+  TransactionType,
+} from '@/types/analysis';
 import { formatLocalDate, getMonthRange, minDate } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
-import { ITransaction } from '@/types/transactions';
 import { fetchTransactionByRange } from '@/services/analysis/analysisService';
 import { getCurrentUser } from '@/services/analysis/budgetService';
 import { syncByMonthClient } from '@/services/fixed-costs/syncFixedTransactions.client';
 import { toast } from 'sonner';
 
-interface ITransactionWithCategory extends ITransaction {
-  categories: {
-    name_ko: string;
-    category_key: string;
-  } | null;
-}
-
 type AnalysisState = {
-  current: ITransactionWithCategory[];
-  prev: ITransactionWithCategory[];
+  current: TransactionAnalysis[];
+  prev: TransactionAnalysis[];
 };
 
 // 카테고리 명: 값(합계 금액)
@@ -100,8 +96,8 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
 
       // 카테고리별 그룹화 및 합계 계산
       const grouped = current.reduce<CategoryGroup>((acc, item) => {
-        const categoryName = item.categories?.name_ko || '기타';
-        const categoryKey = item.categories?.category_key;
+        const categoryName = item.category?.name_ko || '기타';
+        const categoryKey = item.category?.category_key;
 
         // 카테고리가 첫 등장이면 0으로 초기화
         if (!acc[categoryName]) acc[categoryName] = 0;

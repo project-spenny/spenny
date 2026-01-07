@@ -1,4 +1,5 @@
-import { TransactionType } from '@/types/analysis';
+import { TransactionAnalysis, TransactionType } from '@/types/analysis';
+
 import { supabase } from '@/utils/supabase/client';
 
 // 특정 기간 동안 특정 유저의 거래 내역 조회
@@ -7,13 +8,16 @@ export const fetchTransactionByRange = async (
   type: TransactionType,
   startDate: string,
   endDate: string
-) => {
+): Promise<TransactionAnalysis[]> => {
   const { data, error } = await supabase
     .from('transactions')
     .select(
       `
-        *,
-        categories!category_id (
+        amount,
+        date,
+        type,
+        category_id,
+        category:categories!category_id (
           name_ko,
           category_key
         )
@@ -22,8 +26,20 @@ export const fetchTransactionByRange = async (
     .eq('user_id', userId)
     .eq('type', type)
     .gte('date', startDate)
-    .lte('date', endDate);
+    .lte('date', endDate)
+    .order('date', { ascending: false });
+
+  console.log(data);
 
   if (error) throw error;
-  return data || [];
+
+  // 단일 객체로 정규화
+  const normalized: TransactionAnalysis[] = (data ?? []).map((t) => ({
+    ...t,
+    category: Array.isArray(t.category) // category가 배열인지 검사
+      ? (t.category[0] ?? null)
+      : (t.category ?? null),
+  }));
+
+  return normalized;
 };
