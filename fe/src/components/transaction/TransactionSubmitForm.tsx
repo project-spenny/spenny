@@ -165,7 +165,7 @@ export default function TransactionSubmitForm({
       onSubmit={handleSubmit}
       className="mx-auto flex h-full w-full flex-col space-y-6 p-10 pt-2"
     >
-      <div className="sticky top-0 flex items-center justify-between border-b bg-white pb-4">
+      <div className="sticky top-0 flex items-center justify-between border-b bg-background pb-4">
         <Label className="text-xl">
           {mode === 'create' ? '가계부 작성' : '가계부 수정'}
         </Label>
