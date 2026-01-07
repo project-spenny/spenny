@@ -91,6 +91,7 @@ export const syncByMonthShared = async (
     generateThroughDate && generateThroughDate < endDate
       ? generateThroughDate
       : endDate;
+  if (startDate > effectiveEndDate) return { createCount: 0 };
 
   // 해당 월에 유효한 고정비 규칙 조회
   const rules = await deps.fetchFixedRules({
