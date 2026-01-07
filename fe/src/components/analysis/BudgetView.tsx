@@ -3,6 +3,7 @@ import { Calculator, Edit, ListPlus } from 'lucide-react';
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
+import BudgetRecommendDialog from './BudgetRecommendDialog';
 import BudgetSetupDialog from '@/components/analysis/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
 import CategoryBudgetSetting from '@/components/analysis/CategoryBudgetSetting';
@@ -36,6 +37,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
   const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
+  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
   const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(
     null
   );
@@ -88,13 +90,22 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
             description="지출을 관리하기 위해 먼저 한 달 총 예산을 정해볼까요?"
             icon={Calculator}
           >
-            <Button
-              variant="secondary"
-              className="bg-primary/5 hover:bg-primary/10 mt-2 cursor-pointer"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              이번 달 예산 설정하기
-            </Button>
+            <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
+              <Button
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => setIsRecommendOpen(true)}
+              >
+                추천 템플릿으로 시작
+              </Button>
+
+              <Button
+                className="cursor-pointer"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                이번 달 예산 설정하기
+              </Button>
+            </div>
           </AnalysisEmpty>
         </div>
       ) : (
@@ -472,6 +483,12 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
         onOpenChange={setIsDialogOpen}
         selectedDate={selectedDate}
         defaultAmount={totalBudget?.amount} // 기존 금액 전달
+      />
+
+      <BudgetRecommendDialog
+        open={isRecommendOpen}
+        onOpenChange={setIsRecommendOpen}
+        selectedDate={selectedDate}
       />
 
       {/* 총 예산 초기화 모달창 */}
