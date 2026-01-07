@@ -53,11 +53,7 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
           title={`이번 달 ${config.label}이 없어요!`}
           description={config.emptyDescription}
         >
-          <Button
-            variant="secondary"
-            className="bg-primary/5 hover:bg-primary/10 mt-2"
-            asChild
-          >
+          <Button asChild>
             <Link href={'/'}>기록하러 가기</Link>
           </Button>
         </AnalysisEmpty>
