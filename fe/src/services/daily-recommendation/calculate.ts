@@ -31,6 +31,9 @@ export type DailyRecResult = {
   debug: DailyRecDebug;
 };
 
+// 계산 결과를 항상 0 이상인 유한한 숫자로 보정
+const toNonNegative = (n: number) => (Number.isFinite(n) ? Math.max(n, 0) : 0);
+
 // 일일 권장 사용 금액 계산
 export const calculateDailyRec = (input: DailyRecInput): DailyRecResult => {
   // 날짜 통계
@@ -38,17 +41,19 @@ export const calculateDailyRec = (input: DailyRecInput): DailyRecResult => {
     getMonthDayStats(input.today);
 
   // 이번 달 가변 총액
-  const varTotal = input.budget - input.fixedPlannedThisMonth;
+  const varTotal = toNonNegative(input.budget - input.fixedPlannedThisMonth);
 
   // 어제까지 가변 지출
-  const varSpentUntilYesterday =
-    input.spentTotalUntilYesterday - input.spentFixedUntilYesterday;
+  const varSpentUntilYesterday = toNonNegative(
+    input.spentTotalUntilYesterday - input.spentFixedUntilYesterday
+  );
+
   // 남은 가변 예산
-  const varRemaining = varTotal - varSpentUntilYesterday;
+  const varRemaining = toNonNegative(varTotal - varSpentUntilYesterday);
 
   // 기본 일일 한도
   const baseDaily = remainingDays > 0 ? varRemaining / remainingDays : 0;
-  const amount = Math.floor(Math.min(baseDaily, varRemaining));
+  const amount = Math.floor(Math.min(toNonNegative(baseDaily), varRemaining));
 
   return {
     amount,
