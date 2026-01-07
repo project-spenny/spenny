@@ -27,7 +27,7 @@ export default async function Home({ searchParams }: PageProps) {
   };
 
   return (
-    <div className="flex w-full max-w-6xl">
+    <div className="flex w-full max-w-6xl self-start min-h-[900px]">
       <TransactionProvider>
         <CalendarProvider>
           <Suspense fallback={<CalendarSkeleton />}>
