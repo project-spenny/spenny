@@ -7,6 +7,7 @@ import { getMonthRange } from '@/utils/date';
 import { CalendarProvider } from '@/context/CalendarContext';
 import { TransactionProvider } from './history/TransactionContext';
 import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
+import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 interface PageProps {
   searchParams: Promise<{
     month?: string;
@@ -27,7 +28,7 @@ export default async function Home({ searchParams }: PageProps) {
   };
 
   return (
-    <div className="flex w-full max-w-6xl self-start min-h-[900px]">
+    <div className="flex min-h-[900px] w-full max-w-6xl self-start">
       <TransactionProvider>
         <CalendarProvider>
           <Suspense fallback={<CalendarSkeleton />}>
@@ -53,5 +54,18 @@ async function DataCalendar({
   selectedDate?: string;
 }) {
   const transactions = await getTransaction(filters, true);
-  return <Calendar currentMonth={currentMonth} transactions={transactions} />;
+  const amount = 0;
+  const varRemaining = 0;
+  const remainingDays = 0;
+  return (
+    <div className="flex w-full flex-col gap-3">
+      <DailyRecBar
+        amount={amount}
+        varRemaining={varRemaining}
+        remainingDays={remainingDays}
+      />
+
+      <Calendar currentMonth={currentMonth} transactions={transactions} />
+    </div>
+  );
 }
