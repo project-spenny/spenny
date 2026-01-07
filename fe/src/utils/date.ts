@@ -21,8 +21,8 @@ export const getWeekRange = (date: Date) => {
   const end = endOfWeek(date, { weekStartsOn: 1 });
 
   return {
-    startDate: start.toISOString().slice(0, 10),
-    endDate: end.toISOString().slice(0, 10),
+    startDate: formatLocalDate(start),
+    endDate: formatLocalDate(end),
   };
 };
 
