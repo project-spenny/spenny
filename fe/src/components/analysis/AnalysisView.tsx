@@ -6,8 +6,10 @@ import { ANALYSIS_CONFIG } from '@/constants/analysis';
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import CategoryAnalysisList from '@/components/analysis/common/CategoryAnalysisList';
-import CategoryChart from '@/components/analysis/common/CategoryChart';
+import { Button } from '@/components/ui/button';
+import CategoryAnalysisList from '@/components/analysis/CategoryAnalysisList';
+import CategoryChart from '@/components/analysis/CategoryChart';
+import Link from 'next/link';
 import { PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { TransactionType } from '@/types/analysis';
@@ -50,7 +52,15 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
         <AnalysisEmpty
           title={`이번 달 ${config.label}이 없어요!`}
           description={config.emptyDescription}
-        />
+        >
+          <Button
+            variant="secondary"
+            className="bg-primary/5 hover:bg-primary/10 mt-2"
+            asChild
+          >
+            <Link href={'/'}>기록하러 가기</Link>
+          </Button>
+        </AnalysisEmpty>
       </div>
     );
   }

@@ -3,6 +3,7 @@ import { formatLocalDate, getMonthRange, minDate } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ITransaction } from '@/types/transactions';
+import { getCurrentUser } from '@/services/analysis/budgetService';
 import { supabase } from '@/utils/supabase/client';
 import { syncByMonthClient } from '@/services/fixed-costs/syncFixedTransactions.client';
 import { toast } from 'sonner';
@@ -38,6 +39,9 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
       try {
         setIsLoading(true);
 
+        // 현재 로그인한 유저 정보 가져오기
+        const user = await getCurrentUser();
+
         const { startDate, endDate } = getMonthRange(selectedDate);
         const lastMonthDate = new Date(
           selectedDate.getFullYear(),
@@ -46,18 +50,6 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         );
         const { startDate: prevStart, endDate: prevEnd } =
           getMonthRange(lastMonthDate);
-
-        // Supabase에서 현재 로그인한 유저 정보 가져오기
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (!user || authError) {
-          toast.warning('로그인이 필요합니다');
-          setIsLoading(false);
-          return;
-        }
 
         // 분석 데이터 조회 전에 해당 월의 고정비 거래를 먼저 동기화
         const today = formatLocalDate(new Date());
@@ -111,9 +103,12 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         });
       } catch (err) {
         console.error(`[${typeLabel} 내역 조회 실패]`, err);
-        toast.error(
-          `${typeLabel} 내역을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.`
-        );
+
+        const message =
+          err instanceof Error
+            ? err.message
+            : '내역을 불러오는 중 문제가 발생했습니다.';
+        toast.warning(message);
       } finally {
         setIsLoading(false);
       }
@@ -122,41 +117,52 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
     fetchData();
   }, [selectedDate, type]);
 
-  const { totalAmount, prevAmount, categoryData } = useMemo(() => {
-    // 현재/이전 달 총액 계산
-    const currentTotal = current.reduce(
-      (sum, item) => sum + (item.amount || 0),
-      0
-    );
-    const lastTotal = prev.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const { totalAmount, prevAmount, categoryData, categoryTotalsByKey } =
+    useMemo(() => {
+      // 현재/이전 달 총액 계산
+      const currentTotal = current.reduce(
+        (sum, item) => sum + (item.amount || 0),
+        0
+      );
+      const lastTotal = prev.reduce((sum, item) => sum + (item.amount || 0), 0);
 
-    // 카테고리별 그룹화 및 합계 계산
-    const grouped = current.reduce<CategoryGroup>((acc, item) => {
-      const categoryName = item.categories?.name_ko || '기타';
+      // 카테고리 ID별 합계를 담을 객체
+      const totalsByKey: Record<string, number> = {};
 
-      // 카테고리가 첫 등장이면 0으로 초기화
-      if (!acc[categoryName]) acc[categoryName] = 0;
-      // 거래 금액 합산 (누적)
-      acc[categoryName] += item.amount || 0;
+      // 카테고리별 그룹화 및 합계 계산
+      const grouped = current.reduce<CategoryGroup>((acc, item) => {
+        const categoryName = item.categories?.name_ko || '기타';
+        const categoryKey = item.categories?.category_key;
 
-      return acc;
-    }, {});
+        // 카테고리가 첫 등장이면 0으로 초기화
+        if (!acc[categoryName]) acc[categoryName] = 0;
+        // 거래 금액 합산 (누적)
+        acc[categoryName] += item.amount || 0;
 
-    // 배열 변환 및 정렬, 비율 계산
-    const sortedCategoryData: CategoryAnalysis[] = Object.entries(grouped)
-      .map(([name, amount]) => ({
-        name,
-        amount,
-        percentage: currentTotal > 0 ? (amount / currentTotal) * 100 : 0,
-      }))
-      .sort((a, b) => b.amount - a.amount);
+        if (categoryKey) {
+          totalsByKey[categoryKey] =
+            (totalsByKey[categoryKey] || 0) + (item.amount || 0);
+        }
 
-    return {
-      totalAmount: currentTotal,
-      prevAmount: lastTotal,
-      categoryData: sortedCategoryData,
-    };
-  }, [current, prev]);
+        return acc;
+      }, {});
+
+      // 배열 변환 및 정렬, 비율 계산
+      const sortedCategoryData: CategoryAnalysis[] = Object.entries(grouped)
+        .map(([name, amount]) => ({
+          name,
+          amount,
+          percentage: currentTotal > 0 ? (amount / currentTotal) * 100 : 0,
+        }))
+        .sort((a, b) => b.amount - a.amount);
+
+      return {
+        totalAmount: currentTotal,
+        prevAmount: lastTotal,
+        categoryData: sortedCategoryData,
+        categoryTotalsByKey: totalsByKey,
+      };
+    }, [current, prev]);
 
   const diff = totalAmount - prevAmount;
 
@@ -167,5 +173,6 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
     diff,
     isLoading,
     categoryData,
+    categoryTotalsByKey,
   };
 };

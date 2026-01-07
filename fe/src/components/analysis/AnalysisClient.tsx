@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import AnalysisView from '@/components/analysis/AnalysisView';
+import BudgetView from '@/components/analysis/BudgetView';
 import { Button } from '@/components/ui/button';
 
 const AnalysisClient = () => {
@@ -42,7 +43,7 @@ const AnalysisClient = () => {
       value: '수입',
       content: <AnalysisView type="income" selectedDate={currentDate} />,
     },
-    { value: '예산', content: '예산 분석 컴포넌트' },
+    { value: '예산', content: <BudgetView selectedDate={currentDate} /> },
   ];
 
   return (
