@@ -2,14 +2,17 @@
 import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
 import { Receipt } from 'lucide-react';
+import { Spinner } from '../ui/spinner';
 export default function OCR() {
   const [result, setResult] = useState(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
 
+    setLoading(true);
     reader.onloadend = async () => {
       const res = await fetch('/api/ocr', {
         method: 'POST',
@@ -17,6 +20,7 @@ export default function OCR() {
         body: JSON.stringify({ image: reader.result }),
       });
       setResult(await res.json());
+      setLoading(false);
     };
 
     reader.readAsDataURL(file);
@@ -29,7 +33,7 @@ export default function OCR() {
         className="fixed bottom-0 z-50 m-4 h-16 w-16 cursor-pointer rounded-full"
         asChild
       >
-        <Receipt size={20} />
+        {loading ? <Spinner /> : <Receipt size={20} />}
       </Button>
       <input
         ref={inputRef}
