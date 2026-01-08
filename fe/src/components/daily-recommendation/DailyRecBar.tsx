@@ -8,10 +8,9 @@ import { DailyRecResult } from '@/services/daily-recommendation/calculate';
 
 type Props = {
   daily: DailyRecResult;
-  budget: number;
 };
 
-export const DailyRecBar = ({ daily, budget }: Props) => {
+export const DailyRecBar = ({ daily }: Props) => {
   return (
     <>
       {/* 안내 바 */}
@@ -27,8 +26,7 @@ export const DailyRecBar = ({ daily, budget }: Props) => {
 
           <div className="text-muted-foreground text-xs">
             남은 사용 가능 금액 {daily.debug.varRemaining.toLocaleString()}원 ·
-            남은 {daily.debug.remainingDays}일 · 이번 달 총 예산{' '}
-            {budget.toLocaleString()}원
+            남은 {daily.debug.remainingDays}일
           </div>
         </div>
 

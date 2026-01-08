@@ -100,7 +100,7 @@ async function DataCalendar({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <DailyRecBar daily={daily} budget={budget} />
+      <DailyRecBar daily={daily} />
       <Calendar currentMonth={currentMonth} transactions={transactions} />
     </div>
   );
