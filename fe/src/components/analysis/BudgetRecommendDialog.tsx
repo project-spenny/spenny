@@ -1,15 +1,13 @@
 import { ArrowRight, Info } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
+import { useMemo, useState } from 'react';
 
-import { Button } from '../ui/button';
-import { Progress } from '../ui/progress';
-import { useState } from 'react';
+import { BUDGET_GROUPS } from '@/constants/analysis';
+import { Button } from '@/components/ui/button';
+import { CategoryGroupId } from '@/types/budgetGuide';
+import ExpenseAnalysisStep from './Budget/ExpenseAnalysisStep';
+import { Progress } from '@/components/ui/progress';
+import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
   open: boolean;
@@ -23,6 +21,45 @@ const BudgetRecommendDialog = ({
   selectedDate,
 }: BudgetRecommendDialogProps) => {
   const [step, setStep] = useState(1);
+  const [targetSaving, setTargetSaving] = useState(0); // 저축 목표액
+
+  const { processedData, isLoading } = useBudgetGuideData(
+    selectedDate,
+    targetSaving
+  );
+
+  // UI용 그룹 데이터 가공
+  const groupDisplayData = useMemo(() => {
+    if (!processedData) return [];
+
+    const { groupAverages, avgTotal } = processedData.summary;
+
+    return BUDGET_GROUPS.map((group) => {
+      // processedData에서 해당 그룹의 평균 금액 가져오기
+      const amount = groupAverages[group.id as CategoryGroupId] || 0;
+      // 전체에서 차지하는 비중 계산 (분모가 0일 경우 대비)
+      const percent = avgTotal > 0 ? Math.round((amount / avgTotal) * 100) : 0;
+
+      return { ...group, amount, percent };
+    });
+  }, [processedData]);
+
+  if (isLoading)
+    return (
+      <div className="text-muted-foreground p-10 text-center text-sm">
+        소비 패턴 분석 중...
+      </div>
+    );
+  if (!processedData)
+    return (
+      <div className="p-10 text-center text-sm">
+        분석할 지출 데이터가 부족합니다.
+      </div>
+    );
+
+  const { monthlyData, summary, lastMonthIncome, spendableBudget } =
+    processedData;
+  const activeMonths = monthlyData.length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -33,36 +70,24 @@ const BudgetRecommendDialog = ({
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
+          {/* Step 1: 소비 패턴 분석 */}
           {step === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
-              <header className="space-y-2">
-                <div className="font-semibold">소비 패턴 분석</div>
-                <DialogTitle className="text-lg font-bold">
-                  최근 3개월 지출을 그룹별로 분석해봤어요
-                </DialogTitle>
-                <DialogDescription>
-                  가장 정교한 예산 초안을 만들기 위한 데이터입니다.
-                </DialogDescription>
-              </header>
-
-              {/* 그룹별 비중 바 차트 */}
-              <div className="space-y-3">그룹별 비중 바 차트</div>
-
-              {/* 분석 인사이트 */}
-              <div className="bg-primary/5 border-primary/10 rounded-xl border p-4">
-                분석 인사이트
-              </div>
-
-              {/* 상세 리스트 */}
-              <div className="space-y-2 pt-2">상세 리스트</div>
-            </div>
+            <ExpenseAnalysisStep
+              activeMonths={activeMonths}
+              avgTotal={summary.avgTotal}
+              monthlyData={monthlyData}
+              groupDisplayData={groupDisplayData}
+            />
           )}
 
-          {/* step 2, 3 등 추후 추가 예정 */}
+          {/* Step 2: 저축 목표 및 가용 예산 확정 */}
           {step === 2 && (
-            <div className="text-muted-foreground py-10 text-center italic">
-              템플릿 선택 화면 준비 중...
-            </div>
+            <div className="py-10 text-center">저축 목표 및 가용 예산 확정</div>
+          )}
+
+          {/* Step 3: 템플릿 선택 및 결과 확인 */}
+          {step === 3 && (
+            <div className="py-10 text-center">템플릿 선택 및 결과 확인</div>
           )}
         </div>
 
