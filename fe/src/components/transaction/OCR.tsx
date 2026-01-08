@@ -3,7 +3,13 @@ import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
 import { Receipt } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
-export default function OCR() {
+import { OCRResult } from '@/app/(app)/history/TransactionClient';
+
+interface OCRProps {
+  onResult: (data: OCRResult) => void;
+}
+
+export default function OCR({ onResult }: OCRProps) {
   const [result, setResult] = useState(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
@@ -19,7 +25,9 @@ export default function OCR() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: reader.result }),
       });
-      setResult(await res.json());
+      const data = await res.json();
+      onResult(data);
+      setResult(data);
       setLoading(false);
     };
 

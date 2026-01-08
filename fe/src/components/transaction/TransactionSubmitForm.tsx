@@ -14,12 +14,14 @@ import { TagInput } from './common/TagInput';
 import { TitleInput } from './common/TitleInput';
 import { TypeSelector } from './common/TypeSelector';
 import { CategorySelector } from './common/CategorySelector';
+import { OCRResult } from '@/app/(app)/history/TransactionClient';
 
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';
   transaction?: ITransaction | null;
   onClose: () => void;
   onSuccess: () => void;
+  defaultValue?: OCRResult | null;
   defaultDate?: Date;
 }
 
@@ -29,6 +31,7 @@ export default function TransactionSubmitForm({
   onClose,
   onSuccess,
   defaultDate,
+  defaultValue,
 }: TransactionsSubmitFormProps) {
   const initialFormData = useMemo(() => {
     if (mode === 'edit' && transaction) {
@@ -41,16 +44,27 @@ export default function TransactionSubmitForm({
         tags: transaction.tags || [],
       };
     } else {
-      return {
-        title: '',
-        type: '' as '' | 'income' | 'expense',
-        amount: '',
-        date: defaultDate ?? new Date(),
-        category_id: '',
-        tags: [] as string[],
-      };
+      if (defaultValue) {
+        return {
+          title: defaultValue.title,
+          type: 'expense',
+          amount: defaultValue.amount.toString(),
+          date: defaultDate ?? new Date(),
+          category_id: defaultValue.category_id,
+          tags: [] as string[],
+        };
+      } else {
+        return {
+          title: '',
+          type: '' as '' | 'income' | 'expense',
+          amount: '',
+          date: defaultDate ?? new Date(),
+          category_id: '',
+          tags: [] as string[],
+        };
+      }
     }
-  }, [mode, transaction, defaultDate]);
+  }, [mode, transaction, defaultDate, defaultValue]);
 
   const {
     formData,
@@ -165,7 +179,7 @@ export default function TransactionSubmitForm({
       onSubmit={handleSubmit}
       className="mx-auto flex h-full w-full flex-col space-y-6 p-10 pt-2"
     >
-      <div className="sticky top-0 flex items-center justify-between border-b bg-background pb-4">
+      <div className="bg-background sticky top-0 flex items-center justify-between border-b pb-4">
         <Label className="text-xl">
           {mode === 'create' ? '가계부 작성' : '가계부 수정'}
         </Label>
