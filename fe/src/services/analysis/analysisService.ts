@@ -29,8 +29,6 @@ export const fetchTransactionByRange = async (
     .lte('date', endDate)
     .order('date', { ascending: false });
 
-  console.log(data);
-
   if (error) throw error;
 
   // 단일 객체로 정규화
