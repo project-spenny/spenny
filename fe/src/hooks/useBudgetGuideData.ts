@@ -12,7 +12,7 @@ import { getCurrentUser } from '@/services/analysis/budgetService';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-const useBudgetGuideData = (selectedDate: Date) => {
+const useBudgetGuideData = (selectedDate: Date, targetSaving: number = 0) => {
   const { data: rawTransactionData, isLoading } = useQuery({
     queryKey: ['budget-guide', formatMonth(selectedDate)],
     queryFn: async () => {
@@ -132,13 +132,18 @@ const useBudgetGuideData = (selectedDate: Date) => {
       return acc;
     }, {});
 
+    // 가용 예산 = (Income - Saving)
+    const spendableBudget = lastMonthIncome - targetSaving;
+
     return {
       lastMonthIncome,
+      targetSaving,
+      spendableBudget,
       monthlyData,
       summary,
       categoryStats,
     };
-  }, [rawTransactionData]);
+  }, [rawTransactionData, targetSaving]);
 
   return { isLoading, processedData };
 };
