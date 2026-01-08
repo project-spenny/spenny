@@ -79,13 +79,23 @@ export const syncByMonthShared = async (
   deps: SyncDeps,
   args: {
     userId: string;
+    isGuest?: boolean;
     monthDate: Date;
     startDate: string;
     endDate: string;
     generateThroughDate?: string;
   }
 ) => {
-  const { userId, monthDate, startDate, endDate, generateThroughDate } = args;
+  const {
+    userId,
+    isGuest,
+    monthDate,
+    startDate,
+    endDate,
+    generateThroughDate,
+  } = args;
+
+  if (isGuest) return { createdCount: 0 };
 
   // 생성 범위 상한 : 월말(endDate)과 generateThroughDate 중 더 이른 날짜
   const effectiveEndDate = generateThroughDate
