@@ -1,6 +1,12 @@
 import { DailyRecResult } from '@/services/daily-recommendation/calculate';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 type Props = {
@@ -48,64 +54,71 @@ export const DailyRecPanel = ({ daily }: Props) => {
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
         {/* 요약 카드 */}
-        <section>
-          <Card>
-            <CardHeader>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-muted-foreground text-xs">
-                    오늘 권장 사용 금액
-                  </p>
-                  <CardTitle className="text-2xl">
-                    {amount.toLocaleString()}원
-                  </CardTitle>
-                </div>
-
-                <Badge variant="outline">{title}</Badge>
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-muted-foreground text-xs">
+                  오늘 권장 사용 금액
+                </p>
+                <CardTitle className="text-2xl">
+                  {amount.toLocaleString()}원
+                </CardTitle>
               </div>
-            </CardHeader>
 
-            <CardContent>
-              <p className="text-muted-foreground text-xs">{desc}</p>
-            </CardContent>
-          </Card>
-        </section>
+              <Badge variant="outline">{title}</Badge>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-muted-foreground text-xs">{desc}</p>
+          </CardContent>
+        </Card>
 
         {/* 이번 달 사용 현황 (가변 예산 기준) */}
-        <section className="space-y-3 rounded-xl border p-4">
-          <div className="flex items-end justify-between">
-            <h3 className="font-medium">이번 달 가변 예산 사용 현황</h3>
-            <p className="text-muted-foreground text-xs">어제까지 기준</p>
-          </div>
-
-          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
-            {/* Doughnut */}
-            <div className="bg-muted/30 text-muted-foreground flex h-[120px] w-[120px] items-center justify-center rounded-md text-xs">
-              Doughnut
+        <Card>
+          <CardHeader>
+            <div className="flex items-end justify-between">
+              <CardTitle className="text-base">
+                이번 달 가변 예산 사용 현황
+              </CardTitle>
+              <p className="text-muted-foreground text-xs">어제까지 기준</p>
             </div>
+            <CardDescription className="text-xs">
+              총 예산에서 고정비를 제외한 금액이에요.
+            </CardDescription>
+          </CardHeader>
 
-            <div className="space-y-1">
-              <p className="flex justify-between">
-                <span className="text-muted-foreground">가변 예산</span>
-                <span className="font-medium">
-                  {varTotal.toLocaleString()}원
-                </span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-muted-foreground">사용</span>
-                <span className="font-medium">
-                  {varSpentUntilYesterday.toLocaleString()}원
-                </span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-muted-foreground">남음</span>
-                <span className="font-medium">
-                  {varRemaining.toLocaleString()}원
-                </span>
-              </p>
+          <CardContent>
+            <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+              {/* Doughnut */}
+              <div className="bg-muted/30 text-muted-foreground flex h-[120px] w-[120px] items-center justify-center rounded-md text-xs">
+                Doughnut
+              </div>
+
+              <div className="space-y-1">
+                <p className="flex justify-between">
+                  <span className="text-muted-foreground">가변 예산</span>
+                  <span className="font-medium">
+                    {varTotal.toLocaleString()}원
+                  </span>
+                </p>
+                <p className="flex justify-between">
+                  <span className="text-muted-foreground">사용</span>
+                  <span className="font-medium">
+                    {varSpentUntilYesterday.toLocaleString()}원
+                  </span>
+                </p>
+                <p className="flex justify-between">
+                  <span className="text-muted-foreground">남음</span>
+                  <span className="font-medium">
+                    {varRemaining.toLocaleString()}원
+                  </span>
+                </p>
+              </div>
             </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
 
         {/* 계획 vs 실제 누적 */}
         <section className="space-y-3 rounded-xl border p-4">
