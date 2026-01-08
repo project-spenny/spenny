@@ -4,32 +4,43 @@ import { Button } from '../ui/button';
 import { Receipt } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
-
+import { toast } from 'sonner';
 interface OCRProps {
   onResult: (data: OCRResult) => void;
 }
 
 export default function OCR({ onResult }: OCRProps) {
-  const [result, setResult] = useState(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     const reader = new FileReader();
 
     setLoading(true);
     reader.onloadend = async () => {
-      const res = await fetch('/api/ocr', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: reader.result }),
-      });
-      const data = await res.json();
-      onResult(data);
-      setResult(data);
-      setLoading(false);
+      try {
+        const res = await fetch('/api/ocr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: reader.result }),
+        });
+        if (!res.ok) {
+          throw new Error('OCR Request Failed');
+        }
+        const data = await res.json();
+        toast(`영수증 인식이 완료 되었습니다`);
+        onResult(data);
+      } catch (error) {
+        toast(`${error} : 영수증 인식에 실패했습니다`);
+      } finally {
+        setLoading(false);
+        if (inputRef.current) {
+          inputRef.current.value = '';
+        }
+      }
     };
 
     reader.readAsDataURL(file);
@@ -52,7 +63,6 @@ export default function OCR({ onResult }: OCRProps) {
         onChange={handleUpload}
         hidden
       />
-      <div>{JSON.stringify(result)}</div>
     </div>
   );
 }
