@@ -7,6 +7,7 @@ import { getMonthRange } from '@/utils/date';
 import { CalendarProvider } from '@/context/CalendarContext';
 import { TransactionProvider } from './history/TransactionContext';
 import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
+import TestOCR from '@/components/transaction/TestOCR';
 interface PageProps {
   searchParams: Promise<{
     month?: string;
@@ -27,7 +28,7 @@ export default async function Home({ searchParams }: PageProps) {
   };
 
   return (
-    <div className="flex w-full max-w-6xl self-start min-h-[900px]">
+    <div className="flex min-h-[900px] w-full max-w-6xl self-start">
       <TransactionProvider>
         <CalendarProvider>
           <Suspense fallback={<CalendarSkeleton />}>
@@ -39,6 +40,7 @@ export default async function Home({ searchParams }: PageProps) {
           </Suspense>
         </CalendarProvider>
       </TransactionProvider>
+      <TestOCR />
     </div>
   );
 }
