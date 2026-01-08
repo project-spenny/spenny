@@ -8,13 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useSelected } from './TransactionContext';
 import OCR from '@/components/transaction/OCR';
 import { useState } from 'react';
-
-export interface OCRResult {
-  title: string;
-  date: Date;
-  category_id: string;
-  amount: number;
-}
+import { OCRResult } from '@/types/transactions';
 
 export default function TransactionClient() {
   const router = useRouter();

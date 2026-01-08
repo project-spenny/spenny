@@ -6,15 +6,13 @@ import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { Trash } from 'lucide-react';
 import { useTransactionForm } from '@/hooks/useTransactionForm';
-import { ITransaction } from '@/types/transactions';
-
+import { ITransaction, OCRResult } from '@/types/transactions';
 import { AmountInput } from './common/AmountInput';
 import { DatePicker } from './common/DatePicker';
 import { TagInput } from './common/TagInput';
 import { TitleInput } from './common/TitleInput';
 import { TypeSelector } from './common/TypeSelector';
 import { CategorySelector } from './common/CategorySelector';
-import { OCRResult } from '@/app/(app)/history/TransactionClient';
 
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';

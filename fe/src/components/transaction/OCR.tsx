@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
 import { Receipt } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
-import { OCRResult } from '@/app/(app)/history/TransactionClient';
+import { OCRResult } from '@/types/transactions';
 
 interface OCRProps {
   onResult: (data: OCRResult) => void;
@@ -14,8 +14,8 @@ export default function OCR({ onResult }: OCRProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
 
