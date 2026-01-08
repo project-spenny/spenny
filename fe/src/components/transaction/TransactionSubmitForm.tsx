@@ -47,16 +47,16 @@ export default function TransactionSubmitForm({
       if (defaultValue) {
         return {
           title: defaultValue.title,
-          type: 'expense',
+          type: 'expense' as const,
           amount: defaultValue.amount.toString(),
-          date: defaultDate ?? new Date(),
+          date: new Date(defaultValue.date),
           category_id: defaultValue.category_id,
           tags: [] as string[],
         };
       } else {
         return {
           title: '',
-          type: '' as '' | 'income' | 'expense',
+          type: '' as const,
           amount: '',
           date: defaultDate ?? new Date(),
           category_id: '',

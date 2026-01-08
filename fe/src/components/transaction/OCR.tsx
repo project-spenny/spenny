@@ -16,6 +16,7 @@ export default function OCR({ onResult }: OCRProps) {
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
 
     setLoading(true);

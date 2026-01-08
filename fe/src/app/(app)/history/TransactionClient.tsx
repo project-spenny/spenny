@@ -11,7 +11,7 @@ import { useState } from 'react';
 
 export interface OCRResult {
   title: string;
-  date: string;
+  date: Date;
   category_id: string;
   amount: number;
 }
