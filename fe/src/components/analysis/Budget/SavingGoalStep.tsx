@@ -7,61 +7,54 @@ import {
 import { AlertTriangle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { useState } from 'react';
 
 type SavingGoalStepProps = {
-  lastMonthIncome: number; // 가장 최근 수입 (기본값용)
+  income: number;
+  savingsAmount: number;
+  onChange: (income: number, savingsAmount: number) => void;
 };
 
-const SavingGoalStep = ({ lastMonthIncome }: SavingGoalStepProps) => {
-  const [income, setIncome] = useState<number>(lastMonthIncome || 0);
-  const [savingsRate, setSavingsRate] = useState<number>(20); // 기본 저축률 20%
+const SavingGoalStep = ({
+  income,
+  savingsAmount,
+  onChange,
+}: SavingGoalStepProps) => {
+  const savingsRate =
+    income > 0 ? Math.round((savingsAmount / income) * 100) : 0;
+  const spendableBudget = income - savingsAmount || 0;
 
-  const [savingsAmount, setSavingsAmount] = useState<number>(
-    Math.floor((lastMonthIncome * 20) / 100) // 수입의 20%로 초기화
-  );
-
-  // 슬라이더 조절
+  // 슬라이더 변경 시
   const handleSliderChange = (values: number[]) => {
     const rate = values[0];
-    setSavingsRate(rate);
-    setSavingsAmount(Math.floor((income * rate) / 100));
+    const newAmount = Math.floor((income * rate) / 100);
+
+    onChange(income, newAmount);
   };
 
-  // 금액 직접 입력
+  // 금액 입력 시
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+    let newAmount = value;
 
+    // 70% 제한 로직
     if (income > 0) {
       const calculatedRate = Math.round((value / income) * 100);
-
-      // 70% 제한 로직
       if (calculatedRate > 70) {
-        setSavingsRate(70);
-        setSavingsAmount(Math.floor((income * 70) / 100));
-      } else {
-        // 70% 이하일 때만 입력한 그대로 반영
-        setSavingsRate(calculatedRate);
-        setSavingsAmount(value);
+        newAmount = Math.floor((income * 70) / 100);
       }
-    } else {
-      // 수입이 0인 경우 금액만 업데이트
-      setSavingsAmount(value);
     }
+
+    onChange(income, newAmount);
   };
 
-  // 수입 변경
+  // 수입 입력 시
   const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newIncome = Number(e.target.value);
-    setIncome(newIncome);
-
     // 현재 설정된 저축률(savingsRate)에 맞춰 저축 금액 업데이트
-    const newSavingsAmount = Math.floor((newIncome * savingsRate) / 100);
-    setSavingsAmount(newSavingsAmount);
-  };
+    const newAmount = Math.floor((newIncome * savingsRate) / 100);
 
-  // 사용 가능한 예산
-  const spendableBudget = income - savingsAmount || 0;
+    onChange(newIncome, newAmount);
+  };
 
   return (
     <div className="animate-in fade-in slide-in-from-right-2 space-y-8 duration-300">

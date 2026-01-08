@@ -1,6 +1,6 @@
 import { ArrowRight, Info } from 'lucide-react';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
 import { Button } from '@/components/ui/button';
@@ -22,12 +22,33 @@ const BudgetRecommendDialog = ({
   selectedDate,
 }: BudgetRecommendDialogProps) => {
   const [step, setStep] = useState(1);
-  const [targetSaving, setTargetSaving] = useState(0); // 저축 목표액
+  const [goalData, setGoalData] = useState({
+    income: 0,
+    savingsAmount: 0,
+  });
 
   const { processedData, isLoading } = useBudgetGuideData(
     selectedDate,
-    targetSaving
+    goalData.savingsAmount
   );
+
+  useEffect(() => {
+    // 초기값 설정
+    if (processedData && goalData.income === 0) {
+      const initialIncome = processedData.lastMonthIncome;
+      const initialSavings = Math.floor(initialIncome * 0.2); // 초기값 20%
+
+      setGoalData({
+        income: initialIncome,
+        savingsAmount: initialSavings,
+      });
+    }
+  }, [processedData]); // processedData가 로드되는 순간 실행됨
+
+  // Step 2에서 데이터가 바뀔 때 부모 상태 업데이트
+  const handleGoalDataChange = (newIncome: number, newSavings: number) => {
+    setGoalData({ income: newIncome, savingsAmount: newSavings });
+  };
 
   const nextButtonLabels: Record<number, string> = {
     1: '분석 완료! 목표 세우기',
@@ -64,8 +85,7 @@ const BudgetRecommendDialog = ({
       </div>
     );
 
-  const { monthlyData, summary, lastMonthIncome, spendableBudget } =
-    processedData;
+  const { monthlyData, summary } = processedData;
   const activeMonths = monthlyData.length;
 
   return (
@@ -88,11 +108,27 @@ const BudgetRecommendDialog = ({
           )}
 
           {/* Step 2: 저축 목표 및 가용 예산 확정 */}
-          {step === 2 && <SavingGoalStep lastMonthIncome={lastMonthIncome} />}
+          {step === 2 && (
+            <SavingGoalStep
+              income={goalData.income}
+              savingsAmount={goalData.savingsAmount}
+              onChange={handleGoalDataChange}
+            />
+          )}
 
           {/* Step 3: 템플릿 선택 및 결과 확인 */}
           {step === 3 && (
-            <div className="py-10 text-center">템플릿 선택 및 결과 확인</div>
+            <div className="py-10 text-center text-lg font-bold">
+              <p>수입: {goalData.income.toLocaleString()}원</p>
+              <p>저축: {goalData.savingsAmount.toLocaleString()}원</p>
+              <p className="text-primary">
+                가용 예산:{' '}
+                {(goalData.income - goalData.savingsAmount).toLocaleString()}원
+              </p>
+              <p className="text-muted-foreground mt-4 text-sm font-normal">
+                이 예산으로 고정 지출을 설정해볼까요?
+              </p>
+            </div>
           )}
         </div>
 
