@@ -1,8 +1,10 @@
 'use client';
-import { useState } from 'react';
-
+import { useState, useRef } from 'react';
+import { Button } from '../ui/button';
+import { Receipt } from 'lucide-react';
 export default function TestOCR() {
   const [result, setResult] = useState(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleTest = async (e) => {
     const file = e.target.files[0];
@@ -22,7 +24,21 @@ export default function TestOCR() {
 
   return (
     <div>
-      <input type="file" accept="image/*" onChange={handleTest} />
+      <Button
+        onClick={() => inputRef.current?.click()}
+        className="fixed bottom-0 z-50 m-4 h-16 w-16 cursor-pointer rounded-full"
+        asChild
+      >
+        <Receipt size={20} />
+      </Button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleTest}
+        hidden
+      />
       <div>{JSON.stringify(result)}</div>
     </div>
   );

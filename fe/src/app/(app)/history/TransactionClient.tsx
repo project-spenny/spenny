@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import { useRouter } from 'next/navigation';
 import { useSelected } from './TransactionContext';
+import TestOCR from '@/components/transaction/TestOCR';
 
 export default function TransactionClient() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function TransactionClient() {
 
   return (
     <>
+      <TestOCR />
       <Button
         onClick={openCreate}
         className="fixed right-0 bottom-0 z-50 m-4 h-16 w-16 rounded-full"
