@@ -74,6 +74,7 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
     adjustPerDay,
   } = debug;
 
+  const plannedUntilYesterdayRounded = Math.round(plannedUntilYesterday);
   const diff = Math.round(rawDiff);
   const status = getStatus(diff);
   const { title, desc } = statusText[status];
@@ -274,29 +275,25 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
               <Line data={dailyChart} options={dailyOptions} />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-muted/20 rounded-md p-2">
+            <div className="mt-2 grid grid-cols-[auto_1fr] gap-3 text-sm">
+              <div className="p-2">
                 <p className="text-muted-foreground">기준 누적</p>
                 <p className="font-medium">
-                  {plannedUntilYesterday.toLocaleString()}원
+                  {plannedUntilYesterdayRounded.toLocaleString()}원
                 </p>
               </div>
 
-              <div className="bg-muted/20 rounded-md p-2">
-                <p className="text-muted-foreground">실제 누적</p>
+              <div className="p-2">
+                <p className="text-muted-foreground">현재 상태</p>
                 <p className="font-medium">
-                  {varSpentUntilYesterday.toLocaleString()}원
+                  {diff < 0
+                    ? `기준보다 ${Math.abs(diff).toLocaleString()}원 더 사용했어요.`
+                    : diff > 0
+                      ? `기준보다 ${diff.toLocaleString()}원 덜 사용했어요.`
+                      : '기준과 거의 동일해요.'}
                 </p>
               </div>
             </div>
-
-            <p className="mt-2 text-sm font-medium">
-              {diff < 0
-                ? `현재까지 기준보다 ${Math.abs(diff).toLocaleString()}원 더 사용했어요.`
-                : diff > 0
-                  ? `현재까지 기준보다 ${diff.toLocaleString()}원 덜 사용했어요.`
-                  : '현재까지 기준과 거의 동일해요.'}
-            </p>
           </CardContent>
         </Card>
 
