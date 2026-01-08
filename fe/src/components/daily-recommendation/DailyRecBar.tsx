@@ -9,9 +9,15 @@ type Props = {
   amount: number; // 일일 권장 사용 금액
   varRemaining: number; // 남은 가변 예산
   remainingDays: number; // 오늘 포함 남은 일수
+  budget: number;
 };
 
-export const DailyRecBar = ({ amount, varRemaining, remainingDays }: Props) => {
+export const DailyRecBar = ({
+  amount,
+  varRemaining,
+  remainingDays,
+  budget,
+}: Props) => {
   return (
     <>
       {/* 안내 바 */}
@@ -27,7 +33,7 @@ export const DailyRecBar = ({ amount, varRemaining, remainingDays }: Props) => {
 
           <div className="text-muted-foreground text-xs">
             남은 사용 가능 금액 {varRemaining.toLocaleString()}원 · 남은{' '}
-            {remainingDays}일
+            {remainingDays}일 · 이번 달 총 예산 {budget.toLocaleString()}원
           </div>
         </div>
 

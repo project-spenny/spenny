@@ -8,6 +8,9 @@ import { CalendarProvider } from '@/context/CalendarContext';
 import { TransactionProvider } from './history/TransactionContext';
 import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
 import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
+import { getTotalBudgetAmount } from '@/utils/budget';
+import { fetchBudgetsServer } from '@/services/budgets/budget';
+
 interface PageProps {
   searchParams: Promise<{
     month?: string;
@@ -27,6 +30,9 @@ export default async function Home({ searchParams }: PageProps) {
     end_date: endDate,
   };
 
+  const budgets = await fetchBudgetsServer(monthDate);
+  const budget = getTotalBudgetAmount(budgets);
+
   return (
     <div className="flex min-h-[900px] w-full max-w-6xl self-start">
       <TransactionProvider>
@@ -36,6 +42,7 @@ export default async function Home({ searchParams }: PageProps) {
               filters={filters}
               currentMonth={currentMonth}
               selectedDate={params.selected_date}
+              budget={budget}
             />
           </Suspense>
         </CalendarProvider>
@@ -48,10 +55,12 @@ async function DataCalendar({
   filters,
   currentMonth,
   selectedDate,
+  budget,
 }: {
   filters: TransactionFilters;
   currentMonth: string;
   selectedDate?: string;
+  budget: number;
 }) {
   const transactions = await getTransaction(filters, true);
   const amount = 0;
@@ -63,6 +72,7 @@ async function DataCalendar({
         amount={amount}
         varRemaining={varRemaining}
         remainingDays={remainingDays}
+        budget={budget}
       />
 
       <Calendar currentMonth={currentMonth} transactions={transactions} />
