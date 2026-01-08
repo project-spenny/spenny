@@ -1,5 +1,13 @@
 import { DailyRecResult } from '@/services/daily-recommendation/calculate';
-
+import {
+  ArcElement,
+  Chart as ChartJS,
+  ChartOptions,
+  Legend,
+  Tooltip,
+  TooltipItem,
+} from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 import {
   Card,
   CardContent,
@@ -8,6 +16,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { CHART_COLORS } from '@/constants/colors';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 type Props = {
   daily: DailyRecResult;
@@ -50,6 +61,33 @@ export const DailyRecPanel = ({ daily }: Props) => {
   const status = getStatus(diff);
   const { title, desc } = statusText[status];
 
+  const doughnutData = {
+    labels: ['사용', '남음'],
+    datasets: [
+      {
+        data: [varSpentUntilYesterday, varRemaining],
+        backgroundColor: [CHART_COLORS.TOP_5[4], CHART_COLORS.TOP_5[2]],
+      },
+    ],
+  };
+
+  const doughnutOptions: ChartOptions<'doughnut'> = {
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context: TooltipItem<'doughnut'>) => {
+            const value = Number(context.raw ?? 0);
+            const data = context.dataset.data as number[];
+            const total = data.reduce((acc, cur) => acc + Number(cur ?? 0), 0);
+            const percent = total > 0 ? Math.round((value / total) * 100) : 0;
+            return `${percent}%`;
+          },
+        },
+      },
+    },
+  };
+
   return (
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
@@ -90,10 +128,10 @@ export const DailyRecPanel = ({ daily }: Props) => {
           </CardHeader>
 
           <CardContent>
-            <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+            <div className="grid grid-cols-2 items-center gap-4">
               {/* Doughnut */}
-              <div className="bg-muted/30 text-muted-foreground flex h-[120px] w-[120px] items-center justify-center rounded-md text-xs">
-                Doughnut
+              <div>
+                <Doughnut data={doughnutData} options={doughnutOptions} />
               </div>
 
               <div className="space-y-1">
