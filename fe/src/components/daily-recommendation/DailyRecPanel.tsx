@@ -1,5 +1,8 @@
 import { DailyRecResult } from '@/services/daily-recommendation/calculate';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
 type Props = {
   daily: DailyRecResult;
 };
@@ -45,23 +48,27 @@ export const DailyRecPanel = ({ daily }: Props) => {
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
         {/* 요약 카드 */}
-        <section className="space-y-3 rounded-xl border p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-muted-foreground text-xs">
-                오늘 권장 사용 금액
-              </p>
-              <p className="text-2xl font-semibold">
-                {amount.toLocaleString()}원
-              </p>
-            </div>
+        <section>
+          <Card>
+            <CardHeader>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    오늘 권장 사용 금액
+                  </p>
+                  <CardTitle className="text-2xl">
+                    {amount.toLocaleString()}원
+                  </CardTitle>
+                </div>
 
-            <span className="rounded-full border px-3 py-1 text-xs">
-              {title}
-            </span>
-          </div>
+                <Badge variant="outline">{title}</Badge>
+              </div>
+            </CardHeader>
 
-          <p className="text-muted-foreground text-xs">{desc}</p>
+            <CardContent>
+              <p className="text-muted-foreground text-xs">{desc}</p>
+            </CardContent>
+          </Card>
         </section>
 
         {/* 이번 달 사용 현황 (가변 예산 기준) */}
