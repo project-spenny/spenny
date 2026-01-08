@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { CategoryGroupId } from '@/types/budgetGuide';
 import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
+import SavingGoalStep from '@/components/analysis/Budget/SavingGoalStep';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
@@ -81,9 +82,7 @@ const BudgetRecommendDialog = ({
           )}
 
           {/* Step 2: 저축 목표 및 가용 예산 확정 */}
-          {step === 2 && (
-            <div className="py-10 text-center">저축 목표 및 가용 예산 확정</div>
-          )}
+          {step === 2 && <SavingGoalStep lastMonthIncome={lastMonthIncome} />}
 
           {/* Step 3: 템플릿 선택 및 결과 확인 */}
           {step === 3 && (
