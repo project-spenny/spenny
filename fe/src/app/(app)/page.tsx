@@ -15,6 +15,8 @@ import {
   sumFixedExpenseUntilYesterday,
 } from '@/utils/transaction';
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
+import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
+import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs';
 
 interface PageProps {
   searchParams: Promise<{
@@ -38,6 +40,12 @@ export default async function Home({ searchParams }: PageProps) {
   const budgets = await fetchBudgetsServer(monthDate);
   const budget = getTotalBudgetAmount(budgets);
 
+  const fixedRules = await fetchFixedRulesByMonthServer(monthDate);
+  const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
+    fixedRules,
+    monthDate
+  );
+
   return (
     <div className="flex min-h-[900px] w-full max-w-6xl self-start">
       <TransactionProvider>
@@ -48,6 +56,7 @@ export default async function Home({ searchParams }: PageProps) {
               currentMonth={currentMonth}
               selectedDate={params.selected_date}
               budget={budget}
+              fixedPlannedThisMonth={fixedPlannedThisMonth}
             />
           </Suspense>
         </CalendarProvider>
@@ -61,11 +70,13 @@ async function DataCalendar({
   currentMonth,
   selectedDate,
   budget,
+  fixedPlannedThisMonth,
 }: {
   filters: TransactionFilters;
   currentMonth: string;
   selectedDate?: string;
   budget: number;
+  fixedPlannedThisMonth: number;
 }) {
   const transactions = await getTransaction(filters, true);
   const today = new Date();
@@ -78,8 +89,6 @@ async function DataCalendar({
     transactions,
     today
   );
-
-  const fixedPlannedThisMonth = 0;
 
   const daily = calculateDailyRec({
     today,
