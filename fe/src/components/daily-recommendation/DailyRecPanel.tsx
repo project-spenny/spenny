@@ -141,7 +141,7 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
             borderWidth: 3,
             label: {
               display: true,
-              content: `권장 기준 ${planned.toLocaleString()}원`,
+              content: `기준 ${planned.toLocaleString()}원`,
               position: 'center',
             },
           },
@@ -260,7 +260,7 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
             </div>
 
             <p className="text-muted-foreground text-xs">
-              기준은 이번 달 사용 가능한 금액을 날짜에 따라 균등하게 나눈
+              기준 금액은 이번 달 사용 가능한 금액을 날짜에 따라 균등하게 나눈
               값이에요.
             </p>
           </CardHeader>
@@ -270,32 +270,29 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
               <Line data={dailyChart} options={dailyOptions} />
             </div>
 
-            <div className="grid grid-cols-3 text-xs">
-              <div className="p-2">
-                <p className="text-muted-foreground">계획 누적</p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="bg-muted/20 rounded-md p-2">
+                <p className="text-muted-foreground">기준 누적</p>
                 <p className="font-medium">
                   {plannedUntilYesterday.toLocaleString()}원
                 </p>
               </div>
 
-              <div className="p-2">
+              <div className="bg-muted/20 rounded-md p-2">
                 <p className="text-muted-foreground">실제 누적</p>
                 <p className="font-medium">
                   {varSpentUntilYesterday.toLocaleString()}원
                 </p>
               </div>
-
-              <div className="mt-2 p-2">
-                <p className="font-medium">
-                  {Math.abs(diff).toLocaleString()}원{' '}
-                  {diff < 0
-                    ? '더 사용했어요'
-                    : diff > 0
-                      ? '덜 사용했어요'
-                      : '동일해요'}
-                </p>
-              </div>
             </div>
+
+            <p className="mt-2 text-sm font-medium">
+              {diff < 0
+                ? `현재까지 기준보다 ${Math.abs(diff).toLocaleString()}원 더 사용했어요.`
+                : diff > 0
+                  ? `현재까지 기준보다 ${diff.toLocaleString()}원 덜 사용했어요.`
+                  : '현재까지 기준과 거의 동일해요.'}
+            </p>
           </CardContent>
         </Card>
 
