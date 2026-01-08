@@ -9,6 +9,7 @@ import {
   addMonths,
   addWeeks,
 } from 'date-fns';
+import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
 
 const WEEKDAY_LABEL: Record<number, string> = {
   1: '월',
@@ -94,4 +95,17 @@ export const getRuleApplyRange = ({
     from: startOfWeek(today, { weekStartsOn: 1 }),
     to: endOfWeek(today, { weekStartsOn: 1 }),
   };
+};
+
+// 이번 달에 예정된 고정비 지출 총합 계산
+export const getFixedPlannedExpenseByMonth = (
+  rules: IFixedRule[],
+  monthDate: Date
+) => {
+  return rules
+    .filter((r) => r.type === 'expense')
+    .reduce((sum, r) => {
+      const occurrences = getFixedRuleDates(r, monthDate).length;
+      return sum + r.amount * occurrences;
+    }, 0);
 };
