@@ -4,6 +4,29 @@ type Props = {
   daily: DailyRecResult;
 };
 
+type PaceStatus = 'ahead' | 'behind' | 'onTrack';
+
+const getStatus = (diff: number): PaceStatus => {
+  const epsilon = 1000; // 허용 오차(원)
+  if (Math.abs(diff) < epsilon) return 'onTrack';
+  return diff < 0 ? 'ahead' : 'behind';
+};
+
+const statusText: Record<PaceStatus, { title: string; desc: string }> = {
+  ahead: {
+    title: '계획보다 빠르게 쓰고 있어요',
+    desc: '초과 사용분을 남은 기간에 나눠 오늘 권장액을 낮췄어요.',
+  },
+  behind: {
+    title: '계획보다 여유가 있어요',
+    desc: '절약된 금액을 남은 기간에 나눠 오늘 권장액을 높였어요.',
+  },
+  onTrack: {
+    title: '계획대로 진행 중이에요',
+    desc: '현재까지 소비 흐름이 계획과 비슷해요.',
+  },
+};
+
 export const DailyRecPanel = ({ daily }: Props) => {
   const { amount, debug } = daily;
   const {
@@ -15,17 +38,30 @@ export const DailyRecPanel = ({ daily }: Props) => {
     adjustPerDay,
   } = debug;
 
+  const status = getStatus(diff);
+  const { title, desc } = statusText[status];
+
   return (
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
         {/* 요약 카드 */}
-        <section className="space-y-2 rounded-xl border p-4">
-          <div>
-            <p className="text-muted-foreground text-xs">오늘 권장 사용 금액</p>
-            <p className="text-2xl font-semibold">
-              {amount.toLocaleString()}원
-            </p>
+        <section className="space-y-3 rounded-xl border p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-muted-foreground text-xs">
+                오늘 권장 사용 금액
+              </p>
+              <p className="text-2xl font-semibold">
+                {amount.toLocaleString()}원
+              </p>
+            </div>
+
+            <span className="rounded-full border px-3 py-1 text-xs">
+              {title}
+            </span>
           </div>
+
+          <p className="text-muted-foreground text-xs">{desc}</p>
         </section>
 
         {/* 이번 달 사용 현황 (가변 예산 기준) */}
