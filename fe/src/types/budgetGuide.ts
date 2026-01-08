@@ -1,11 +1,10 @@
-export type CategoryGroupId = 'essential' | 'flexible' | 'savings';
+export type CategoryGroupId = 'essential' | 'flexible';
 
 export type MonthlySummary = {
   month: string;
   total: number;
   essential: number;
   flexible: number;
-  savings: number;
 };
 
 export type CategoryBase = {

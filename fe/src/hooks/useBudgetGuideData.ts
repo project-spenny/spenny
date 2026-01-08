@@ -89,7 +89,6 @@ const useBudgetGuideData = (selectedDate: Date) => {
           total: 0,
           essential: 0,
           flexible: 0,
-          savings: 0,
         };
         acc.monthlyMap[month].total += item.amount;
         acc.monthlyMap[month][groupId] += item.amount;
@@ -120,8 +119,6 @@ const useBudgetGuideData = (selectedDate: Date) => {
           monthlyData.reduce((sum, m) => sum + m.essential, 0) / activeMonths,
         flexible:
           monthlyData.reduce((sum, m) => sum + m.flexible, 0) / activeMonths,
-        savings:
-          monthlyData.reduce((sum, m) => sum + m.savings, 0) / activeMonths,
       },
     };
 

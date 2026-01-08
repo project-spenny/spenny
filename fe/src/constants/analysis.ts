@@ -39,9 +39,6 @@ export const EXPENSE_CATEGORY_GROUP_MAP: Record<string, CategoryGroupId> = {
   BEAUTY: 'flexible', // 미용
   PET: 'flexible', // 반려동물
   OTHER_EXPENSE: 'flexible', // 기타
-
-  // Savings (여유/저축)
-  EVENT: 'savings', // 경조
-  MEDICAL: 'savings', // 의료
-  SAVINGS: 'savings', // 저축
+  EVENT: 'flexible', // 경조
+  MEDICAL: 'flexible', // 의료
 } as const;
