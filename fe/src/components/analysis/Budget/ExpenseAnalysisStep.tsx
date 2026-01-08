@@ -1,5 +1,9 @@
 import { BarChart3, BarChartHorizontal } from 'lucide-react';
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { GroupDisplayInfo, MonthlySummary } from '@/types/budgetGuide';
 
 import { Separator } from '@/components/ui/separator';
@@ -23,11 +27,17 @@ const ExpenseAnalysisStep = ({
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
       <DialogHeader className="space-y-2">
-        <div className="text-primary font-bold uppercase">
-          Step 1. 소비 분석
+        <div>
+          <div className="text-primary font-bold uppercase">
+            Step 1. 소비 분석
+          </div>
+          <DialogDescription className="text-sm">
+            최근 {activeMonths}개월간의 소비 패턴을 분석해 현재 지출 흐름을
+            보여드려요.
+          </DialogDescription>
         </div>
         <DialogTitle className="text-xl leading-tight font-bold">
-          최근 {activeMonths}개월간 <br />월 평균{' '}
+          최근 {activeMonths}개월간 월 평균{' '}
           <span className="text-primary">
             {Math.floor(avgTotal).toLocaleString()}원
           </span>
