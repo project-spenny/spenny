@@ -27,6 +27,10 @@ export default function TransactionClient() {
     router.refresh();
   };
 
+  const handleClose = () => {
+    close();
+    setOcrData(null);
+  };
   const handleOCRResult = (data: OCRResult) => {
     setOcrData(data);
     openCreate();
@@ -44,11 +48,11 @@ export default function TransactionClient() {
       >
         <Plus size={20} />
       </Button>
-      <ResponsivePanel isOpen={isOpen} setIsOpen={close}>
+      <ResponsivePanel isOpen={isOpen} setIsOpen={handleSuccess}>
         <TransactionSubmitForm
           mode={mode}
           transaction={selectedTransaction}
-          onClose={close}
+          onClose={handleClose}
           onSuccess={handleSuccess}
           defaultValue={ocrData}
         />

@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '../ui/button';
 import { supabase } from '@/utils/supabase/client';
@@ -76,6 +76,19 @@ export default function TransactionSubmitForm({
     removeTag,
     UpdateField,
   } = useTransactionForm(initialFormData);
+
+  useEffect(() => {
+    if (defaultValue) {
+      setFormData({
+        title: defaultValue.title,
+        type: 'expense',
+        amount: defaultValue.amount.toString(),
+        date: new Date(defaultValue.date),
+        category_id: defaultValue.category_id,
+        tags: [],
+      });
+    }
+  }, [defaultValue, setFormData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
