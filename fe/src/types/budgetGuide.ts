@@ -7,6 +7,18 @@ export type MonthlySummary = {
   flexible: number;
 };
 
+export type GroupInfo = {
+  id: CategoryGroupId;
+  label: string;
+  color: string;
+  description: string;
+};
+
+export type GroupDisplayInfo = GroupInfo & {
+  amount: number;
+  percent: number;
+};
+
 export type CategoryBase = {
   name: string;
   groupId: CategoryGroupId;

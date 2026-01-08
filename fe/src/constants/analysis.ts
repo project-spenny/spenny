@@ -1,6 +1,6 @@
+import { CategoryGroupId, GroupInfo } from '@/types/budgetGuide';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
-import { CategoryGroupId } from '@/types/budgetGuide';
 import { THEME_COLOR } from '@/constants/colors';
 
 export const ANALYSIS_CONFIG = {
@@ -42,3 +42,19 @@ export const EXPENSE_CATEGORY_GROUP_MAP: Record<string, CategoryGroupId> = {
   EVENT: 'flexible', // 경조
   MEDICAL: 'flexible', // 의료
 } as const;
+
+// 그룹 정의
+export const BUDGET_GROUPS: GroupInfo[] = [
+  {
+    id: 'essential',
+    label: 'Essential (필수)',
+    color: 'bg-blue-500',
+    description: '주거, 통신/구독, 교통, 식비, 교육, 육아, 금융',
+  },
+  {
+    id: 'flexible',
+    label: 'Flexible (유연)',
+    color: 'bg-lime-500',
+    description: '문화/여가, 쇼핑, 미용, 반려동물, 경조, 의료, 기타',
+  },
+] as const;
