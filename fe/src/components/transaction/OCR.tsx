@@ -34,7 +34,9 @@ export default function OCR({ onResult }: OCRProps) {
         toast(`영수증 인식이 완료 되었습니다`);
         onResult(data);
       } catch (error) {
-        toast(`${error} : 영수증 인식에 실패했습니다`);
+        toast(
+          error instanceof Error ? error.message : '영수증 인식에 실패했습니다'
+        );
       } finally {
         setLoading(false);
         if (inputRef.current) {
