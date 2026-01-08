@@ -6,8 +6,12 @@ import {
   Legend,
   Tooltip,
   TooltipItem,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
 } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, Line } from 'react-chartjs-2';
 import {
   Card,
   CardContent,
@@ -17,11 +21,21 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CHART_COLORS } from '@/constants/colors';
+import { DailyRecChartData } from '@/services/daily-recommendation/chart';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend
+);
 
 type Props = {
   daily: DailyRecResult;
+  dailyChartData: DailyRecChartData;
 };
 
 type PaceStatus = 'ahead' | 'behind' | 'onTrack';
@@ -47,7 +61,7 @@ const statusText: Record<PaceStatus, { title: string; desc: string }> = {
   },
 };
 
-export const DailyRecPanel = ({ daily }: Props) => {
+export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
   const { amount, debug } = daily;
   const {
     varTotal,
@@ -61,6 +75,10 @@ export const DailyRecPanel = ({ daily }: Props) => {
   const diff = Math.round(rawDiff);
   const status = getStatus(diff);
   const { title, desc } = statusText[status];
+  const planned =
+    daily.debug.daysInMonth > 0
+      ? Math.round(daily.debug.varTotal / daily.debug.daysInMonth)
+      : 0;
 
   const doughnutData = {
     labels: ['지출', '남은 금액'],
@@ -85,6 +103,55 @@ export const DailyRecPanel = ({ daily }: Props) => {
             return `${percent}%`;
           },
         },
+      },
+    },
+  };
+
+  const dailyChart = {
+    labels: dailyChartData.labels,
+    datasets: [
+      {
+        label: '지출',
+        data: dailyChartData.actualDailySeries,
+        tension: 0.2,
+        borderWidth: 3,
+        pointRadius: 2,
+        pointHoverRadius: 8,
+        borderColor: '#5C7AFF',
+        fill: true,
+      },
+    ],
+  };
+
+  const dailyOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          title: (items) => items?.[0]?.label ?? '',
+          label: (ctx: TooltipItem<'line'>) => {
+            const idx = ctx.dataIndex;
+            const actual = dailyChartData.actualDailySeries[idx] ?? 0;
+            const diff = actual - planned;
+
+            if (diff > 0) {
+              return `${diff.toLocaleString()}원 더 사용`;
+            }
+            if (diff < 0) {
+              return `${Math.abs(diff).toLocaleString()}원 덜 사용`;
+            }
+            return '차이 없음';
+          },
+        },
+      },
+    },
+    scales: {
+      x: { ticks: { autoSkip: true, maxTicksLimit: 8 } },
+      y: {
+        ticks: { callback: (v: string | number) => Number(v).toLocaleString() },
       },
     },
   };
@@ -180,8 +247,8 @@ export const DailyRecPanel = ({ daily }: Props) => {
           </CardHeader>
           <CardContent>
             {/* Line chart */}
-            <div className="bg-muted/30 text-muted-foreground flex h-[180px] items-center justify-center rounded-md text-xs">
-              Line Chart (계획선 vs 실제선)
+            <div className="h-[180px]">
+              <Line data={dailyChart} options={dailyOptions} />
             </div>
 
             <div className="grid grid-cols-3 text-xs">
