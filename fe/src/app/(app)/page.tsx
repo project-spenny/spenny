@@ -10,6 +10,11 @@ import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
 import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 import { getTotalBudgetAmount } from '@/utils/budget';
 import { fetchBudgetsServer } from '@/services/budgets/budget';
+import {
+  sumExpenseUntilYesterday,
+  sumFixedExpenseUntilYesterday,
+} from '@/utils/transaction';
+import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
 
 interface PageProps {
   searchParams: Promise<{
@@ -63,9 +68,31 @@ async function DataCalendar({
   budget: number;
 }) {
   const transactions = await getTransaction(filters, true);
-  const amount = 0;
-  const varRemaining = 0;
-  const remainingDays = 0;
+  const today = new Date();
+
+  const spentTotalUntilYesterday = sumExpenseUntilYesterday(
+    transactions,
+    today
+  );
+  const spentFixedUntilYesterday = sumFixedExpenseUntilYesterday(
+    transactions,
+    today
+  );
+
+  const fixedPlannedThisMonth = 0;
+
+  const daily = calculateDailyRec({
+    today,
+    budget,
+    fixedPlannedThisMonth,
+    spentTotalUntilYesterday,
+    spentFixedUntilYesterday,
+  });
+
+  const amount = daily.amount;
+  const varRemaining = daily.debug.varRemaining;
+  const remainingDays = daily.debug.remainingDays;
+
   return (
     <div className="flex w-full flex-col gap-3">
       <DailyRecBar
