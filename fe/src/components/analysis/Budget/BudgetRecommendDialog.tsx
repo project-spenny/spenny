@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { BUDGET_GROUPS } from '@/constants/analysis';
 import { Button } from '@/components/ui/button';
 import { CategoryGroupId } from '@/types/budgetGuide';
-import ExpenseAnalysisStep from './Budget/ExpenseAnalysisStep';
+import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
