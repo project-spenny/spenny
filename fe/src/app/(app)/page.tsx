@@ -98,19 +98,9 @@ async function DataCalendar({
     spentFixedUntilYesterday,
   });
 
-  const amount = daily.amount;
-  const varRemaining = daily.debug.varRemaining;
-  const remainingDays = daily.debug.remainingDays;
-
   return (
     <div className="flex w-full flex-col gap-3">
-      <DailyRecBar
-        amount={amount}
-        varRemaining={varRemaining}
-        remainingDays={remainingDays}
-        budget={budget}
-      />
-
+      <DailyRecBar daily={daily} budget={budget} />
       <Calendar currentMonth={currentMonth} transactions={transactions} />
     </div>
   );
