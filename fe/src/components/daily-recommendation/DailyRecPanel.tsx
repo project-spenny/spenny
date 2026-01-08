@@ -62,7 +62,7 @@ export const DailyRecPanel = ({ daily }: Props) => {
   const { title, desc } = statusText[status];
 
   const doughnutData = {
-    labels: ['사용', '남음'],
+    labels: ['지출', '남은 금액'],
     datasets: [
       {
         data: [varSpentUntilYesterday, varRemaining],
@@ -118,7 +118,7 @@ export const DailyRecPanel = ({ daily }: Props) => {
           <CardHeader>
             <div className="flex items-end justify-between">
               <CardTitle className="text-base">
-                이번 달 가변 예산 사용 현황
+                이번 달 사용 금액 현황
               </CardTitle>
               <p className="text-muted-foreground text-xs">어제까지 기준</p>
             </div>
@@ -128,27 +128,33 @@ export const DailyRecPanel = ({ daily }: Props) => {
           </CardHeader>
 
           <CardContent>
-            <div className="grid grid-cols-2 items-center gap-4">
+            <div className="grid grid-cols-2 items-center">
               {/* Doughnut */}
-              <div>
+              <div className="h-[150px] w-[150px]">
                 <Doughnut data={doughnutData} options={doughnutOptions} />
               </div>
 
               <div className="space-y-1">
-                <p className="flex justify-between">
-                  <span className="text-muted-foreground">가변 예산</span>
+                <p className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    이번 달 사용 가능 금액
+                  </span>
                   <span className="font-medium">
                     {varTotal.toLocaleString()}원
                   </span>
                 </p>
-                <p className="flex justify-between">
-                  <span className="text-muted-foreground">사용</span>
+                <p className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    어제까지의 지출
+                  </span>
                   <span className="font-medium">
                     {varSpentUntilYesterday.toLocaleString()}원
                   </span>
                 </p>
-                <p className="flex justify-between">
-                  <span className="text-muted-foreground">남음</span>
+                <p className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    남은 금액
+                  </span>
                   <span className="font-medium">
                     {varRemaining.toLocaleString()}원
                   </span>
