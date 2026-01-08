@@ -5,12 +5,14 @@ import { ChevronRight } from 'lucide-react';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import { DailyRecPanel } from './DailyRecPanel';
 import { DailyRecResult } from '@/services/daily-recommendation/calculate';
+import { DailyRecChartData } from '@/services/daily-recommendation/chart';
 
 type Props = {
   daily: DailyRecResult;
+  dailyChartData: DailyRecChartData;
 };
 
-export const DailyRecBar = ({ daily }: Props) => {
+export const DailyRecBar = ({ daily, dailyChartData }: Props) => {
   return (
     <>
       {/* 안내 바 */}
@@ -43,7 +45,7 @@ export const DailyRecBar = ({ daily }: Props) => {
             </Button>
           }
         >
-          <DailyRecPanel daily={daily} />
+          <DailyRecPanel daily={daily} dailyChartData={dailyChartData} />
         </ResponsivePanel>
       </div>
     </>
