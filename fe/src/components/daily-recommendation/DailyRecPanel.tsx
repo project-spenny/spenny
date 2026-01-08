@@ -72,9 +72,11 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
     plannedUntilYesterday,
     diff: rawDiff,
     adjustPerDay,
+    remainingDays,
   } = debug;
 
   const plannedUntilYesterdayRounded = Math.round(plannedUntilYesterday);
+  const adjustPerDayRounded = Math.round(adjustPerDay);
   const diff = Math.round(rawDiff);
   const status = getStatus(diff);
   const { title, desc } = statusText[status];
@@ -297,31 +299,48 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
           </CardContent>
         </Card>
 
-        {/* 계산 근거 */}
-        <section className="space-y-2 rounded-xl border p-4">
-          <h3 className="font-medium">오늘 권장액이 조정된 이유</h3>
-          <p className="text-muted-foreground text-xs">
-            어제까지의 계획과 실제 차이를 남은 기간에 나눠 하루 권장액을
-            조정합니다.
-          </p>
+        {/* 권장액 조정 방식 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              오늘 권장액이 달라진 이유
+            </CardTitle>
+            <CardDescription className="text-xs">
+              어제까지의 실제 지출이 기준 누적과 얼마나 달랐는지에 따라, 그
+              차이를 남은 기간에 나눠 오늘 권장액에 반영해요.
+            </CardDescription>
+          </CardHeader>
 
-          <div className="bg-muted/20 space-y-1 rounded-md p-3 text-xs">
-            <p className="flex justify-between">
-              <span className="text-muted-foreground">계획 - 실제</span>
-              <span className="font-medium">{diff.toLocaleString()}원</span>
-            </p>
-            <p className="flex justify-between">
-              <span className="text-muted-foreground">하루 보정값</span>
-              <span className="font-medium">
-                {adjustPerDay.toLocaleString()}원
-              </span>
-            </p>
-            <p className="flex justify-between">
-              <span className="text-muted-foreground">보정 후 권장액 기준</span>
-              <span className="font-medium">(기본 일일 한도 + 보정값)</span>
-            </p>
-          </div>
-        </section>
+          <CardContent>
+            <div className="flex flex-col gap-2 rounded-md border p-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">
+                  어제까지 기준 누적
+                </span>
+                <span className="font-medium">
+                  {plannedUntilYesterdayRounded.toLocaleString()}원
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">기준 대비 차이</span>
+                <span className="font-medium">{diff.toLocaleString()}원</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">남은 일수</span>
+                <span className="font-medium">{remainingDays}일</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">하루 보정값</span>
+                <span className="font-medium">
+                  {adjustPerDayRounded.toLocaleString()}원
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
