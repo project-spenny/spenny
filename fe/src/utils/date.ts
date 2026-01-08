@@ -78,3 +78,10 @@ export const getMonthDayStats = (today: Date): MonthDayStats => {
 
   return { daysInMonth, dayOfMonth, elapsedDays, remainingDays };
 };
+
+// 로컬 기준 어제 날짜를 'YYYY-MM-DD' 문자열로 반환
+export const getYesterdayLocalDate = (today: Date) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() - 1);
+  return formatLocalDate(d);
+};

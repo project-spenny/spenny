@@ -1,4 +1,5 @@
 import { ITransaction } from '@/types/transactions';
+import { getYesterdayLocalDate } from './date';
 
 export const isExpense = (
   t: ITransaction
@@ -27,6 +28,12 @@ export const sumExpenseUntil = (transactions: ITransaction[], until: string) =>
     (t) => isExpense(t) && isOnOrBefore(t.date, until)
   );
 
+// 어제까지의 총 지출 합계
+export const sumExpenseUntilYesterday = (
+  transactions: ITransaction[],
+  today: Date
+) => sumExpenseUntil(transactions, getYesterdayLocalDate(today));
+
 // 특정 기준일(until)까지의 고정비 지출 합계
 export const sumFixedExpenseUntil = (
   transactions: ITransaction[],
@@ -36,3 +43,9 @@ export const sumFixedExpenseUntil = (
     transactions,
     (t) => isFixedExpense(t) && isOnOrBefore(t.date, until)
   );
+
+// 어제까지의 고정비 지출 합계
+export const sumFixedExpenseUntilYesterday = (
+  transactions: ITransaction[],
+  today: Date
+) => sumFixedExpenseUntil(transactions, getYesterdayLocalDate(today));
