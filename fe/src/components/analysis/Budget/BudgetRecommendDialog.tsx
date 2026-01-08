@@ -29,6 +29,12 @@ const BudgetRecommendDialog = ({
     targetSaving
   );
 
+  const nextButtonLabels: Record<number, string> = {
+    1: '분석 완료! 목표 세우기',
+    2: '목표 설정 완료',
+    3: '예산 확정하기',
+  };
+
   // UI용 그룹 데이터 가공
   const groupDisplayData = useMemo(() => {
     if (!processedData) return [];
@@ -106,7 +112,7 @@ const BudgetRecommendDialog = ({
                 className="h-12 flex-2 cursor-pointer text-base font-bold"
                 onClick={() => setStep(step + 1)}
               >
-                {step === 1 ? '내게 맞는 템플릿 선택하기' : '다음 단계'}
+                {nextButtonLabels[step] || '다음 단계'}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>

@@ -65,16 +65,20 @@ const SavingGoalStep = ({ lastMonthIncome }: SavingGoalStepProps) => {
 
   return (
     <div className="animate-in fade-in slide-in-from-right-2 space-y-8 duration-300">
-      <DialogHeader>
-        <div className="text-primary font-bold uppercase">
-          Step 2. 목표 설정
+      <DialogHeader className="space-y-2">
+        <div className="space-y-1">
+          <div className="text-primary font-bold uppercase">
+            Step 2. 목표 설정
+          </div>
+          <DialogTitle className="text-xl font-bold">
+            얼마를 저축하고 얼마를 쓰실 건가요?
+          </DialogTitle>
         </div>
-        <DialogTitle className="text-xl font-bold">
-          이번 달 수입과 저축 목표를 정해볼까요?
-        </DialogTitle>
 
         <DialogDescription>
-          이번 달 예상 수입은 지난 달 수입에 기반하여 제공됩니다.
+          지난달 수입 데이터를 기반으로 이번 달 예산을 미리 구성해 보았습니다.
+          <br />
+          필요에 따라 금액을 직접 수정해 보세요.
         </DialogDescription>
       </DialogHeader>
 
