@@ -54,10 +54,11 @@ export const DailyRecPanel = ({ daily }: Props) => {
     varSpentUntilYesterday,
     varRemaining,
     plannedUntilYesterday,
-    diff,
+    diff: rawDiff,
     adjustPerDay,
   } = debug;
 
+  const diff = Math.round(rawDiff);
   const status = getStatus(diff);
   const { title, desc } = statusText[status];
 
@@ -164,40 +165,53 @@ export const DailyRecPanel = ({ daily }: Props) => {
           </CardContent>
         </Card>
 
-        {/* 계획 vs 실제 누적 */}
-        <section className="space-y-3 rounded-xl border p-4">
-          <div className="flex items-end justify-between">
-            <h3 className="font-medium">계획 대비 소비 페이스</h3>
-            <p className="text-muted-foreground text-xs">누적 기준</p>
-          </div>
+        {/* 계획 대비 소비 페이스 */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-end justify-between">
+              <CardTitle className="text-base">계획 대비 소비 페이스</CardTitle>
+              <p className="text-muted-foreground text-xs">어제까지 기준</p>
+            </div>
 
-          {/* Line chart */}
-          <div className="bg-muted/30 text-muted-foreground flex h-[180px] items-center justify-center rounded-md text-xs">
-            Line Chart (계획선 vs 실제선)
-          </div>
+            <p className="text-muted-foreground text-xs">
+              계획은 이번 달 사용 가능 금액을 날짜에 따라 균등하게 나눈 누적
+              기준이에요.
+            </p>
+          </CardHeader>
+          <CardContent>
+            {/* Line chart */}
+            <div className="bg-muted/30 text-muted-foreground flex h-[180px] items-center justify-center rounded-md text-xs">
+              Line Chart (계획선 vs 실제선)
+            </div>
 
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="bg-muted/20 rounded-md p-2">
-              <p className="text-muted-foreground">계획(어제까지)</p>
-              <p className="font-medium">
-                {plannedUntilYesterday.toLocaleString()}원
-              </p>
+            <div className="grid grid-cols-3 text-xs">
+              <div className="p-2">
+                <p className="text-muted-foreground">계획 누적</p>
+                <p className="font-medium">
+                  {plannedUntilYesterday.toLocaleString()}원
+                </p>
+              </div>
+
+              <div className="p-2">
+                <p className="text-muted-foreground">실제 누적</p>
+                <p className="font-medium">
+                  {varSpentUntilYesterday.toLocaleString()}원
+                </p>
+              </div>
+
+              <div className="mt-2 p-2">
+                <p className="font-medium">
+                  {Math.abs(diff).toLocaleString()}원{' '}
+                  {diff < 0
+                    ? '더 사용했어요'
+                    : diff > 0
+                      ? '덜 사용했어요'
+                      : '동일해요'}
+                </p>
+              </div>
             </div>
-            <div className="bg-muted/20 rounded-md p-2">
-              <p className="text-muted-foreground">실제(어제까지)</p>
-              <p className="font-medium">
-                {varSpentUntilYesterday.toLocaleString()}원
-              </p>
-            </div>
-            <div className="bg-muted/20 rounded-md p-2">
-              <p className="text-muted-foreground">차이</p>
-              <p className="font-medium">
-                {Math.abs(diff).toLocaleString()}원{' '}
-                {diff < 0 ? '초과' : diff > 0 ? '절약' : ''}
-              </p>
-            </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
 
         {/* 계산 근거 */}
         <section className="space-y-2 rounded-xl border p-4">
