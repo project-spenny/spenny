@@ -1,19 +1,5 @@
 import { DailyRecResult } from '@/services/daily-recommendation/calculate';
 import {
-  ArcElement,
-  Chart as ChartJS,
-  ChartOptions,
-  Legend,
-  Tooltip,
-  TooltipItem,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-} from 'chart.js';
-import { Doughnut, Line } from 'react-chartjs-2';
-import annotationPlugin from 'chartjs-plugin-annotation';
-import {
   Card,
   CardContent,
   CardDescription,
@@ -21,19 +7,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CHART_COLORS } from '@/constants/colors';
 import { DailyRecChartData } from '@/services/daily-recommendation/chart';
-
-ChartJS.register(
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-  annotationPlugin
-);
+import { DailyRecUsageCard } from './DailyRecDoughnut';
+import { DailyRecPaceCard } from './DailyRecLine';
 
 type Props = {
   daily: DailyRecResult;
@@ -85,103 +61,6 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
       ? Math.round(daily.debug.varTotal / daily.debug.daysInMonth)
       : 0;
 
-  const doughnutData = {
-    labels: ['지출', '남은 금액'],
-    datasets: [
-      {
-        data: [varSpentUntilYesterday, varRemaining],
-        backgroundColor: [CHART_COLORS.TOP_5[4], CHART_COLORS.TOP_5[2]],
-      },
-    ],
-  };
-
-  const doughnutOptions: ChartOptions<'doughnut'> = {
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (context: TooltipItem<'doughnut'>) => {
-            const value = Number(context.raw ?? 0);
-            const data = context.dataset.data as number[];
-            const total = data.reduce((acc, cur) => acc + Number(cur ?? 0), 0);
-            const percent = total > 0 ? Math.round((value / total) * 100) : 0;
-            return `${percent}%`;
-          },
-        },
-      },
-    },
-  };
-
-  const dailyChart = {
-    labels: dailyChartData.labels,
-    datasets: [
-      {
-        label: '지출',
-        data: dailyChartData.actualDailySeries,
-        tension: 0.2,
-        borderWidth: 3,
-        pointRadius: 2,
-        pointHoverRadius: 8,
-        pointHitRadius: 50,
-        borderColor: '#5C7AFF',
-        fill: true,
-      },
-    ],
-  };
-
-  const dailyOptions: ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-
-    plugins: {
-      legend: { display: false },
-      annotation: {
-        annotations: {
-          plannedLine: {
-            type: 'line',
-            yMin: planned,
-            yMax: planned,
-            borderColor: '#f43f5e',
-            borderWidth: 3,
-            label: {
-              display: true,
-              content: `기준 ${planned.toLocaleString()}원`,
-              position: 'center',
-              backgroundColor: '#FFFFFF',
-              color: '#f43f5e',
-              borderWidth: 0,
-            },
-          },
-        },
-      },
-
-      tooltip: {
-        callbacks: {
-          title: (items) => items?.[0]?.label ?? '',
-          label: (ctx: TooltipItem<'line'>) => {
-            const idx = ctx.dataIndex;
-            const actual = dailyChartData.actualDailySeries[idx] ?? 0;
-            const diff = actual - planned;
-
-            if (diff > 0) {
-              return `${diff.toLocaleString()}원 더 사용`;
-            }
-            if (diff < 0) {
-              return `${Math.abs(diff).toLocaleString()}원 덜 사용`;
-            }
-            return '차이 없음';
-          },
-        },
-      },
-    },
-    scales: {
-      x: { ticks: { autoSkip: true, maxTicksLimit: 8 } },
-      y: {
-        ticks: { callback: (v: string | number) => Number(v).toLocaleString() },
-      },
-    },
-  };
-
   return (
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
@@ -208,96 +87,19 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
         </Card>
 
         {/* 이번 달 사용 현황 (가변 예산 기준) */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-end justify-between">
-              <CardTitle className="text-base">
-                이번 달 사용 금액 현황
-              </CardTitle>
-              <p className="text-muted-foreground text-xs">어제까지 기준</p>
-            </div>
-            <CardDescription className="text-xs">
-              총 예산에서 고정비를 제외한 금액이에요.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <div className="grid grid-cols-2 items-center">
-              {/* Doughnut */}
-              <div className="h-[150px] w-[150px]">
-                <Doughnut data={doughnutData} options={doughnutOptions} />
-              </div>
-
-              <div className="space-y-1">
-                <p className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">
-                    이번 달 사용 가능 금액
-                  </span>
-                  <span className="font-medium">
-                    {varTotal.toLocaleString()}원
-                  </span>
-                </p>
-                <p className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">
-                    어제까지의 지출
-                  </span>
-                  <span className="font-medium">
-                    {varSpentUntilYesterday.toLocaleString()}원
-                  </span>
-                </p>
-                <p className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">
-                    남은 금액
-                  </span>
-                  <span className="font-medium">
-                    {varRemaining.toLocaleString()}원
-                  </span>
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <DailyRecUsageCard
+          varTotal={varTotal}
+          varSpentUntilYesterday={varSpentUntilYesterday}
+          varRemaining={varRemaining}
+        />
 
         {/* 기준 대비 소비 페이스 */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-end justify-between">
-              <CardTitle className="text-base">기준 대비 소비 페이스</CardTitle>
-              <p className="text-muted-foreground text-xs">어제까지 기준</p>
-            </div>
-
-            <p className="text-muted-foreground text-xs">
-              기준 금액은 이번 달 사용 가능한 금액을 날짜에 따라 균등하게 나눈
-              값이에요.
-            </p>
-          </CardHeader>
-          <CardContent>
-            {/* Line chart */}
-            <div className="h-[180px]">
-              <Line data={dailyChart} options={dailyOptions} />
-            </div>
-
-            <div className="mt-2 grid grid-cols-[auto_1fr] gap-3 text-sm">
-              <div className="p-2">
-                <p className="text-muted-foreground">기준 누적</p>
-                <p className="font-medium">
-                  {plannedUntilYesterdayRounded.toLocaleString()}원
-                </p>
-              </div>
-
-              <div className="p-2">
-                <p className="text-muted-foreground">현재 상태</p>
-                <p className="font-medium">
-                  {diff < 0
-                    ? `기준보다 ${Math.abs(diff).toLocaleString()}원 더 사용했어요.`
-                    : diff > 0
-                      ? `기준보다 ${diff.toLocaleString()}원 덜 사용했어요.`
-                      : '기준과 거의 동일해요.'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <DailyRecPaceCard
+          dailyChartData={dailyChartData}
+          planned={planned}
+          plannedUntilYesterdayRounded={plannedUntilYesterdayRounded}
+          diff={diff}
+        />
 
         {/* 권장액 조정 방식 */}
         <Card>
