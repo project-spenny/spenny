@@ -48,18 +48,18 @@ const getStatus = (diff: number): PaceStatus => {
   return diff < 0 ? 'ahead' : 'behind';
 };
 
-const statusText: Record<PaceStatus, { title: string; desc: string }> = {
+const statusText = {
   ahead: {
-    title: '계획보다 빠르게 쓰고 있어요',
-    desc: '초과 사용분을 남은 기간에 나눠 오늘 권장액을 낮췄어요.',
+    title: '조금 빠른 소비 페이스예요',
+    desc: '기준보다 사용이 많아, 남은 기간을 고려해 오늘 권장액을 조정했어요.',
   },
   behind: {
-    title: '계획보다 여유가 있어요',
-    desc: '절약된 금액을 남은 기간에 나눠 오늘 권장액을 높였어요.',
+    title: '여유 있는 소비 페이스예요',
+    desc: '기준보다 사용이 적어, 오늘 사용할 수 있는 금액이 조금 늘었어요.',
   },
   onTrack: {
-    title: '계획대로 진행 중이에요',
-    desc: '현재까지 소비 흐름이 계획과 비슷해요.',
+    title: '안정적인 소비 페이스예요',
+    desc: '지금 흐름을 유지하면 무리 없이 사용할 수 있어요.',
   },
 };
 
