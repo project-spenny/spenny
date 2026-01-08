@@ -12,6 +12,7 @@ import {
   LineElement,
 } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
+import annotationPlugin from 'chartjs-plugin-annotation';
 import {
   Card,
   CardContent,
@@ -30,7 +31,8 @@ ChartJS.register(
   PointElement,
   LineElement,
   Tooltip,
-  Legend
+  Legend,
+  annotationPlugin
 );
 
 type Props = {
@@ -129,6 +131,23 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
 
     plugins: {
       legend: { display: false },
+      annotation: {
+        annotations: {
+          plannedLine: {
+            type: 'line',
+            yMin: planned,
+            yMax: planned,
+            borderColor: '#f43f5e',
+            borderWidth: 3,
+            label: {
+              display: true,
+              content: `권장 기준 ${planned.toLocaleString()}원`,
+              position: 'center',
+            },
+          },
+        },
+      },
+
       tooltip: {
         callbacks: {
           title: (items) => items?.[0]?.label ?? '',
@@ -232,17 +251,17 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
           </CardContent>
         </Card>
 
-        {/* 계획 대비 소비 페이스 */}
+        {/* 기준 대비 소비 페이스 */}
         <Card>
           <CardHeader>
             <div className="flex items-end justify-between">
-              <CardTitle className="text-base">계획 대비 소비 페이스</CardTitle>
+              <CardTitle className="text-base">기준 대비 소비 페이스</CardTitle>
               <p className="text-muted-foreground text-xs">어제까지 기준</p>
             </div>
 
             <p className="text-muted-foreground text-xs">
-              계획은 이번 달 사용 가능 금액을 날짜에 따라 균등하게 나눈 누적
-              기준이에요.
+              기준은 이번 달 사용 가능한 금액을 날짜에 따라 균등하게 나눈
+              값이에요.
             </p>
           </CardHeader>
           <CardContent>
