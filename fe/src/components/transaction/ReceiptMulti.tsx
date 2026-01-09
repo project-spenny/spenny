@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { supabase } from '@/utils/supabase/client';
 import { Input } from '../ui/input';
 import { DatePicker } from './common/DatePicker';
+import { Checkbox } from '../ui/checkbox';
 import {
   Popover,
   PopoverContent,
@@ -59,11 +60,11 @@ export default function ReceiptMulti() {
     });
   };
 
-  const toggleAll = () => {
-    if (checkedItems.size === results.length) {
-      setCheckedItems(new Set());
-    } else {
+  const toggleAll = (checked: boolean | 'indeterminate') => {
+    if (checked === true) {
       setCheckedItems(new Set(results.map((_, i) => i)));
+    } else {
+      setCheckedItems(new Set());
     }
   };
 
@@ -315,11 +316,9 @@ export default function ReceiptMulti() {
               <div className="max-h-[60vh] space-y-3 overflow-y-auto">
                 <div className="flex items-center justify-between">
                   <label className="flex cursor-pointer items-center gap-2">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={checkedItems.size === results.length}
-                      onChange={toggleAll}
-                      className="h-4 w-4"
+                      onCheckedChange={toggleAll}
                     />
                     <span className="text-sm">전체 선택</span>
                   </label>
@@ -330,11 +329,10 @@ export default function ReceiptMulti() {
                       key={index}
                       className="flex gap-4 rounded-lg border p-4"
                     >
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={checkedItems.has(index)}
-                        onChange={() => toggleCheck(index)}
-                        className="top-4 right-4 h-5 w-5 cursor-pointer"
+                        onCheckedChange={() => toggleCheck(index)}
+                        className="h-5 w-5"
                       />
                       <img
                         src={item.preview}
