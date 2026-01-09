@@ -41,6 +41,7 @@ const BudgetRecommendDialog = ({
     income: 0,
     savingsAmount: 0,
   });
+  const [confirmedSavings, setConfirmedSavings] = useState(0);
   const [isAdjusted, setIsAdjusted] = useState(false);
 
   const [selectedTemplateId, setSelectedTemplateId] =
@@ -49,7 +50,7 @@ const BudgetRecommendDialog = ({
 
   const { processedData, isLoading: isAnalysisLoading } = useBudgetGuideData(
     selectedDate,
-    goalData.savingsAmount
+    confirmedSavings
   );
 
   useEffect(() => {
@@ -62,6 +63,7 @@ const BudgetRecommendDialog = ({
         income: initialIncome,
         savingsAmount: initialSavings,
       });
+      setConfirmedSavings(initialSavings);
     }
   }, [processedData]); // processedData가 로드되는 순간 실행됨
 
@@ -90,7 +92,10 @@ const BudgetRecommendDialog = ({
 
   // step 이동 버튼 핸들러
   const handleNextStep = () => {
-    if (step === 3 && processedData) {
+    if (step === 2) {
+      setConfirmedSavings(goalData.savingsAmount);
+      setStep(step + 1);
+    } else if (step === 3 && processedData) {
       let result: CalculatedBudgetItem[] = [];
       let adjusted = false;
 
