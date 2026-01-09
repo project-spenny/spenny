@@ -1,4 +1,4 @@
-import { DailyRecResult } from '@/services/daily-recommendation/calculate';
+import { DailyRecResult } from '@/services/daily-recommendation/base';
 import {
   Card,
   CardContent,

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import { DailyRecPanel } from './DailyRecPanel';
-import { DailyRecResult } from '@/services/daily-recommendation/calculate';
+import { DailyRecResult } from '@/services/daily-recommendation/base';
 import { DailyRecChartData } from '@/services/daily-recommendation/chart';
 
 type Props = {
