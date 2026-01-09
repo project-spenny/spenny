@@ -5,7 +5,7 @@ import { getMonthDayStats } from '@/utils/date';
 const toNonNegative = (n: number) => (Number.isFinite(n) ? Math.max(n, 0) : 0);
 
 // 일일 권장 사용 금액 계산
-export const calculateDailyRec = (input: DailyRecInput): DailyRecResult => {
+export const calculateBaseDailyRec = (input: DailyRecInput): DailyRecResult => {
   // 날짜 통계
   const { daysInMonth, dayOfMonth, elapsedDays, remainingDays } =
     getMonthDayStats(input.today);

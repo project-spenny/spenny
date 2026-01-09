@@ -77,7 +77,7 @@ const defaultOptions: Required<SpendingPatternOptions> = {
   combineMix: { weekdayWeekend: 0.6, segment: 0.4 },
 };
 
-export const calculateWeights = (
+export const calculateSpendingPatternWeights = (
   spendingTransactions: SpendingTransaction[],
   todayDateString: string,
   options?: SpendingPatternOptions

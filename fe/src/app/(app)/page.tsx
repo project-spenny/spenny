@@ -15,7 +15,7 @@ import {
   sumExpenseUntilYesterday,
   sumFixedExpenseUntilYesterday,
 } from '@/utils/transaction';
-import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
+import { calculateBaseDailyRec } from '@/services/daily-recommendation/calculate';
 import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
 import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs';
 import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
@@ -92,7 +92,7 @@ async function DataCalendar({
     today
   );
 
-  const daily = calculateDailyRec({
+  const daily = calculateBaseDailyRec({
     today,
     budget,
     fixedPlannedThisMonth,
