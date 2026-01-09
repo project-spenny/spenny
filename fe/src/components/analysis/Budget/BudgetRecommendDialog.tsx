@@ -81,8 +81,6 @@ const BudgetRecommendDialog = ({
   // 템플릿 선택 핸들러
   const handleTemplateSelect = (id: TemplateId) => {
     setSelectedTemplateId(id);
-    // TODO: 선택된 템플릿에 따라 예산 초안(budgetDraft)을 계산하는 함수를 실행할 예정
-    console.log(`선택된 템플릿: ${id}`);
   };
 
   // step 이동 버튼 핸들러
@@ -211,7 +209,6 @@ const BudgetRecommendDialog = ({
             <TemplateSelectionStep
               selectedId={selectedTemplateId}
               onSelect={handleTemplateSelect}
-              spendableBudget={spendableBudget}
             />
           )}
 
