@@ -23,14 +23,30 @@ export const calculateDailyRec = (
   );
 
   // 일일 권장액에 가중치 적용
-  const weightedAmountRaw = baseResult.amount * weights.combinedWeight;
-  const weightedAmount = Math.floor(weightedAmountRaw);
+  const weightedTotalAmountRaw = baseResult.amount * weights.combinedWeight;
+  const weightedTotalAmount = Math.floor(weightedTotalAmountRaw);
+
+  // 일일 권장액에 오늘 지출 합산
+  const spentVariableToday = spendingTransactions.reduce((sum, transaction) => {
+    const isToday = transaction.date === todayDateString;
+    const amount = transaction.amount;
+
+    if (!isToday) return sum;
+    if (!Number.isFinite(amount) || amount <= 0) return sum;
+
+    return sum + amount;
+  }, 0);
+
+  // 최종적으로 오늘 남은 권장액
+  const remainingAmount = Math.max(weightedTotalAmount - spentVariableToday, 0);
 
   return {
-    amount: weightedAmount,
+    amount: remainingAmount,
     debug: {
       ...baseResult.debug,
       weights,
+      weightedTotalAmount,
+      spentVariableToday,
     },
   };
 };
