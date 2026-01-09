@@ -24,6 +24,7 @@ import {
 } from '../ui/dialog';
 import { TitleInput } from './common/TitleInput';
 import { read } from 'fs';
+import { Progress } from '@/components/ui/progress';
 import { Label } from '../ui/label';
 interface OCRProps {
   onResult: (data: OCRResult) => void;
@@ -43,6 +44,8 @@ export default function ReceiptMulti() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [results, setResults] = useState<ResultWithPreview[]>([]);
   const [step, setStep] = useState<'upload' | 'result'>('upload');
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
+
   // 이미지를 base64 문자열로 변환
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -93,6 +96,7 @@ export default function ReceiptMulti() {
     const errors: number[] = [];
 
     setLoading(true);
+    setProgress({ current: 0, total: files.length });
 
     for (let i = 0; i < files.length; i++) {
       toast(`${i} 번째`);
@@ -116,6 +120,8 @@ export default function ReceiptMulti() {
       } catch {
         errors.push(i + 1);
       }
+
+      setProgress({ current: i + 1, total: files.length });
     }
 
     setLoading(false);
@@ -134,7 +140,7 @@ export default function ReceiptMulti() {
   // 가계부 업로드
   const handleSubmit = async () => {
     if (results.length === 0) {
-      toast.error('저장할 데이터가 없습니다');
+      toast.error('인식할 데이터가 없습니다');
       return;
     }
 
@@ -166,14 +172,14 @@ export default function ReceiptMulti() {
         .insert(transactionsData);
 
       if (error) {
-        toast.error('저장 실패');
+        toast.error('인식 실패');
         return;
       }
 
-      toast.success(`${results.length} 건 저장 완료`);
+      toast.success(`인식 완료!`);
       setOpen(false);
     } catch (error) {
-      toast.error('저장 중 오류가 발생했습니다');
+      toast.error('인식 중 오류가 발생했습니다');
     } finally {
       setLoading(false);
     }
@@ -257,6 +263,14 @@ export default function ReceiptMulti() {
                     ))}
                   </div>
                 </>
+              )}
+              {loading && (
+                <div className="space-y-2">
+                  <Progress value={(progress.current / progress.total) * 100} />
+                  <p className="text-muted-foreground text-center text-sm">
+                    {progress.current} / {progress.total} 처리 중...
+                  </p>
+                </div>
               )}
               <Button
                 onClick={handleUpload}
