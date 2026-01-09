@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '../ui/dialog';
+import { read } from 'fs';
 interface OCRProps {
   onResult: (data: OCRResult) => void;
 }
@@ -22,11 +23,28 @@ export default function ReceiptMulti({ onResult }: OCRProps) {
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>();
   const inputRef = useRef<HTMLInputElement>(null);
+  // 이미지를 base64 문자열로 변환
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
-  console.log(files);
+  const addFiles = async (newFiles: File[]) => {
+    const imgFiles = newFiles.filter((file) => file.type.startsWith('image/')); // 이미지 아닌 파일은 걸러내기
+    if (imgFiles.length === 0) {
+      toast.error('이미지 파일만 업로드 가능합니다');
+      return;
+    }
+    setFiles((prev) => [...(prev || []), ...imgFiles]);
+  };
+
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    setFiles(selectedFiles);
+    addFiles(selectedFiles);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
