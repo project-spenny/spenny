@@ -50,7 +50,8 @@ export const BUDGET_GROUPS: GroupInfo[] = [
     label: 'Essential (필수)',
     color: 'bg-blue-500',
     textColor: 'text-blue-600',
-    badgeColor: 'bg-blue-100 text-blue-700',
+    badgeColor:
+      'bg-blue-100 text-blue-700 dark:bg-blue-700/30 dark:text-primary',
     description: '주거, 통신/구독, 교통, 식비, 교육, 육아, 금융',
   },
   {
@@ -58,7 +59,8 @@ export const BUDGET_GROUPS: GroupInfo[] = [
     label: 'Flexible (유연)',
     color: 'bg-lime-500',
     textColor: 'text-lime-600',
-    badgeColor: 'bg-lime-100 text-lime-700',
+    badgeColor:
+      'bg-lime-100 text-lime-700 dark:bg-lime-700/30 dark:text-primary',
     description: '문화/여가, 쇼핑, 미용, 반려동물, 경조, 의료, 기타',
   },
 ] as const;
