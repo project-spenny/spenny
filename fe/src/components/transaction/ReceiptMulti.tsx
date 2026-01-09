@@ -1,11 +1,10 @@
 'use client';
 import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
-import { Receipt, Images, Upload, X } from 'lucide-react';
+import { Images, Upload, X } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
-import Image from 'next/image';
 import { supabase } from '@/utils/supabase/client';
 import { Input } from '../ui/input';
 import { DatePicker } from './common/DatePicker';
@@ -23,13 +22,8 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '../ui/dialog';
-import { TitleInput } from './common/TitleInput';
-import { read } from 'fs';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '../ui/label';
-interface OCRProps {
-  onResult: (data: OCRResult) => void;
-}
 
 interface ResultWithPreview {
   result: OCRResult;
@@ -196,14 +190,14 @@ export default function ReceiptMulti() {
         .insert(transactionsData);
 
       if (error) {
-        toast.error('인식 실패');
+        toast.error('등록 실패');
         return;
       }
 
-      toast.success(`인식 완료!`);
+      toast.success(`등록 완료!`);
       setOpen(false);
     } catch (error) {
-      toast.error('인식 중 오류가 발생했습니다');
+      toast.error('등록 중 오류가 발생했습니다');
     } finally {
       setLoading(false);
     }
