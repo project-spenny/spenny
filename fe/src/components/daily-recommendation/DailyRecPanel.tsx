@@ -9,33 +9,15 @@ import { Badge } from '@/components/ui/badge';
 import { DailyRecUsageCard } from './DailyRecDoughnut';
 import { DailyRecPaceCard } from './DailyRecLine';
 import { DailyRecChartData, DailyRecResult } from '@/types/dailyRec';
+import {
+  getPaceExplanation,
+  getPaceStatus,
+  getPatternExplanation,
+} from '@/services/daily-recommendation/explain';
 
 type Props = {
   daily: DailyRecResult;
   dailyChartData: DailyRecChartData;
-};
-
-type PaceStatus = 'ahead' | 'behind' | 'onTrack';
-
-const getStatus = (diff: number): PaceStatus => {
-  const epsilon = 1000; // 허용 오차(원)
-  if (Math.abs(diff) < epsilon) return 'onTrack';
-  return diff < 0 ? 'ahead' : 'behind';
-};
-
-const statusText = {
-  ahead: {
-    title: '조금 빠른 소비 페이스예요',
-    desc: '기준보다 사용이 많아, 남은 기간을 고려해 오늘 권장액을 조정했어요.',
-  },
-  behind: {
-    title: '여유 있는 소비 페이스예요',
-    desc: '기준보다 사용이 적어, 오늘 사용할 수 있는 금액이 조금 늘었어요.',
-  },
-  onTrack: {
-    title: '안정적인 소비 페이스예요',
-    desc: '지금 흐름을 유지하면 무리 없이 사용할 수 있어요.',
-  },
 };
 
 export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
@@ -56,8 +38,8 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
   const plannedUntilYesterdayRounded = Math.round(plannedUntilYesterday);
   const adjustPerDayRounded = Math.round(adjustPerDay);
   const diff = Math.round(rawDiff);
-  const status = getStatus(diff);
-  const { title, desc } = statusText[status];
+  const paceStatus = getPaceStatus(diff);
+  const { title, desc } = getPaceExplanation(paceStatus);
   const planned =
     daily.debug.daysInMonth > 0
       ? Math.round(daily.debug.varTotal / daily.debug.daysInMonth)
@@ -65,43 +47,8 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
 
   const totalAmount = weightedTotalAmount ?? amount;
   const spentToday = spentVariableToday ?? 0;
-  const combinedWeight = weights?.combinedWeight;
 
-  // 패턴 가중치 퍼센트 표시용
-  const patternRate =
-    weights?.combinedWeight != null
-      ? Math.round((weights.combinedWeight - 1) * 100)
-      : 0;
-
-  // 구간 라벨
-  const segmentLabel =
-    weights?.basis?.todaySegment === 'early'
-      ? '월초'
-      : weights?.basis?.todaySegment === 'mid'
-        ? '월중'
-        : weights?.basis?.todaySegment === 'late'
-          ? '월말'
-          : null;
-
-  // 요일 라벨
-  const weekendLabel =
-    weights?.basis?.todayIsWeekend == null
-      ? null
-      : weights.basis.todayIsWeekend
-        ? '주말'
-        : '평일';
-
-  // 패턴 설명 문장
-  const patternReasonParts = [weekendLabel, segmentLabel].filter(Boolean);
-  const patternReason =
-    patternReasonParts.length > 0 ? patternReasonParts.join(' · ') : null;
-
-  const patternMessage =
-    combinedWeight == null || patternRate === 0
-      ? '최근 소비 패턴과 비슷한 수준으로 계산했어요.'
-      : patternRate > 0
-        ? `${patternReason ?? '소비 패턴'} 경향을 반영해 오늘 권장액이 조금 늘었어요 (+${patternRate}%).`
-        : `${patternReason ?? '소비 패턴'} 경향을 반영해 오늘 권장액이 조금 줄었어요 (${patternRate}%).`;
+  const patternMessage = getPatternExplanation(weights);
 
   return (
     <div className="flex min-h-full flex-col px-6">
