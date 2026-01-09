@@ -5,8 +5,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
-import { Badge } from '@/components/ui/badge';
-import BudgetResultRow from './BudgetResultRow';
+import BudgetResultSection from '@/components/analysis/Budget/BudgetResultSection';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';
 import { Card } from '@/components/ui/card';
 import { Info } from 'lucide-react';
@@ -42,12 +41,8 @@ const BudgetResultStep = ({
   );
 
   // 전체 예산 대비 그룹별 비중(%) 계산
-  const essentialPercent = Math.round(
-    (essentialTotal / (spendableBudget || 1)) * 100
-  );
-  const flexiblePercent = Math.round(
-    (flexibleTotal / (spendableBudget || 1)) * 100
-  );
+  const getPercent = (total: number) =>
+    Math.round((total / (spendableBudget || 1)) * 100);
 
   return (
     <div className="flex flex-col gap-6">
@@ -89,76 +84,26 @@ const BudgetResultStep = ({
 
       <div className="space-y-10">
         {/* 필수 지출 섹션 */}
-        <div className="group space-y-4">
-          <div className="flex items-end justify-between px-1">
-            <div className="space-y-1">
-              <h3
-                className={`flex items-center gap-2 text-lg font-bold ${essentialGroup.textColor}`}
-              >
-                필수 지출
-                <Badge
-                  className={`${essentialGroup.badgeColor} px-2 py-0.5 font-bold`}
-                >
-                  {essentialPercent}%
-                </Badge>
-              </h3>
-              <p className="text-muted-foreground text-xs font-medium">
-                {essentialGroup.description}
-              </p>
-            </div>
-            <div className="text-right">
-              <span className="text-lg font-black text-slate-800">
-                {essentialTotal.toLocaleString()}원
-              </span>
-            </div>
-          </div>
-
-          <div className="grid gap-2 md:grid-cols-2">
-            {essentialItems.map((item) => (
-              <BudgetResultRow
-                key={item.categoryId}
-                item={item}
-                badgeColor={essentialGroup.badgeColor}
-              />
-            ))}
-          </div>
-        </div>
+        <BudgetResultSection
+          title="필수 지출"
+          totalAmount={essentialTotal}
+          percent={getPercent(essentialTotal)}
+          description={essentialGroup.description}
+          items={essentialItems}
+          textColor={essentialGroup.textColor}
+          badgeColor={essentialGroup.badgeColor}
+        />
 
         {/* 유연 지출 섹션 */}
-        <div className="group space-y-4">
-          <div className="flex items-end justify-between px-1">
-            <div className="space-y-1">
-              <h3
-                className={`flex items-center gap-2 text-lg font-bold ${flexibleGroup.textColor}`}
-              >
-                유연 지출
-                <Badge
-                  className={`${flexibleGroup.badgeColor} px-2 py-0.5 font-bold`}
-                >
-                  {flexiblePercent}%
-                </Badge>
-              </h3>
-              <p className="text-muted-foreground text-xs font-medium">
-                {flexibleGroup.description}
-              </p>
-            </div>
-            <div className="text-right">
-              <span className="text-lg font-black text-slate-800">
-                {flexibleTotal.toLocaleString()}원
-              </span>
-            </div>
-          </div>
-
-          <div className="grid gap-2 md:grid-cols-2">
-            {flexibleItems.map((item) => (
-              <BudgetResultRow
-                key={item.categoryId}
-                item={item}
-                badgeColor={flexibleGroup.badgeColor}
-              />
-            ))}
-          </div>
-        </div>
+        <BudgetResultSection
+          title="유연 지출"
+          totalAmount={flexibleTotal}
+          percent={getPercent(flexibleTotal)}
+          description={flexibleGroup.description}
+          items={flexibleItems}
+          textColor={flexibleGroup.textColor}
+          badgeColor={flexibleGroup.badgeColor}
+        />
       </div>
 
       <div className="text-muted-foreground flex gap-1 px-2 text-xs">
