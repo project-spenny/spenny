@@ -19,13 +19,14 @@ interface OCRProps {
   onResult: (data: OCRResult) => void;
 }
 
-export default function ReceiptMulti({ onResult }: OCRProps) {
+export default function ReceiptMulti() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [results, setResults] = useState<OCRResult[]>([]);
 
   // 이미지를 base64 문자열로 변환
   const fileToBase64 = (file: File): Promise<string> => {
@@ -62,6 +63,52 @@ export default function ReceiptMulti({ onResult }: OCRProps) {
     addFiles(selectedFiles);
     if (inputRef.current) {
       inputRef.current.value = '';
+    }
+  };
+
+  // 업로드
+  const handleUpload = async () => {
+    // 파일 없을 때 예외처리
+    if (files.length === 0) {
+      toast.error('업로드 할 파일을 등록해주세요');
+      return;
+    }
+
+    const ocrResults: OCRResult[] = [];
+    const errors: number[] = [];
+
+    setLoading(true);
+
+    for (let i = 0; i < files.length; i++) {
+      toast(`${i} 번째`);
+      try {
+        const base64 = await fileToBase64(files[i]);
+        const res = await fetch('/api/ocr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64 }),
+        });
+
+        if (!res.ok) {
+          throw new Error('영수증 인식에 실패했습니다');
+        }
+
+        const data = await res.json();
+        ocrResults.push(data);
+      } catch {
+        errors.push(i + 1);
+      }
+    }
+
+    setLoading(false);
+
+    if (errors.length > 0) {
+      toast.error(`${errors.join(', ')}번째 영수증 인식 실패`);
+    }
+
+    if (ocrResults.length > 0) {
+      toast.success(`${results.length}개 영수증 인식 완료`);
+      setResults(ocrResults);
     }
   };
   return (
@@ -145,6 +192,38 @@ export default function ReceiptMulti({ onResult }: OCRProps) {
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
+          )}
+          <Button
+            onClick={handleUpload}
+            disabled={loading || files.length === 0}
+          >
+            {loading ? '처리 중...' : `영수증 업로드`}
+          </Button>
+          {results.length > 0 && (
+            <>
+              <div className="space-y-3 overflow-y-auto">
+                {results.map((result, index) => (
+                  <div key={index} className="space-y-2 rounded-lg border p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{result.title}</span>
+                      <span className="text-muted-foreground text-sm">
+                        {typeof result.date === 'string'
+                          ? result.date
+                          : new Date(result.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground text-sm">
+                        {result.category_id}
+                      </span>
+                      <span className="font-bold">
+                        {result.amount.toLocaleString()}원
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
