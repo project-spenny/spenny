@@ -72,7 +72,9 @@ export const calculateKeepPatternBudget = (
   const distributedItems = getBasicDraft(spendableBudget, categoryStats);
 
   // 자투리 금액 보정하여 최종 반환
-  return fillGap(distributedItems, spendableBudget);
+  return fillGap(distributedItems, spendableBudget).sort(
+    (a, b) => b.amount - a.amount
+  );
 };
 
 // 유연 지출 절감형/강력 절약형 공통 예산 산출 함수
@@ -133,7 +135,9 @@ export const calculateSaveFlexible = (
 
   // 자투리 보정 및 반환
   return {
-    items: fillGap(adjustedItems, spendableBudget),
+    items: fillGap(adjustedItems, spendableBudget).sort(
+      (a, b) => b.amount - a.amount
+    ),
     isAdjusted: true,
   };
 };
