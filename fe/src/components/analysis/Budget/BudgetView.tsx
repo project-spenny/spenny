@@ -516,6 +516,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
         defaultAmount={totalBudget?.amount} // 기존 금액 전달
       />
 
+      {/* 예산 추천 */}
       <BudgetRecommendDialog
         open={isRecommendOpen}
         onOpenChange={setIsRecommendOpen}

@@ -7,20 +7,17 @@ import {
 
 import { BUDGET_TEMPLATES } from '@/constants/budgetTemplates';
 import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { TemplateId } from '@/types/budgetGuide';
 import { cn } from '@/lib/utils';
 
 type TemplateSelectionStepProps = {
   selectedId: TemplateId;
   onSelect: (id: TemplateId) => void;
-  spendableBudget: number;
 };
 
 const TemplateSelectionStep = ({
   selectedId,
   onSelect,
-  spendableBudget,
 }: TemplateSelectionStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
