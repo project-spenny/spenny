@@ -65,9 +65,16 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
                   {amount.toLocaleString()}원
                 </CardTitle>
 
-                <p className="text-muted-foreground text-xs">
-                  총 권장액 {totalAmount.toLocaleString()}원에서 오늘 지출{' '}
-                  {spentToday.toLocaleString()}원을 뺐어요
+                <p className="text-muted-foreground text-sm">
+                  총 권장액{' '}
+                  <span className="text-foreground font-medium">
+                    {totalAmount.toLocaleString()}원
+                  </span>
+                  <span className="text-foreground px-2 font-bold">-</span>오늘
+                  지출{' '}
+                  <span className="text-foreground font-medium">
+                    {spentToday.toLocaleString()}원
+                  </span>
                 </p>
               </div>
 
@@ -77,10 +84,13 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
 
           <CardContent>
             {/* 가중치(패턴) 근거 */}
-            <p className="text-muted-foreground text-xs">{patternMessage}</p>
-
+            <p className="text-foreground border-primary/40 border-l-2 pl-3 text-sm">
+              {patternMessage}
+            </p>
             {/* 페이스(누적 흐름) 근거 */}
-            <p className="text-muted-foreground text-xs">{desc}</p>
+            <p className="text-foreground border-primary/40 border-l-2 pl-3 text-sm">
+              {desc}
+            </p>
           </CardContent>
         </Card>
 
