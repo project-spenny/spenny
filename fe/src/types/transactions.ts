@@ -12,3 +12,10 @@ export interface ITransaction {
   updated_at: Date;
   tags: string[];
 }
+
+export interface OCRResult {
+  title: string;
+  date: Date;
+  category_id: string;
+  amount: number;
+}
