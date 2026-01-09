@@ -74,3 +74,66 @@ export const calculateKeepPatternBudget = (
   // 자투리 금액 보정하여 최종 반환
   return fillGap(distributedItems, spendableBudget);
 };
+
+// 유연 지출 절감형/강력 절약형 공통 예산 산출 함수
+export const calculateSaveFlexible = (
+  spendableBudget: number,
+  categoryStats: Record<string, CategoryStat>,
+  maxFlexibleRatio: number
+): { items: CalculatedBudgetItem[]; isAdjusted: boolean } => {
+  if (Object.keys(categoryStats).length === 0)
+    return { items: [], isAdjusted: false };
+
+  // 과거 비중으로 먼저 계산
+  const distributedItems = getBasicDraft(spendableBudget, categoryStats);
+
+  // 현재 유연 지출(flexible) 그룹의 총 비중 계산
+  const currentFlexibleTotal = distributedItems
+    .filter((item) => item.groupId === 'flexible')
+    .reduce((sum, item) => sum + item.amount, 0);
+
+  const currentFlexibleRatio = currentFlexibleTotal / spendableBudget;
+
+  // 조정이 필요한지 확인 (상한선보다 클 때만 조정)
+  const isAdjusted = currentFlexibleRatio > maxFlexibleRatio;
+
+  if (!isAdjusted) {
+    // 조정이 필요 없으면 원본에 차액만 보정해서 반환
+    return {
+      items: fillGap(distributedItems, spendableBudget),
+      isAdjusted: false,
+    };
+  }
+
+  // 조정 로직: 유연 지출을 상한선 금액으로 강제 고정
+  const targetFlexibleTotal = spendableBudget * maxFlexibleRatio;
+  const targetEssentialTotal = spendableBudget - targetFlexibleTotal;
+
+  // 그룹별 내에서 다시 비중 재배분
+  const adjustedItems = distributedItems.map((item) => {
+    if (item.groupId === 'flexible') {
+      // 유연 그룹 내에서의 상대적 비중 계산
+      const groupWeight = item.amount / currentFlexibleTotal;
+
+      return {
+        ...item,
+        amount: Math.floor((targetFlexibleTotal * groupWeight) / 100) * 100,
+      };
+    } else {
+      // 필수/고정 그룹 합산 (essential)
+      const currentEssentialTotal = spendableBudget - currentFlexibleTotal;
+      const groupWeight = item.amount / currentEssentialTotal;
+
+      return {
+        ...item,
+        amount: Math.floor((targetEssentialTotal * groupWeight) / 100) * 100,
+      };
+    }
+  });
+
+  // 자투리 보정 및 반환
+  return {
+    items: fillGap(adjustedItems, spendableBudget),
+    isAdjusted: true,
+  };
+};
