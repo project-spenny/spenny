@@ -41,3 +41,14 @@ export type BudgetGuideData = {
   targetSaving: number; // 저축 목표
   spendableBudget: number; // (Income - Saving)
 };
+
+// 예산 템플릿
+export type TemplateId = 'keep-pattern' | 'save-flexible' | 'extreme-save';
+
+export type BudgetTemplate = {
+  id: TemplateId;
+  title: string;
+  description: string;
+  subtitle: string;
+  flexibleLimitRatio?: number; // Flexible 그룹의 최대 비중 (%)
+};
