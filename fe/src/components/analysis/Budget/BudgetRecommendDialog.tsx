@@ -1,5 +1,9 @@
 import { ArrowRight, Info } from 'lucide-react';
-import { CategoryGroupId, TemplateId } from '@/types/budgetGuide';
+import {
+  CalculatedBudgetItem,
+  CategoryGroupId,
+  TemplateId,
+} from '@/types/budgetGuide';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -9,6 +13,7 @@ import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisSte
 import { Progress } from '@/components/ui/progress';
 import SavingGoalStep from '@/components/analysis/Budget/SavingGoalStep';
 import TemplateSelectionStep from '@/components/analysis/Budget/TemplateSelectionStep';
+import { calculateKeepPatternBudget } from '@/utils/calculateBudget';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
@@ -27,9 +32,10 @@ const BudgetRecommendDialog = ({
     income: 0,
     savingsAmount: 0,
   });
-  // 선택된 템플릿
+
   const [selectedTemplateId, setSelectedTemplateId] =
-    useState<TemplateId>('keep-pattern');
+    useState<TemplateId>('keep-pattern'); // 선택된 템플릿
+  const [budgetDraft, setBudgetDraft] = useState<CalculatedBudgetItem[]>([]); // 계산된 예산 초안
 
   const { processedData, isLoading } = useBudgetGuideData(
     selectedDate,
@@ -61,10 +67,30 @@ const BudgetRecommendDialog = ({
     console.log(`선택된 템플릿: ${id}`);
   };
 
+  // step 이동 버튼 핸들러
+  const handleNextStep = () => {
+    if (step === 3 && processedData) {
+      const result = calculateKeepPatternBudget(
+        spendableBudget,
+        processedData.categoryStats
+      );
+
+      setBudgetDraft(result);
+      console.log('💰 [버튼 클릭] 계산된 예산 초안:', result);
+
+      setStep(4); // 계산 후 결과 페이지로 이동
+    } else if (step === 4) {
+      onOpenChange(false); // 다이얼로그 닫기
+    } else {
+      setStep(step + 1);
+    }
+  };
+
   const nextButtonLabels: Record<number, string> = {
     1: '분석 완료! 목표 세우기',
     2: '목표 설정 완료',
-    3: '예산 확정하기',
+    3: '예산 결과 확인하기',
+    4: '이대로 예산 확정하기',
   };
 
   // UI용 그룹 데이터 가공
@@ -107,7 +133,7 @@ const BudgetRecommendDialog = ({
       <DialogContent className="flex h-[800px] w-full flex-col md:max-w-2xl">
         {/* 상단 Step 표시 */}
         <div className="px-6 pt-6">
-          <Progress value={(step / 3) * 100} className="h-1" />
+          <Progress value={(step / 4) * 100} className="h-1" />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -130,7 +156,7 @@ const BudgetRecommendDialog = ({
             />
           )}
 
-          {/* Step 3: 템플릿 선택 및 결과 확인 */}
+          {/* Step 3: 템플릿 선택 */}
           {step === 3 && (
             <TemplateSelectionStep
               selectedId={selectedTemplateId}
@@ -138,6 +164,8 @@ const BudgetRecommendDialog = ({
               spendableBudget={spendableBudget}
             />
           )}
+
+          {/* Step: 예산 결과 확인 및 최종 확정 */}
         </div>
 
         <DialogFooter className="border-t p-6">
@@ -154,10 +182,10 @@ const BudgetRecommendDialog = ({
               )}
               <Button
                 className="h-12 flex-2 cursor-pointer text-base font-bold"
-                onClick={() => setStep(step + 1)}
+                onClick={handleNextStep}
               >
                 {nextButtonLabels[step] || '다음 단계'}
-                <ArrowRight className="h-4 w-4" />
+                {step < 4 && <ArrowRight className="h-4 w-4" />}
               </Button>
             </div>
 
