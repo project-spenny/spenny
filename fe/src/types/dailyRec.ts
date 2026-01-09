@@ -29,6 +29,7 @@ export type DailyRecDebug = {
   adjustedDaily: number;
 
   weights?: SpendingPatternWeights; // 소비 패턴 기반 가중치 정보
+  totalAmountBeforePattern?: number; // 소비 패턴 적용 전 오늘 총 권장액
   weightedTotalAmount?: number; // 오늘 총 권장액
   spentVariableToday?: number; // 오늘 가변 지출
 };

@@ -22,8 +22,12 @@ export const calculateDailyRec = (
     todayDateString
   );
 
+  // 소비 패턴 적용 전 일일 권장액
+  const totalAmountBeforePattern = baseResult.amount;
+
   // 일일 권장액에 가중치 적용
-  const weightedTotalAmountRaw = baseResult.amount * weights.combinedWeight;
+  const weightedTotalAmountRaw =
+    totalAmountBeforePattern * weights.combinedWeight;
   const weightedTotalAmount = Math.floor(weightedTotalAmountRaw);
 
   // 일일 권장액에 오늘 지출 합산
@@ -47,6 +51,7 @@ export const calculateDailyRec = (
       weights,
       weightedTotalAmount,
       spentVariableToday,
+      totalAmountBeforePattern,
     },
   };
 };
