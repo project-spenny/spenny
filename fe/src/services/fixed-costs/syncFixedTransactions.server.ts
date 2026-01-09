@@ -22,6 +22,14 @@ export const syncByMonthServer = async ({
 
   if (!user) throw new Error('User not authenticated');
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_guest')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const isGuest = !!profile?.is_guest;
+
   return syncByMonthShared(
     {
       // 해당 월에 유효한 고정비 규칙 조회
@@ -63,6 +71,13 @@ export const syncByMonthServer = async ({
         throw error;
       },
     },
-    { userId: user.id, monthDate, startDate, endDate, generateThroughDate }
+    {
+      userId: user.id,
+      isGuest,
+      monthDate,
+      startDate,
+      endDate,
+      generateThroughDate,
+    }
   );
 };

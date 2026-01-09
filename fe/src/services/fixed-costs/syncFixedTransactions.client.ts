@@ -7,7 +7,8 @@ import { PG_ERROR } from '@/constants/postgres';
 // 클라이언트 환경에서 고정비 규칙 기반 월별 거래 동기화
 export const syncByMonthClient = async (
   monthDate: Date,
-  generateThroughDate?: string
+  generateThroughDate?: string,
+  options?: { isGuest?: boolean }
 ) => {
   const userId = await requireUserId();
   const { startDate, endDate } = getMonthRange(monthDate);
@@ -53,6 +54,13 @@ export const syncByMonthClient = async (
         throw error;
       },
     },
-    { userId, monthDate, startDate, endDate, generateThroughDate }
+    {
+      userId,
+      isGuest: options?.isGuest,
+      monthDate,
+      startDate,
+      endDate,
+      generateThroughDate,
+    }
   );
 };
