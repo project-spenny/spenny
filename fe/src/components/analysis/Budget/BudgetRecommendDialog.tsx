@@ -68,7 +68,12 @@ const BudgetRecommendDialog = ({
   // open 상태가 false가 될 때 step을 1로 리셋
   useEffect(() => {
     if (!open) {
-      const timer = setTimeout(() => setStep(1), 300);
+      const timer = setTimeout(() => {
+        setStep(1);
+        setSelectedTemplateId('keep-pattern');
+        setBudgetDraft([]);
+        setIsAdjusted(false);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [open]);
