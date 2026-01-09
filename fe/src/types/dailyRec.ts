@@ -40,3 +40,31 @@ export type DailyRecChartData = {
   labels: string[];
   actualDailySeries: number[];
 };
+
+// 월 구간 (초/중/말)
+export type DaySegment = 'early' | 'mid' | 'late';
+
+// 소비 패턴 가중치 산출에 사용된 근거 데이터
+export type SpendingPatternBasis = {
+  avgAll: number; // 최근 기간 전체 평균
+  avgWeekday: number; // 최근 기간 평일 평균
+  avgWeekend: number; // 최근 기간 주말 평균
+
+  avgEarly: number; // 월초(1~7) 평균
+  avgMid: number; // 월중(8~23) 평균
+  avgLate: number; // 월말(24~말일) 평균
+
+  todayIsWeekend: boolean;
+  todaySegment: DaySegment;
+
+  lookbackDays: number; // 통계 계산에 사용한 기간(일)
+};
+
+// 소비 패턴 가중치 결과
+export type SpendingPatternWeights = {
+  dowWeight: number; // 평일/주말 패턴 영향
+  segmentWeight: number; // 월초/중/말 패턴 영향
+  combinedWeight: number; // 최종 적용 가중치
+
+  basis: SpendingPatternBasis;
+};
