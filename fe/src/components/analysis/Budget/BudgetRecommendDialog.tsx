@@ -5,6 +5,10 @@ import {
   TemplateId,
 } from '@/types/budgetGuide';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
+import {
+  calculateKeepPatternBudget,
+  calculateSaveFlexible,
+} from '@/utils/calculateBudget';
 import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
@@ -15,7 +19,6 @@ import { Progress } from '@/components/ui/progress';
 import SavingGoalStep from '@/components/analysis/Budget/SavingGoalStep';
 import { Spinner } from '@/components/ui/spinner';
 import TemplateSelectionStep from '@/components/analysis/Budget/TemplateSelectionStep';
-import { calculateKeepPatternBudget } from '@/utils/calculateBudget';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
@@ -38,6 +41,7 @@ const BudgetRecommendDialog = ({
     income: 0,
     savingsAmount: 0,
   });
+  const [isAdjusted, setIsAdjusted] = useState(false);
 
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<TemplateId>('keep-pattern'); // 선택된 템플릿
@@ -84,12 +88,42 @@ const BudgetRecommendDialog = ({
   // step 이동 버튼 핸들러
   const handleNextStep = () => {
     if (step === 3 && processedData) {
-      const result = calculateKeepPatternBudget(
-        spendableBudget,
-        processedData.categoryStats
-      );
+      let result: CalculatedBudgetItem[] = [];
+      let adjusted = false;
+
+      // 템플릿별 분기 처리
+      switch (selectedTemplateId) {
+        case 'keep-pattern':
+          result = calculateKeepPatternBudget(
+            spendableBudget,
+            processedData.categoryStats
+          );
+          adjusted = false;
+          break;
+        case 'save-flexible': {
+          const res = calculateSaveFlexible(
+            spendableBudget,
+            processedData.categoryStats,
+            0.4
+          );
+          result = res.items;
+          adjusted = res.isAdjusted;
+          break;
+        }
+        case 'extreme-save': {
+          const res = calculateSaveFlexible(
+            spendableBudget,
+            processedData.categoryStats,
+            0.3
+          );
+          result = res.items;
+          adjusted = res.isAdjusted;
+          break;
+        }
+      }
 
       setBudgetDraft(result);
+      setIsAdjusted(adjusted);
       setStep(step + 1);
     } else if (step === 4) {
       if (isSubmitting) return;
@@ -186,6 +220,8 @@ const BudgetRecommendDialog = ({
             <BudgetResultStep
               budgetDraft={budgetDraft}
               spendableBudget={spendableBudget}
+              isAdjusted={isAdjusted}
+              templateId={selectedTemplateId}
             />
           )}
         </div>
