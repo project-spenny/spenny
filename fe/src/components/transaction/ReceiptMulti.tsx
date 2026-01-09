@@ -224,7 +224,7 @@ export default function ReceiptMulti() {
         <DialogContent className="max-w-lg overflow-hidden border-none">
           <DialogHeader>
             <DialogTitle>
-              {step === 'upload' ? '영수증 업로드' : '인식 결과'}
+              {step === 'upload' ? `영수증 업로드` : '인식 결과'}
             </DialogTitle>
           </DialogHeader>
           {step === 'upload' && (
@@ -249,9 +249,6 @@ export default function ReceiptMulti() {
               {/* 미리보기 영역 */}
               {previews.length > 0 && (
                 <>
-                  <p className="text-muted-foreground">
-                    {previews.length}개의 이미지
-                  </p>
                   <div className="grid grid-cols-4 gap-6 overflow-y-scroll">
                     {previews.map((src, index) => (
                       <div key={index} className="group relative">
@@ -283,7 +280,9 @@ export default function ReceiptMulti() {
                 onClick={handleUpload}
                 disabled={loading || files.length === 0}
               >
-                {loading ? '처리 중...' : `영수증 업로드`}
+                {loading
+                  ? '처리 중...'
+                  : `${previews.length}개의 영수증 업로드`}
               </Button>
             </>
           )}
@@ -394,8 +393,11 @@ export default function ReceiptMulti() {
                 <Button
                   disabled={loading || results.length === 0}
                   onClick={handleSubmit}
+                  className="w-full"
                 >
-                  {loading ? '등록 중...' : '전체 등록'}
+                  {loading
+                    ? '등록 중...'
+                    : `${results.length}개 데이터 가계부 등록`}
                 </Button>
               </div>
             </>
