@@ -7,6 +7,7 @@ import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { supabase } from '@/utils/supabase/client';
+import { Input } from '../ui/input';
 
 import {
   Dialog,
@@ -20,6 +21,11 @@ interface OCRProps {
   onResult: (data: OCRResult) => void;
 }
 
+interface ResultWithPreview {
+  result: OCRResult;
+  preview: string;
+}
+
 export default function ReceiptMulti() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,7 +33,7 @@ export default function ReceiptMulti() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [results, setResults] = useState<OCRResult[]>([]);
+  const [results, setResults] = useState<ResultWithPreview[]>([]);
   const [step, setStep] = useState<'upload' | 'result'>('upload');
   // 이미지를 base64 문자열로 변환
   const fileToBase64 = (file: File): Promise<string> => {
@@ -75,7 +81,7 @@ export default function ReceiptMulti() {
       return;
     }
 
-    const ocrResults: OCRResult[] = [];
+    const ocrResults: ResultWithPreview[] = [];
     const errors: number[] = [];
 
     setLoading(true);
@@ -95,7 +101,10 @@ export default function ReceiptMulti() {
         }
 
         const data = await res.json();
-        ocrResults.push(data);
+        ocrResults.push({
+          result: data,
+          preview: previews[i],
+        });
       } catch {
         errors.push(i + 1);
       }
@@ -136,11 +145,11 @@ export default function ReceiptMulti() {
 
       const transactionsData = results.map((item) => ({
         user_id: user.id,
-        title: item.title,
+        title: item.result.title,
         type: 'expense',
-        amount: Number(item.amount),
-        date: item.date,
-        category_id: item.category_id,
+        amount: Number(item.result.amount),
+        date: item.result.date,
+        category_id: item.result.category_id,
         tags: null,
       }));
 
@@ -227,26 +236,6 @@ export default function ReceiptMulti() {
                   </div>
                 </>
               )}
-              {/* 이미지 상세보기 overlay */}
-              {selectedImage && (
-                <div
-                  className="round-lg absolute inset-0 flex items-center justify-center bg-black/70"
-                  onClick={() => setSelectedImage(null)}
-                >
-                  <Button
-                    className="absolute bottom-4 h-16 w-16 cursor-pointer rounded-full text-white"
-                    onClick={() => setSelectedImage(null)}
-                    asChild
-                  >
-                    <X size={12} />
-                  </Button>
-                  <img
-                    src={selectedImage}
-                    className="max-h-96 max-w-96 object-contain"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
-              )}
               <Button
                 onClick={handleUpload}
                 disabled={loading || files.length === 0}
@@ -261,26 +250,42 @@ export default function ReceiptMulti() {
                 <p className="text-muted-foreground text-md">
                   총 {results.length}건
                 </p>
-                {results.map((result, index) => (
-                  <div key={index} className="space-y-2 rounded-lg border p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{result.title}</span>
-                      <span className="text-muted-foreground text-sm">
-                        {typeof result.date === 'string'
-                          ? result.date
-                          : new Date(result.date).toLocaleDateString()}
-                      </span>
+                <div>
+                  {results.map((item, index) => (
+                    <div
+                      key={index}
+                      className="space-y-2 rounded-lg border p-4"
+                    >
+                      <img
+                        src={item.preview}
+                        onClick={() => setSelectedImage(item.preview)}
+                        className="h-16 w-12 cursor-pointer rounded object-cover hover:opacity-70"
+                      />
+                      <div className="space-y-2">
+                        <Input
+                          value={item.result.title}
+                          onChange={(e) => {}}
+                          placeholder="가게명"
+                        />
+                        <Input
+                          type="date"
+                          value={
+                            typeof item.result.date === 'string'
+                              ? item.result.date
+                              : ''
+                          }
+                          onChange={(e) => {}}
+                        />
+                        <Input
+                          type="number"
+                          value={item.result.amount}
+                          onChange={(e) => {}}
+                          placeholder="금액"
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-sm">
-                        {result.category_id}
-                      </span>
-                      <span className="font-bold">
-                        {result.amount.toLocaleString()}원
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
                 <Button
                   disabled={loading || results.length === 0}
                   onClick={handleSubmit}
@@ -289,6 +294,26 @@ export default function ReceiptMulti() {
                 </Button>
               </div>
             </>
+          )}
+          {/* 이미지 상세보기 overlay */}
+          {selectedImage && (
+            <div
+              className="round-lg absolute inset-0 flex items-center justify-center bg-black/70"
+              onClick={() => setSelectedImage(null)}
+            >
+              <Button
+                className="absolute bottom-4 h-16 w-16 cursor-pointer rounded-full text-white"
+                onClick={() => setSelectedImage(null)}
+                asChild
+              >
+                <X size={12} />
+              </Button>
+              <img
+                src={selectedImage}
+                className="max-h-96 max-w-96 object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
           )}
         </DialogContent>
       </Dialog>
