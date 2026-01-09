@@ -8,7 +8,13 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { supabase } from '@/utils/supabase/client';
 import { Input } from '../ui/input';
-
+import { DatePicker } from './common/DatePicker';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { CATEGORIES } from '@/constants/categories';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +22,9 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '../ui/dialog';
+import { TitleInput } from './common/TitleInput';
 import { read } from 'fs';
+import { Label } from '../ui/label';
 interface OCRProps {
   onResult: (data: OCRResult) => void;
 }
@@ -246,42 +254,89 @@ export default function ReceiptMulti() {
           )}
           {step === 'result' && (
             <>
-              <div className="space-y-3 overflow-y-auto">
-                <p className="text-muted-foreground text-md">
-                  총 {results.length}건
-                </p>
-                <div>
+              <div className="max-h-[60vh] space-y-3 overflow-y-auto">
+                <div className="flex flex-col gap-2">
                   {results.map((item, index) => (
                     <div
                       key={index}
-                      className="space-y-2 rounded-lg border p-4"
+                      className="flex gap-4 rounded-lg border p-4"
                     >
                       <img
                         src={item.preview}
                         onClick={() => setSelectedImage(item.preview)}
-                        className="h-16 w-12 cursor-pointer rounded object-cover hover:opacity-70"
+                        className="h-32 w-24 cursor-pointer rounded object-cover hover:opacity-70"
                       />
-                      <div className="space-y-2">
-                        <Input
-                          value={item.result.title}
-                          onChange={(e) => {}}
-                          placeholder="가게명"
-                        />
-                        <Input
-                          type="date"
-                          value={
-                            typeof item.result.date === 'string'
-                              ? item.result.date
-                              : ''
-                          }
-                          onChange={(e) => {}}
-                        />
-                        <Input
-                          type="number"
-                          value={item.result.amount}
-                          onChange={(e) => {}}
-                          placeholder="금액"
-                        />
+                      <div className="flex flex-1 flex-col gap-2">
+                        <div className="flex items-center">
+                          <Label className="w-20 shrink-0">거래처</Label>
+                          <Input
+                            value={item.result.title}
+                            onChange={(e) => {}}
+                            placeholder="가게명"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <Label className="w-20 shrink-0">날짜</Label>
+                          <DatePicker
+                            value={
+                              typeof item.result.date === 'string'
+                                ? new Date(item.result.date)
+                                : item.result.date
+                            }
+                            onChange={(date) => {
+                              const formatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                            }}
+                            hideLabel
+                          />
+                        </div>
+
+                        <div className="flex gap-4">
+                          <div className="flex items-center">
+                            <Label className="w-20 shrink-0">금액</Label>
+                            <Input
+                              type="number"
+                              value={item.result.amount}
+                              onChange={(e) => {}}
+                              placeholder="금액"
+                            />
+                            <span className="text-muted-foreground ml-2 text-sm">
+                              원
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <Label className="w-20 shrink-0">카테고리</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="flex-1 justify-start text-center"
+                              >
+                                {item.result.category_id
+                                  ? CATEGORIES.expense.find(
+                                      (cat) =>
+                                        cat.category_key ===
+                                        item.result.category_id
+                                    )?.name_ko || '선택'
+                                  : '선택'}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="end">
+                              <div className="grid grid-cols-3">
+                                {CATEGORIES.expense.map((cat) => (
+                                  <div
+                                    key={cat.category_key}
+                                    onClick={() => {}}
+                                    className="flex h-12 w-20 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
+                                  >
+                                    {cat.name_ko}
+                                  </div>
+                                ))}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       </div>
                     </div>
                   ))}
