@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
+import BudgetResultStep from '@/components/analysis/Budget/BudgetResultStep';
 import { Button } from '@/components/ui/button';
 import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
@@ -90,7 +91,7 @@ const BudgetRecommendDialog = ({
     1: '분석 완료! 목표 세우기',
     2: '목표 설정 완료',
     3: '예산 결과 확인하기',
-    4: '이대로 예산 확정하기',
+    4: '이대로 시작하기',
   };
 
   // UI용 그룹 데이터 가공
@@ -165,7 +166,13 @@ const BudgetRecommendDialog = ({
             />
           )}
 
-          {/* Step: 예산 결과 확인 및 최종 확정 */}
+          {/* Step 4: 예산 결과 확인 및 최종 확정 */}
+          {step === 4 && (
+            <BudgetResultStep
+              budgetDraft={budgetDraft}
+              spendableBudget={spendableBudget}
+            />
+          )}
         </div>
 
         <DialogFooter className="border-t p-6">
