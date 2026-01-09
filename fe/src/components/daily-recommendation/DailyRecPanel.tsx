@@ -1,4 +1,3 @@
-import { DailyRecResult } from '@/services/daily-recommendation/base';
 import {
   Card,
   CardContent,
@@ -7,9 +6,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DailyRecChartData } from '@/services/daily-recommendation/chart';
 import { DailyRecUsageCard } from './DailyRecDoughnut';
 import { DailyRecPaceCard } from './DailyRecLine';
+import { DailyRecChartData, DailyRecResult } from '@/types/dailyRec';
 
 type Props = {
   daily: DailyRecResult;
@@ -49,6 +48,9 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
     diff: rawDiff,
     adjustPerDay,
     remainingDays,
+    weights,
+    weightedTotalAmount,
+    spentVariableToday,
   } = debug;
 
   const plannedUntilYesterdayRounded = Math.round(plannedUntilYesterday);
@@ -61,6 +63,46 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
       ? Math.round(daily.debug.varTotal / daily.debug.daysInMonth)
       : 0;
 
+  const totalAmount = weightedTotalAmount ?? amount;
+  const spentToday = spentVariableToday ?? 0;
+  const combinedWeight = weights?.combinedWeight;
+
+  // 패턴 가중치 퍼센트 표시용
+  const patternRate =
+    weights?.combinedWeight != null
+      ? Math.round((weights.combinedWeight - 1) * 100)
+      : 0;
+
+  // 구간 라벨
+  const segmentLabel =
+    weights?.basis?.todaySegment === 'early'
+      ? '월초'
+      : weights?.basis?.todaySegment === 'mid'
+        ? '월중'
+        : weights?.basis?.todaySegment === 'late'
+          ? '월말'
+          : null;
+
+  // 요일 라벨
+  const weekendLabel =
+    weights?.basis?.todayIsWeekend == null
+      ? null
+      : weights.basis.todayIsWeekend
+        ? '주말'
+        : '평일';
+
+  // 패턴 설명 문장
+  const patternReasonParts = [weekendLabel, segmentLabel].filter(Boolean);
+  const patternReason =
+    patternReasonParts.length > 0 ? patternReasonParts.join(' · ') : null;
+
+  const patternMessage =
+    combinedWeight == null || patternRate === 0
+      ? '최근 소비 패턴과 비슷한 수준으로 계산했어요.'
+      : patternRate > 0
+        ? `${patternReason ?? '소비 패턴'} 경향을 반영해 오늘 권장액이 조금 늘었어요 (+${patternRate}%).`
+        : `${patternReason ?? '소비 패턴'} 경향을 반영해 오늘 권장액이 조금 줄었어요 (${patternRate}%).`;
+
   return (
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
@@ -68,13 +110,18 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="space-y-1">
                 <p className="text-muted-foreground text-xs">
-                  오늘 권장 사용 금액
+                  오늘 남은 권장 사용액
                 </p>
                 <CardTitle className="text-2xl">
                   {amount.toLocaleString()}원
                 </CardTitle>
+
+                <p className="text-muted-foreground text-xs">
+                  총 권장액 {totalAmount.toLocaleString()}원에서 오늘 지출{' '}
+                  {spentToday.toLocaleString()}원을 뺐어요
+                </p>
               </div>
 
               <Badge variant="outline">{title}</Badge>
@@ -82,6 +129,10 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
           </CardHeader>
 
           <CardContent>
+            {/* 가중치(패턴) 근거 */}
+            <p className="text-muted-foreground text-xs">{patternMessage}</p>
+
+            {/* 페이스(누적 흐름) 근거 */}
             <p className="text-muted-foreground text-xs">{desc}</p>
           </CardContent>
         </Card>
