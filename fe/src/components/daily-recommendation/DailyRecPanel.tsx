@@ -1,12 +1,149 @@
-export const DailyRecPanel = () => {
+import { DailyRecResult } from '@/services/daily-recommendation/calculate';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { DailyRecChartData } from '@/services/daily-recommendation/chart';
+import { DailyRecUsageCard } from './DailyRecDoughnut';
+import { DailyRecPaceCard } from './DailyRecLine';
+
+type Props = {
+  daily: DailyRecResult;
+  dailyChartData: DailyRecChartData;
+};
+
+type PaceStatus = 'ahead' | 'behind' | 'onTrack';
+
+const getStatus = (diff: number): PaceStatus => {
+  const epsilon = 1000; // 허용 오차(원)
+  if (Math.abs(diff) < epsilon) return 'onTrack';
+  return diff < 0 ? 'ahead' : 'behind';
+};
+
+const statusText = {
+  ahead: {
+    title: '조금 빠른 소비 페이스예요',
+    desc: '기준보다 사용이 많아, 남은 기간을 고려해 오늘 권장액을 조정했어요.',
+  },
+  behind: {
+    title: '여유 있는 소비 페이스예요',
+    desc: '기준보다 사용이 적어, 오늘 사용할 수 있는 금액이 조금 늘었어요.',
+  },
+  onTrack: {
+    title: '안정적인 소비 페이스예요',
+    desc: '지금 흐름을 유지하면 무리 없이 사용할 수 있어요.',
+  },
+};
+
+export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
+  const { amount, debug } = daily;
+  const {
+    varTotal,
+    varSpentUntilYesterday,
+    varRemaining,
+    plannedUntilYesterday,
+    diff: rawDiff,
+    adjustPerDay,
+    remainingDays,
+  } = debug;
+
+  const plannedUntilYesterdayRounded = Math.round(plannedUntilYesterday);
+  const adjustPerDayRounded = Math.round(adjustPerDay);
+  const diff = Math.round(rawDiff);
+  const status = getStatus(diff);
+  const { title, desc } = statusText[status];
+  const planned =
+    daily.debug.daysInMonth > 0
+      ? Math.round(daily.debug.varTotal / daily.debug.daysInMonth)
+      : 0;
+
   return (
-    <div className="space-y-4 text-sm">
-      <p>
-        오늘 권장 사용액은 이번 달 예산과 어제까지의 소비 내역을 바탕으로
-        계산됩니다.
-      </p>
-      <p>이번 달 총 예산에서 고정비와 이미 사용한 금액을 제외한 금액입니다.</p>
-      <p>자세한 계산 근거</p>
+    <div className="flex min-h-full flex-col px-6">
+      <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
+        {/* 요약 카드 */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-muted-foreground text-xs">
+                  오늘 권장 사용 금액
+                </p>
+                <CardTitle className="text-2xl">
+                  {amount.toLocaleString()}원
+                </CardTitle>
+              </div>
+
+              <Badge variant="outline">{title}</Badge>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            <p className="text-muted-foreground text-xs">{desc}</p>
+          </CardContent>
+        </Card>
+
+        {/* 이번 달 사용 현황 (가변 예산 기준) */}
+        <DailyRecUsageCard
+          varTotal={varTotal}
+          varSpentUntilYesterday={varSpentUntilYesterday}
+          varRemaining={varRemaining}
+        />
+
+        {/* 기준 대비 소비 페이스 */}
+        <DailyRecPaceCard
+          dailyChartData={dailyChartData}
+          planned={planned}
+          plannedUntilYesterdayRounded={plannedUntilYesterdayRounded}
+          diff={diff}
+        />
+
+        {/* 권장액 조정 방식 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              오늘 권장액이 달라진 이유
+            </CardTitle>
+            <CardDescription className="text-xs">
+              어제까지의 실제 지출이 기준 누적과 얼마나 달랐는지에 따라, 그
+              차이를 남은 기간에 나눠 오늘 권장액에 반영해요.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <div className="flex flex-col gap-2 rounded-md border p-3 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">
+                  어제까지 기준 누적
+                </span>
+                <span className="font-medium">
+                  {plannedUntilYesterdayRounded.toLocaleString()}원
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">기준 대비 차이</span>
+                <span className="font-medium">{diff.toLocaleString()}원</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">남은 일수</span>
+                <span className="font-medium">{remainingDays}일</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">하루 보정값</span>
+                <span className="font-medium">
+                  {adjustPerDayRounded.toLocaleString()}원
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

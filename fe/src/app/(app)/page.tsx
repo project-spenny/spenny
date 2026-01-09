@@ -7,6 +7,7 @@ import { getMonthRange } from '@/utils/date';
 import { CalendarProvider } from '@/context/CalendarContext';
 import { TransactionProvider } from './history/TransactionContext';
 import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
+import TestOCR from '@/components/transaction/OCR';
 import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 import { getTotalBudgetAmount } from '@/utils/budget';
 import { fetchBudgetsServer } from '@/services/budgets/budget';
@@ -17,6 +18,7 @@ import {
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
 import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
 import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs';
+import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
 
 interface PageProps {
   searchParams: Promise<{
@@ -98,19 +100,15 @@ async function DataCalendar({
     spentFixedUntilYesterday,
   });
 
-  const amount = daily.amount;
-  const varRemaining = daily.debug.varRemaining;
-  const remainingDays = daily.debug.remainingDays;
+  const monthDate = new Date(`${currentMonth}-01`);
+  const dailyChartData = buildDailyRecChartData({
+    monthDate,
+    transactions,
+  });
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <DailyRecBar
-        amount={amount}
-        varRemaining={varRemaining}
-        remainingDays={remainingDays}
-        budget={budget}
-      />
-
+      <DailyRecBar daily={daily} dailyChartData={dailyChartData} />
       <Calendar currentMonth={currentMonth} transactions={transactions} />
     </div>
   );

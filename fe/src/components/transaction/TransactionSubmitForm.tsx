@@ -1,13 +1,12 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '../ui/button';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { Trash } from 'lucide-react';
 import { useTransactionForm } from '@/hooks/useTransactionForm';
-import { ITransaction } from '@/types/transactions';
-
+import { ITransaction, OCRResult } from '@/types/transactions';
 import { AmountInput } from './common/AmountInput';
 import { DatePicker } from './common/DatePicker';
 import { TagInput } from './common/TagInput';
@@ -20,6 +19,7 @@ interface TransactionsSubmitFormProps {
   transaction?: ITransaction | null;
   onClose: () => void;
   onSuccess: () => void;
+  defaultValue?: OCRResult | null;
   defaultDate?: Date;
 }
 
@@ -29,6 +29,7 @@ export default function TransactionSubmitForm({
   onClose,
   onSuccess,
   defaultDate,
+  defaultValue,
 }: TransactionsSubmitFormProps) {
   const initialFormData = useMemo(() => {
     if (mode === 'edit' && transaction) {
@@ -41,16 +42,27 @@ export default function TransactionSubmitForm({
         tags: transaction.tags || [],
       };
     } else {
-      return {
-        title: '',
-        type: '' as '' | 'income' | 'expense',
-        amount: '',
-        date: defaultDate ?? new Date(),
-        category_id: '',
-        tags: [] as string[],
-      };
+      if (defaultValue) {
+        return {
+          title: defaultValue.title,
+          type: 'expense' as const,
+          amount: defaultValue.amount.toString(),
+          date: new Date(defaultValue.date),
+          category_id: defaultValue.category_id,
+          tags: [] as string[],
+        };
+      } else {
+        return {
+          title: '',
+          type: '' as const,
+          amount: '',
+          date: defaultDate ?? new Date(),
+          category_id: '',
+          tags: [] as string[],
+        };
+      }
     }
-  }, [mode, transaction, defaultDate]);
+  }, [mode, transaction, defaultDate, defaultValue]);
 
   const {
     formData,
@@ -62,6 +74,19 @@ export default function TransactionSubmitForm({
     removeTag,
     UpdateField,
   } = useTransactionForm(initialFormData);
+
+  useEffect(() => {
+    if (defaultValue) {
+      setFormData({
+        title: defaultValue.title,
+        type: 'expense',
+        amount: defaultValue.amount.toString(),
+        date: new Date(defaultValue.date),
+        category_id: defaultValue.category_id,
+        tags: [],
+      });
+    }
+  }, [defaultValue, setFormData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,7 +190,7 @@ export default function TransactionSubmitForm({
       onSubmit={handleSubmit}
       className="mx-auto flex h-full w-full flex-col space-y-6 p-10 pt-2"
     >
-      <div className="sticky top-0 flex items-center justify-between border-b bg-background pb-4">
+      <div className="bg-background sticky top-0 flex items-center justify-between border-b pb-4">
         <Label className="text-xl">
           {mode === 'create' ? '가계부 작성' : '가계부 수정'}
         </Label>

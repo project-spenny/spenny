@@ -22,12 +22,17 @@ export type DailyRecDebug = {
   varSpentUntilYesterday: number;
   varRemaining: number;
 
-  // 계산 단계별 값
   baseDaily: number;
+
+  // 누적 소비 흐름 보정
+  plannedUntilYesterday: number;
+  diff: number;
+  adjustPerDay: number;
+  adjustedDaily: number;
 };
 
 export type DailyRecResult = {
-  amount: number; // 최종 일일 권장 사용 금액
+  amount: number;
   debug: DailyRecDebug;
 };
 
@@ -53,7 +58,24 @@ export const calculateDailyRec = (input: DailyRecInput): DailyRecResult => {
 
   // 기본 일일 한도
   const baseDaily = remainingDays > 0 ? varRemaining / remainingDays : 0;
-  const amount = Math.floor(Math.min(toNonNegative(baseDaily), varRemaining));
+
+  // 계획 기준 어제까지의 가변 지출
+  const plannedUntilYesterday =
+    daysInMonth > 0 ? (varTotal / daysInMonth) * elapsedDays : 0;
+
+  // 실제 지출과 계획 지출의 차이
+  const diff = plannedUntilYesterday - varSpentUntilYesterday;
+
+  // 남은 기간(오늘 포함)에 차이를 분산
+  const adjustPerDay = remainingDays > 0 ? diff / remainingDays : 0;
+
+  // 보정된 일일 한도
+  const adjustedDaily = baseDaily + adjustPerDay;
+
+  // 최종 일일 권장액
+  const amount = Math.floor(
+    Math.min(toNonNegative(adjustedDaily), varRemaining)
+  );
 
   return {
     amount,
@@ -68,6 +90,11 @@ export const calculateDailyRec = (input: DailyRecInput): DailyRecResult => {
       varRemaining,
 
       baseDaily,
+
+      plannedUntilYesterday,
+      diff,
+      adjustPerDay,
+      adjustedDaily,
     },
   };
 };
