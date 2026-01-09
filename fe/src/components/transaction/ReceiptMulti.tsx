@@ -178,6 +178,20 @@ export default function ReceiptMulti() {
       setLoading(false);
     }
   };
+
+  const updateResult = (
+    index: number,
+    field: keyof OCRResult,
+    value: string | number
+  ) => {
+    setResults((prev) =>
+      prev.map((item, i) =>
+        i === index
+          ? { ...item, result: { ...item.result, [field]: value } }
+          : item
+      )
+    );
+  };
   return (
     <>
       <Dialog
@@ -271,7 +285,9 @@ export default function ReceiptMulti() {
                           <Label className="w-20 shrink-0">거래처</Label>
                           <Input
                             value={item.result.title}
-                            onChange={(e) => {}}
+                            onChange={(e) =>
+                              updateResult(index, 'title', e.target.value)
+                            }
                             placeholder="가게명"
                           />
                         </div>
@@ -285,6 +301,7 @@ export default function ReceiptMulti() {
                             }
                             onChange={(date) => {
                               const formatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                              updateResult(index, 'date', formatted);
                             }}
                             hideLabel
                           />
@@ -296,7 +313,13 @@ export default function ReceiptMulti() {
                             <Input
                               type="number"
                               value={item.result.amount}
-                              onChange={(e) => {}}
+                              onChange={(e) =>
+                                updateResult(
+                                  index,
+                                  'amount',
+                                  Number(e.target.value)
+                                )
+                              }
                               placeholder="금액"
                             />
                             <span className="text-muted-foreground ml-2 text-sm">
@@ -327,7 +350,13 @@ export default function ReceiptMulti() {
                                 {CATEGORIES.expense.map((cat) => (
                                   <div
                                     key={cat.category_key}
-                                    onClick={() => {}}
+                                    onClick={() => {
+                                      updateResult(
+                                        index,
+                                        'category_id',
+                                        cat.category_key
+                                      );
+                                    }}
                                     className="flex h-12 w-20 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
                                   >
                                     {cat.name_ko}
