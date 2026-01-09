@@ -82,15 +82,25 @@ async function DataCalendar({
   fixedPlannedThisMonth: number;
 }) {
   const today = new Date();
+  const isCurrentMonth = currentMonth === formatMonth(today);
+
+  // 이번 달 거래 (캘린더/차트/월 누적 계산용)
+  const transactions = await getTransaction(filters, true);
+
+  if (!isCurrentMonth) {
+    return (
+      <div className="flex w-full flex-col gap-3">
+        <Calendar currentMonth={currentMonth} transactions={transactions} />
+      </div>
+    );
+  }
+
   const lookbackDays = 56;
 
   const lookbackEndDateString = formatLocalDate(today);
   const lookbackStartDate = new Date(today);
   lookbackStartDate.setDate(lookbackStartDate.getDate() - (lookbackDays - 1));
   const lookbackStartDateString = formatLocalDate(lookbackStartDate);
-
-  // 이번 달 거래 (캘린더/차트/월 누적 계산용)
-  const transactions = await getTransaction(filters, true);
 
   // 어제까지 월 누적 지출 계산
   const spentTotalUntilYesterday = sumExpenseUntilYesterday(
