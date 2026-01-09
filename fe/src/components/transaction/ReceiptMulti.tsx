@@ -6,6 +6,7 @@ import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { supabase } from '@/utils/supabase/client';
 
 import {
   Dialog,
@@ -110,6 +111,54 @@ export default function ReceiptMulti() {
       toast.success(`${results.length}개 영수증 인식 완료`);
       setResults(ocrResults);
       setStep('result');
+    }
+  };
+
+  // 가계부 업로드
+  const handleSubmit = async () => {
+    if (results.length === 0) {
+      toast.error('저장할 데이터가 없습니다');
+      return;
+    }
+
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (!user || authError) {
+        toast.warning('로그인이 필요합니다');
+        return;
+      }
+
+      setLoading(true);
+
+      const transactionsData = results.map((item) => ({
+        user_id: user.id,
+        title: item.title,
+        type: 'expense',
+        amount: Number(item.amount),
+        date: item.date,
+        category_id: item.category_id,
+        tags: null,
+      }));
+
+      const { error } = await supabase
+        .from('transactions')
+        .insert(transactionsData);
+
+      if (error) {
+        toast.error('저장 실패');
+        return;
+      }
+
+      toast.success(`${results.length} 건 저장 완료`);
+      setOpen(false);
+    } catch (error) {
+      toast.error('저장 중 오류가 발생했습니다');
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -232,6 +281,12 @@ export default function ReceiptMulti() {
                     </div>
                   </div>
                 ))}
+                <Button
+                  disabled={loading || results.length === 0}
+                  onClick={handleSubmit}
+                >
+                  {loading ? '등록 중...' : '전체 등록'}
+                </Button>
               </div>
             </>
           )}
