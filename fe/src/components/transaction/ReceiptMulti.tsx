@@ -45,6 +45,27 @@ export default function ReceiptMulti() {
   const [results, setResults] = useState<ResultWithPreview[]>([]);
   const [step, setStep] = useState<'upload' | 'result'>('upload');
   const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
+
+  const toggleCheck = (index: number) => {
+    setCheckedItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleAll = () => {
+    if (checkedItems.size === results.length) {
+      setCheckedItems(new Set());
+    } else {
+      setCheckedItems(new Set(results.map((_, i) => i)));
+    }
+  };
 
   // 이미지를 base64 문자열로 변환
   const fileToBase64 = (file: File): Promise<string> => {
@@ -139,8 +160,8 @@ export default function ReceiptMulti() {
 
   // 가계부 업로드
   const handleSubmit = async () => {
-    if (results.length === 0) {
-      toast.error('인식할 데이터가 없습니다');
+    if (checkedItems.size === 0) {
+      toast.error('가계부에 등록할 데이터를 체크해주세요');
       return;
     }
 
@@ -157,15 +178,17 @@ export default function ReceiptMulti() {
 
       setLoading(true);
 
-      const transactionsData = results.map((item) => ({
-        user_id: user.id,
-        title: item.result.title,
-        type: 'expense',
-        amount: Number(item.result.amount),
-        date: item.result.date,
-        category_id: item.result.category_id,
-        tags: null,
-      }));
+      const transactionsData = results
+        .filter((_, index) => checkedItems.has(index))
+        .map((item) => ({
+          user_id: user.id,
+          title: item.result.title,
+          type: 'expense',
+          amount: Number(item.result.amount),
+          date: item.result.date,
+          category_id: item.result.category_id,
+          tags: null,
+        }));
 
       const { error } = await supabase
         .from('transactions')
@@ -205,6 +228,7 @@ export default function ReceiptMulti() {
     setResults([]);
     setStep('upload');
     setSelectedImage(null);
+    setCheckedItems(new Set());
   };
   const handleClose = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -289,12 +313,29 @@ export default function ReceiptMulti() {
           {step === 'result' && (
             <>
               <div className="max-h-[60vh] space-y-3 overflow-y-auto">
+                <div className="flex items-center justify-between">
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={checkedItems.size === results.length}
+                      onChange={toggleAll}
+                      className="h-4 w-4"
+                    />
+                    <span className="text-sm">전체 선택</span>
+                  </label>
+                </div>
                 <div className="flex flex-col gap-2">
                   {results.map((item, index) => (
                     <div
                       key={index}
                       className="flex gap-4 rounded-lg border p-4"
                     >
+                      <input
+                        type="checkbox"
+                        checked={checkedItems.has(index)}
+                        onChange={() => toggleCheck(index)}
+                        className="top-4 right-4 h-5 w-5 cursor-pointer"
+                      />
                       <img
                         src={item.preview}
                         onClick={() => setSelectedImage(item.preview)}
@@ -397,7 +438,7 @@ export default function ReceiptMulti() {
                 >
                   {loading
                     ? '등록 중...'
-                    : `${results.length}개 데이터 가계부 등록`}
+                    : `${checkedItems.size} / ${results.length}개 데이터 등록`}
                 </Button>
               </div>
             </>
