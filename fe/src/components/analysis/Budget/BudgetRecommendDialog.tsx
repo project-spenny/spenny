@@ -145,7 +145,7 @@ const BudgetRecommendDialog = ({
   };
 
   const nextButtonLabels: Record<number, string> = {
-    1: '분석 완료! 목표 세우기',
+    1: '저축 목표 세우기',
     2: '목표 설정 완료',
     3: '예산 결과 확인하기',
     4: '이대로 시작하기',
@@ -173,15 +173,11 @@ const BudgetRecommendDialog = ({
         소비 패턴 분석 중...
       </div>
     );
-  if (!processedData)
-    return (
-      <div className="p-10 text-center text-sm">
-        분석할 지출 데이터가 부족합니다.
-      </div>
-    );
 
-  const { monthlyData, summary } = processedData;
+  const monthlyData = processedData?.monthlyData || [];
+  const summary = processedData?.summary || { avgTotal: 0, groupAverages: {} };
   const activeMonths = monthlyData.length;
+  const isFewData = activeMonths > 0 && activeMonths < 3;
 
   // 가용 예산
   const spendableBudget = goalData.income - goalData.savingsAmount;
@@ -199,6 +195,7 @@ const BudgetRecommendDialog = ({
           {step === 1 && (
             <ExpenseAnalysisStep
               activeMonths={activeMonths}
+              isFewData={isFewData}
               avgTotal={summary.avgTotal}
               monthlyData={monthlyData}
               groupDisplayData={groupDisplayData}
@@ -217,6 +214,7 @@ const BudgetRecommendDialog = ({
           {/* Step 3: 템플릿 선택 */}
           {step === 3 && (
             <TemplateSelectionStep
+              activeMonths={activeMonths}
               selectedId={selectedTemplateId}
               onSelect={handleTemplateSelect}
             />
@@ -225,6 +223,7 @@ const BudgetRecommendDialog = ({
           {/* Step 4: 예산 결과 확인 및 최종 확정 */}
           {step === 4 && (
             <BudgetResultStep
+              activeMonths={activeMonths}
               budgetDraft={budgetDraft}
               spendableBudget={spendableBudget}
               isAdjusted={isAdjusted}
