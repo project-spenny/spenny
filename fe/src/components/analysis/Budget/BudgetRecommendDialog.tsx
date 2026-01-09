@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
 import SavingGoalStep from '@/components/analysis/Budget/SavingGoalStep';
+import { Spinner } from '@/components/ui/spinner';
 import TemplateSelectionStep from '@/components/analysis/Budget/TemplateSelectionStep';
 import { calculateKeepPatternBudget } from '@/utils/calculateBudget';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
@@ -21,12 +22,16 @@ type BudgetRecommendDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedDate: Date;
+  onConfirm: (budgetDraft: CalculatedBudgetItem[], totalBudget: number) => void;
+  isSubmitting: boolean;
 };
 
 const BudgetRecommendDialog = ({
   open,
   onOpenChange,
   selectedDate,
+  onConfirm,
+  isSubmitting = false,
 }: BudgetRecommendDialogProps) => {
   const [step, setStep] = useState(1);
   const [goalData, setGoalData] = useState({
@@ -38,7 +43,7 @@ const BudgetRecommendDialog = ({
     useState<TemplateId>('keep-pattern'); // 선택된 템플릿
   const [budgetDraft, setBudgetDraft] = useState<CalculatedBudgetItem[]>([]); // 계산된 예산 초안
 
-  const { processedData, isLoading } = useBudgetGuideData(
+  const { processedData, isLoading: isAnalysisLoading } = useBudgetGuideData(
     selectedDate,
     goalData.savingsAmount
   );
@@ -55,6 +60,14 @@ const BudgetRecommendDialog = ({
       });
     }
   }, [processedData]); // processedData가 로드되는 순간 실행됨
+
+  // open 상태가 false가 될 때 step을 1로 리셋
+  useEffect(() => {
+    if (!open) {
+      const timer = setTimeout(() => setStep(1), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   // Step 2에서 데이터가 바뀔 때 부모 상태 업데이트
   const handleGoalDataChange = (newIncome: number, newSavings: number) => {
@@ -77,11 +90,13 @@ const BudgetRecommendDialog = ({
       );
 
       setBudgetDraft(result);
-      console.log('💰 [버튼 클릭] 계산된 예산 초안:', result);
-
-      setStep(4); // 계산 후 결과 페이지로 이동
+      setStep(step + 1);
     } else if (step === 4) {
-      onOpenChange(false); // 다이얼로그 닫기
+      if (isSubmitting) return;
+
+      if (budgetDraft.length > 0) {
+        onConfirm(budgetDraft, spendableBudget); // 부모 컴포넌트로 데이터 전달
+      }
     } else {
       setStep(step + 1);
     }
@@ -110,7 +125,7 @@ const BudgetRecommendDialog = ({
     });
   }, [processedData]);
 
-  if (isLoading)
+  if (isAnalysisLoading)
     return (
       <div className="text-muted-foreground p-10 text-center text-sm">
         소비 패턴 분석 중...
@@ -190,9 +205,19 @@ const BudgetRecommendDialog = ({
               <Button
                 className="h-12 flex-2 cursor-pointer text-base font-bold"
                 onClick={handleNextStep}
+                disabled={isSubmitting}
               >
-                {nextButtonLabels[step] || '다음 단계'}
-                {step < 4 && <ArrowRight className="h-4 w-4" />}
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <Spinner />
+                    <span className="flex items-center gap-2">저장 중</span>
+                  </div>
+                ) : (
+                  <>
+                    {nextButtonLabels[step] || '다음 단계'}
+                    {step < 4 && <ArrowRight className="h-4 w-4" />}
+                  </>
+                )}
               </Button>
             </div>
 
