@@ -32,6 +32,35 @@ const getDaySegment = (d: Date): DaySegment => {
 // 평균 계산 (데이터 부족 시 오류 방지)
 const average = (sum: number, count: number) => (count > 0 ? sum / count : 0);
 
+// 통계 단위 : 합계(sum) + 표본 수(count)
+type Stat = { sum: number; count: number };
+
+// 소비 패턴 계산에 필요한 통계 묶음
+type Stats = {
+  all: Stat;
+  weekday: Stat;
+  weekend: Stat;
+  early: Stat;
+  mid: Stat;
+  late: Stat;
+};
+
+// 통계 초기화
+const createStats = (): Stats => ({
+  all: { sum: 0, count: 0 },
+  weekday: { sum: 0, count: 0 },
+  weekend: { sum: 0, count: 0 },
+  early: { sum: 0, count: 0 },
+  mid: { sum: 0, count: 0 },
+  late: { sum: 0, count: 0 },
+});
+
+const addStat = (stat: Stat, value: number) => {
+  stat.sum += value;
+  stat.count += 1;
+};
+const avgStat = (stat: Stat) => average(stat.sum, stat.count);
+
 type SpendingPatternOptions = {
   lookbackDays?: number; // 최근 패턴 계산에 사용할 기간(일)
   weekdayWeekendClamp?: { min: number; max: number }; // 평일/주말 가중치 제한 범위
@@ -96,23 +125,7 @@ export const calculateWeights = (
   }
 
   // 일 단위 합계/일수 집계
-  let totalSpendSum = 0;
-  let totalDayCount = 0;
-
-  let weekdaySpendSum = 0;
-  let weekdayCount = 0;
-
-  let weekendSpendSum = 0;
-  let weekendCount = 0;
-
-  let earlySpendSum = 0;
-  let earlyCount = 0;
-
-  let midSpendSum = 0;
-  let midCount = 0;
-
-  let lateSpendSum = 0;
-  let lateCount = 0;
+  const stats = createStats();
 
   // lookback 기간 내 해당 날짜의 총 지출을 기준으로 평균 계산
   for (
@@ -120,43 +133,37 @@ export const calculateWeights = (
     cursorDate <= yesterdayDate;
     cursorDate.setDate(cursorDate.getDate() + 1)
   ) {
-    const cursorDateKey = formatLocalDate(cursorDate); // 현재 날짜 키
-    const currentDaySpend = dailySpendByDate.get(cursorDateKey) ?? 0; // 해당 일 지출(없으면 0)
+    const cursorDateKey = formatLocalDate(cursorDate);
+    const currentDaySpend = dailySpendByDate.get(cursorDateKey) ?? 0;
 
-    // 전체 합계/일수
-    totalSpendSum += currentDaySpend;
-    totalDayCount += 1;
+    // 전체
+    addStat(stats.all, currentDaySpend);
 
-    // 평일/주말 분기
+    // 평일/주말
     if (isWeekend(cursorDate)) {
-      weekendSpendSum += currentDaySpend;
-      weekendCount += 1;
+      addStat(stats.weekend, currentDaySpend);
     } else {
-      weekdaySpendSum += currentDaySpend;
-      weekdayCount += 1;
+      addStat(stats.weekday, currentDaySpend);
     }
 
-    // 월 내 구간 분기
+    // 월 내 구간
     const daySegment = getDaySegment(cursorDate);
     if (daySegment === 'early') {
-      earlySpendSum += currentDaySpend;
-      earlyCount += 1;
+      addStat(stats.early, currentDaySpend);
     } else if (daySegment === 'mid') {
-      midSpendSum += currentDaySpend;
-      midCount += 1;
+      addStat(stats.mid, currentDaySpend);
     } else {
-      lateSpendSum += currentDaySpend;
-      lateCount += 1;
+      addStat(stats.late, currentDaySpend);
     }
   }
 
   // 평균 계산
-  const avgAll = average(totalSpendSum, totalDayCount);
-  const avgWeekday = average(weekdaySpendSum, weekdayCount);
-  const avgWeekend = average(weekendSpendSum, weekendCount);
-  const avgEarly = average(earlySpendSum, earlyCount);
-  const avgMid = average(midSpendSum, midCount);
-  const avgLate = average(lateSpendSum, lateCount);
+  const avgAll = avgStat(stats.all);
+  const avgWeekday = avgStat(stats.weekday);
+  const avgWeekend = avgStat(stats.weekend);
+  const avgEarly = avgStat(stats.early);
+  const avgMid = avgStat(stats.mid);
+  const avgLate = avgStat(stats.late);
 
   // 오늘 기준 상태값
   const todayIsWeekend = isWeekend(todayDate);
