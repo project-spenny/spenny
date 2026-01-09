@@ -1,13 +1,14 @@
 import { ArrowRight, Info } from 'lucide-react';
+import { CategoryGroupId, TemplateId } from '@/types/budgetGuide';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
 import { Button } from '@/components/ui/button';
-import { CategoryGroupId } from '@/types/budgetGuide';
 import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
 import SavingGoalStep from '@/components/analysis/Budget/SavingGoalStep';
+import TemplateSelectionStep from '@/components/analysis/Budget/TemplateSelectionStep';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
@@ -26,6 +27,9 @@ const BudgetRecommendDialog = ({
     income: 0,
     savingsAmount: 0,
   });
+  // 선택된 템플릿
+  const [selectedTemplateId, setSelectedTemplateId] =
+    useState<TemplateId>('keep-pattern');
 
   const { processedData, isLoading } = useBudgetGuideData(
     selectedDate,
@@ -48,6 +52,13 @@ const BudgetRecommendDialog = ({
   // Step 2에서 데이터가 바뀔 때 부모 상태 업데이트
   const handleGoalDataChange = (newIncome: number, newSavings: number) => {
     setGoalData({ income: newIncome, savingsAmount: newSavings });
+  };
+
+  // 템플릿 선택 핸들러
+  const handleTemplateSelect = (id: TemplateId) => {
+    setSelectedTemplateId(id);
+    // TODO: 선택된 템플릿에 따라 예산 초안(budgetDraft)을 계산하는 함수를 실행할 예정
+    console.log(`선택된 템플릿: ${id}`);
   };
 
   const nextButtonLabels: Record<number, string> = {
@@ -88,6 +99,9 @@ const BudgetRecommendDialog = ({
   const { monthlyData, summary } = processedData;
   const activeMonths = monthlyData.length;
 
+  // 가용 예산
+  const spendableBudget = goalData.income - goalData.savingsAmount;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[800px] w-full flex-col md:max-w-2xl">
@@ -118,17 +132,11 @@ const BudgetRecommendDialog = ({
 
           {/* Step 3: 템플릿 선택 및 결과 확인 */}
           {step === 3 && (
-            <div className="py-10 text-center text-lg font-bold">
-              <p>수입: {goalData.income.toLocaleString()}원</p>
-              <p>저축: {goalData.savingsAmount.toLocaleString()}원</p>
-              <p className="text-primary">
-                가용 예산:{' '}
-                {(goalData.income - goalData.savingsAmount).toLocaleString()}원
-              </p>
-              <p className="text-muted-foreground mt-4 text-sm font-normal">
-                이 예산으로 고정 지출을 설정해볼까요?
-              </p>
-            </div>
+            <TemplateSelectionStep
+              selectedId={selectedTemplateId}
+              onSelect={handleTemplateSelect}
+              spendableBudget={spendableBudget}
+            />
           )}
         </div>
 
