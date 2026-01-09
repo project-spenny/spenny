@@ -98,23 +98,29 @@ export default function ReceiptMulti({ onResult }: OCRProps) {
             hidden
           />
         </div>
+        {/* 미리보기 영역 */}
         {previews.length > 0 && (
-          <div className="grid grid-cols-4 gap-6 overflow-y-scroll">
-            {previews.map((src, index) => (
-              <div key={index} className="group relative">
-                <img
-                  src={src}
-                  className="h-30 w-full rounded object-cover hover:opacity-60"
-                />
-                <button
-                  onClick={() => removeFile(index)}
-                  className="bg-destructive absolute top-1 right-1 cursor-pointer rounded-full p-1 text-white opacity-0 group-hover:opacity-60 hover:opacity-95"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
+          <>
+            <p className="text-muted-foreground">
+              {previews.length}개의 이미지
+            </p>
+            <div className="grid grid-cols-4 gap-6 overflow-y-scroll">
+              {previews.map((src, index) => (
+                <div key={index} className="group relative">
+                  <img
+                    src={src}
+                    className="h-30 w-full rounded object-cover hover:opacity-60"
+                  />
+                  <button
+                    onClick={() => removeFile(index)}
+                    className="bg-destructive absolute top-1 right-1 cursor-pointer rounded-full p-1 text-white opacity-0 group-hover:opacity-60 hover:opacity-95"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </DialogContent>
     </Dialog>
