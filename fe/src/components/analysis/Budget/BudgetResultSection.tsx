@@ -37,7 +37,7 @@ const BudgetResultSection = ({
             </Badge>
           </div>
 
-          <p className="text-muted-foreground text-xs font-medium">
+          <p className="text-muted-foreground text-sm font-medium">
             {description}
           </p>
         </div>
