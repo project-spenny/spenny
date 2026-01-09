@@ -5,6 +5,7 @@ import { Receipt, Images, Upload, X } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 import {
   Dialog,
@@ -21,8 +22,9 @@ interface OCRProps {
 export default function ReceiptMulti({ onResult }: OCRProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [files, setFiles] = useState<File[]>();
+  const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [previews, setPreviews] = useState<string[]>([]);
   // 이미지를 base64 문자열로 변환
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -40,6 +42,17 @@ export default function ReceiptMulti({ onResult }: OCRProps) {
       return;
     }
     setFiles((prev) => [...(prev || []), ...imgFiles]);
+
+    //미리보기 생성
+    const newPreviews = await Promise.all(
+      imgFiles.map((file) => fileToBase64(file))
+    );
+    setPreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,6 +98,24 @@ export default function ReceiptMulti({ onResult }: OCRProps) {
             hidden
           />
         </div>
+        {previews.length > 0 && (
+          <div className="grid grid-cols-4 gap-6 overflow-y-scroll">
+            {previews.map((src, index) => (
+              <div key={index} className="group relative">
+                <img
+                  src={src}
+                  className="h-30 w-full rounded object-cover hover:opacity-60"
+                />
+                <button
+                  onClick={() => removeFile(index)}
+                  className="bg-destructive absolute top-1 right-1 cursor-pointer rounded-full p-1 text-white opacity-0 group-hover:opacity-60 hover:opacity-95"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
