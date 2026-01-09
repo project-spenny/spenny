@@ -9,6 +9,7 @@ import { supabase } from '@/utils/supabase/client';
 import { Input } from '../ui/input';
 import { DatePicker } from './common/DatePicker';
 import { Checkbox } from '../ui/checkbox';
+import { formatLocalDate } from '@/utils/date';
 import {
   Popover,
   PopoverContent,
@@ -353,7 +354,7 @@ export default function ReceiptMulti() {
                                 : item.result.date
                             }
                             onChange={(date) => {
-                              const formatted = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                              const formatted = formatLocalDate(date);
                               updateResult(index, 'date', formatted);
                             }}
                             hideLabel
