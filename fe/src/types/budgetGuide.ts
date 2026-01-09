@@ -20,6 +20,8 @@ export type GroupInfo = {
   id: CategoryGroupId;
   label: string;
   color: string;
+  textColor: string;
+  badgeColor: string;
   description: string;
 };
 
