@@ -57,7 +57,7 @@ const SavingGoalStep = ({
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-right-2 space-y-8 duration-300">
+    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300">
       <DialogHeader className="space-y-2">
         <div className="space-y-1">
           <div className="text-primary font-bold uppercase">
