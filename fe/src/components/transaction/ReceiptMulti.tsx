@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
 import { Receipt } from 'lucide-react';
+import { Images } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
@@ -28,7 +29,12 @@ export default function ReceiptMulti({ onResult }: OCRProps) {
       }}
     >
       <DialogTrigger asChild>
-        <Button asChild>{loading ? <Spinner /> : <Receipt size={20} />}</Button>
+        <Button
+          className="h-16 w-16 cursor-pointer rounded-full hover:bg-gray-800"
+          asChild
+        >
+          {loading ? <Spinner /> : <Images size={12} />}
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>

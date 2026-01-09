@@ -5,6 +5,7 @@ import { Receipt } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
+import { Camera } from 'lucide-react';
 interface OCRProps {
   onResult: (data: OCRResult) => void;
 }
@@ -52,10 +53,10 @@ export default function ReceipCapture({ onResult }: OCRProps) {
     <div>
       <Button
         onClick={() => inputRef.current?.click()}
-        className="fixed bottom-0 z-50 m-4 h-16 w-16 cursor-pointer rounded-full"
+        className="h-16 w-16 cursor-pointer rounded-full hover:bg-gray-800"
         asChild
       >
-        {loading ? <Spinner /> : <Receipt size={20} />}
+        {loading ? <Spinner /> : <Camera size={12} />}
       </Button>
       <input
         ref={inputRef}
