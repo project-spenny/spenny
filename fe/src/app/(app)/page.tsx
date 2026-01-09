@@ -18,6 +18,7 @@ import {
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
 import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
 import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs';
+import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
 
 interface PageProps {
   searchParams: Promise<{
@@ -99,19 +100,15 @@ async function DataCalendar({
     spentFixedUntilYesterday,
   });
 
-  const amount = daily.amount;
-  const varRemaining = daily.debug.varRemaining;
-  const remainingDays = daily.debug.remainingDays;
+  const monthDate = new Date(`${currentMonth}-01`);
+  const dailyChartData = buildDailyRecChartData({
+    monthDate,
+    transactions,
+  });
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <DailyRecBar
-        amount={amount}
-        varRemaining={varRemaining}
-        remainingDays={remainingDays}
-        budget={budget}
-      />
-
+      <DailyRecBar daily={daily} dailyChartData={dailyChartData} />
       <Calendar currentMonth={currentMonth} transactions={transactions} />
     </div>
   );
