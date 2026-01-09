@@ -34,7 +34,6 @@ export default function TransactionClient() {
 
   return (
     <>
-      <ReceiptCapture onResult={handleOCRResult} />
       <Button
         onClick={openCreate}
         className="fixed right-0 bottom-0 z-50 m-4 h-16 w-16 rounded-full"
