@@ -9,7 +9,7 @@ interface OCRProps {
   onResult: (data: OCRResult) => void;
 }
 
-export default function OCR({ onResult }: OCRProps) {
+export default function ReceipCapture({ onResult }: OCRProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 

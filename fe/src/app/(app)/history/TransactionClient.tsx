@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import { useRouter } from 'next/navigation';
 import { useSelected } from './TransactionContext';
-import OCR from '@/components/transaction/OCR';
+import ReceiptCapture from '@/components/transaction/ReceiptCapture';
 import { useState } from 'react';
 import { OCRResult } from '@/types/transactions';
 
@@ -34,7 +34,7 @@ export default function TransactionClient() {
 
   return (
     <>
-      <OCR onResult={handleOCRResult} />
+      <ReceiptCapture onResult={handleOCRResult} />
       <Button
         onClick={openCreate}
         className="fixed right-0 bottom-0 z-50 m-4 h-16 w-16 rounded-full"
