@@ -29,30 +29,55 @@ export const getPaceExplanation = (status: PaceStatus) => {
   }
 };
 
+const getDayLabel = (weights: SpendingPatternWeights) =>
+  weights.basis.todayIsWeekend ? '주말' : '평일';
+
+const getSegmentLabel = (weights: SpendingPatternWeights) => {
+  switch (weights.basis.todaySegment) {
+    case 'early':
+      return '월초';
+    case 'mid':
+      return '월중';
+    case 'late':
+      return '월말';
+  }
+};
+
+export type PatternExplanation = {
+  reasonLabel: string;
+  ratePercent: number;
+  message: string;
+};
+
 export const getPatternExplanation = (
   weights?: SpendingPatternWeights
-): string => {
+): PatternExplanation => {
   if (!weights || weights.combinedWeight == null) {
-    return '최근 소비 패턴과 비슷한 수준으로 계산했어요.';
+    return {
+      reasonLabel: '소비 패턴',
+      ratePercent: 0,
+      message: '최근 소비 패턴과 비슷한 수준으로 계산했어요.',
+    };
   }
 
-  const rate = Math.round((weights.combinedWeight - 1) * 100);
-  if (rate === 0) {
-    return '최근 소비 패턴과 비슷한 수준으로 계산했어요.';
+  const ratePercent = Math.round((weights.combinedWeight - 1) * 100);
+
+  const reasonLabel = `${getDayLabel(weights)} · ${getSegmentLabel(weights)}`;
+
+  if (ratePercent === 0) {
+    return {
+      reasonLabel,
+      ratePercent,
+      message: `${reasonLabel} 소비 패턴을 반영해 계산했어요.`,
+    };
   }
 
-  const segmentLabel =
-    weights.basis.todaySegment === 'early'
-      ? '월초'
-      : weights.basis.todaySegment === 'mid'
-        ? '월중'
-        : '월말';
-
-  const dayLabel = weights.basis.todayIsWeekend ? '주말' : '평일';
-
-  const reason = `${dayLabel} · ${segmentLabel}`;
-
-  return rate > 0
-    ? `${reason} 소비 경향을 반영해 오늘 권장액이 조금 늘었어요.`
-    : `${reason} 소비 경향을 반영해 오늘 권장액이 조금 줄었어요.`;
+  return {
+    reasonLabel,
+    ratePercent,
+    message:
+      ratePercent > 0
+        ? `${reasonLabel} 소비 경향을 반영해 오늘 권장액을 조금 더 여유 있게 계산했어요.`
+        : `${reasonLabel} 소비 경향을 반영해 오늘 권장액을 조금 보수적으로 계산했어요.`,
+  };
 };
