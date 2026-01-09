@@ -56,22 +56,25 @@ const SavingGoalStep = ({
     onChange(newIncome, newAmount);
   };
 
+  const titleDesc =
+    income === 0
+      ? '수입과 저축 목표를 입력해 주세요. 입력하신 금액을 바탕으로 이번 달 예산을 추천해 드릴게요.'
+      : '지난 소비 데이터를 기반으로 이번 달 예산을 미리 구성해 보았습니다. 필요에 따라 금액을 직접 수정해 보세요.';
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300">
-      <DialogHeader className="space-y-2">
+      <DialogHeader className="space-y-2 break-keep">
         <div className="space-y-1">
           <div className="text-primary font-bold uppercase">
-            Step 2. 목표 설정
+            Step 2. 저축 및 가용 예산 목표 설정
           </div>
-          <DialogTitle className="text-xl font-bold">
+          <DialogTitle className="text-xl font-bold break-keep">
             얼마를 저축하고 얼마를 쓰실 건가요?
           </DialogTitle>
         </div>
 
-        <DialogDescription>
-          지난달 수입 데이터를 기반으로 이번 달 예산을 미리 구성해 보았습니다.
-          <br />
-          필요에 따라 금액을 직접 수정해 보세요.
+        <DialogDescription className="break-keep">
+          {titleDesc}
         </DialogDescription>
       </DialogHeader>
 

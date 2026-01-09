@@ -15,12 +15,14 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 type BudgetResultStepProps = {
+  activeMonths: number;
   budgetDraft: CalculatedBudgetItem[];
   spendableBudget: number;
   isAdjusted: boolean;
   templateId: string;
 };
 const BudgetResultStep = ({
+  activeMonths,
   budgetDraft,
   spendableBudget,
   isAdjusted,
@@ -54,7 +56,7 @@ const BudgetResultStep = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <DialogHeader className="space-y-2">
+      <DialogHeader className="space-y-2 break-keep">
         <div className="space-y-1">
           <div className="text-primary font-bold uppercase">
             Step 4. 예산 산출 결과 확인
@@ -65,9 +67,8 @@ const BudgetResultStep = ({
         </div>
 
         <DialogDescription>
-          수입과 지출 습관을 바탕으로 항목별 예산을 나누었습니다.
-          <br />
-          확인 후 아래 버튼을 눌러 이번 달 자산 관리를 시작해 보세요!
+          수입과 지출 습관을 바탕으로 항목별 예산을 나누었습니다. 확인 후 아래
+          버튼을 눌러 이번 달 자산 관리를 시작해 보세요!
         </DialogDescription>
       </DialogHeader>
 
@@ -102,7 +103,7 @@ const BudgetResultStep = ({
 
         <p className="text-muted-foreground px-2 text-sm break-keep">
           {templateId === 'keep-pattern'
-            ? '최근 3개월간의 지출 패턴을 그대로 반영하여 예산을 구성했습니다.'
+            ? `최근 ${activeMonths}개월간의 지출 패턴을 그대로 반영하여 예산을 구성했습니다.`
             : isAdjusted
               ? `유연 지출 비중이 기준보다 높아, 목표 비중에 맞춰 예산을 효율적으로 재배분했습니다.`
               : `이미 선택하신 ${currentTemplate?.title}의 지출 기준을 잘 지키고 계시네요!`}
@@ -176,8 +177,8 @@ const BudgetResultStep = ({
       </section>
 
       <div className="text-muted-foreground flex gap-1 px-2 text-xs">
-        <Info className="h-3.5 w-3.5 shrink-0" />
-        <p>
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <p className="break-keep">
           과거 소비 비중을 바탕으로 산출된 예산입니다. 100원 단위 미만의 잔돈은
           가장 지출 비중이 높은 항목에 자동으로 포함되었습니다.
         </p>

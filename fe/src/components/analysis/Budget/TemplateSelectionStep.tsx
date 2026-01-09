@@ -11,17 +11,19 @@ import { TemplateId } from '@/types/budgetGuide';
 import { cn } from '@/lib/utils';
 
 type TemplateSelectionStepProps = {
+  activeMonths: number;
   selectedId: TemplateId;
   onSelect: (id: TemplateId) => void;
 };
 
 const TemplateSelectionStep = ({
+  activeMonths,
   selectedId,
   onSelect,
 }: TemplateSelectionStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
-      <DialogHeader className="space-y-2">
+      <DialogHeader className="space-y-2 break-keep">
         <div className="space-y-1">
           <div className="text-primary font-bold uppercase">
             Step 3. 예산 템플릿
@@ -78,10 +80,10 @@ const TemplateSelectionStep = ({
       </section>
 
       <div className="text-muted-foreground flex gap-1 px-2 text-xs">
-        <Info className="h-3.5 w-3.5 shrink-0" />
-        <p>
-          최근 3개월간의 소비 습관을 기반으로 카테고리별 가중치를 계산하여 이번
-          달 예산을 자동으로 배분합니다.
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <p className="break-keep">
+          최근 {activeMonths}개월간의 소비 습관을 기반으로 카테고리별 가중치를
+          계산하여 이번 달 예산을 자동으로 배분합니다.
         </p>
       </div>
     </div>

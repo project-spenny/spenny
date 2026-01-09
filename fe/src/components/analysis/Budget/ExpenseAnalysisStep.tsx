@@ -1,4 +1,4 @@
-import { BarChart3, BarChartHorizontal } from 'lucide-react';
+import { AlertTriangle, BarChart3, BarChartHorizontal } from 'lucide-react';
 import {
   DialogDescription,
   DialogHeader,
@@ -6,11 +6,13 @@ import {
 } from '@/components/ui/dialog';
 import { GroupDisplayInfo, MonthlySummary } from '@/types/budgetGuide';
 
+import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 type ExpenseAnalysisStepProps = {
   activeMonths: number;
+  isFewData: boolean;
   avgTotal: number;
   monthlyData: MonthlySummary[];
   groupDisplayData: GroupDisplayInfo[];
@@ -18,6 +20,7 @@ type ExpenseAnalysisStepProps = {
 
 const ExpenseAnalysisStep = ({
   activeMonths,
+  isFewData,
   avgTotal,
   monthlyData,
   groupDisplayData,
@@ -26,7 +29,7 @@ const ExpenseAnalysisStep = ({
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
-      <DialogHeader className="space-y-2">
+      <DialogHeader className="space-y-2 break-keep">
         <div className="space-y-1">
           <div className="text-primary font-bold uppercase">
             Step 1. 소비 분석
@@ -46,6 +49,19 @@ const ExpenseAnalysisStep = ({
           보여드려요.
         </DialogDescription>
       </DialogHeader>
+
+      {/* 데이터 부족 알림 배너 (1~2개월인 경우에만 표시) */}
+      {isFewData && (
+        <Card className="flex flex-row items-start gap-2 p-3 text-amber-600">
+          <AlertTriangle className="h-4 w-4" />
+          <p className="text-xs break-keep">
+            데이터가 3개월 미만이라 분석 결과가 정확하지 않을 수 있어요.
+            데이터가 쌓일수록 더 정확해져요.
+          </p>
+        </Card>
+      )}
+
+      <Separator />
 
       {/* 월별 지출 추이 */}
       <div className="space-y-4">
@@ -107,11 +123,11 @@ const ExpenseAnalysisStep = ({
         </div>
 
         {/* 상세 리스트 */}
-        <div className="space-y-2">
+        <div className="space-y-4">
           {groupDisplayData.map((g) => (
-            <div
+            <Card
               key={g.id}
-              className="bg-primary/5 border-primary/10 flex items-center justify-between rounded-xl border p-4"
+              className="flex flex-row items-center justify-between p-4"
             >
               <div className="flex items-center gap-3">
                 <div className={cn('h-2 w-2 rounded-full', g.color)} />
@@ -128,7 +144,7 @@ const ExpenseAnalysisStep = ({
                 </div>
                 <div className="text-xs">{g.percent}%</div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
