@@ -28,7 +28,7 @@ export default function OCR({ onResult }: OCRProps) {
           body: JSON.stringify({ image: reader.result }),
         });
         if (!res.ok) {
-          throw new Error('OCR Request Failed');
+          throw new Error('영수증 인식에 실패했습니다');
         }
         const data = await res.json();
         toast(`영수증 인식이 완료 되었습니다`);
