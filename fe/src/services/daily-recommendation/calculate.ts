@@ -1,40 +1,5 @@
+import { DailyRecInput, DailyRecResult } from '@/types/dailyRec';
 import { getMonthDayStats } from '@/utils/date';
-
-// 일일 권장 사용 금액 계산에 필요한 입력 값
-export type DailyRecInput = {
-  today: Date;
-  budget: number;
-  fixedPlannedThisMonth: number; // 이번 달 예정 고정비 합
-  spentTotalUntilYesterday: number; // 이번 달 어제까지의 총 지출 합
-  spentFixedUntilYesterday: number; // 이번 달 어제까지 고정비로 지출된 금액 합
-};
-
-// 디버그용 중간 계산 결과
-export type DailyRecDebug = {
-  // 날짜 관련
-  daysInMonth: number;
-  dayOfMonth: number;
-  elapsedDays: number;
-  remainingDays: number;
-
-  // 가변 예산 흐름
-  varTotal: number;
-  varSpentUntilYesterday: number;
-  varRemaining: number;
-
-  baseDaily: number;
-
-  // 누적 소비 흐름 보정
-  plannedUntilYesterday: number;
-  diff: number;
-  adjustPerDay: number;
-  adjustedDaily: number;
-};
-
-export type DailyRecResult = {
-  amount: number;
-  debug: DailyRecDebug;
-};
 
 // 계산 결과를 항상 0 이상인 유한한 숫자로 보정
 const toNonNegative = (n: number) => (Number.isFinite(n) ? Math.max(n, 0) : 0);
