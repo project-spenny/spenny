@@ -1,4 +1,5 @@
 import { Calculator, Edit, ListPlus } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
@@ -16,9 +17,18 @@ import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 import useBudgetData from '@/hooks/useBudgetData';
-import { useState } from 'react';
+import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
+  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
+  const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
+  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
+  const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(
+    null
+  );
+
   const {
     totalBudget,
     categoryBudgets,
@@ -37,17 +47,15 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     categoryTotalsByKey,
     current: transactions,
   } = useAnalysisData(selectedDate, 'expense');
+  const { processedData, isLoading: isAnalysisLoading } =
+    useBudgetGuideData(selectedDate);
 
-  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
-  const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
-  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
-  const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(
-    null
-  );
+  // 과거 데이터 유무 판단 (이번 달 제외 3개월)
+  const hasPastData = useMemo(() => {
+    return processedData && processedData.monthlyData.length > 0;
+  }, [processedData]);
 
-  const isLoading = isBudgetLoading || isExpenseLoading;
+  const isLoading = isBudgetLoading || isExpenseLoading || isAnalysisLoading;
   const isSubmitting = isSaving || isSavingCategories;
 
   // 예산이 설정된 카테고리 키 목록 생성
@@ -122,13 +130,15 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
             icon={Calculator}
           >
             <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
-              <Button
-                variant="outline"
-                className="cursor-pointer"
-                onClick={() => setIsRecommendOpen(true)}
-              >
-                추천 템플릿으로 시작
-              </Button>
+              {hasPastData && (
+                <Button
+                  variant="outline"
+                  className="cursor-pointer"
+                  onClick={() => setIsRecommendOpen(true)}
+                >
+                  추천 템플릿으로 시작
+                </Button>
+              )}
 
               <Button
                 className="cursor-pointer"
