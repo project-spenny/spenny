@@ -198,14 +198,21 @@ export default function ReceiptMulti() {
       )
     );
   };
+
+  const reset = () => {
+    setFiles([]);
+    setPreviews([]);
+    setResults([]);
+    setStep('upload');
+    setSelectedImage(null);
+  };
+  const handleClose = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) reset();
+  };
   return (
     <>
-      <Dialog
-        open={open}
-        onOpenChange={(isOpen) => {
-          setOpen(isOpen);
-        }}
-      >
+      <Dialog open={open} onOpenChange={handleClose}>
         <DialogTrigger asChild>
           <Button
             className="h-16 w-16 cursor-pointer rounded-full hover:bg-gray-800"
