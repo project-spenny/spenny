@@ -75,3 +75,14 @@ export type BudgetTemplate = {
   subtitle: string;
   flexibleLimitRatio?: number; // Flexible 그룹의 최대 비중 (0.3 = 30%)
 };
+
+/** * 예산 수립 결과
+ * - 계산된 예산 초안의 개별 카테고리 정보
+ */
+export type CalculatedBudgetItem = {
+  categoryId: string;
+  name: string;
+  groupId: CategoryGroupId;
+  amount: number;
+  weight: number;
+};
