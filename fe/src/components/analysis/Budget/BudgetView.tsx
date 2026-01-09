@@ -53,7 +53,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     .filter(([key]) => !budgetKeys.has(key))
     .map(([key, amount]) => {
       const categoryName =
-        transactions.find((t) => t.categories?.category_key === key)?.categories
+        transactions.find((t) => t.category?.category_key === key)?.category
           ?.name_ko || key;
 
       return { key, amount, name: categoryName };
