@@ -31,6 +31,7 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
     adjustPerDay,
     remainingDays,
     weights,
+    totalAmountBeforePattern,
     weightedTotalAmount,
     spentVariableToday,
   } = debug;
@@ -85,7 +86,7 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
           <CardContent>
             {/* 가중치(패턴) 근거 */}
             <p className="text-foreground border-primary/40 border-l-2 pl-3 text-sm">
-              {patternMessage}
+              {patternMessage.message}
             </p>
             {/* 페이스(누적 흐름) 근거 */}
             <p className="text-foreground border-primary/40 border-l-2 pl-3 text-sm">
@@ -116,37 +117,76 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
               오늘 권장액이 달라진 이유
             </CardTitle>
             <CardDescription className="text-xs">
-              어제까지의 실제 지출이 기준 누적과 얼마나 달랐는지에 따라, 그
-              차이를 남은 기간에 나눠 오늘 권장액에 반영해요.
+              소비 흐름(누적)과 소비 패턴(요일/월초·월말)을 함께 반영해 오늘
+              권장액을 계산해요.
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
-            <div className="flex flex-col gap-2 rounded-md border p-3 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">
-                  어제까지 기준 누적
-                </span>
-                <span className="font-medium">
-                  {plannedUntilYesterdayRounded.toLocaleString()}원
-                </span>
-              </div>
+          <CardContent className="space-y-4">
+            {/* 소비 흐름 보정(페이스) */}
+            <div>
+              <p className="mb-2 text-xs font-medium">소비 흐름 보정</p>
 
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">기준 대비 차이</span>
-                <span className="font-medium">{diff.toLocaleString()}원</span>
-              </div>
+              <div className="flex flex-col gap-2 rounded-md border p-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">
+                    기준 누적(어제까지)
+                  </span>
+                  <span className="font-medium">
+                    {plannedUntilYesterdayRounded.toLocaleString()}원
+                  </span>
+                </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">남은 일수</span>
-                <span className="font-medium">{remainingDays}일</span>
-              </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">기준 대비 차이</span>
+                  <span className="font-medium">{diff.toLocaleString()}원</span>
+                </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">하루 보정값</span>
-                <span className="font-medium">
-                  {adjustPerDayRounded.toLocaleString()}원
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">남은 일수</span>
+                  <span className="font-medium">{remainingDays}일</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">하루 보정값</span>
+                  <span className="font-medium">
+                    {adjustPerDayRounded.toLocaleString()}원
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 소비 패턴 보정(패턴) */}
+            <div>
+              <p className="mb-2 text-xs font-medium">소비 패턴 보정</p>
+
+              <div className="flex flex-col gap-2 rounded-md border p-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">반영 기준</span>
+                  <span className="font-medium">
+                    {patternMessage.reasonLabel ?? '-'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">패턴 보정률</span>
+                  <span className="font-medium">
+                    {patternMessage.ratePercent > 0
+                      ? `+${patternMessage.ratePercent}%`
+                      : `${patternMessage.ratePercent}%`}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">패턴 영향 금액</span>
+                  <span className="font-medium">
+                    {(
+                      (weightedTotalAmount ?? 0) -
+                      (totalAmountBeforePattern ?? 0)
+                    ).toLocaleString()}
+                    원
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
