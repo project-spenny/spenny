@@ -39,25 +39,6 @@ const TemplateSelectionStep = ({
         </DialogDescription>
       </DialogHeader>
 
-      {/* 가용 예산 카드 */}
-      <Card className="gap-2 p-5">
-        <p>이번 달 가용 지출 예산</p>
-
-        <div className="flex items-baseline gap-1 font-bold">
-          <span className="text-2xl tracking-tight">
-            {spendableBudget.toLocaleString()}
-          </span>
-          <span className="text-sm">원</span>
-        </div>
-
-        <div className="text-muted-foreground mt-2 flex gap-1 text-xs">
-          <Info className="h-3.5 w-3.5 shrink-0" />
-          <p>수입에서 저축 목표를 제외한 금액입니다.</p>
-        </div>
-      </Card>
-
-      <Separator />
-
       {/* 템플릿 선택 섹션 */}
       <section className="flex flex-col gap-4">
         {BUDGET_TEMPLATES.map((template) => {
@@ -99,7 +80,7 @@ const TemplateSelectionStep = ({
         })}
       </section>
 
-      <div className="text-muted-foreground flex gap-1 text-xs">
+      <div className="text-muted-foreground flex gap-1 px-2 text-xs">
         <Info className="h-3.5 w-3.5 shrink-0" />
         <p>
           최근 3개월간의 소비 습관을 기반으로 카테고리별 가중치를 계산하여 이번
