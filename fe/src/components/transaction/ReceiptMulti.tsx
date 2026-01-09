@@ -116,7 +116,6 @@ export default function ReceiptMulti() {
     setProgress({ current: 0, total: files.length });
 
     for (let i = 0; i < files.length; i++) {
-      toast(`${i} 번째`);
       try {
         const base64 = await fileToBase64(files[i]);
         const res = await fetch('/api/ocr', {
@@ -150,6 +149,7 @@ export default function ReceiptMulti() {
     if (ocrResults.length > 0) {
       toast.success(`${results.length}개 영수증 인식 완료`);
       setResults(ocrResults);
+      setCheckedItems(new Set(ocrResults.map((_, i) => i)));
       setStep('result');
     }
   };
