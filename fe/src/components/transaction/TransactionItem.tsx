@@ -51,6 +51,7 @@ export const TransactionItem = ({
         </div>
         <ItemActions className="ml-auto">
           <Button
+            variant='ghost'
             className="cursor-pointer"
             size="sm"
             onClick={() => {
