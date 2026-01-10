@@ -147,7 +147,7 @@ export default function ReceiptMulti() {
     }
 
     if (ocrResults.length > 0) {
-      toast.success(`${results.length}개 영수증 인식 완료`);
+      toast.success(`${ocrResults.length}개 영수증 인식 완료`);
       setResults(ocrResults);
       setCheckedItems(new Set(ocrResults.map((_, i) => i)));
       setStep('result');
