@@ -22,10 +22,19 @@ export const TransactionItem = ({
   onEdit,
 }: TransactionItemProps) => {
   const { openEdit } = useSelected();
+  const handleClick = () => {
+    if (onEdit) {
+      onEdit(transaction);
+    }
+    openEdit(transaction);
+  };
   return (
-    <Item variant="outline"
-    className='cursor-pointer hover:border-brand-soft transition-colors'>
-      <ItemContent className="flex flex-row items-center ">
+    <Item
+      variant="outline"
+      className="hover:border-brand-soft cursor-pointer transition-colors"
+      onClick={handleClick}
+    >
+      <ItemContent className="flex flex-row items-center">
         <div className="flex w-32 flex-col gap-1">
           <span className="text-muted-foreground text-xs">
             {formatDateKR(new Date(transaction.date))}
@@ -50,21 +59,9 @@ export const TransactionItem = ({
           </ItemTitle>
           <ItemTitle className="p-2 text-left">{transaction.title}</ItemTitle>
         </div>
-        <ItemActions className="ml-auto">
-          <Button
-            variant='ghost'
-            className="cursor-pointer"
-            size="sm"
-            onClick={() => {
-              if (onEdit) {
-                onEdit(transaction);
-              }
-              openEdit(transaction);
-            }}
-          >
-            <ChevronRight />
-          </Button>
-        </ItemActions>
+        <div className='ml-auto'>
+          <ChevronRight />
+        </div>
       </ItemContent>
     </Item>
   );
