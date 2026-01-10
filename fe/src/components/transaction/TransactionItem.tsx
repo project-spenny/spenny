@@ -23,8 +23,9 @@ export const TransactionItem = ({
 }: TransactionItemProps) => {
   const { openEdit } = useSelected();
   return (
-    <Item variant="outline">
-      <ItemContent className="flex flex-row items-center">
+    <Item variant="outline"
+    className='cursor-pointer hover:border-brand-soft transition-colors'>
+      <ItemContent className="flex flex-row items-center ">
         <div className="flex w-32 flex-col gap-1">
           <span className="text-muted-foreground text-xs">
             {formatDateKR(new Date(transaction.date))}
