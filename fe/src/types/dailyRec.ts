@@ -44,6 +44,7 @@ export type DailyRecResult = {
 export type DailyRecChartData = {
   labels: string[];
   actualDailySeries: number[];
+  recommendedDailySeries: (number | null)[];
 };
 
 // 월 구간 (초/중/말)
