@@ -39,26 +39,16 @@ export default async function Home({ searchParams }: PageProps) {
     end_date: endDate,
   };
 
-  const budgets = await fetchBudgetsServer(monthDate);
-  const budget = getTotalBudgetAmount(budgets);
-
-  const fixedRules = await fetchFixedRulesByMonthServer(monthDate);
-  const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
-    fixedRules,
-    monthDate
-  );
-
   return (
     <div className="flex min-h-[900px] w-full max-w-6xl self-start">
       <TransactionProvider>
         <CalendarProvider>
-          <Suspense fallback={<CalendarSkeleton />}>
+          <Suspense key={currentMonth} fallback={<CalendarSkeleton />}>
             <DataCalendar
               filters={filters}
               currentMonth={currentMonth}
               selectedDate={params.selected_date}
-              budget={budget}
-              fixedPlannedThisMonth={fixedPlannedThisMonth}
+              monthDate={monthDate}
             />
           </Suspense>
         </CalendarProvider>
@@ -71,18 +61,27 @@ async function DataCalendar({
   filters,
   currentMonth,
   selectedDate,
-  budget,
-  fixedPlannedThisMonth,
+  monthDate,
 }: {
   filters: TransactionFilters;
   currentMonth: string;
   selectedDate?: string;
-  budget: number;
-  fixedPlannedThisMonth: number;
+  monthDate: Date;
 }) {
-  const transactions = await getTransaction(filters, true);
+  const [transactions, budgets, fixedRules] = await Promise.all([
+    getTransaction(filters, true),
+    fetchBudgetsServer(monthDate),
+    fetchFixedRulesByMonthServer(monthDate),
+  ]);
+
+  const budget = getTotalBudgetAmount(budgets);
+
   const today = new Date();
 
+  const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
+    fixedRules,
+    monthDate
+  );
   const spentTotalUntilYesterday = sumExpenseUntilYesterday(
     transactions,
     today
@@ -100,7 +99,6 @@ async function DataCalendar({
     spentFixedUntilYesterday,
   });
 
-  const monthDate = new Date(`${currentMonth}-01`);
   const dailyChartData = buildDailyRecChartData({
     monthDate,
     transactions,
