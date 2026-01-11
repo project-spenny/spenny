@@ -39,3 +39,17 @@ export type Budget = {
   created_at: Date;
   updated_at: Date;
 };
+
+/**
+ * 카테고리가 포함된 예산 타입
+ */
+export type BudgetWithCategory = {
+  id: string;
+  amount: number;
+  budget_month: string;
+  category_id: string | null;
+  category: {
+    name_ko: string;
+    category_key: string;
+  } | null;
+};

@@ -1,9 +1,10 @@
-import { Calculator, Edit, ListPlus } from 'lucide-react';
+import { Calculator, Edit } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
+import BudgetCategoryList from './BudgetCategoryList';
 import BudgetOverview from './BudgetOverview';
 import BudgetRecommendDialog from '@/components/budget/BudgetRecommendDialog';
 import BudgetSetupDialog from '@/components/budget/BudgetSetupDialog';
@@ -11,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';
 import CategoryBudgetSetting from '@/components/budget/CategoryBudgetSetting';
 import ConfirmDialog from '@/components/budget/ConfirmDialog';
-import { Progress } from '@/components/ui/progress';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import { Separator } from '@/components/ui/separator';
 import { THEME_COLOR } from '@/constants/colors';
@@ -61,7 +61,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
 
   // 예산이 설정된 카테고리 키 목록 생성
   const budgetKeys = new Set(
-    categoryBudgets.map((b) => b.categories?.category_key).filter(Boolean)
+    categoryBudgets.map((b) => b.category?.category_key).filter(Boolean)
   );
   // 예산에는 없지만 지출이 발생한 항목들 필터링
   const unbudgetedExpenses = Object.entries(categoryTotalsByKey)
@@ -157,151 +157,13 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
           <div className="relative">
             {/* 카테고리별 예산 */}
             <AnalysisSection title={'카테고리별 예산'}>
-              {categoryBudgets.length === 0 ? (
-                <AnalysisEmpty
-                  title="카테고리별 예산을 설정해주세요"
-                  description="식비, 교통비 등 항목별로 예산을 나누면 더 체계적으로 관리할 수 있어요."
-                  icon={ListPlus}
-                >
-                  <Button
-                    variant="ghost"
-                    className="bg-primary/5 hover:bg-primary/10 mt-2 cursor-pointer"
-                    onClick={() => setIsCategoryPanelOpen(true)}
-                  >
-                    카테고리 예산 설정하기
-                  </Button>
-                </AnalysisEmpty>
-              ) : (
-                <div className="flex flex-col items-center py-6">
-                  <div className="absolute top-8 right-8 flex gap-1">
-                    <Button
-                      variant="ghost"
-                      className="text-muted-foreground hover:text-foreground h-8 cursor-pointer px-2"
-                      onClick={() => setIsCategoryPanelOpen(true)}
-                    >
-                      수정
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive h-8 cursor-pointer px-2"
-                      onClick={() => setIsCategoryConfirmOpen(true)}
-                    >
-                      초기화
-                    </Button>
-                  </div>
-
-                  {/* 카테고리별 예산 리스트 */}
-                  <div className="w-full max-w-lg space-y-6">
-                    {categoryBudgets.map((budget) => {
-                      const categoryName =
-                        budget.categories?.name_ko || '미지정';
-                      const categoryKey = budget.categories?.category_key;
-                      const categoryExpense = categoryKey
-                        ? categoryTotalsByKey[categoryKey] || 0
-                        : 0;
-
-                      const isOver = categoryExpense > budget.amount;
-                      const diff = Math.abs(budget.amount - categoryExpense);
-                      const usagePercentage =
-                        budget.amount > 0
-                          ? Math.round((categoryExpense / budget.amount) * 100)
-                          : 0;
-
-                      return (
-                        <div
-                          key={budget.id}
-                          className={cn(
-                            'border-muted-foreground/30 rounded-2xl border border-dashed p-5 transition-all',
-                            isOver ? 'bg-destructive/5' : 'bg-card'
-                          )}
-                        >
-                          <div className="mb-4 flex items-end justify-between">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-1 text-sm">
-                                <span className="font-bold">
-                                  {categoryName}
-                                </span>
-                                <span
-                                  className={cn(
-                                    'rounded-full px-2 py-0.5 text-xs',
-                                    usagePercentage >= 90
-                                      ? 'bg-destructive/10 text-destructive'
-                                      : 'bg-primary/10 text-primary'
-                                  )}
-                                >
-                                  {usagePercentage}%
-                                </span>
-                              </div>
-
-                              <div className="flex items-center gap-2 tracking-tight">
-                                <span className="text-2xl font-bold">
-                                  {categoryExpense.toLocaleString()}
-                                </span>
-                                <div className="text-muted-foreground flex items-center text-sm">
-                                  /
-                                  <div
-                                    className="hover:text-primary flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 transition-colors hover:underline"
-                                    onClick={() =>
-                                      categoryKey &&
-                                      openCategorySetting(categoryKey)
-                                    }
-                                  >
-                                    {budget.amount.toLocaleString()}원
-                                    <Edit className="h-4 w-4" />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="text-right">
-                              <p className="text-muted-foreground text-xs font-medium">
-                                남은 예산
-                              </p>
-                              <p
-                                className={cn(
-                                  'text-lg font-bold tracking-tight',
-                                  isOver ? THEME_COLOR.EXPENSE : 'text-primary'
-                                )}
-                              >
-                                {isOver
-                                  ? `-${Math.abs(diff).toLocaleString()}`
-                                  : diff.toLocaleString()}
-                                원
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* 프로그레스 바 */}
-                          <div className="space-y-2">
-                            <Progress
-                              value={Math.min(usagePercentage, 100)}
-                              className="h-2"
-                              indicatorClassName={
-                                usagePercentage >= 90
-                                  ? 'bg-red-400'
-                                  : 'bg-primary'
-                              }
-                            />
-
-                            {isOver && (
-                              <p
-                                className={cn(
-                                  'mt-2 text-sm font-medium',
-                                  THEME_COLOR.EXPENSE
-                                )}
-                              >
-                                ⚠️ [{categoryName}] 카테고리 지출이 예산을
-                                초과했습니다.
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              <BudgetCategoryList
+                budgets={categoryBudgets}
+                categoryTotalsByKey={categoryTotalsByKey}
+                onEditAll={() => setIsCategoryPanelOpen(true)}
+                onResetAll={() => setIsCategoryConfirmOpen(true)}
+                onEditItem={openCategorySetting}
+              />
 
               {/* 예산 미설정 지출 목록 */}
               {unbudgetedExpenses.length > 0 && (
