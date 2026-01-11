@@ -13,8 +13,33 @@ import {
   getPaceExplanation,
   getPaceStatus,
   getPatternExplanation,
+  PaceStatus,
 } from '@/services/daily-recommendation/explain';
 import { DailyRecPanelSkeleton } from './DailyRecPanelSkeleton';
+import { cn } from '@/lib/utils';
+
+type PaceBadgeStyle = {
+  dotClass: string;
+  badgeClass: string;
+};
+
+const PACE_BADGE_STYLE: Record<PaceStatus, PaceBadgeStyle> = {
+  ahead: {
+    dotClass: 'bg-red-500',
+    badgeClass:
+      'border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400',
+  },
+  behind: {
+    dotClass: 'bg-green-500',
+    badgeClass:
+      'border-green-200 bg-green-50 text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-400',
+  },
+  onTrack: {
+    dotClass: 'bg-amber-400',
+    badgeClass:
+      'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400',
+  },
+};
 
 type Props = {
   daily: DailyRecResult;
@@ -55,12 +80,13 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
   const spentToday = spentVariableToday ?? 0;
 
   const patternMessage = getPatternExplanation(weights);
+  const badgeStyle = PACE_BADGE_STYLE[paceStatus];
 
   return (
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
         {/* 요약 카드 */}
-        <Card>
+        <Card className="border-l-brand border-l-4">
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
@@ -83,8 +109,15 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
                   </span>
                 </p>
               </div>
-
-              <Badge variant="outline">{title}</Badge>
+              <Badge
+                variant="outline"
+                className={cn('flex items-center gap-2', badgeStyle.badgeClass)}
+              >
+                <span
+                  className={cn('h-2 w-2 rounded-full', badgeStyle.dotClass)}
+                />
+                {title}
+              </Badge>
             </div>
           </CardHeader>
 
