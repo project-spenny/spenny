@@ -39,7 +39,7 @@ const TemplateSelectionStep = ({
                 'relative cursor-pointer gap-1 border-2 p-5 text-left transition-all',
                 isSelected
                   ? 'border-brand bg-brand-subtle dark:bg-brand/10 shadow-md'
-                  : 'hover:border-brand/40 border-border'
+                  : 'hover:border-brand-soft border-border'
               )}
             >
               <div className="flex items-center justify-between">
