@@ -31,14 +31,12 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
   const {
     totalBudget,
     categoryBudgets,
-    saveBudget,
-    saveCategoryBudgets,
     removeBudget,
     futureFixedAmount,
+    applyRecommendTemplate,
     isLoading: isBudgetLoading,
     isDeleting,
-    isSaving,
-    isSavingCategories,
+    isApplyingTemplate,
   } = useBudgetData(selectedDate);
   const {
     totalAmount: totalExpense,
@@ -55,7 +53,6 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
   }, [processedData]);
 
   const isLoading = isBudgetLoading || isExpenseLoading || isAnalysisLoading;
-  const isSubmitting = isSaving || isSavingCategories;
 
   // 예산 미설정 지출 목록 구하기
   const unbudgetedExpenses = useMemo(() => {
@@ -84,26 +81,16 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
   // 추천 예산 적용 핸들러
   const handleRecommendConfirm = (
     budgetDraft: CalculatedBudgetItem[],
-    totalBudget: number
+    totalAmount: number
   ) => {
-    saveBudget(
-      { amount: totalBudget, categoryId: null },
-      {
-        onSuccess: () => {
-          // 총 예산 저장 성공 후, 카테고리별 예산 일괄 저장
-          const categoryData = budgetDraft.map((item) => ({
-            categoryId: item.categoryId,
-            amount: item.amount,
-          }));
+    const categoryData = budgetDraft.map((item) => ({
+      categoryId: item.categoryId,
+      amount: item.amount,
+    }));
 
-          saveCategoryBudgets(categoryData, {
-            onSuccess: () => {
-              setIsRecommendOpen(false); // 모든 저장 성공 시 다이얼로그 닫기
-            },
-          });
-        },
-      }
-    );
+    applyRecommendTemplate(totalAmount, categoryData, {
+      onSuccess: () => setIsRecommendOpen(false),
+    });
   };
 
   if (isLoading)
@@ -207,7 +194,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
         onOpenChange={setIsRecommendOpen}
         selectedDate={selectedDate}
         onConfirm={handleRecommendConfirm}
-        isSubmitting={isSubmitting}
+        isSubmitting={isApplyingTemplate}
       />
 
       {/* 총 예산 초기화 모달창 */}
