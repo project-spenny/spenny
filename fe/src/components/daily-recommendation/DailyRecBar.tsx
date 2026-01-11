@@ -5,6 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import { DailyRecPanel } from './DailyRecPanel';
 import { DailyRecChartData, DailyRecResult } from '@/types/dailyRec';
+import { cn } from '@/lib/utils';
 
 type Props = {
   daily: DailyRecResult;
@@ -13,7 +14,14 @@ type Props = {
 
 export const DailyRecBar = ({ daily, dailyChartData }: Props) => {
   return (
-    <div className="bg-brand-subtle flex items-center justify-between rounded-md px-4 py-3">
+    <div
+      className={cn(
+        'flex items-center justify-between rounded-md px-4 py-3',
+        'bg-brand-subtle dark:bg-muted/40',
+        'dark:border-border border border-transparent',
+        'border-l-brand border-l-4'
+      )}
+    >
       {/* 왼쪽 정보 영역 */}
       <div className="space-y-1">
         <div className="flex items-baseline gap-2">
