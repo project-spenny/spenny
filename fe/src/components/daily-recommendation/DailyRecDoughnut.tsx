@@ -65,7 +65,7 @@ export const DailyRecUsageCard = ({
       <CardContent>
         <div className="grid grid-cols-2 items-center">
           {/* Doughnut */}
-          <div className="h-[150px] w-[150px]">
+          <div className="h-38 w-38">
             <Doughnut data={doughnutData} options={doughnutOptions} />
           </div>
 

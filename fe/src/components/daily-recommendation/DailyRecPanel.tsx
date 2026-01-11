@@ -14,13 +14,18 @@ import {
   getPaceStatus,
   getPatternExplanation,
 } from '@/services/daily-recommendation/explain';
+import { DailyRecPanelSkeleton } from './DailyRecPanelSkeleton';
 
 type Props = {
   daily: DailyRecResult;
   dailyChartData: DailyRecChartData;
+  loading?: boolean;
 };
 
-export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
+export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
+  const isLoading = loading || !daily || !dailyChartData;
+  if (isLoading) return <DailyRecPanelSkeleton />;
+
   const { amount, debug } = daily;
   const {
     varTotal,

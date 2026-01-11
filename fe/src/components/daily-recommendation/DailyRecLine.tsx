@@ -104,7 +104,7 @@ export const DailyRecPaceCard = ({
       </CardHeader>
       <CardContent>
         {/* Line chart */}
-        <div className="h-[180px]">
+        <div className="h-45">
           <Line data={dailyChart} options={dailyOptions} />
         </div>
 
