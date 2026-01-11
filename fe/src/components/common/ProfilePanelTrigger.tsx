@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import { useQuery } from '@tanstack/react-query';
 import { Profile } from '@/schemas/profile';
+import Image from 'next/image';
 
 async function fetchProfile(): Promise<Profile> {
   const res = await fetch('/api/profile', { method: 'GET' });
@@ -28,8 +29,8 @@ export default function ProfilePanelTrigger() {
               src={profile?.profile_image_url ?? undefined}
               alt="프로필"
             />
-            <AvatarFallback>
-              {profile?.nickname?.[0]?.toUpperCase() ?? 'ME'}
+            <AvatarFallback className="flex items-center justify-center bg-white">
+              <Image src="/logo_pig.svg" alt="" width={20} height={20} />
             </AvatarFallback>
           </Avatar>
         </Button>

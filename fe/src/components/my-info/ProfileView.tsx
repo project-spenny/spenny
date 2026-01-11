@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Profile } from '@/schemas/profile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Image from 'next/image';
 
 type ProfileViewProps = {
   profile: Profile;
@@ -23,8 +24,8 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
             src={profile.profile_image_url ?? undefined}
             alt="프로필 이미지"
           />
-          <AvatarFallback>
-            {profile.nickname?.[0]?.toUpperCase() ?? 'ME'}
+          <AvatarFallback className="flex items-center justify-center bg-white">
+            <Image src="/logo_pig.svg" alt="" width={30} height={30} />
           </AvatarFallback>
         </Avatar>
       </div>
