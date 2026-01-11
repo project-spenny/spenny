@@ -1,9 +1,4 @@
 import { CheckCircle2, Info, Lightbulb } from 'lucide-react';
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
 import { BUDGET_TEMPLATES } from '@/constants/budgetTemplates';
@@ -11,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import BudgetResultSection from '@/components/analysis/Budget/BudgetResultSection';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';
 import { Card } from '@/components/ui/card';
+import DialogStepHeader from '@/components/analysis/Budget/common/DialogStepHeader';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
@@ -56,21 +52,13 @@ const BudgetResultStep = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <DialogHeader className="space-y-2 break-keep">
-        <div className="space-y-1">
-          <div className="text-primary font-bold uppercase">
-            Step 4. 예산 산출 결과 확인
-          </div>
-          <DialogTitle className="text-xl font-bold">
-            이번 달, 이렇게 소비해 보는 건 어떨까요?
-          </DialogTitle>
-        </div>
-
-        <DialogDescription>
-          수입과 지출 습관을 바탕으로 항목별 예산을 나누었습니다. 확인 후 아래
-          버튼을 눌러 이번 달 자산 관리를 시작해 보세요!
-        </DialogDescription>
-      </DialogHeader>
+      <DialogStepHeader
+        step={4}
+        subTitle="예산 산출 결과 확인"
+        title="이번 달, 이렇게 소비해 보는 건 어떨까요?"
+        description="수입과 지출 습관을 바탕으로 항목별 예산을 나누었습니다. 확인 후 아래
+          버튼을 눌러 이번 달 자산 관리를 시작해 보세요!"
+      />
 
       {/* 조정 상태 피드백 섹션 */}
       <Card

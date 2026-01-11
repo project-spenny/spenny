@@ -1,10 +1,5 @@
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-
 import { AlertTriangle } from 'lucide-react';
+import DialogStepHeader from '@/components/analysis/Budget/common/DialogStepHeader';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 
@@ -63,20 +58,12 @@ const SavingGoalStep = ({
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300">
-      <DialogHeader className="space-y-2 break-keep">
-        <div className="space-y-1">
-          <div className="text-primary font-bold uppercase">
-            Step 2. 저축 및 가용 예산 목표 설정
-          </div>
-          <DialogTitle className="text-xl font-bold break-keep">
-            얼마를 저축하고 얼마를 쓰실 건가요?
-          </DialogTitle>
-        </div>
-
-        <DialogDescription className="break-keep">
-          {titleDesc}
-        </DialogDescription>
-      </DialogHeader>
+      <DialogStepHeader
+        step={2}
+        subTitle="저축 및 가용 예산 목표 설정"
+        title="얼마를 저축하고 얼마를 쓰실 건가요?"
+        description={titleDesc}
+      />
 
       {/* 수입 입력 섹션 */}
       <div className="flex items-center justify-between rounded-xl">

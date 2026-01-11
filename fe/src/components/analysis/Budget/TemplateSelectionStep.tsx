@@ -1,12 +1,8 @@
 import { CheckCircle2, Info } from 'lucide-react';
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 import { BUDGET_TEMPLATES } from '@/constants/budgetTemplates';
 import { Card } from '@/components/ui/card';
+import DialogStepHeader from '@/components/analysis/Budget/common/DialogStepHeader';
 import { TemplateId } from '@/types/budgetGuide';
 import { cn } from '@/lib/utils';
 
@@ -23,20 +19,12 @@ const TemplateSelectionStep = ({
 }: TemplateSelectionStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
-      <DialogHeader className="space-y-2 break-keep">
-        <div className="space-y-1">
-          <div className="text-primary font-bold uppercase">
-            Step 3. 예산 템플릿
-          </div>
-          <DialogTitle className="text-xl font-bold">
-            어떤 방식으로 예산을 짤까요?
-          </DialogTitle>
-        </div>
-
-        <DialogDescription>
-          선택하신 템플릿에 따라 가용 예산이 카테고리별로 자동 배분됩니다.
-        </DialogDescription>
-      </DialogHeader>
+      <DialogStepHeader
+        step={3}
+        subTitle="예산 템플릿"
+        title="어떤 방식으로 예산을 짤까요?"
+        description="선택하신 템플릿에 따라 가용 예산이 카테고리별로 자동 배분됩니다."
+      />
 
       {/* 템플릿 선택 섹션 */}
       <section className="flex flex-col gap-4">
