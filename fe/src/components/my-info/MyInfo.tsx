@@ -9,6 +9,7 @@ import LogoutButton from './LogoutButton';
 import ProfileEdit from './ProfileEdit';
 import ProfileView from './ProfileView';
 import MyInfoSkeleton from './MyInfoSkeleton';
+import { toast } from 'sonner';
 
 // 프로필 조회 함수
 async function fetchProfile(): Promise<Profile> {
@@ -50,6 +51,10 @@ export default function MyInfo() {
     mutationFn: updateProfile,
     onSuccess: (updated) => {
       queryClient.setQueryData(['profile'], updated);
+      toast.success('프로필이 저장되었어요.');
+    },
+    onError: () => {
+      toast.error('프로필 저장에 실패했어요. 잠시 후 다시 시도해주세요.');
     },
   });
 
