@@ -1,12 +1,11 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import AnalysisView from '@/components/analysis/AnalysisView';
 import BudgetView from '@/components/analysis/Budget/BudgetView';
-import { Button } from '@/components/ui/button';
+import MonthNavigator from '@/components/common/MonthNavigator';
 
 const AnalysisClient = () => {
   const router = useRouter();
@@ -49,45 +48,24 @@ const AnalysisClient = () => {
   return (
     <div className="flex min-h-screen w-full flex-col py-4">
       {/* 달 선택 */}
-      <div className="flex flex-col items-center justify-center py-6 md:py-10">
-        <span className="text-muted-foreground text-sm font-bold md:text-base">
-          {year}
-        </span>
-
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer"
-            onClick={() => moveMonth(-1)}
-          >
-            <ChevronLeft />
-          </Button>
-
-          <span className="text-2xl font-bold">{month}월</span>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer"
-            onClick={() => moveMonth(1)}
-          >
-            <ChevronRight />
-          </Button>
-        </div>
-      </div>
+      <MonthNavigator
+        year={year}
+        month={month}
+        onPrev={() => moveMonth(-1)}
+        onNext={() => moveMonth(1)}
+      />
 
       {/* 탭 리스트 */}
       <Tabs
         defaultValue="지출"
         className="mx-auto w-full max-w-4xl px-6 md:px-12"
       >
-        <TabsList className="flex h-12 w-full gap-2 p-2">
+        <TabsList className="bg-brand-subtle dark:bg-brand/10 flex h-12 w-full gap-2 p-2">
           {analysisTabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="hover:bg-primary/10 flex-1 cursor-pointer transition-all data-[state=active]:font-bold md:text-base"
+              className="hover:bg-brand/10 flex-1 cursor-pointer transition-all data-[state=active]:font-bold md:text-base"
             >
               {tab.value}
             </TabsTrigger>
