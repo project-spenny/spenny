@@ -23,15 +23,28 @@ export const DailyRecPaceCard = ({
     labels: dailyChartData.labels,
     datasets: [
       {
-        label: '지출',
+        label: '실제 지출',
         data: dailyChartData.actualDailySeries,
         tension: 0.2,
-        borderWidth: 3,
+        borderWidth: 2,
         pointRadius: 2,
         pointHoverRadius: 8,
         pointHitRadius: 50,
-        borderColor: '#5C7AFF',
+        borderColor: '#f43f5e',
         fill: true,
+        spanGaps: false,
+      },
+      {
+        label: '권장 사용액',
+        data: dailyChartData.recommendedDailySeries,
+        tension: 0.2,
+        borderWidth: 2,
+        pointRadius: 2,
+        pointHoverRadius: 6,
+        pointHitRadius: 50,
+        borderColor: '#3b82f6',
+        fill: false,
+        spanGaps: false,
       },
     ],
   };
@@ -39,23 +52,26 @@ export const DailyRecPaceCard = ({
   const dailyOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
 
     plugins: {
-      legend: { display: false },
+      legend: { display: true },
       annotation: {
         annotations: {
           plannedLine: {
             type: 'line',
             yMin: planned,
             yMax: planned,
-            borderColor: '#f43f5e',
-            borderWidth: 3,
+            borderColor: '#C6D0E2',
+            borderWidth: 2,
             label: {
               display: true,
               content: `기준 ${planned.toLocaleString()}원`,
               position: 'center',
-              backgroundColor: '#FFFFFF',
-              color: '#f43f5e',
+              color: '#C6D0E2',
               borderWidth: 0,
             },
           },
