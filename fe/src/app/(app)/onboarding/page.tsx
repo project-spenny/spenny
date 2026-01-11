@@ -9,23 +9,26 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 import ProfileForm from '@/components/onboarding/ProfileForm';
 import { OnboardingProfileValues } from '@/schemas/profile';
 
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
-import { toast } from 'sonner';
 
 export default function OnboardingPage() {
   const router = useRouter();
 
   const [phase, setPhase] = useState<'form' | 'intro'>('form');
   const [introStep, setIntroStep] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
 
   const [serverError, setServerError] = useState<string | null>(null);
 
   const exitOnboarding = () => {
+    if (isExiting) return;
+    setIsExiting(true);
     router.replace('/');
   };
 
@@ -80,6 +83,7 @@ export default function OnboardingPage() {
                     <Button
                       type="button"
                       variant="ghost"
+                      disabled={isExiting}
                       className="absolute -top-3 right-2"
                       onClick={exitOnboarding}
                     >
@@ -115,6 +119,7 @@ export default function OnboardingPage() {
                   steps={INTRO_STEPS}
                   introStep={introStep}
                   isLastIntro={isLastIntro}
+                  isExiting={isExiting}
                   onPrev={goPrev}
                   onNext={goNext}
                   onExit={exitOnboarding}

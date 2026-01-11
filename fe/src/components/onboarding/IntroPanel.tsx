@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { Spinner } from '../ui/spinner';
 
 type IntroStep = {
   title: string;
@@ -13,6 +14,7 @@ type IntroPanelProps = {
   steps: readonly IntroStep[];
   introStep: number;
   isLastIntro: boolean;
+  isExiting: boolean;
   onPrev: () => void;
   onNext: () => void;
   onExit: () => void;
@@ -22,6 +24,7 @@ export default function IntroPanel({
   steps,
   introStep,
   isLastIntro,
+  isExiting,
   onPrev,
   onNext,
   onExit,
@@ -78,7 +81,8 @@ export default function IntroPanel({
         {/* 오른쪽 */}
         <div className="justify-self-end">
           {isLastIntro ? (
-            <Button type="button" onClick={onExit}>
+            <Button type="button" onClick={onExit} disabled={isExiting}>
+              {isExiting && <Spinner />}
               시작하기
             </Button>
           ) : (
