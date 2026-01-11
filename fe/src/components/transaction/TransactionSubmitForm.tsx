@@ -13,6 +13,7 @@ import { TagInput } from './common/TagInput';
 import { TitleInput } from './common/TitleInput';
 import { TypeSelector } from './common/TypeSelector';
 import { CategorySelector } from './common/CategorySelector';
+import { QuickAmountButtons } from './common/QuickAmountButtons';
 
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';
@@ -222,6 +223,10 @@ export default function TransactionSubmitForm({
       <AmountInput
         value={formData.amount}
         onChange={(value) => UpdateField('amount', value)}
+      />
+      <QuickAmountButtons
+        value={formData.amount}
+        onClick={(value) => UpdateField('amount', value)}
       />
 
       <DatePicker
