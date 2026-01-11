@@ -3,10 +3,10 @@ import { CheckCircle2, Info, Lightbulb } from 'lucide-react';
 import { BUDGET_GROUPS } from '@/constants/analysis';
 import { BUDGET_TEMPLATES } from '@/constants/budgetTemplates';
 import { Badge } from '@/components/ui/badge';
-import BudgetResultSection from '@/components/analysis/Budget/BudgetResultSection';
+import BudgetResultSection from '@/components/budget/steps/BudgetResultSection';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';
 import { Card } from '@/components/ui/card';
-import DialogStepHeader from '@/components/analysis/Budget/common/DialogStepHeader';
+import DialogStepHeader from '@/components/budget/steps/DialogStepHeader';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 

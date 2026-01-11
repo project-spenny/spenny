@@ -1,5 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
-import DialogStepHeader from '@/components/analysis/Budget/common/DialogStepHeader';
+import DialogStepHeader from '@/components/budget/steps/DialogStepHeader';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 
