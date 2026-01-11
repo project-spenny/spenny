@@ -77,6 +77,13 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6">
+      <Image
+        src="/logo_vertical.svg"
+        alt="SPENNY logo"
+        width={400}
+        height={400}
+      />
+
       <div className="flex flex-col gap-4">
         <button
           type="button"
