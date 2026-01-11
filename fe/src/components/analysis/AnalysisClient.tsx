@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import AnalysisView from '@/components/analysis/AnalysisView';
-import BudgetView from '@/components/analysis/BudgetView';
+import BudgetView from '@/components/analysis/Budget/BudgetView';
 import { Button } from '@/components/ui/button';
 
 const AnalysisClient = () => {

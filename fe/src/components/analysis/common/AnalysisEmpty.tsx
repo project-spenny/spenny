@@ -23,7 +23,7 @@ const AnalysisEmpty = ({
 
       <div className="text-muted-foreground space-y-1 text-center">
         <p className="text-lg font-semibold tracking-tight">{title}</p>
-        {description && <p className="text-sm">{description}</p>}
+        {description && <p className="text-sm break-keep">{description}</p>}
       </div>
 
       {children && <div className="mt-2">{children}</div>}
