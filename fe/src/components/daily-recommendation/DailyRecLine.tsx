@@ -79,20 +79,22 @@ export const DailyRecPaceCard = ({
       },
 
       tooltip: {
+        filter: (ctx) => ctx.datasetIndex === 0,
         callbacks: {
           title: (items) => items?.[0]?.label ?? '',
           label: (ctx: TooltipItem<'line'>) => {
             const idx = ctx.dataIndex;
             const actual = dailyChartData.actualDailySeries[idx] ?? 0;
-            const diff = actual - planned;
+            const rec = dailyChartData.recommendedDailySeries[idx];
 
-            if (diff > 0) {
-              return `${diff.toLocaleString()}원 더 사용`;
-            }
-            if (diff < 0) {
-              return `${Math.abs(diff).toLocaleString()}원 덜 사용`;
-            }
-            return '차이 없음';
+            if (rec == null) return ''; // 미래 구간이면 표시 안 함
+
+            const diff = actual - rec;
+
+            if (diff > 0) return `권장보다 ${diff.toLocaleString()}원 더 사용`;
+            if (diff < 0)
+              return `권장보다 ${Math.abs(diff).toLocaleString()}원 덜 사용`;
+            return '권장과 동일';
           },
         },
       },
