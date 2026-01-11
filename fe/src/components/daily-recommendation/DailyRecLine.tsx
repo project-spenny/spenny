@@ -164,7 +164,7 @@ export const DailyRecPaceCard = ({ dailyChartData, planned }: Props) => {
 
           {/* 권장 대비 문장 */}
           <p className="text-sm font-medium">
-            {rec === 0 && actual === 0 ? (
+            {actual == 0 ? (
               '해당 날짜의 지출 데이터가 없어요.'
             ) : diffToRec > 0 ? (
               <span className="text-red-500">
