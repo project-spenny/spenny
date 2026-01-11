@@ -35,10 +35,8 @@ export const CategorySelector = ({
         <Popover open={open} onOpenChange={onOpenChange}>
           <PopoverTrigger asChild>
             <Button type="button" variant="outline" className="w-full">
-              {value === ''
-                ? '선택'
-                : categories.find((cat) => cat.category_key === value)
-                    ?.name_ko || '선택'}
+              {categories.find((cat) => cat.category_key === value)?.name_ko ||
+                '선택'}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">

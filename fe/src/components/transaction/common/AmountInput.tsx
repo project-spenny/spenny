@@ -20,7 +20,7 @@ export const AmountInput = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             min="0"
-            className="text-right"
+            className="[appearance:textfield] !py-5 text-right !text-2xl [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
           <Label className="pl-2">원</Label>
         </div>
