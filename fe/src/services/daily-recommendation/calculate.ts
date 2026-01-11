@@ -1,100 +1,57 @@
-import { getMonthDayStats } from '@/utils/date';
+import { DailyRecInput, DailyRecResult } from '@/types/dailyRec';
+import {
+  calculateSpendingPatternWeights,
+  SpendingTransaction,
+} from './spendingPattern';
+import { calculateBaseDailyRec } from './base';
+import { formatLocalDate } from '@/utils/date';
 
-// 일일 권장 사용 금액 계산에 필요한 입력 값
-export type DailyRecInput = {
-  today: Date;
-  budget: number;
-  fixedPlannedThisMonth: number; // 이번 달 예정 고정비 합
-  spentTotalUntilYesterday: number; // 이번 달 어제까지의 총 지출 합
-  spentFixedUntilYesterday: number; // 이번 달 어제까지 고정비로 지출된 금액 합
-};
+export const calculateDailyRec = (
+  input: DailyRecInput,
+  spendingTransactions: SpendingTransaction[]
+): DailyRecResult => {
+  // 누적 흐름 기반 일일 권장액 계산
+  const baseResult = calculateBaseDailyRec(input);
 
-// 디버그용 중간 계산 결과
-export type DailyRecDebug = {
-  // 날짜 관련
-  daysInMonth: number;
-  dayOfMonth: number;
-  elapsedDays: number;
-  remainingDays: number;
+  // 가중치 계산을 위한 기준일 문자열
+  const todayDateString = formatLocalDate(input.today);
 
-  // 가변 예산 흐름
-  varTotal: number;
-  varSpentUntilYesterday: number;
-  varRemaining: number;
-
-  baseDaily: number;
-
-  // 누적 소비 흐름 보정
-  plannedUntilYesterday: number;
-  diff: number;
-  adjustPerDay: number;
-  adjustedDaily: number;
-};
-
-export type DailyRecResult = {
-  amount: number;
-  debug: DailyRecDebug;
-};
-
-// 계산 결과를 항상 0 이상인 유한한 숫자로 보정
-const toNonNegative = (n: number) => (Number.isFinite(n) ? Math.max(n, 0) : 0);
-
-// 일일 권장 사용 금액 계산
-export const calculateDailyRec = (input: DailyRecInput): DailyRecResult => {
-  // 날짜 통계
-  const { daysInMonth, dayOfMonth, elapsedDays, remainingDays } =
-    getMonthDayStats(input.today);
-
-  // 이번 달 가변 총액
-  const varTotal = toNonNegative(input.budget - input.fixedPlannedThisMonth);
-
-  // 어제까지 가변 지출
-  const varSpentUntilYesterday = toNonNegative(
-    input.spentTotalUntilYesterday - input.spentFixedUntilYesterday
+  // 소비 패턴 가중치 계산
+  const weights = calculateSpendingPatternWeights(
+    spendingTransactions,
+    todayDateString
   );
 
-  // 남은 가변 예산
-  const varRemaining = toNonNegative(varTotal - varSpentUntilYesterday);
+  // 소비 패턴 적용 전 일일 권장액
+  const totalAmountBeforePattern = baseResult.amount;
 
-  // 기본 일일 한도
-  const baseDaily = remainingDays > 0 ? varRemaining / remainingDays : 0;
+  // 일일 권장액에 가중치 적용
+  const weightedTotalAmountRaw =
+    totalAmountBeforePattern * weights.combinedWeight;
+  const weightedTotalAmount = Math.floor(weightedTotalAmountRaw);
 
-  // 계획 기준 어제까지의 가변 지출
-  const plannedUntilYesterday =
-    daysInMonth > 0 ? (varTotal / daysInMonth) * elapsedDays : 0;
+  // 일일 권장액에 오늘 지출 합산
+  const spentVariableToday = spendingTransactions.reduce((sum, transaction) => {
+    const isToday = transaction.date === todayDateString;
+    const amount = transaction.amount;
 
-  // 실제 지출과 계획 지출의 차이
-  const diff = plannedUntilYesterday - varSpentUntilYesterday;
+    if (!isToday) return sum;
+    if (!Number.isFinite(amount) || amount <= 0) return sum;
 
-  // 남은 기간(오늘 포함)에 차이를 분산
-  const adjustPerDay = remainingDays > 0 ? diff / remainingDays : 0;
+    return sum + amount;
+  }, 0);
 
-  // 보정된 일일 한도
-  const adjustedDaily = baseDaily + adjustPerDay;
-
-  // 최종 일일 권장액
-  const amount = Math.floor(
-    Math.min(toNonNegative(adjustedDaily), varRemaining)
-  );
+  // 최종적으로 오늘 남은 권장액
+  const remainingAmount = Math.max(weightedTotalAmount - spentVariableToday, 0);
 
   return {
-    amount,
+    amount: remainingAmount,
     debug: {
-      daysInMonth,
-      dayOfMonth,
-      elapsedDays,
-      remainingDays,
-
-      varTotal,
-      varSpentUntilYesterday,
-      varRemaining,
-
-      baseDaily,
-
-      plannedUntilYesterday,
-      diff,
-      adjustPerDay,
-      adjustedDaily,
+      ...baseResult.debug,
+      weights,
+      weightedTotalAmount,
+      spentVariableToday,
+      totalAmountBeforePattern,
     },
   };
 };
