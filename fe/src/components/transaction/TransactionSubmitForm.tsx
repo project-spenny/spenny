@@ -224,10 +224,6 @@ export default function TransactionSubmitForm({
         value={formData.amount}
         onChange={(value) => UpdateField('amount', value)}
       />
-      <QuickAmountButtons
-        value={formData.amount}
-        onClick={(value) => UpdateField('amount', value)}
-      />
 
       <DatePicker
         value={formData.date}
