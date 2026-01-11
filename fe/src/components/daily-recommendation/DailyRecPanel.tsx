@@ -107,7 +107,7 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
           varRemaining={varRemaining}
         />
 
-        {/* 기준 대비 소비 페이스 */}
+        {/* 이번 달 소비 페이스 */}
         <DailyRecPaceCard dailyChartData={dailyChartData} planned={planned} />
 
         {/* 권장액 조정 방식 */}
@@ -130,7 +130,7 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
               <div className="flex flex-col gap-2 rounded-md border p-3 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">
-                    기준 누적(어제까지)
+                    기준 금액 누적(어제까지)
                   </span>
                   <span className="font-medium">
                     {plannedUntilYesterdayRounded.toLocaleString()}원
@@ -138,7 +138,9 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">기준 대비 차이</span>
+                  <span className="text-muted-foreground">
+                    기준 대비 누적 지출 차이
+                  </span>
                   <span className="font-medium">{diff.toLocaleString()}원</span>
                 </div>
 

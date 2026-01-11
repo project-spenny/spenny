@@ -131,8 +131,8 @@ export const DailyRecPaceCard = ({ dailyChartData, planned }: Props) => {
     <Card>
       <CardHeader>
         <div className="flex items-end justify-between">
-          <CardTitle className="text-base">기준 대비 소비 페이스</CardTitle>
-          <p className="text-muted-foreground text-xs">어제까지 기준</p>
+          <CardTitle className="text-base">이번 달 소비 페이스</CardTitle>
+          <p className="text-muted-foreground text-xs">권장/실제 비교</p>
         </div>
 
         <p className="text-muted-foreground text-xs">
