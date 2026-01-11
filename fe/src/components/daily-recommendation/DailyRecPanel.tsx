@@ -108,12 +108,7 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
         />
 
         {/* 기준 대비 소비 페이스 */}
-        <DailyRecPaceCard
-          dailyChartData={dailyChartData}
-          planned={planned}
-          plannedUntilYesterdayRounded={plannedUntilYesterdayRounded}
-          diff={diff}
-        />
+        <DailyRecPaceCard dailyChartData={dailyChartData} planned={planned} />
 
         {/* 권장액 조정 방식 */}
         <Card>
