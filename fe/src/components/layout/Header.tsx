@@ -2,6 +2,7 @@
 
 import GuestModeNotice from '../common/GuestModeNotice';
 import Image from 'next/image';
+import Link from 'next/link';
 import ModeToggle from '../common/ModeToggle';
 import { Profile } from '@/schemas/profile';
 import ProfilePanelTrigger from '../common/ProfilePanelTrigger';
@@ -25,12 +26,14 @@ const Header = () => {
   return (
     <header className="bg-secondary fixed top-0 z-10 flex h-16 w-full items-center justify-between border-b p-2">
       <h1 className="px-2">
-        <Image
-          src="/logo_horizontal.svg"
-          alt="Spenny"
-          width={200}
-          height={100}
-        />
+        <Link href="/" className="block">
+          <Image
+            src="/logo_horizontal.svg"
+            alt="Spenny"
+            width={200}
+            height={100}
+          />
+        </Link>
       </h1>
       <ModeToggle />
       {isGuest ? <GuestModeNotice /> : <ProfilePanelTrigger />}
