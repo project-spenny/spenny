@@ -209,13 +209,15 @@ export default function TransactionSubmitForm({
         }}
       />
 
-      <CategorySelector
-        transactionType={formData.type}
-        value={formData.category_id}
-        open={categoryOpen}
-        onOpenChange={setCategoryOpen}
-        onChange={(category) => UpdateField('category_id', category)}
-      />
+      {formData.type !== '' && (
+        <CategorySelector
+          transactionType={formData.type}
+          value={formData.category_id}
+          open={categoryOpen}
+          onOpenChange={setCategoryOpen}
+          onChange={(category) => UpdateField('category_id', category)}
+        />
+      )}
 
       <AmountInput
         value={formData.amount}
