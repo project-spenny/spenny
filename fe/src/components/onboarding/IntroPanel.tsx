@@ -11,6 +11,7 @@ type IntroStep = {
 type IntroPanelProps = {
   steps: readonly IntroStep[];
   introStep: number;
+  isLastIntro: boolean;
   onPrev: () => void;
   onNext: () => void;
   onExit: () => void;
@@ -19,12 +20,11 @@ type IntroPanelProps = {
 export default function IntroPanel({
   steps,
   introStep,
+  isLastIntro,
   onPrev,
   onNext,
   onExit,
 }: IntroPanelProps) {
-  const isLastIntro = introStep === steps.length - 1;
-
   return (
     <div className="space-y-6">
       <div className="h-100">설명 내용</div>

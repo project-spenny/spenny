@@ -53,6 +53,8 @@ export default function OnboardingPage() {
   const goNext = () =>
     setIntroStep((s) => Math.min(INTRO_STEPS.length - 1, s + 1));
 
+  const isLastIntro = introStep === INTRO_STEPS.length - 1;
+
   return (
     <div className="fixed inset-0 z-50">
       {/* 배경 클릭 방지 */}
@@ -71,14 +73,16 @@ export default function OnboardingPage() {
                 </>
               ) : (
                 <>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="absolute -top-3 right-2"
-                    onClick={exitOnboarding}
-                  >
-                    건너뛰기
-                  </Button>
+                  {!isLastIntro && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="absolute -top-3 right-2"
+                      onClick={exitOnboarding}
+                    >
+                      건너뛰기
+                    </Button>
+                  )}
                   <CardTitle className="text-xl">
                     {INTRO_STEPS[introStep].title}
                   </CardTitle>
@@ -107,6 +111,7 @@ export default function OnboardingPage() {
                 <IntroPanel
                   steps={INTRO_STEPS}
                   introStep={introStep}
+                  isLastIntro={isLastIntro}
                   onPrev={goPrev}
                   onNext={goNext}
                   onExit={exitOnboarding}
