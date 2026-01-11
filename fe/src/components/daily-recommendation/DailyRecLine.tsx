@@ -3,8 +3,8 @@
 import '@/components/daily-recommendation/chartSetup';
 import { Line } from 'react-chartjs-2';
 import type { ChartOptions, TooltipItem } from 'chart.js';
-import { DailyRecChartData } from '@/services/daily-recommendation/chart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DailyRecChartData } from '@/types/dailyRec';
 
 type Props = {
   dailyChartData: DailyRecChartData;

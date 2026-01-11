@@ -1,10 +1,6 @@
+import { DailyRecChartData } from '@/types/dailyRec';
 import { ITransaction } from '@/types/transactions';
 import { isFixedExpense } from '@/utils/transaction';
-
-export type DailyRecChartData = {
-  labels: string[];
-  actualDailySeries: number[];
-};
 
 export const buildDailyRecChartData = ({
   monthDate,
