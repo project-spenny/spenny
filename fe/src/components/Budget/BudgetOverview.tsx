@@ -33,7 +33,7 @@ const BudgetOverview = ({
           <div className="absolute top-8 right-8 flex gap-1">
             <Button
               variant="ghost"
-              className="text-muted-foreground hover:text-foreground h-8 cursor-pointer px-2"
+              className="text-muted-foreground hover:bg-brand/10 h-8 cursor-pointer px-2"
               onClick={onEdit}
             >
               수정
@@ -41,7 +41,7 @@ const BudgetOverview = ({
 
             <Button
               variant="ghost"
-              className="text-destructive hover:text-destructive h-8 cursor-pointer px-2"
+              className="text-destructive hover:bg-brand/10 hover:text-destructive h-8 cursor-pointer px-2"
               onClick={onReset}
             >
               초기화

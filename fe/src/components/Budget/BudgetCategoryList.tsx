@@ -38,14 +38,14 @@ const BudgetCategoryList = ({
       <div className="absolute top-8 right-8 flex gap-1">
         <Button
           variant="ghost"
-          className="text-muted-foreground h-8 cursor-pointer px-2"
+          className="text-muted-foreground hover:bg-brand/10 h-8 cursor-pointer px-2"
           onClick={onEditAll}
         >
           수정
         </Button>
         <Button
           variant="ghost"
-          className="text-destructive h-8 cursor-pointer px-2"
+          className="text-destructive hover:bg-brand/10 hover:text-destructive h-8 cursor-pointer px-2"
           onClick={onResetAll}
         >
           초기화

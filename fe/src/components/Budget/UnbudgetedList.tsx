@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Edit } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { THEME_COLOR } from '@/constants/colors';
@@ -45,22 +47,21 @@ const UnbudgetedList = ({ items, onSetBudget }: UnbudgetedListProps) => {
 
           <div className="flex flex-col gap-3">
             {items.map((item) => (
-              <div
-                key={item.key}
-                className="border-muted-foreground/30 bg-card rounded-xl border border-dashed p-5 transition-all"
-              >
+              <Card key={item.key} className="p-5">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <p className="text-foreground text-base font-bold transition-colors">
                         {item.name}
                       </p>
-                      <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs">
+
+                      <Badge className="bg-primary/10 text-primary px-2 py-0.5">
                         미설정
-                      </span>
+                      </Badge>
                     </div>
-                    <p className="text-muted-foreground text-sm font-semibold">
-                      <span className="text-foreground">
+
+                    <p className="text-sm font-semibold">
+                      <span className={THEME_COLOR.EXPENSE}>
                         {item.amount.toLocaleString()}원
                       </span>{' '}
                       지출됨
@@ -78,7 +79,7 @@ const UnbudgetedList = ({ items, onSetBudget }: UnbudgetedListProps) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>

@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Edit } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { THEME_COLOR } from '@/constants/colors';
@@ -23,26 +25,26 @@ const BudgetCategoryItem = ({
   const usagePercentage = amount > 0 ? Math.round((expense / amount) * 100) : 0;
 
   return (
-    <div
+    <Card
       className={cn(
-        'border-muted-foreground/30 rounded-2xl border border-dashed p-5 transition-all',
-        isOver ? 'bg-destructive/5' : 'bg-card'
+        'border-muted-foreground/30 gap-0 p-5',
+        isOver ? 'bg-destructive/5' : 'bg-primary-foreground'
       )}
     >
       <div className="mb-4 flex items-end justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-1 text-sm">
             <span className="font-bold">{name}</span>
-            <span
+            <Badge
               className={cn(
-                'rounded-full px-2 py-0.5 text-xs',
+                'px-2 py-0.5 font-semibold',
                 usagePercentage >= 90
                   ? 'bg-destructive/10 text-destructive'
-                  : 'bg-primary/10 text-primary'
+                  : 'bg-brand-subtle dark:bg-brand/10 text-brand'
               )}
             >
               {usagePercentage}%
-            </span>
+            </Badge>
           </div>
 
           <div className="flex items-center gap-2 tracking-tight">
@@ -67,7 +69,7 @@ const BudgetCategoryItem = ({
           <p
             className={cn(
               'text-lg font-bold tracking-tight',
-              isOver ? THEME_COLOR.EXPENSE : 'text-primary'
+              isOver ? THEME_COLOR.EXPENSE : 'text-brand'
             )}
           >
             {isOver
@@ -83,9 +85,7 @@ const BudgetCategoryItem = ({
         <Progress
           value={Math.min(usagePercentage, 100)}
           className="h-2"
-          indicatorClassName={
-            usagePercentage >= 90 ? 'bg-red-400' : 'bg-primary'
-          }
+          indicatorClassName={usagePercentage >= 90 ? 'bg-red-400' : 'bg-brand'}
         />
 
         {isOver && (
@@ -94,7 +94,7 @@ const BudgetCategoryItem = ({
           </p>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 
