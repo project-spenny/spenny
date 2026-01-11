@@ -15,6 +15,7 @@ import { OnboardingProfileValues } from '@/schemas/profile';
 
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
+import { toast } from 'sonner';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -42,6 +43,8 @@ export default function OnboardingPage() {
       setServerError('저장에 실패했어요. 잠시 후 다시 시도해주세요.');
       return;
     }
+
+    toast.success('기본 정보가 저장되었어요');
 
     // 온보딩 소개 단계로 전환
     setIntroStep(0);
