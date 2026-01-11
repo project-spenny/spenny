@@ -3,7 +3,7 @@ interface ICATEGORIES {
   expense: Category[];
 }
 
-type Category = {
+export type Category = {
   category_key: string;
   name_en: string;
   name_ko: string;
