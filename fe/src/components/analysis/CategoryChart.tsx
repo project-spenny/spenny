@@ -85,10 +85,8 @@ const CategoryChart = ({
       <div className="pointer-events-none absolute flex flex-col items-center justify-center text-center">
         {selectedItem ? (
           <>
-            <span className="text-muted-foreground text-base font-medium">
-              {selectedItem.name}
-            </span>
-            <span className="text-primary animate-in zoom-in text-xl font-bold duration-300">
+            <span className="text-base font-semibold">{selectedItem.name}</span>
+            <span className="text-brand animate-in zoom-in text-xl font-bold duration-300">
               {selectedItem.percentage.toFixed(1)}%
             </span>
           </>
