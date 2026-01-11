@@ -6,6 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import Image from 'next/image';
 
 interface CategorySelectorProps {
   transactionType: string;
@@ -48,10 +49,16 @@ export const CategorySelector = ({
                     onChange(cat.category_key);
                     onOpenChange(false);
                   }}
-                  className="flex h-16 w-24 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
+                  className="flex h-20 w-24 cursor-pointer flex-col items-center justify-center gap-2 text-center text-sm hover:bg-gray-100"
                   key={cat.category_key}
                 >
-                  {cat.name_ko}
+                  <Image
+                    src={cat.icon}
+                    alt={cat.name_ko}
+                    width={22}
+                    height={22}
+                  />
+                  <p className="text-muted-foreground text-xs">{cat.name_ko}</p>
                 </div>
               ))}
             </div>
