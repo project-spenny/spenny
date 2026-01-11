@@ -9,10 +9,10 @@ export const AmountInput = ({
   onChange: (type: string) => void;
 }) => {
   return (
-    <div className="flex items-center">
-      <Label className="w-30 pr-2">금액</Label>
+    <div className="flex items-start gap-2">
+      <Label className="w-26 pr-2">금액</Label>
       <div className="flex w-full flex-col gap-2">
-        <div className="flex">
+        <div className="flex items-center gap-2">
           <Input
             id="amount"
             type="number"
@@ -20,9 +20,9 @@ export const AmountInput = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             min="0"
-            className="[appearance:textfield] !py-5 text-right !text-2xl [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="h-12 flex-1 [appearance:textfield] rounded-none border-0 border-b-1 text-right !text-2xl [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
-          <Label className="pl-2">원</Label>
+          <span className="text-lg font-medium">원</span>
         </div>
         <QuickAmountButtons
           value={value}
