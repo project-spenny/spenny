@@ -10,6 +10,7 @@ import ProfileEdit from './ProfileEdit';
 import ProfileView from './ProfileView';
 import MyInfoSkeleton from './MyInfoSkeleton';
 import { toast } from 'sonner';
+import ModeToggle from '../common/ModeToggle';
 
 // 프로필 조회 함수
 async function fetchProfile(): Promise<Profile> {
@@ -90,7 +91,20 @@ export default function MyInfo() {
           <ProfileView profile={profile} onEdit={() => setIsEditing(true)} />
         )}
       </div>
+
       <Separator />
+
+      {/* 설정 영역 */}
+      <div className="flex items-center justify-between p-4">
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium">다크 모드</p>
+          <p className="text-muted-foreground text-xs">
+            화면 테마를 변경할 수 있어요.
+          </p>
+        </div>
+
+        <ModeToggle />
+      </div>
 
       {/* 로그아웃 */}
       <div className="mt-auto ml-auto">
