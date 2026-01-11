@@ -31,7 +31,7 @@ export const DatePicker = ({
   return (
     <div className="flex items-center">
       {!hideLabel && <Label className="w-28 pr-2">{label}</Label>}
-      <div>
+      <div className="w-full">
         <Popover>
           <PopoverTrigger asChild>
             <Button
