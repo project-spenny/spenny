@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 type IntroStep = {
   title: string;
@@ -45,19 +46,29 @@ export default function IntroPanel({
         {/* 중앙 */}
         <div className="justify-self-center">
           <div
-            className="flex items-center justify-center gap-2"
+            className="flex items-center justify-center gap-3"
             aria-label="온보딩 진행 상태"
           >
             {steps.map((_, index) => {
               const active = introStep === index;
-              return (
+              return active ? (
                 <span
                   key={index}
-                  aria-current={active ? 'step' : undefined}
-                  className={cn(
-                    'h-2 w-2 rounded-full transition-colors',
-                    active ? 'bg-primary' : 'bg-gray-200'
-                  )}
+                  aria-current="step"
+                  className="flex items-center"
+                >
+                  <Image
+                    src="/logo_pig.svg"
+                    alt="logo pig"
+                    width={25}
+                    height={25}
+                    className="animate-bounce"
+                  />
+                </span>
+              ) : (
+                <span
+                  key={index}
+                  className={cn('h-2 w-2 rounded-full', 'bg-gray-200')}
                 />
               );
             })}
