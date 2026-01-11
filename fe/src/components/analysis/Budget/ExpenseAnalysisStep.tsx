@@ -71,14 +71,14 @@ const ExpenseAnalysisStep = ({
                 key={m.month}
                 className="flex h-full flex-1 flex-col items-center justify-end gap-2"
               >
-                <span className="text-muted-foreground text-xs font-bold tracking-tight">
+                <span className="text-xs font-bold tracking-tight">
                   {Math.floor(m.total).toLocaleString()}원
                 </span>
                 <div
                   style={{ height: `${height * 0.8}%` }}
-                  className="bg-primary/80 w-full max-w-10 rounded-t-md"
+                  className="bg-brand w-full max-w-10 rounded-t-md"
                 />
-                <span className="text-xs font-medium">
+                <span className="text-xs font-bold">
                   {Number(m.month.split('-')[1])}월
                 </span>
               </div>

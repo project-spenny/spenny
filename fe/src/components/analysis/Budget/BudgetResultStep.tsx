@@ -127,11 +127,11 @@ const BudgetResultStep = ({
           <div className="flex items-center justify-between">
             <p>이번 달 가용 지출 예산</p>
 
-            <div className="flex items-baseline gap-1 font-bold">
+            <div className="text-brand flex items-baseline gap-1 font-bold">
               <span className="text-2xl tracking-tight">
                 {spendableBudget.toLocaleString()}
               </span>
-              <span className="text-sm">원</span>
+              <span className="text-base">원</span>
             </div>
           </div>
 

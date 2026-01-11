@@ -73,7 +73,7 @@ const SavingGoalStep = ({
           </Label>
         </div>
 
-        <div className="border-primary/20 focus-within:border-primary flex w-fit items-center gap-1 border-b-2">
+        <div className="border-primary/20 focus-within:border-brand flex w-fit items-center gap-1 border-b-2">
           <input
             id="income"
             type="text"
@@ -96,7 +96,7 @@ const SavingGoalStep = ({
             </Label>
           </div>
 
-          <div className="border-primary/20 focus-within:border-primary flex items-center gap-1 border-b-2">
+          <div className="border-primary/20 focus-within:border-brand flex items-center gap-1 border-b-2">
             <input
               id="saving"
               type="text"
@@ -116,7 +116,7 @@ const SavingGoalStep = ({
           onValueChange={handleSliderChange}
           max={70} // 최대 70%
           step={1}
-          className="py-2"
+          className="**:data-[slot=slider-range]:bg-brand py-2"
         />
 
         <div className="flex flex-col gap-2">
@@ -139,7 +139,7 @@ const SavingGoalStep = ({
       {/* 예산 미리보기 결과 */}
       <div className="space-y-2 py-2">
         <p className="font-bold">사용 가능한 한 달 예산</p>
-        <p className="text-primary mt-1 text-2xl font-black tracking-tight">
+        <p className="text-brand mt-1 text-2xl font-black tracking-tight">
           {Math.max(0, spendableBudget).toLocaleString()}원
         </p>
       </div>

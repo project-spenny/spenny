@@ -36,10 +36,10 @@ const TemplateSelectionStep = ({
               key={template.id}
               onClick={() => onSelect(template.id)}
               className={cn(
-                'hover:border-primary/50 relative cursor-pointer gap-1 border-2 p-5 text-left transition-all',
+                'relative cursor-pointer gap-1 border-2 p-5 text-left transition-all',
                 isSelected
-                  ? 'border-primary bg-primary/5 shadow-md'
-                  : 'border-border'
+                  ? 'border-brand bg-brand-subtle dark:bg-brand/10 shadow-md'
+                  : 'hover:border-brand/40 border-border'
               )}
             >
               <div className="flex items-center justify-between">
@@ -47,13 +47,15 @@ const TemplateSelectionStep = ({
                   className={cn(
                     'rounded-full px-2 py-1 text-xs font-bold',
                     isSelected
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'bg-brand text-primary-foreground'
                       : 'bg-muted text-muted-foreground'
                   )}
                 >
                   {template.subtitle}
                 </span>
-                {isSelected && <CheckCircle2 className="h-5 w-5 shrink-0" />}
+                {isSelected && (
+                  <CheckCircle2 className="text-brand-strong h-5 w-5 shrink-0" />
+                )}
               </div>
 
               <div>

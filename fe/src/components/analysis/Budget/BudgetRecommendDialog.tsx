@@ -187,7 +187,7 @@ const BudgetRecommendDialog = ({
       <DialogContent className="flex h-[800px] w-full flex-col md:max-w-2xl">
         {/* 상단 Step 표시 */}
         <div className="px-6 pt-6">
-          <Progress value={(step / 4) * 100} className="h-1" />
+          <Progress value={(step / 4) * 100} className="[&>div]:bg-brand h-2" />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
