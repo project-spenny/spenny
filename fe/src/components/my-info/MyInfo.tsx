@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import LogoutButton from './LogoutButton';
 import ProfileEdit from './ProfileEdit';
 import ProfileView from './ProfileView';
+import MyInfoSkeleton from './MyInfoSkeleton';
 
 // 프로필 조회 함수
 async function fetchProfile(): Promise<Profile> {
@@ -59,7 +60,7 @@ export default function MyInfo() {
   };
 
   if (isLoading) {
-    return <div className="p-4">로딩 중…</div>;
+    return <MyInfoSkeleton />;
   }
 
   if (isError || !profile) {
