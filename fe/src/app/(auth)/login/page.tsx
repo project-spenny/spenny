@@ -1,5 +1,6 @@
 'use client';
 
+import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/utils/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -98,8 +99,9 @@ export default function LoginPage() {
             height={20}
             className="absolute left-3"
           />
-          <span>
-            {loadingAction === 'google' ? '구글 로그인 중…' : '구글로 시작하기'}
+          <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span>{loadingAction === 'google' && <Spinner />}</span>
+            구글로 시작하기
           </span>
         </button>
         <button
@@ -115,10 +117,9 @@ export default function LoginPage() {
             height={20}
             className="absolute left-3"
           />
-          <span>
-            {loadingAction === 'kakao'
-              ? '카카오 로그인 중…'
-              : '카카오로 시작하기'}
+          <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span>{loadingAction === 'kakao' && <Spinner />}</span>
+            카카오로 시작하기
           </span>
         </button>
       </div>
@@ -136,7 +137,10 @@ export default function LoginPage() {
           disabled={isLoading}
           className="flex h-[45px] w-[300px] items-center justify-center rounded-sm border text-sm text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loadingAction === 'guest' ? '체험 계정 접속 중…' : '체험해보기'}
+          <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span>{loadingAction === 'guest' && <Spinner />}</span>
+            체험해보기
+          </span>
         </button>
 
         <p className="mt-1 text-xs text-gray-400">
