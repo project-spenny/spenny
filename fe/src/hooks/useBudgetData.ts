@@ -7,6 +7,7 @@ import {
 import { formatLocalDate, formatMonth } from '@/utils/date';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { BudgetWithCategory } from '@/types/analysis';
 import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixed-costs';
 import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
 import { toast } from 'sonner';
@@ -21,7 +22,7 @@ const useBudgetData = (selectedDate: Date) => {
     // 연-월이 바뀔 때마다 자동으로 새로운 데이터 fetch
     queryKey: ['budgets', monthKey],
     queryFn: () => fetchBudgets(selectedDate),
-    select: (data) => {
+    select: (data: BudgetWithCategory[]) => {
       const totalBudget =
         data?.find((item) => item.category_id === null) || null;
       const categoryBudgets =
