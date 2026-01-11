@@ -9,7 +9,7 @@ import BudgetRecommendDialog from '@/components/budget/BudgetRecommendDialog';
 import BudgetSetupDialog from '@/components/budget/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';
-import CategoryBudgetSetting from '@/components/analysis/CategoryBudgetSetting';
+import CategoryBudgetSetting from '@/components/budget/CategoryBudgetSetting';
 import ConfirmDialog from '@/components/budget/ConfirmDialog';
 import { Progress } from '@/components/ui/progress';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
