@@ -26,12 +26,13 @@ const Header = () => {
   return (
     <header className="bg-secondary fixed top-0 z-10 flex h-16 w-full items-center justify-between border-b p-2">
       <h1 className="px-2">
-        <Link href="/" className="block">
+        <Link href="/">
           <Image
             src="/logo_horizontal.svg"
             alt="Spenny"
             width={200}
             height={100}
+            draggable="false"
           />
         </Link>
       </h1>
