@@ -1,7 +1,9 @@
 import { Edit, HelpCircle, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -101,6 +103,7 @@ const CategoryBudgetSetting = ({
     const currentCategoryIds = currentBudgets.map((b) => b.categoryId);
     const deleteData = categoryBudgets
       .map((b) => b.category_id)
+      .filter((id): id is string => id !== null)
       .filter((id) => !currentCategoryIds.includes(id));
 
     if (deleteData.length > 0) removeBudget(deleteData);
@@ -130,17 +133,17 @@ const CategoryBudgetSetting = ({
   const isOverBudget = remaining < 0;
 
   return (
-    <div className="flex h-[80vh] flex-col px-8 py-6 md:h-[92vh] md:py-0">
+    <div className="flex flex-col px-8">
       <div className="space-y-1 pb-4">
         <h2 className="text-xl font-bold">카테고리별 예산 설정</h2>
         <p className="text-muted-foreground text-sm font-medium">
           항목별 목표 금액을 정해보세요.
         </p>
 
-        <div
+        <Card
           className={cn(
-            'border-muted-foreground/30 mt-4 rounded-2xl border border-dashed p-5 transition-all',
-            isOverBudget ? 'bg-destructive/5' : 'bg-primary/5'
+            'mt-4 gap-0 p-5 transition-all',
+            isOverBudget ? 'bg-destructive/5' : 'bg-primary-foreground'
           )}
         >
           <div className="mb-4 flex items-end justify-between">
@@ -171,7 +174,7 @@ const CategoryBudgetSetting = ({
               <p
                 className={cn(
                   'text-lg font-bold tracking-tight',
-                  isOverBudget ? THEME_COLOR.EXPENSE : 'text-primary'
+                  isOverBudget ? THEME_COLOR.EXPENSE : 'text-brand'
                 )}
               >
                 {isOverBudget
@@ -187,7 +190,7 @@ const CategoryBudgetSetting = ({
             <Progress
               value={Math.min((totalAllocated / totalBudgetAmount) * 100, 100)}
               className="h-2"
-              indicatorClassName={isOverBudget ? 'bg-red-400' : 'bg-primary'}
+              indicatorClassName={isOverBudget ? 'bg-red-400' : 'bg-brand'}
             />
 
             {isOverBudget && (
@@ -198,7 +201,7 @@ const CategoryBudgetSetting = ({
               </p>
             )}
           </div>
-        </div>
+        </Card>
       </div>
 
       <Separator />
@@ -227,14 +230,14 @@ const CategoryBudgetSetting = ({
                     <p className="text-sm font-semibold">{category.name_ko}</p>
                     {totalBudgetAmount > 0 &&
                       Number(amounts[category.category_key]) > 0 && (
-                        <p className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs">
+                        <Badge className="bg-brand-subtle dark:bg-brand/10 text-brand px-2 py-0.5 text-xs font-semibold">
                           {Math.round(
                             (Number(amounts[category.category_key]) /
                               totalBudgetAmount) *
                               100
                           )}
                           %
-                        </p>
+                        </Badge>
                       )}
                   </div>
 
@@ -259,7 +262,7 @@ const CategoryBudgetSetting = ({
                           e.target.value
                         )
                       }
-                      className="focus-visible:ring-primary h-9 pr-7 text-right"
+                      className="focus-visible:ring-brand-soft h-9 pr-7 text-right"
                     />
                     {amounts[category.category_key] && (
                       <Button

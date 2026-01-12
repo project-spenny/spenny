@@ -14,10 +14,10 @@ const NavItem = ({
   return (
     <Button
       asChild
-      variant={isActive ? 'outline' : 'ghost'}
+      variant="ghost"
       className={cn(
-        'active:bg-primary/10 dark:active:bg-primary/20 duration-200 md:h-20 md:w-24',
-        isActive ? 'font-bold' : 'font-normal'
+        'hover:bg-brand/10 active:bg-brand/20 dark:hover:bg-brand/10 dark:active:bg-brand/20 duration-200 md:h-20 md:w-24',
+        isActive ? 'bg-brand/10 font-bold' : 'font-normal'
       )}
     >
       <Link href={href}>{label}</Link>

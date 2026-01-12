@@ -76,7 +76,7 @@ const BudgetSetupDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">💰 월 예산 설정</DialogTitle>
+          <DialogTitle className="text-xl">월 예산 설정</DialogTitle>
           <DialogDescription>
             지출 계획을 세우기 위해 이번 달 총 예산을 입력해주세요.
           </DialogDescription>
@@ -92,7 +92,7 @@ const BudgetSetupDialog = ({
               placeholder="예: 500,000"
               value={amount}
               onChange={handleAmountChange}
-              className="text-lg font-semibold"
+              className="focus-visible:ring-brand-soft text-lg font-semibold"
             />
 
             {isTouched && isInvalid && (

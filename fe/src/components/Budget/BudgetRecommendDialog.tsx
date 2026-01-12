@@ -12,13 +12,13 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
-import BudgetResultStep from '@/components/analysis/Budget/BudgetResultStep';
+import BudgetResultStep from '@/components/budget/steps/BudgetResultStep';
 import { Button } from '@/components/ui/button';
-import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisStep';
+import ExpenseAnalysisStep from '@/components/budget/steps/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
-import SavingGoalStep from '@/components/analysis/Budget/SavingGoalStep';
+import SavingGoalStep from '@/components/budget/steps/SavingGoalStep';
 import { Spinner } from '@/components/ui/spinner';
-import TemplateSelectionStep from '@/components/analysis/Budget/TemplateSelectionStep';
+import TemplateSelectionStep from '@/components/budget/steps/TemplateSelectionStep';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
@@ -187,7 +187,7 @@ const BudgetRecommendDialog = ({
       <DialogContent className="flex h-[800px] w-full flex-col md:max-w-2xl">
         {/* 상단 Step 표시 */}
         <div className="px-6 pt-6">
-          <Progress value={(step / 4) * 100} className="h-1" />
+          <Progress value={(step / 4) * 100} className="[&>div]:bg-brand h-2" />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">

@@ -7,6 +7,7 @@ import {
 import { formatLocalDate, formatMonth } from '@/utils/date';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { BudgetWithCategory } from '@/types/analysis';
 import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixed-costs';
 import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
 import { toast } from 'sonner';
@@ -21,7 +22,7 @@ const useBudgetData = (selectedDate: Date) => {
     // 연-월이 바뀔 때마다 자동으로 새로운 데이터 fetch
     queryKey: ['budgets', monthKey],
     queryFn: () => fetchBudgets(selectedDate),
-    select: (data) => {
+    select: (data: BudgetWithCategory[]) => {
       const totalBudget =
         data?.find((item) => item.category_id === null) || null;
       const categoryBudgets =
@@ -99,6 +100,28 @@ const useBudgetData = (selectedDate: Date) => {
     },
   });
 
+  const applyRecommendTemplate = (
+    totalAmount: number,
+    categoryData: { categoryId: string; amount: number }[],
+    options?: { onSuccess?: () => void }
+  ) => {
+    // 먼저 총 예산 저장
+    saveBudget(
+      { amount: totalAmount, categoryId: null },
+      {
+        onSuccess: () => {
+          // 총 예산 저장 성공 후, 카테고리별 예산 일괄 저장
+          saveCategoryBudgets(categoryData, {
+            onSuccess: () => {
+              // 둘 다 성공하면 다이얼로그 닫기
+              options?.onSuccess?.();
+            },
+          });
+        },
+      }
+    );
+  };
+
   return {
     totalBudget: data?.totalBudget ?? null,
     categoryBudgets: data?.categoryBudgets ?? [],
@@ -110,6 +133,8 @@ const useBudgetData = (selectedDate: Date) => {
     removeBudget,
     isSavingCategories,
     saveCategoryBudgets,
+    applyRecommendTemplate,
+    isApplyingTemplate: isSaving || isSavingCategories,
   };
 };
 
