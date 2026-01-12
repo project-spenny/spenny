@@ -189,67 +189,71 @@ export default function TransactionSubmitForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto flex h-full w-full flex-col space-y-6 p-10 pt-2"
+      className="mx-auto flex min-h-full w-full flex-1 flex-col px-10"
     >
-      <div className="bg-background sticky top-0 flex items-center justify-between border-b pb-4">
+      <div className="bg-background sticky top-0 z-10 flex items-center justify-between border-b pb-4">
         <Label className="text-xl">
           {mode === 'create' ? '가계부 작성' : '가계부 수정'}
         </Label>
       </div>
 
-      <TitleInput
-        value={formData.title}
-        onChange={(title) => UpdateField('title', title)}
-      />
-
-      <TypeSelector
-        value={formData.type}
-        onChange={(type) => {
-          UpdateField('type', type);
-          UpdateField('category_id', '');
-        }}
-      />
-
-      {formData.type !== '' && (
-        <CategorySelector
-          transactionType={formData.type}
-          value={formData.category_id}
-          open={categoryOpen}
-          onOpenChange={setCategoryOpen}
-          onChange={(category) => UpdateField('category_id', category)}
+      <div className="min-h-0 flex-1 space-y-6 py-6">
+        <TitleInput
+          value={formData.title}
+          onChange={(title) => UpdateField('title', title)}
         />
-      )}
 
-      <AmountInput
-        value={formData.amount}
-        onChange={(value) => UpdateField('amount', value)}
-      />
+        <TypeSelector
+          value={formData.type}
+          onChange={(type) => {
+            UpdateField('type', type);
+            UpdateField('category_id', '');
+          }}
+        />
 
-      <DatePicker
-        value={formData.date}
-        onChange={(date) => UpdateField('date', date)}
-      />
-
-      <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
-
-      <div className="mt-auto flex gap-2 border-t p-4">
-        {mode === 'edit' && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleDelete()}
-            className="h-12 w-12"
-          >
-            <Trash />
-          </Button>
+        {formData.type !== '' && (
+          <CategorySelector
+            transactionType={formData.type}
+            value={formData.category_id}
+            open={categoryOpen}
+            onOpenChange={setCategoryOpen}
+            onChange={(category) => UpdateField('category_id', category)}
+          />
         )}
-        <Button
-          type="submit"
-          className="h-12 flex-1"
-          onClick={(e) => handleSubmit(e)}
-        >
-          {mode === 'create' ? '저장' : '수정'}
-        </Button>
+
+        <AmountInput
+          value={formData.amount}
+          onChange={(value) => UpdateField('amount', value)}
+        />
+
+        <DatePicker
+          value={formData.date}
+          onChange={(date) => UpdateField('date', date)}
+        />
+
+        <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
+      </div>
+
+      <div className="bg-background sticky bottom-0 z-10 border-t py-4">
+        <div className="flex gap-2">
+          {mode === 'edit' && (
+            <Button
+              type="button"
+              variant="outline"
+              className="hover:text-destructive"
+              onClick={() => handleDelete()}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
+          <Button
+            type="submit"
+            className="flex-1"
+            onClick={(e) => handleSubmit(e)}
+          >
+            {mode === 'create' ? '저장' : '수정'}
+          </Button>
+        </div>
       </div>
     </form>
   );

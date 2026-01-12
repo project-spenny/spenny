@@ -180,7 +180,7 @@ export default function FixedCostSubmitForm({
           />
         </div>
 
-        <div className="bg-background sticky bottom-0 z-10 border-t pt-4 pb-4">
+        <div className="bg-background sticky bottom-0 z-10 border-t py-4">
           {mode === 'create' ? (
             <Button type="submit" className="w-full">
               저장
