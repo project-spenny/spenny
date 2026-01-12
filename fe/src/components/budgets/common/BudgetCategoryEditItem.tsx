@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 type BudgetCategoryEditItemProps = {
   category: Category;
@@ -18,12 +19,14 @@ type BudgetCategoryEditItemProps = {
 
 const BudgetCategoryEditItem = ({
   category,
-  amount,
+  amount = '',
   totalBudgetAmount,
   onChange,
   onReset,
   inputRef,
 }: BudgetCategoryEditItemProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   const categoryInfo = CATEGORIES.expense.find(
     (c) => c.category_key === category.category_key
   );
@@ -71,7 +74,15 @@ const BudgetCategoryEditItem = ({
           ref={inputRef}
           type="text"
           placeholder="0"
-          value={amount ? Number(amount).toLocaleString() : ''}
+          value={
+            isFocused
+              ? amount
+              : amount !== ''
+                ? Number(amount).toLocaleString()
+                : ''
+          }
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           onChange={(e) => onChange(category.category_key, e.target.value)}
           className="focus-visible:ring-brand-soft h-9 pr-7 text-right"
         />

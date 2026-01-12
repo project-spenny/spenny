@@ -153,7 +153,7 @@ const BudgetCategorySetting = ({
               <BudgetCategoryEditItem
                 key={category.category_key}
                 category={category}
-                amount={amounts[category.category_key]}
+                amount={amounts[category.category_key] ?? ''}
                 totalBudgetAmount={totalBudgetAmount}
                 onChange={handleAmountChange}
                 onReset={handleResetCategory}
