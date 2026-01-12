@@ -80,9 +80,6 @@ async function DataCalendar({
   const today = new Date();
   const isCurrentMonth = currentMonth === formatMonth(today);
 
-  // 이번 달 거래 (캘린더/차트/월 누적 계산용)
-  const transactions = await getTransaction(filters, true);
-
   const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
     fixedRules,
     monthDate
