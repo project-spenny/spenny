@@ -16,7 +16,7 @@ const AppLayout = ({
         <Navigation />
 
         <div className="flex w-full flex-col md:pl-28">
-          <main className="flex-1">{children}</main>
+          <main className="flex flex-1 justify-center">{children}</main>
           <Footer />
         </div>
 
