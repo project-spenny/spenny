@@ -46,13 +46,13 @@ export const CATEGORIES: ICATEGORIES = {
       category_key: 'BUSINESS_INCOME',
       name_en: 'Business Income',
       name_ko: '사업수익',
-      icon: '/icon/business.png',
+      icon: '/icon/business-income.png',
     },
     {
       category_key: 'INVESTMENT_INCOME',
       name_en: 'Investment Income',
       name_ko: '금융수익',
-      icon: '/icon/investment.png',
+      icon: '/icon/investment-income.png',
     },
     {
       category_key: 'INSURANCE',
