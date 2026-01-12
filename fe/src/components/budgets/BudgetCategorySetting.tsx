@@ -21,7 +21,7 @@ type CategoryBudgetSettingProps = {
   onEditTotalBudget?: () => void;
 };
 
-const CategoryBudgetSetting = ({
+const BudgetCategorySetting = ({
   selectedDate,
   totalBudgetAmount,
   initialCategoryKey,
@@ -322,4 +322,4 @@ const CategoryBudgetSetting = ({
   );
 };
 
-export default CategoryBudgetSetting;
+export default BudgetCategorySetting;
