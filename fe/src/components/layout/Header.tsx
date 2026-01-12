@@ -34,6 +34,7 @@ const Header = () => {
             height={80}
             draggable="false"
             className="h-auto w-36 md:w-[180px]"
+            priority
           />
         </Link>
       </h1>
