@@ -13,14 +13,44 @@ import {
   getPaceExplanation,
   getPaceStatus,
   getPatternExplanation,
+  PaceStatus,
 } from '@/services/daily-recommendation/explain';
+import { DailyRecPanelSkeleton } from './DailyRecPanelSkeleton';
+import { cn } from '@/lib/utils';
+
+type PaceBadgeStyle = {
+  dotClass: string;
+  badgeClass: string;
+};
+
+const PACE_BADGE_STYLE: Record<PaceStatus, PaceBadgeStyle> = {
+  ahead: {
+    dotClass: 'bg-red-500',
+    badgeClass:
+      'border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400',
+  },
+  behind: {
+    dotClass: 'bg-green-500',
+    badgeClass:
+      'border-green-200 bg-green-50 text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-400',
+  },
+  onTrack: {
+    dotClass: 'bg-amber-400',
+    badgeClass:
+      'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400',
+  },
+};
 
 type Props = {
   daily: DailyRecResult;
   dailyChartData: DailyRecChartData;
+  loading?: boolean;
 };
 
-export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
+export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
+  const isLoading = loading || !daily || !dailyChartData;
+  if (isLoading) return <DailyRecPanelSkeleton />;
+
   const { amount, debug } = daily;
   const {
     varTotal,
@@ -50,12 +80,13 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
   const spentToday = spentVariableToday ?? 0;
 
   const patternMessage = getPatternExplanation(weights);
+  const badgeStyle = PACE_BADGE_STYLE[paceStatus];
 
   return (
     <div className="flex min-h-full flex-col px-6">
       <div className="scrollbar-hide space-y-6 overflow-y-auto pb-24">
         {/* 요약 카드 */}
-        <Card>
+        <Card className="border-l-brand border-l-4">
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
@@ -78,8 +109,15 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
                   </span>
                 </p>
               </div>
-
-              <Badge variant="outline">{title}</Badge>
+              <Badge
+                variant="outline"
+                className={cn('flex items-center gap-2', badgeStyle.badgeClass)}
+              >
+                <span
+                  className={cn('h-2 w-2 rounded-full', badgeStyle.dotClass)}
+                />
+                {title}
+              </Badge>
             </div>
           </CardHeader>
 
@@ -102,13 +140,8 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
           varRemaining={varRemaining}
         />
 
-        {/* 기준 대비 소비 페이스 */}
-        <DailyRecPaceCard
-          dailyChartData={dailyChartData}
-          planned={planned}
-          plannedUntilYesterdayRounded={plannedUntilYesterdayRounded}
-          diff={diff}
-        />
+        {/* 이번 달 소비 페이스 */}
+        <DailyRecPaceCard dailyChartData={dailyChartData} planned={planned} />
 
         {/* 권장액 조정 방식 */}
         <Card>
@@ -130,7 +163,7 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
               <div className="flex flex-col gap-2 rounded-md border p-3 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">
-                    기준 누적(어제까지)
+                    기준 금액 누적(어제까지)
                   </span>
                   <span className="font-medium">
                     {plannedUntilYesterdayRounded.toLocaleString()}원
@@ -138,7 +171,9 @@ export const DailyRecPanel = ({ daily, dailyChartData }: Props) => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">기준 대비 차이</span>
+                  <span className="text-muted-foreground">
+                    기준 대비 누적 지출 차이
+                  </span>
                   <span className="font-medium">{diff.toLocaleString()}원</span>
                 </div>
 

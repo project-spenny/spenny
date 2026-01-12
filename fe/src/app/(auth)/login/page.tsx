@@ -1,5 +1,7 @@
 'use client';
 
+import AnimatedLogo from '@/components/login/AnimatedLogo';
+import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/utils/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -76,13 +78,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 overflow-x-hidden">
+      <AnimatedLogo />
       <div className="flex flex-col gap-4">
         <button
           type="button"
           onClick={() => signInWithProvider('google')}
           disabled={isLoading}
-          className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm border disabled:cursor-not-allowed disabled:opacity-60"
+          className="relative flex h-11 w-75 cursor-pointer items-center justify-center rounded-sm border disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Image
             src="/google_logo.svg"
@@ -91,15 +94,16 @@ export default function LoginPage() {
             height={20}
             className="absolute left-3"
           />
-          <span>
-            {loadingAction === 'google' ? '구글 로그인 중…' : '구글로 시작하기'}
+          <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span>{loadingAction === 'google' && <Spinner />}</span>
+            구글로 시작하기
           </span>
         </button>
         <button
           type="button"
           onClick={() => signInWithProvider('kakao')}
           disabled={isLoading}
-          className="relative flex h-[45px] w-[300px] cursor-pointer items-center justify-center rounded-sm bg-[#FEE500] disabled:cursor-not-allowed disabled:opacity-60"
+          className="relative flex h-11 w-75 cursor-pointer items-center justify-center rounded-sm bg-[#FEE500] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Image
             src="/kakao_symbol.svg"
@@ -108,10 +112,9 @@ export default function LoginPage() {
             height={20}
             className="absolute left-3"
           />
-          <span>
-            {loadingAction === 'kakao'
-              ? '카카오 로그인 중…'
-              : '카카오로 시작하기'}
+          <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span>{loadingAction === 'kakao' && <Spinner />}</span>
+            카카오로 시작하기
           </span>
         </button>
       </div>
@@ -127,9 +130,12 @@ export default function LoginPage() {
           type="button"
           onClick={signInAsGuest}
           disabled={isLoading}
-          className="flex h-[45px] w-[300px] items-center justify-center rounded-sm border text-sm text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-11 w-75 items-center justify-center rounded-sm border text-sm text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loadingAction === 'guest' ? '체험 계정 접속 중…' : '체험해보기'}
+          <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span>{loadingAction === 'guest' && <Spinner />}</span>
+            체험해보기
+          </span>
         </button>
 
         <p className="mt-1 text-xs text-gray-400">

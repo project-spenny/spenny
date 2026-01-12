@@ -16,6 +16,7 @@ import {
   onboardingProfileSchema,
   type OnboardingProfileValues,
 } from '@/schemas/profile';
+import { Spinner } from '../ui/spinner';
 
 type ProfileFormState = {
   isDirty: boolean;
@@ -28,7 +29,7 @@ type ProfileFormProps = {
   onSubmit: (
     data: OnboardingProfileValues,
     dirtyFields: FieldNamesMarkedBoolean<OnboardingProfileValues>
-  ) => void;
+  ) => Promise<void>;
   children?: (state: ProfileFormState) => React.ReactNode;
 };
 
@@ -117,6 +118,7 @@ export default function ProfileForm({
           className="w-full"
           disabled={isSubmitting || !isDirty}
         >
+          {isSubmitting && <Spinner />}
           저장
         </Button>
       )}

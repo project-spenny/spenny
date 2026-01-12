@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { toast } from 'sonner';
 interface IFormData {
   title: string;
   type: 'income' | 'expense' | '';
@@ -63,9 +63,24 @@ export const useTransactionForm = (initialData?: IFormData) => {
 
   const addTag = (tag: string) => {
     const trimmedTag = tag.trim();
-    if (trimmedTag && !formData.tags.includes(trimmedTag)) {
-      UpdateField('tags', [...formData.tags, trimmedTag]);
+
+    if (!trimmedTag) return;
+
+    if (trimmedTag.length > 10) {
+      toast.error('태그는 최대 10자를 초과할 수 없습니다');
+      return;
     }
+
+    if (formData.tags.includes(trimmedTag)) {
+      toast.error('이미 존재하는 태그입니다');
+      return;
+    }
+    if (formData.tags.length >= 5) {
+      toast.error('태그는 최대 5개까지 추가할 수 있습니다.');
+      return;
+    }
+
+    UpdateField('tags', [...formData.tags, trimmedTag]);
   };
 
   const removeTag = (tagToRemove: string) => {

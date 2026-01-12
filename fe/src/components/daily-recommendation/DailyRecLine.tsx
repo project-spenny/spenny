@@ -2,36 +2,68 @@
 
 import '@/components/daily-recommendation/chartSetup';
 import { Line } from 'react-chartjs-2';
-import type { ChartOptions, TooltipItem } from 'chart.js';
+import type { ChartOptions, TooltipItem, Chart as ChartJS } from 'chart.js';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DailyRecChartData } from '@/types/dailyRec';
+import { useRef, useState } from 'react';
 
 type Props = {
   dailyChartData: DailyRecChartData;
   planned: number;
-  plannedUntilYesterdayRounded: number;
-  diff: number;
 };
 
-export const DailyRecPaceCard = ({
-  dailyChartData,
-  planned,
-  plannedUntilYesterdayRounded,
-  diff,
-}: Props) => {
+export const DailyRecPaceCard = ({ dailyChartData, planned }: Props) => {
+  const [selectedIndex, setSelectedIndex] = useState<number>(() => {
+    return new Date().getDate() - 1;
+  });
+  const chartRef = useRef<ChartJS<'line'>>(null);
+
+  const handleChartClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    const chart = chartRef.current;
+    if (!chart) return;
+
+    const elements = chart.getElementsAtEventForMode(
+      event.nativeEvent,
+      'index',
+      { intersect: false },
+      true
+    );
+
+    if (!elements.length) return;
+    setSelectedIndex(elements[0].index);
+  };
+
+  const label = dailyChartData.labels[selectedIndex] ?? '';
+  const rec = dailyChartData.recommendedDailySeries[selectedIndex] ?? 0;
+  const actual = dailyChartData.actualDailySeries[selectedIndex] ?? 0;
+  const diffToRec = actual - rec;
+
   const dailyChart = {
     labels: dailyChartData.labels,
     datasets: [
       {
-        label: '지출',
+        label: '실제 지출',
         data: dailyChartData.actualDailySeries,
         tension: 0.2,
-        borderWidth: 3,
+        borderWidth: 2,
         pointRadius: 2,
         pointHoverRadius: 8,
         pointHitRadius: 50,
-        borderColor: '#5C7AFF',
+        borderColor: '#f43f5e',
         fill: true,
+        spanGaps: false,
+      },
+      {
+        label: '권장 사용액',
+        data: dailyChartData.recommendedDailySeries,
+        tension: 0.2,
+        borderWidth: 2,
+        pointRadius: 2,
+        pointHoverRadius: 6,
+        pointHitRadius: 50,
+        borderColor: '#3b82f6',
+        fill: false,
+        spanGaps: false,
       },
     ],
   };
@@ -39,23 +71,28 @@ export const DailyRecPaceCard = ({
   const dailyOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
 
     plugins: {
-      legend: { display: false },
+      legend: { display: true },
       annotation: {
         annotations: {
           plannedLine: {
             type: 'line',
             yMin: planned,
             yMax: planned,
-            borderColor: '#f43f5e',
-            borderWidth: 3,
+            borderColor: '#94a3b8',
+            borderWidth: 2,
             label: {
               display: true,
               content: `기준 ${planned.toLocaleString()}원`,
-              position: 'center',
-              backgroundColor: '#FFFFFF',
-              color: '#f43f5e',
+              position: 'end',
+              backgroundColor: 'rgba(255,255,255,0.8)',
+              color: '#94a3b8',
+              padding: 4,
               borderWidth: 0,
             },
           },
@@ -63,20 +100,21 @@ export const DailyRecPaceCard = ({
       },
 
       tooltip: {
+        filter: (ctx) => ctx.datasetIndex === 0,
         callbacks: {
           title: (items) => items?.[0]?.label ?? '',
           label: (ctx: TooltipItem<'line'>) => {
             const idx = ctx.dataIndex;
             const actual = dailyChartData.actualDailySeries[idx] ?? 0;
-            const diff = actual - planned;
+            const rec = dailyChartData.recommendedDailySeries[idx];
 
-            if (diff > 0) {
-              return `${diff.toLocaleString()}원 더 사용`;
-            }
-            if (diff < 0) {
-              return `${Math.abs(diff).toLocaleString()}원 덜 사용`;
-            }
-            return '차이 없음';
+            if (rec == null) return ''; // 미래 구간이면 표시 안 함
+
+            const diff = actual - rec;
+
+            if (diff > 0) return `+ ${diff.toLocaleString()}원`;
+            if (diff < 0) return `- ${Math.abs(diff).toLocaleString()}원`;
+            return '동일';
           },
         },
       },
@@ -93,8 +131,8 @@ export const DailyRecPaceCard = ({
     <Card>
       <CardHeader>
         <div className="flex items-end justify-between">
-          <CardTitle className="text-base">기준 대비 소비 페이스</CardTitle>
-          <p className="text-muted-foreground text-xs">어제까지 기준</p>
+          <CardTitle className="text-base">이번 달 소비 페이스</CardTitle>
+          <p className="text-muted-foreground text-xs">권장/실제 비교</p>
         </div>
 
         <p className="text-muted-foreground text-xs">
@@ -104,28 +142,44 @@ export const DailyRecPaceCard = ({
       </CardHeader>
       <CardContent>
         {/* Line chart */}
-        <div className="h-[180px]">
-          <Line data={dailyChart} options={dailyOptions} />
+        <div className="h-45">
+          <Line
+            ref={chartRef}
+            data={dailyChart}
+            options={dailyOptions}
+            onClick={handleChartClick}
+          />
         </div>
 
-        <div className="mt-2 grid grid-cols-[auto_1fr] gap-3 text-sm">
-          <div className="p-2">
-            <p className="text-muted-foreground">기준 누적</p>
-            <p className="font-medium">
-              {plannedUntilYesterdayRounded.toLocaleString()}원
-            </p>
+        <div className="mt-3 space-y-2 rounded-md border p-3 text-sm">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="font-medium">{label}</span>
+
+            <span className="text-muted-foreground text-xs">권장</span>
+            <span className="font-medium">{rec.toLocaleString()}원</span>
+
+            <span className="text-muted-foreground text-xs">지출</span>
+            <span className="font-medium">{actual.toLocaleString()}원</span>
           </div>
 
-          <div className="p-2">
-            <p className="text-muted-foreground">현재 상태</p>
-            <p className="font-medium">
-              {diff < 0
-                ? `기준보다 ${Math.abs(diff).toLocaleString()}원 더 사용했어요.`
-                : diff > 0
-                  ? `기준보다 ${diff.toLocaleString()}원 덜 사용했어요.`
-                  : '기준과 거의 동일해요.'}
-            </p>
-          </div>
+          {/* 권장 대비 문장 */}
+          <p className="text-sm font-medium">
+            {actual == 0 ? (
+              '해당 날짜의 지출 데이터가 없어요.'
+            ) : diffToRec > 0 ? (
+              <span className="text-red-500">
+                권장보다 {diffToRec.toLocaleString()}원 더 사용했어요.
+              </span>
+            ) : diffToRec < 0 ? (
+              <span className="text-blue-600">
+                권장보다 {Math.abs(diffToRec).toLocaleString()}원 덜 사용했어요.
+              </span>
+            ) : (
+              <span className="text-foreground">
+                권장과 동일하게 사용했어요.
+              </span>
+            )}
+          </p>
         </div>
       </CardContent>
     </Card>

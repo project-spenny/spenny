@@ -1,8 +1,12 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { DailyRecBarSkeleton } from '../daily-recommendation/DailyRecBarSkeleton';
 
 export function CalendarSkeleton() {
   return (
     <div className="flex w-full flex-col items-center">
+      <div className="w-full">
+        <DailyRecBarSkeleton />
+      </div>
       <div className="flex flex-col items-center justify-center py-6 md:py-10">
         <Skeleton className="mb-2 h-4 w-12" />
         <div className="flex items-center gap-3">
