@@ -33,25 +33,38 @@ const BudgetCategorySetting = ({
   } = useBudgetData(selectedDate);
   const { data: allCategories, isLoading: isCategoriesLoading } =
     useCategories('expense');
+
   const [amounts, setAmounts] = useState<Record<string, string>>({});
+  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({}); // 각 카테고리 Input 참조
 
-  // 각 카테고리 Input을 참조하기 위한 ref 객체
-  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  // 계산 로직
+  // 현재 입력된 값 중 유효한(0보다 큰) 데이터만 추출
+  const validCategoryBudgets = Object.entries(amounts)
+    .filter(([_, value]) => value !== '' && Number(value) > 0)
+    .map(([categoryId, value]) => ({ categoryId, amount: Number(value) }));
 
-  // 초기 포커스
-  useEffect(() => {
-    if (initialCategoryKey && !isCategoriesLoading) {
-      setTimeout(() => {
-        const targetInput = inputRefs.current[initialCategoryKey];
+  // 현재 입력된 모든 카테고리 금액의 합계
+  const totalAllocated = validCategoryBudgets.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+  // 초과 여부
+  const isOverBudget = totalBudgetAmount - totalAllocated < 0;
 
-        if (targetInput) {
-          targetInput.focus();
-          targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
-    }
-  }, [initialCategoryKey, isCategoriesLoading]);
+  // 개수 비교 결과
+  const isCategoryCountChanged =
+    validCategoryBudgets.length !== categoryBudgets.length;
+  // 금액 비교 결과
+  const isAnyAmountChanged = validCategoryBudgets.some((current) => {
+    const original = categoryBudgets.find(
+      (b) => b.category_id === current.categoryId
+    );
+    return original?.amount !== current.amount;
+  });
+  // 변경 여부 (기존 값과 비교)
+  const isDirty = isCategoryCountChanged || isAnyAmountChanged;
 
+  // 데이터 초기화
   useEffect(() => {
     if (categoryBudgets && allCategories) {
       const initialMap: Record<string, string> = {};
@@ -70,34 +83,38 @@ const BudgetCategorySetting = ({
       setAmounts(initialMap);
     }
   }, [categoryBudgets, allCategories]);
+  // 초기 포커스
+  useEffect(() => {
+    if (!initialCategoryKey || isCategoriesLoading) return;
 
-  // 현재 입력된 값 중 유효한(0보다 큰) 데이터만 추출
-  const currentBudgets = Object.entries(amounts)
-    .filter(([_, value]) => value !== '' && Number(value) > 0)
-    .map(([categoryId, value]) => ({ categoryId, amount: Number(value) }));
+    const timer = setTimeout(() => {
+      const targetInput = inputRefs.current[initialCategoryKey];
+      if (!targetInput) return;
 
-  // 개수 비교 결과
-  const hasCountChanged = currentBudgets.length !== categoryBudgets.length;
+      targetInput.focus();
+      targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
 
-  // 금액 비교 결과
-  const hasAmountChanged = currentBudgets.some((current) => {
-    const original = categoryBudgets.find(
-      (b) => b.category_id === current.categoryId
-    );
-    return original?.amount !== current.amount;
-  });
+    return () => clearTimeout(timer);
+  }, [initialCategoryKey, isCategoriesLoading]);
 
-  // 변경 여부 (기존 값과 비교)
-  const isChanged = hasCountChanged || hasAmountChanged;
-
+  // 핸들러
+  const handleAmountChange = (category: string, value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, '');
+    setAmounts((prev) => ({ ...prev, [category]: numericValue }));
+  };
+  const handleResetCategory = (categoryKey: string) => {
+    setAmounts((prev) => ({ ...prev, [categoryKey]: '' }));
+    inputRefs.current[categoryKey]?.focus(); // 초기화 후 다시 포커스
+  };
   const handleSave = () => {
-    if (!allCategories || !isChanged) return;
+    if (!allCategories || !isDirty) return;
 
     // 추가 및 수정할 데이터 (0원보다 큰 유효한 예산 리스트)
-    const upsertData = currentBudgets;
+    const upsertData = validCategoryBudgets;
 
     // 삭제할 데이터 (기존 예산 중 입력값이 0이 된 항목들)
-    const currentCategoryIds = currentBudgets.map((b) => b.categoryId);
+    const currentCategoryIds = validCategoryBudgets.map((b) => b.categoryId);
     const deleteData = categoryBudgets
       .map((b) => b.category_id)
       .filter((id): id is string => id !== null)
@@ -108,26 +125,6 @@ const BudgetCategorySetting = ({
 
     if (onSaveSuccess) onSaveSuccess();
   };
-
-  const handleAmountChange = (category: string, value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, '');
-    setAmounts((prev) => ({ ...prev, [category]: numericValue }));
-  };
-
-  const handleResetCategory = (categoryKey: string) => {
-    setAmounts((prev) => ({ ...prev, [categoryKey]: '' }));
-    inputRefs.current[categoryKey]?.focus(); // 초기화 후 다시 포커스
-  };
-
-  // 현재 입력된 모든 카테고리 금액의 합계
-  const totalAllocated = currentBudgets.reduce(
-    (sum, item) => sum + item.amount,
-    0
-  );
-
-  // 남은 금액 및 초과 여부
-  const remaining = totalBudgetAmount - totalAllocated;
-  const isOverBudget = remaining < 0;
 
   return (
     <div className="flex h-full flex-col px-8">
@@ -180,7 +177,7 @@ const BudgetCategorySetting = ({
             총 예산을 늘리거나 카테고리 금액을 조절해주세요.
           </p>
         ) : (
-          !isChanged && (
+          !isDirty && (
             <p className="text-muted-foreground text-center text-sm">
               {categoryBudgets.length === 0
                 ? '카테고리별 예산 금액을 입력해주세요.'
@@ -195,7 +192,7 @@ const BudgetCategorySetting = ({
             isOverBudget && 'bg-red-400 hover:bg-red-500'
           )}
           onClick={handleSave}
-          disabled={isSavingCategories || !isChanged || isOverBudget}
+          disabled={isSavingCategories || !isDirty || isOverBudget}
         >
           {isSavingCategories ? '저장 중' : '저장하기'}
         </Button>
