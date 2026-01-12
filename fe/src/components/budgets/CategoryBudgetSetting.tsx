@@ -133,9 +133,9 @@ const CategoryBudgetSetting = ({
   const isOverBudget = remaining < 0;
 
   return (
-    <div className="flex flex-col px-8">
-      <div className="space-y-1 pb-4">
-        <h2 className="text-xl font-bold">카테고리별 예산 설정</h2>
+    <div className="flex h-full flex-col px-8">
+      <div className="bg-background sticky top-0 space-y-1 pb-4">
+        <p className="text-xl font-bold">카테고리별 예산 설정</p>
         <p className="text-muted-foreground text-sm font-medium">
           항목별 목표 금액을 정해보세요.
         </p>
@@ -290,7 +290,7 @@ const CategoryBudgetSetting = ({
       <Separator />
 
       {/* 하단 버튼 영역 */}
-      <div className="space-y-4 p-4">
+      <div className="bg-background sticky bottom-0 space-y-4 border-t p-4">
         {isOverBudget ? (
           <p
             className={cn('text-center text-sm font-bold', THEME_COLOR.EXPENSE)}
