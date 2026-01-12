@@ -1,11 +1,14 @@
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { CATEGORIES } from '@/constants/categories';
+import { Category } from '@/constants/categories';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import Image from 'next/image';
+import { se } from 'date-fns/locale';
 
 interface CategorySelectorProps {
   transactionType: string;
@@ -14,6 +17,23 @@ interface CategorySelectorProps {
   onOpenChange: (open: boolean) => void;
   onChange: (category: string) => void;
 }
+
+const SelectedIcon = (categories: Category[], value: string) => {
+  const selected = categories.find((cat) => cat.category_key === value);
+  return selected ? (
+    <div className="flex items-center gap-2">
+      <Image
+        src={selected.icon}
+        alt={selected.name_ko}
+        width={22}
+        height={22}
+      />
+      <span>{selected.name_ko}</span>
+    </div>
+  ) : (
+    '선택'
+  );
+};
 
 export const CategorySelector = ({
   transactionType,
@@ -33,11 +53,8 @@ export const CategorySelector = ({
       <div className="w-full">
         <Popover open={open} onOpenChange={onOpenChange}>
           <PopoverTrigger asChild>
-            <Button type="button" variant="outline" className="w-full">
-              {value === ''
-                ? '선택'
-                : categories.find((cat) => cat.category_key === value)
-                    ?.name_ko || '선택'}
+            <Button type="button" variant="outline" className="h-10 w-full">
+              {SelectedIcon(categories, value)}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -48,10 +65,16 @@ export const CategorySelector = ({
                     onChange(cat.category_key);
                     onOpenChange(false);
                   }}
-                  className="flex h-16 w-24 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
+                  className="flex h-20 w-24 cursor-pointer flex-col items-center justify-center gap-2 text-center text-sm hover:bg-gray-100"
                   key={cat.category_key}
                 >
-                  {cat.name_ko}
+                  <Image
+                    src={cat.icon}
+                    alt={cat.name_ko}
+                    width={22}
+                    height={22}
+                  />
+                  <p className="text-muted-foreground text-xs">{cat.name_ko}</p>
                 </div>
               ))}
             </div>

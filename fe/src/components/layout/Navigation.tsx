@@ -7,7 +7,7 @@ const Navigation = () => {
   const pathname = usePathname(); // 현재 경로 가져오기
   const navItems = [
     { label: '홈', href: '/' },
-    { label: '내역', href: '/history' },
+    { label: '가계부', href: '/history' },
     { label: '분석', href: '/analysis' },
     { label: '고정비', href: '/fixed-costs' },
   ];
