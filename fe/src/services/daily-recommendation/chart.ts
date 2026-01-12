@@ -41,6 +41,13 @@ export const buildDailyRecChartData = ({
     () => null
   );
 
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${ym}-${String(d).padStart(2, '0')}`;
+    if (dateStr > todayStr) continue; // 미래는 null
+
+    actualDailySeries[d - 1] = 0; // 과거/오늘은 0으로 시작
+  }
+
   // 실제 지출 일별 시리즈
   for (const t of transactions) {
     // 지출만
