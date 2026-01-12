@@ -3,10 +3,11 @@
 import { Profile, ProfilePatchValues } from '@/schemas/profile';
 import ProfileForm from '../onboarding/ProfileForm';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '../ui/spinner';
 
 type Props = {
   profile: Profile; // 기존 프로필 값
-  onSave: (values: ProfilePatchValues) => void;
+  onSave: (values: ProfilePatchValues) => Promise<void>;
   onCancel: () => void;
 };
 
@@ -24,7 +25,7 @@ export default function ProfileEdit({ profile, onSave, onCancel }: Props) {
           ...(dirtyFields.birth_date ? { birth_date: data.birth_date } : {}),
           ...(dirtyFields.gender ? { gender: data.gender } : {}),
         };
-        onSave(payload);
+        return onSave(payload);
       }}
     >
       {({ isDirty, isSubmitting }) => (
@@ -43,6 +44,7 @@ export default function ProfileEdit({ profile, onSave, onCancel }: Props) {
             className="flex-1"
             disabled={!isDirty || isSubmitting}
           >
+            {isSubmitting && <Spinner />}
             저장
           </Button>
         </div>

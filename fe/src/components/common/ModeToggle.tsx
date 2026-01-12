@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { useTheme } from 'next-themes';
+import { Switch } from '@/components/ui/switch';
 
 const ModeToggle = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -20,13 +20,16 @@ const ModeToggle = () => {
     return null;
   }
 
+  const isDark = (resolvedTheme ?? theme) === 'dark';
+
   return (
-    <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="bg-secondary text-secondary-foreground rounded-md border px-4 py-2 transition-all hover:opacity-80"
-    >
-      {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-    </button>
+    <div>
+      <Switch
+        checked={isDark}
+        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+        aria-label="다크 모드 전환"
+      />
+    </div>
   );
 };
 
