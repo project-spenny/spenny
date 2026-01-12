@@ -54,12 +54,13 @@ export default function FixedCostsPage() {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
+      <FixedCostsAddButton onClick={handleCreateClick} />
+
       <div className="flex w-full flex-col items-center space-y-6 p-4 md:p-6 lg:p-8">
         <div className="w-full max-w-xl space-y-6">
           <header>
             <h1 className="text-xl font-semibold">고정비 관리</h1>
           </header>
-          <FixedCostsAddButton onClick={handleCreateClick} />
         </div>
       </div>
 
