@@ -103,6 +103,7 @@ const CategoryBudgetSetting = ({
     const currentCategoryIds = currentBudgets.map((b) => b.categoryId);
     const deleteData = categoryBudgets
       .map((b) => b.category_id)
+      .filter((id): id is string => id !== null)
       .filter((id) => !currentCategoryIds.includes(id));
 
     if (deleteData.length > 0) removeBudget(deleteData);
