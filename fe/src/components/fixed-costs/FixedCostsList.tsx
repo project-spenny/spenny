@@ -1,15 +1,5 @@
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemTitle,
-} from '@/components/ui/item';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import FixedCostItem from './FixedCostItem';
 import { IFixedRule } from '@/types/fixed-costs';
-import { formatFixedRuleCycle } from '@/utils/fixed-costs';
-import { THEME_COLOR } from '@/constants/colors';
 
 type FixedCostsListProps = {
   items: IFixedRule[];
@@ -43,35 +33,8 @@ export default function FixedCostsList({
 
   return (
     <div className="space-y-2">
-      {items.map((e) => (
-        <Item variant="outline" key={e.id}>
-          <ItemContent className="flex flex-row items-center">
-            <div className="flex w-24 flex-col gap-1">
-              <span className="text-muted-foreground text-xs">
-                {formatFixedRuleCycle(e)}
-              </span>
-              <span
-                className={cn(
-                  'text-sm font-bold',
-                  e.type === 'income' ? THEME_COLOR.INCOME : THEME_COLOR.EXPENSE
-                )}
-              >
-                {e.type === 'income' ? '+' : '-'}
-                {e.amount.toLocaleString()}원
-              </span>
-            </div>
-            <ItemTitle className="p-2 text-left">{e.title}</ItemTitle>
-            <ItemActions className="ml-auto">
-              <Button
-                className="cursor-pointer"
-                size="sm"
-                onClick={() => onEdit(e)}
-              >
-                <ChevronRight />
-              </Button>
-            </ItemActions>
-          </ItemContent>
-        </Item>
+      {items.map((rule) => (
+        <FixedCostItem key={rule.id} rule={rule} onEdit={onEdit} />
       ))}
     </div>
   );
