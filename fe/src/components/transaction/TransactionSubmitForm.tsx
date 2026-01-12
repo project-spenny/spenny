@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '../ui/button';
 import { supabase } from '@/utils/supabase/client';
@@ -14,6 +14,7 @@ import { TitleInput } from './common/TitleInput';
 import { TypeSelector } from './common/TypeSelector';
 import { CategorySelector } from './common/CategorySelector';
 import { QuickAmountButtons } from './common/QuickAmountButtons';
+import { Spinner } from '../ui/spinner';
 
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';
@@ -76,6 +77,8 @@ export default function TransactionSubmitForm({
     UpdateField,
   } = useTransactionForm(initialFormData);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     if (defaultValue) {
       setFormData({
@@ -91,13 +94,15 @@ export default function TransactionSubmitForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // 중복 제출 방지
 
     const errorMsg = validateFormData();
-
     if (errorMsg) {
       toast(errorMsg);
       return;
     }
+
+    setIsSubmitting(true);
     try {
       const {
         data: { user },
@@ -159,14 +164,17 @@ export default function TransactionSubmitForm({
       onClose();
     } catch (error) {
       toast.warning('수정 실패');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
     if (!transaction) return;
+    if (isSubmitting) return;
 
     if (!confirm('삭제하시겠습니까?')) return;
-
+    setIsSubmitting(true);
     try {
       const { error } = await supabase
         .from('transactions')
@@ -183,6 +191,8 @@ export default function TransactionSubmitForm({
       onClose();
     } catch (error) {
       toast.error('오류가 발생했습니다');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -241,16 +251,13 @@ export default function TransactionSubmitForm({
               type="button"
               variant="outline"
               className="hover:text-destructive"
-              onClick={() => handleDelete()}
+              onClick={handleDelete}
             >
               <Trash className="h-4 w-4" />
             </Button>
           )}
-          <Button
-            type="submit"
-            className="flex-1"
-            onClick={(e) => handleSubmit(e)}
-          >
+          <Button type="submit" className="flex-1">
+            {isSubmitting && <Spinner />}
             {mode === 'create' ? '저장' : '수정'}
           </Button>
         </div>
