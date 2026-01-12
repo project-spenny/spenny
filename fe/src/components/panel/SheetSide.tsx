@@ -31,7 +31,9 @@ const SheetSide = ({ children, open, onOpenChange }: PanelProps) => {
           </Button>
         </SheetClose>
 
-        {children}
+        <div className="scrollbar-hide flex min-h-0 flex-1 flex-col overflow-y-auto">
+          {children}
+        </div>
       </SheetContent>
     </Sheet>
   );

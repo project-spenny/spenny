@@ -21,7 +21,7 @@ const DrawerBottom = ({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         className={cn(
-          'flex-col overflow-hidden outline-none',
+          'flex flex-col overflow-hidden outline-none',
           isFull ? 'h-screen' : 'h-[80vh]'
         )}
       >
