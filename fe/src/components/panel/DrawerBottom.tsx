@@ -24,7 +24,7 @@ const DrawerBottom = ({
         {/* DialogTitle 누락 방지 */}
         <DrawerTitle className="sr-only">DrawerBottom</DrawerTitle>
 
-        <DrawerClose className="absolute top-0 right-0 z-10 m-4" asChild>
+        <DrawerClose className="absolute top-3 right-2 z-10" asChild>
           <Button
             variant="ghost"
             size="icon"
@@ -34,7 +34,7 @@ const DrawerBottom = ({
           </Button>
         </DrawerClose>
 
-        {children}
+        <div className="pt-8">{children}</div>
       </DrawerContent>
     </Drawer>
   );
