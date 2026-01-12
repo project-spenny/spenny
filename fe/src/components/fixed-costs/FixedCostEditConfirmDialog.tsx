@@ -15,6 +15,7 @@ type FixedCostEditConfirmDialogProps = {
   cycle: 'WEEKLY' | 'MONTHLY';
   onApplyIncludeCurrent: () => void;
   onApplyExcludeCurrent: () => void;
+  pending?: boolean;
 };
 
 export default function FixedCostEditConfirmDialog({
@@ -23,6 +24,7 @@ export default function FixedCostEditConfirmDialog({
   cycle,
   onApplyIncludeCurrent,
   onApplyExcludeCurrent,
+  pending = false,
 }: FixedCostEditConfirmDialogProps) {
   const unit = cycle === 'WEEKLY' ? '이번주' : '이번달';
 
@@ -38,7 +40,11 @@ export default function FixedCostEditConfirmDialog({
 
         <div className="mt-3 flex flex-col gap-3">
           <div className="rounded-md border p-3">
-            <Button className="w-full" onClick={onApplyIncludeCurrent}>
+            <Button
+              className="w-full"
+              onClick={onApplyIncludeCurrent}
+              disabled={pending}
+            >
               {unit} 포함 이후 전부 적용
             </Button>
             <p className="text-muted-foreground mt-1 text-sm">
@@ -51,6 +57,7 @@ export default function FixedCostEditConfirmDialog({
               variant="outline"
               className="w-full"
               onClick={onApplyExcludeCurrent}
+              disabled={pending}
             >
               {unit} 제외 이후 전부 적용
             </Button>

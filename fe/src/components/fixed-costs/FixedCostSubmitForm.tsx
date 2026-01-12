@@ -200,14 +200,19 @@ export default function FixedCostSubmitForm({
 
         <div className="bg-background sticky bottom-0 z-10 border-t py-4">
           {mode === 'create' ? (
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && <Spinner />}
               저장
             </Button>
           ) : (
             <div className="flex items-center gap-2">
-              {ruleId && <FixedCostDeleteDialog onDelete={handleDeleteRule} />}
-              <Button type="submit" className="flex-1">
+              {ruleId && (
+                <FixedCostDeleteDialog
+                  onDelete={handleDeleteRule}
+                  disabled={isSubmitting}
+                />
+              )}
+              <Button type="submit" className="flex-1" disabled={isSubmitting}>
                 {isSubmitting && <Spinner />}
                 수정
               </Button>
@@ -222,6 +227,7 @@ export default function FixedCostSubmitForm({
         cycle={formData.cycle as 'WEEKLY' | 'MONTHLY'}
         onApplyIncludeCurrent={handleApplyIncludeCurrent}
         onApplyExcludeCurrent={handleApplyExcludeCurrent}
+        pending={isSubmitting}
       />
     </div>
   );
