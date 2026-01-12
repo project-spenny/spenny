@@ -19,22 +19,29 @@ const DrawerBottom = ({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
-        className={cn('outline-none', isFull ? 'h-screen' : 'h-[80vh]')}
+        className={cn(
+          'flex-col overflow-hidden outline-none',
+          isFull ? 'h-screen' : 'h-[80vh]'
+        )}
       >
         {/* DialogTitle 누락 방지 */}
         <DrawerTitle className="sr-only">DrawerBottom</DrawerTitle>
 
-        <DrawerClose className="absolute top-3 right-2 z-10" asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 cursor-pointer rounded-full"
-          >
-            <X />
-          </Button>
-        </DrawerClose>
+        <div className="flex justify-end pr-2">
+          <DrawerClose asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 cursor-pointer rounded-full"
+            >
+              <X />
+            </Button>
+          </DrawerClose>
+        </div>
 
-        <div className="pt-8">{children}</div>
+        <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
+          {children}
+        </div>
       </DrawerContent>
     </Drawer>
   );

@@ -133,7 +133,7 @@ const CategoryBudgetSetting = ({
   const isOverBudget = remaining < 0;
 
   return (
-    <div className="flex h-[74vh] flex-col px-8 md:h-[92vh] md:py-0">
+    <div className="flex flex-col px-8">
       <div className="space-y-1 pb-4">
         <h2 className="text-xl font-bold">카테고리별 예산 설정</h2>
         <p className="text-muted-foreground text-sm font-medium">
