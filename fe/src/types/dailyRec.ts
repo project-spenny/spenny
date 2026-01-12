@@ -43,7 +43,8 @@ export type DailyRecResult = {
 // 일일 권장 사용 금액 관련 차트 데이터
 export type DailyRecChartData = {
   labels: string[];
-  actualDailySeries: number[];
+  actualDailySeries: Array<number | null>;
+  recommendedDailySeries: Array<number | null>;
 };
 
 // 월 구간 (초/중/말)

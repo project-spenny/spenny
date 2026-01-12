@@ -1,6 +1,6 @@
 import { SpendingPatternWeights } from '@/types/dailyRec';
 
-type PaceStatus = 'ahead' | 'behind' | 'onTrack';
+export type PaceStatus = 'ahead' | 'behind' | 'onTrack';
 
 const EPSILON = 1000; // 허용 오차(원)
 

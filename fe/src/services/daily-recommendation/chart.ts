@@ -1,22 +1,54 @@
 import { DailyRecChartData } from '@/types/dailyRec';
 import { ITransaction } from '@/types/transactions';
-import { isFixedExpense } from '@/utils/transaction';
+import {
+  isFixedExpense,
+  sumExpenseUntilYesterday,
+  sumFixedExpenseUntilYesterday,
+} from '@/utils/transaction';
+import { SpendingTransaction } from './spendingPattern';
+import { formatLocalDate, formatMonth, parseLocalDate } from '@/utils/date';
+import { calculateDailyRec } from './calculate';
 
 export const buildDailyRecChartData = ({
   monthDate,
   transactions,
+  today,
+  budget,
+  fixedPlannedThisMonth,
+  spendingTransactions,
 }: {
   monthDate: Date;
   transactions: ITransaction[];
+  today: Date;
+  budget: number;
+  fixedPlannedThisMonth: number;
+  spendingTransactions: SpendingTransaction[];
 }): DailyRecChartData => {
-  const year = monthDate.getFullYear();
-  const month = String(monthDate.getMonth() + 1).padStart(2, '0');
-  const ym = `${year}-${month}`;
-  const daysInMonth = new Date(year, monthDate.getMonth() + 1, 0).getDate();
+  const todayStr = formatLocalDate(today);
+  const ym = formatMonth(monthDate);
+  const daysInMonth = new Date(
+    monthDate.getFullYear(),
+    monthDate.getMonth() + 1,
+    0
+  ).getDate();
   const labels = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}일`);
+  const actualDailySeries: Array<number | null> = Array.from(
+    { length: daysInMonth },
+    () => null
+  );
+  const recommendedDailySeries: Array<number | null> = Array.from(
+    { length: daysInMonth },
+    () => null
+  );
 
-  const actualDailySeries = Array.from({ length: daysInMonth }, () => 0);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${ym}-${String(d).padStart(2, '0')}`;
+    if (dateStr > todayStr) continue; // 미래는 null
 
+    actualDailySeries[d - 1] = 0; // 과거/오늘은 0으로 시작
+  }
+
+  // 실제 지출 일별 시리즈
   for (const t of transactions) {
     // 지출만
     if (t.type !== 'expense') continue;
@@ -26,17 +58,57 @@ export const buildDailyRecChartData = ({
 
     // 해당 월만
     if (!t.date || t.date.slice(0, 7) !== ym) continue;
+    if (t.date > todayStr) continue;
 
     const day = Number(t.date.slice(8, 10));
     if (!Number.isFinite(day) || day < 1 || day > daysInMonth) continue;
 
-    actualDailySeries[day - 1] += Math.abs(Number(t.amount) || 0);
+    actualDailySeries[day - 1] =
+      (actualDailySeries[day - 1] ?? 0) + Math.abs(Number(t.amount) || 0);
   }
 
   // 표시용 반올림
   for (let i = 0; i < actualDailySeries.length; i++) {
-    actualDailySeries[i] = Math.round(actualDailySeries[i]);
+    if (actualDailySeries[i] !== null) {
+      actualDailySeries[i] = Math.round(actualDailySeries[i]!);
+    }
   }
 
-  return { labels, actualDailySeries };
+  // 권장액 일별 시리즈
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${ym}-${String(d).padStart(2, '0')}`;
+    if (dateStr > todayStr) continue;
+
+    const dayDate = parseLocalDate(dateStr)!;
+
+    const spentTotalUntilYesterday = sumExpenseUntilYesterday(
+      transactions,
+      dayDate
+    );
+    const spentFixedUntilYesterday = sumFixedExpenseUntilYesterday(
+      transactions,
+      dayDate
+    );
+
+    const spendingUntilThatDay = spendingTransactions.filter(
+      (st) => st.date <= dateStr
+    );
+
+    const rec = calculateDailyRec(
+      {
+        today: dayDate,
+        budget,
+        fixedPlannedThisMonth,
+        spentTotalUntilYesterday,
+        spentFixedUntilYesterday,
+      },
+      spendingUntilThatDay
+    );
+
+    recommendedDailySeries[d - 1] = Math.round(
+      rec.debug.weightedTotalAmount ?? 0
+    );
+  }
+
+  return { labels, actualDailySeries, recommendedDailySeries };
 };

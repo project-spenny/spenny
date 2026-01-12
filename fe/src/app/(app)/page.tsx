@@ -150,6 +150,10 @@ async function DataCalendar({
   const dailyChartData = buildDailyRecChartData({
     monthDate,
     transactions,
+    today,
+    budget,
+    fixedPlannedThisMonth,
+    spendingTransactions,
   });
 
   return (
