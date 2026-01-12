@@ -19,6 +19,7 @@ import {
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 import FixedCostDeleteDialog from './FixedCostDeleteDialog';
+import { Spinner } from '../ui/spinner';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -36,6 +37,7 @@ export default function FixedCostSubmitForm({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingPayload, setPendingPayload] =
     useState<CreateFixedRuleInput | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     formData,
@@ -47,6 +49,7 @@ export default function FixedCostSubmitForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // 중복 제출 방지
 
     const errorMsg = validateFormData();
     if (errorMsg) {
@@ -73,6 +76,7 @@ export default function FixedCostSubmitForm({
       setConfirmOpen(true);
       return;
     }
+    setIsSubmitting(true);
 
     try {
       await createFixedRule(payload);
@@ -80,6 +84,8 @@ export default function FixedCostSubmitForm({
       onSuccess(); // 고정비 목록 갱신
     } catch {
       toast.error('고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -90,7 +96,9 @@ export default function FixedCostSubmitForm({
 
   const handleApplyIncludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await updateFixedRuleWithScope({
         id: ruleId,
@@ -103,12 +111,16 @@ export default function FixedCostSubmitForm({
       onSuccess();
     } catch {
       toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleApplyExcludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await updateFixedRuleWithScope({
         id: ruleId,
@@ -121,12 +133,16 @@ export default function FixedCostSubmitForm({
       onSuccess();
     } catch {
       toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDeleteRule = async () => {
     if (!ruleId) return;
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await deleteFixedRule(ruleId);
       toast.success('고정비 규칙이 삭제되었습니다.');
@@ -135,6 +151,8 @@ export default function FixedCostSubmitForm({
       toast.error(
         '고정비 규칙 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.'
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -183,12 +201,14 @@ export default function FixedCostSubmitForm({
         <div className="bg-background sticky bottom-0 z-10 border-t py-4">
           {mode === 'create' ? (
             <Button type="submit" className="w-full">
+              {isSubmitting && <Spinner />}
               저장
             </Button>
           ) : (
             <div className="flex items-center gap-2">
               {ruleId && <FixedCostDeleteDialog onDelete={handleDeleteRule} />}
               <Button type="submit" className="flex-1">
+                {isSubmitting && <Spinner />}
                 수정
               </Button>
             </div>
