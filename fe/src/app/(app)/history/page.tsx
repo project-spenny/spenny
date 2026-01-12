@@ -27,7 +27,7 @@ export default async function Page({ searchParams }: PageProps) {
   return (
     <>
       <TransactionProvider>
-        <div className="flex h-screen w-full flex-col">
+        <div className="flex min-h-screen w-full flex-col">
           <Suspense fallback={<TransactionListSkeleton />}>
             <TransactionListWrapper filters={filters} />
           </Suspense>

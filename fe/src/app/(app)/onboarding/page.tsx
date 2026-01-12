@@ -9,6 +9,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 import ProfileForm from '@/components/onboarding/ProfileForm';
 import { OnboardingProfileValues } from '@/schemas/profile';
@@ -21,10 +22,13 @@ export default function OnboardingPage() {
 
   const [phase, setPhase] = useState<'form' | 'intro'>('form');
   const [introStep, setIntroStep] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
 
   const [serverError, setServerError] = useState<string | null>(null);
 
   const exitOnboarding = () => {
+    if (isExiting) return;
+    setIsExiting(true);
     router.replace('/');
   };
 
@@ -43,6 +47,8 @@ export default function OnboardingPage() {
       return;
     }
 
+    toast.success('기본 정보가 저장되었어요');
+
     // 온보딩 소개 단계로 전환
     setIntroStep(0);
     setPhase('intro');
@@ -52,6 +58,8 @@ export default function OnboardingPage() {
   const goPrev = () => setIntroStep((s) => Math.max(0, s - 1));
   const goNext = () =>
     setIntroStep((s) => Math.min(INTRO_STEPS.length - 1, s + 1));
+
+  const isLastIntro = introStep === INTRO_STEPS.length - 1;
 
   return (
     <div className="fixed inset-0 z-50">
@@ -71,14 +79,17 @@ export default function OnboardingPage() {
                 </>
               ) : (
                 <>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="absolute -top-3 right-2"
-                    onClick={exitOnboarding}
-                  >
-                    건너뛰기
-                  </Button>
+                  {!isLastIntro && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={isExiting}
+                      className="absolute -top-3 right-2"
+                      onClick={exitOnboarding}
+                    >
+                      건너뛰기
+                    </Button>
+                  )}
                   <CardTitle className="text-xl">
                     {INTRO_STEPS[introStep].title}
                   </CardTitle>
@@ -107,6 +118,8 @@ export default function OnboardingPage() {
                 <IntroPanel
                   steps={INTRO_STEPS}
                   introStep={introStep}
+                  isLastIntro={isLastIntro}
+                  isExiting={isExiting}
                   onPrev={goPrev}
                   onNext={goNext}
                   onExit={exitOnboarding}

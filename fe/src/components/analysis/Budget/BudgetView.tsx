@@ -1,10 +1,13 @@
 import { Calculator, Edit, ListPlus } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import BudgetSetupDialog from '@/components/analysis/BudgetSetupDialog';
+import BudgetRecommendDialog from '@/components/analysis/Budget/BudgetRecommendDialog';
+import BudgetSetupDialog from '@/components/analysis/Budget/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
+import { CalculatedBudgetItem } from '@/types/budgetGuide';
 import CategoryBudgetSetting from '@/components/analysis/CategoryBudgetSetting';
 import ConfirmDialog from '@/components/analysis/common/ConfirmDialog';
 import { Progress } from '@/components/ui/progress';
@@ -14,16 +17,29 @@ import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 import useBudgetData from '@/hooks/useBudgetData';
-import { useState } from 'react';
+import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
+  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
+  const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
+  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
+  const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(
+    null
+  );
+
   const {
     totalBudget,
     categoryBudgets,
+    saveBudget,
+    saveCategoryBudgets,
     removeBudget,
     futureFixedAmount,
     isLoading: isBudgetLoading,
     isDeleting,
+    isSaving,
+    isSavingCategories,
   } = useBudgetData(selectedDate);
   const {
     totalAmount: totalExpense,
@@ -31,16 +47,16 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     categoryTotalsByKey,
     current: transactions,
   } = useAnalysisData(selectedDate, 'expense');
+  const { processedData, isLoading: isAnalysisLoading } =
+    useBudgetGuideData(selectedDate);
 
-  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
-  const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
-  const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(
-    null
-  );
+  // 과거 데이터 유무 판단 (이번 달 제외 3개월)
+  const hasPastData = useMemo(() => {
+    return processedData && processedData.monthlyData.length > 0;
+  }, [processedData]);
 
-  const isLoading = isBudgetLoading || isExpenseLoading;
+  const isLoading = isBudgetLoading || isExpenseLoading || isAnalysisLoading;
+  const isSubmitting = isSaving || isSavingCategories;
 
   // 예산이 설정된 카테고리 키 목록 생성
   const budgetKeys = new Set(
@@ -51,7 +67,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     .filter(([key]) => !budgetKeys.has(key))
     .map(([key, amount]) => {
       const categoryName =
-        transactions.find((t) => t.categories?.category_key === key)?.categories
+        transactions.find((t) => t.category?.category_key === key)?.category
           ?.name_ko || key;
 
       return { key, amount, name: categoryName };
@@ -71,6 +87,31 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     setIsCategoryPanelOpen(true);
   };
 
+  // 추천 예산 적용 핸들러
+  const handleRecommendConfirm = (
+    budgetDraft: CalculatedBudgetItem[],
+    totalBudget: number
+  ) => {
+    saveBudget(
+      { amount: totalBudget, categoryId: null },
+      {
+        onSuccess: () => {
+          // 총 예산 저장 성공 후, 카테고리별 예산 일괄 저장
+          const categoryData = budgetDraft.map((item) => ({
+            categoryId: item.categoryId,
+            amount: item.amount,
+          }));
+
+          saveCategoryBudgets(categoryData, {
+            onSuccess: () => {
+              setIsRecommendOpen(false); // 모든 저장 성공 시 다이얼로그 닫기
+            },
+          });
+        },
+      }
+    );
+  };
+
   if (isLoading)
     return (
       <div className="py-20">
@@ -88,13 +129,24 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
             description="지출을 관리하기 위해 먼저 한 달 총 예산을 정해볼까요?"
             icon={Calculator}
           >
-            <Button
-              variant="secondary"
-              className="bg-primary/5 hover:bg-primary/10 mt-2 cursor-pointer"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              이번 달 예산 설정하기
-            </Button>
+            <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
+              {hasPastData && (
+                <Button
+                  variant="outline"
+                  className="cursor-pointer"
+                  onClick={() => setIsRecommendOpen(true)}
+                >
+                  추천 템플릿으로 시작
+                </Button>
+              )}
+
+              <Button
+                className="cursor-pointer"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                이번 달 예산 설정하기
+              </Button>
+            </div>
           </AnalysisEmpty>
         </div>
       ) : (
@@ -472,6 +524,15 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
         onOpenChange={setIsDialogOpen}
         selectedDate={selectedDate}
         defaultAmount={totalBudget?.amount} // 기존 금액 전달
+      />
+
+      {/* 예산 추천 */}
+      <BudgetRecommendDialog
+        open={isRecommendOpen}
+        onOpenChange={setIsRecommendOpen}
+        selectedDate={selectedDate}
+        onConfirm={handleRecommendConfirm}
+        isSubmitting={isSubmitting}
       />
 
       {/* 총 예산 초기화 모달창 */}

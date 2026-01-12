@@ -2,6 +2,8 @@
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import { Spinner } from '../ui/spinner';
 
 type IntroStep = {
   title: string;
@@ -11,6 +13,8 @@ type IntroStep = {
 type IntroPanelProps = {
   steps: readonly IntroStep[];
   introStep: number;
+  isLastIntro: boolean;
+  isExiting: boolean;
   onPrev: () => void;
   onNext: () => void;
   onExit: () => void;
@@ -19,12 +23,12 @@ type IntroPanelProps = {
 export default function IntroPanel({
   steps,
   introStep,
+  isLastIntro,
+  isExiting,
   onPrev,
   onNext,
   onExit,
 }: IntroPanelProps) {
-  const isLastIntro = introStep === steps.length - 1;
-
   return (
     <div className="space-y-6">
       <div className="h-100">설명 내용</div>
@@ -45,19 +49,29 @@ export default function IntroPanel({
         {/* 중앙 */}
         <div className="justify-self-center">
           <div
-            className="flex items-center justify-center gap-2"
+            className="flex items-center justify-center gap-3"
             aria-label="온보딩 진행 상태"
           >
             {steps.map((_, index) => {
               const active = introStep === index;
-              return (
+              return active ? (
                 <span
                   key={index}
-                  aria-current={active ? 'step' : undefined}
-                  className={cn(
-                    'h-2 w-2 rounded-full transition-colors',
-                    active ? 'bg-primary' : 'bg-gray-200'
-                  )}
+                  aria-current="step"
+                  className="flex items-center"
+                >
+                  <Image
+                    src="/logo_pig.svg"
+                    alt="logo pig"
+                    width={25}
+                    height={25}
+                    className="animate-bounce"
+                  />
+                </span>
+              ) : (
+                <span
+                  key={index}
+                  className={cn('h-2 w-2 rounded-full', 'bg-gray-200')}
                 />
               );
             })}
@@ -67,7 +81,8 @@ export default function IntroPanel({
         {/* 오른쪽 */}
         <div className="justify-self-end">
           {isLastIntro ? (
-            <Button type="button" onClick={onExit}>
+            <Button type="button" onClick={onExit} disabled={isExiting}>
+              {isExiting && <Spinner />}
               시작하기
             </Button>
           ) : (

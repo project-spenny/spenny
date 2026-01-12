@@ -29,7 +29,7 @@ export const DatePicker = ({
   hideLabel = false,
 }: DatePickerProps) => {
   return (
-    <div className="flex items-center">
+    <div className="flex w-full items-center">
       {!hideLabel && <Label className="w-28 pr-2">{label}</Label>}
       <div className="w-full">
         <Popover>

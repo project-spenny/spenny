@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { THEME_COLOR } from '@/constants/colors';
 import { toast } from 'sonner';
 import useBudgetData from '@/hooks/useBudgetData';
