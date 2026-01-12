@@ -161,7 +161,6 @@ export default function TransactionSubmitForm({
         tags: [],
       });
       onSuccess();
-      onClose();
     } catch (error) {
       toast.warning('수정 실패');
     } finally {
@@ -188,7 +187,6 @@ export default function TransactionSubmitForm({
 
       toast.success('기록이 삭제되었습니다');
       onSuccess();
-      onClose();
     } catch (error) {
       toast.error('오류가 발생했습니다');
     } finally {
@@ -252,11 +250,12 @@ export default function TransactionSubmitForm({
               variant="outline"
               className="hover:text-destructive"
               onClick={handleDelete}
+              disabled={isSubmitting}
             >
               <Trash className="h-4 w-4" />
             </Button>
           )}
-          <Button type="submit" className="flex-1">
+          <Button type="submit" className="flex-1" disabled={isSubmitting}>
             {isSubmitting && <Spinner />}
             {mode === 'create' ? '저장' : '수정'}
           </Button>
