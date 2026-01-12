@@ -1,10 +1,9 @@
-import { Edit, HelpCircle, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-import { Badge } from '@/components/ui/badge';
+import BudgetCategoryEditItem from '@/components/budgets/common/BudgetCategoryEditItem';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Edit } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -13,7 +12,7 @@ import { cn } from '@/lib/utils';
 import useBudgetData from '@/hooks/useBudgetData';
 import useCategories from '@/hooks/useCategories';
 
-type CategoryBudgetSettingProps = {
+type BudgetCategorySettingProps = {
   selectedDate: Date;
   totalBudgetAmount: number;
   initialCategoryKey?: string | null;
@@ -27,7 +26,7 @@ const BudgetCategorySetting = ({
   initialCategoryKey,
   onSaveSuccess,
   onEditTotalBudget,
-}: CategoryBudgetSettingProps) => {
+}: BudgetCategorySettingProps) => {
   const {
     categoryBudgets,
     saveCategoryBudgets,
@@ -212,77 +211,19 @@ const BudgetCategorySetting = ({
           {isCategoriesLoading ? (
             <div>카테고리 목록 불러오는 중</div>
           ) : (
-            allCategories?.map((category) => {
-              const Icon = HelpCircle;
-
-              return (
-                <div
-                  key={category.category_key}
-                  className="flex items-center gap-2 py-1"
-                >
-                  {/* 아이콘 원형 배경 */}
-                  <div className="bg-secondary text-secondary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-                    <Icon size={20} />
-                  </div>
-
-                  {/* 카테고리명 */}
-                  <div className="flex flex-1 items-center gap-1">
-                    <p className="text-sm font-semibold">{category.name_ko}</p>
-                    {totalBudgetAmount > 0 &&
-                      Number(amounts[category.category_key]) > 0 && (
-                        <Badge className="bg-brand-subtle dark:bg-brand/10 text-brand px-2 py-0.5 text-xs font-semibold">
-                          {Math.round(
-                            (Number(amounts[category.category_key]) /
-                              totalBudgetAmount) *
-                              100
-                          )}
-                          %
-                        </Badge>
-                      )}
-                  </div>
-
-                  {/* 금액 입력부 */}
-                  <div className="relative w-36">
-                    <Input
-                      ref={(el) => {
-                        inputRefs.current[category.category_key] = el;
-                      }}
-                      type="text"
-                      placeholder="0"
-                      value={
-                        amounts[category.category_key]
-                          ? Number(
-                              amounts[category.category_key]
-                            ).toLocaleString()
-                          : ''
-                      }
-                      onChange={(e) =>
-                        handleAmountChange(
-                          category.category_key,
-                          e.target.value
-                        )
-                      }
-                      className="focus-visible:ring-brand-soft h-9 pr-7 text-right"
-                    />
-                    {amounts[category.category_key] && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-destructive absolute top-1/2 left-0.5 h-8 w-8 shrink-0 -translate-y-1/2"
-                        onClick={() =>
-                          handleResetCategory(category.category_key)
-                        }
-                      >
-                        <X size={16} />
-                      </Button>
-                    )}
-                    <span className="text-muted-foreground absolute top-1/2 right-2.5 -translate-y-1/2 text-xs">
-                      원
-                    </span>
-                  </div>
-                </div>
-              );
-            })
+            allCategories?.map((category) => (
+              <BudgetCategoryEditItem
+                key={category.category_key}
+                category={category}
+                amount={amounts[category.category_key]}
+                totalBudgetAmount={totalBudgetAmount}
+                onChange={handleAmountChange}
+                onReset={handleResetCategory}
+                inputRef={(el) => {
+                  inputRefs.current[category.category_key] = el;
+                }}
+              />
+            ))
           )}
         </div>
       </ScrollArea>
