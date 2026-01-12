@@ -2,7 +2,7 @@ import { AlertTriangle, BarChart3, BarChartHorizontal } from 'lucide-react';
 import { GroupDisplayInfo, MonthlySummary } from '@/types/budgetGuide';
 
 import { Card } from '@/components/ui/card';
-import DialogStepHeader from '@/components/budget/steps/DialogStepHeader';
+import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
