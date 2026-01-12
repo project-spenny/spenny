@@ -38,7 +38,6 @@ const Header = () => {
           />
         </Link>
       </h1>
-      <ModeToggle />
       {isGuest ? <GuestModeNotice /> : <ProfilePanelTrigger />}
     </header>
   );
