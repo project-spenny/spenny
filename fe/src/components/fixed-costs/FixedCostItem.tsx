@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react';
 import { IFixedRule } from '@/types/fixed-costs';
 import { formatFixedRuleCycle } from '@/utils/fixed-costs';
 import { THEME_COLOR } from '@/constants/colors';
+import { CATEGORIES } from '@/constants/categories';
 
 type FixedCostItemProps = {
   rule: IFixedRule;
@@ -17,6 +18,10 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
     onEdit?.(rule);
   };
 
+  const categoryName = CATEGORIES[rule.type].find(
+    (cat) => cat.category_key === rule.category_id
+  )?.name_ko;
+
   return (
     <Item
       variant="outline"
@@ -24,7 +29,8 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
       onClick={handleClick}
     >
       <ItemContent className="flex flex-row items-center">
-        <div className="flex w-24 flex-col gap-1">
+        {/* 좌측: 주기 + 금액 */}
+        <div className="flex w-32 flex-col gap-1">
           <span className="text-muted-foreground text-xs">
             {formatFixedRuleCycle(rule)}
           </span>
@@ -39,8 +45,15 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
           </span>
         </div>
 
-        <ItemTitle className="p-2 text-left">{rule.title}</ItemTitle>
+        {/* 중앙: 카테고리 + 제목 */}
+        <div className="pl-2">
+          <ItemTitle className="text-muted-foreground pl-2 text-left text-xs">
+            {categoryName}
+          </ItemTitle>
+          <ItemTitle className="p-2 text-left">{rule.title}</ItemTitle>
+        </div>
 
+        {/* 우측 */}
         <div className="ml-auto">
           <ChevronRight />
         </div>
