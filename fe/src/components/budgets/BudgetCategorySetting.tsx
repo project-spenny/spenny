@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import BudgetCategoryEditItem from '@/components/budgets/common/BudgetCategoryEditItem';
+import BudgetSummary from '@/components/budgets/common/BudgetSummary';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Edit } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { THEME_COLOR } from '@/constants/colors';
@@ -139,68 +137,11 @@ const BudgetCategorySetting = ({
           항목별 목표 금액을 정해보세요.
         </p>
 
-        <Card
-          className={cn(
-            'mt-4 gap-0 p-5 transition-all',
-            isOverBudget ? 'bg-destructive/5' : 'bg-primary-foreground'
-          )}
-        >
-          <div className="mb-4 flex items-end justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-bold">총 예산</p>
-
-              <div className="flex items-center gap-2 tracking-tight">
-                <span className="text-2xl font-bold">
-                  {totalAllocated.toLocaleString()}
-                </span>
-                <div className="text-muted-foreground flex items-center text-sm">
-                  /
-                  <div
-                    className="hover:text-primary flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 transition-colors hover:underline"
-                    onClick={onEditTotalBudget}
-                  >
-                    {totalBudgetAmount.toLocaleString()}원
-                    <Edit className="h-4 w-4" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="text-muted-foreground text-xs font-medium">
-                남은 예산
-              </p>
-              <p
-                className={cn(
-                  'text-lg font-bold tracking-tight',
-                  isOverBudget ? THEME_COLOR.EXPENSE : 'text-brand'
-                )}
-              >
-                {isOverBudget
-                  ? `-${Math.abs(remaining).toLocaleString()}`
-                  : remaining.toLocaleString()}
-                원
-              </p>
-            </div>
-          </div>
-
-          {/* 프로그레스 바 */}
-          <div className="space-y-2">
-            <Progress
-              value={Math.min((totalAllocated / totalBudgetAmount) * 100, 100)}
-              className="h-2"
-              indicatorClassName={isOverBudget ? 'bg-red-400' : 'bg-brand'}
-            />
-
-            {isOverBudget && (
-              <p
-                className={cn('mt-2 text-sm font-medium', THEME_COLOR.EXPENSE)}
-              >
-                ⚠️ 설정된 카테고리 예산이 총 예산을 초과했습니다.
-              </p>
-            )}
-          </div>
-        </Card>
+        <BudgetSummary
+          totalBudget={totalBudgetAmount}
+          totalAllocated={totalAllocated}
+          onEditTotal={onEditTotalBudget}
+        />
       </div>
 
       <Separator />
