@@ -15,9 +15,10 @@ import {
 
 type Props = {
   onDelete: () => void | Promise<void>;
+  disabled?: boolean;
 };
 
-export default function FixedCostDeleteDialog({ onDelete }: Props) {
+export default function FixedCostDeleteDialog({ onDelete, disabled }: Props) {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -34,13 +35,15 @@ export default function FixedCostDeleteDialog({ onDelete }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
+        <Button
           type="button"
-          className="text-muted-foreground hover:text-destructive inline-flex h-10 w-10 items-center justify-center rounded-md border"
+          variant="outline"
+          className="hover:text-destructive"
           aria-label="고정비 규칙 삭제"
+          disabled={disabled || pending}
         >
           <Trash className="h-4 w-4" />
-        </button>
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
