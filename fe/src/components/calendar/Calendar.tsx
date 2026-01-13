@@ -22,7 +22,7 @@ import { Item, ItemContent } from '../ui/item';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface DayData {
