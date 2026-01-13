@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import { Calendar as CalendarView } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { Day, type DayButton, getDefaultClassNames } from 'react-day-picker';
@@ -22,6 +22,7 @@ import { Item, ItemContent } from '../ui/item';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
+  children?: ReactNode;
 }
 
 interface DayData {
@@ -85,7 +86,11 @@ const CustomDay = ({
   );
 };
 
-export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
+export const Calendar = ({
+  currentMonth,
+  transactions,
+  children,
+}: CalendarProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -198,11 +203,10 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   };
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="flex flex-col items-center justify-center py-6 md:py-10">
+      <div className="flex flex-col items-center justify-center py-3 md:py-6">
         <span className="text-muted-foreground text-sm font-bold md:text-base">
           {year}
         </span>
-
         <div className="flex items-center justify-center gap-3">
           <Button
             variant="ghost"
@@ -225,7 +229,7 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
           </Button>
         </div>
       </div>
-
+      <div className="w-full">{children}</div>
       <CalendarView
         month={month}
         mode="single"

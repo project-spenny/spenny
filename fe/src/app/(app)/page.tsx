@@ -154,8 +154,9 @@ async function DataCalendar({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <DailyRecBar daily={daily} dailyChartData={dailyChartData} />
-      <Calendar currentMonth={currentMonth} transactions={transactions} />
+      <Calendar currentMonth={currentMonth} transactions={transactions}>
+        <DailyRecBar daily={daily} dailyChartData={dailyChartData} />
+      </Calendar>
     </div>
   );
 }

@@ -51,7 +51,7 @@ export default function TransactionClient() {
 
   return (
     <>
-      <div className="fixed bottom-0 z-50 m-4 flex gap-4 rounded-full bg-[#151515] p-1">
+      <div className="bg-foreground fixed bottom-0 z-50 m-4 flex gap-4 rounded-full p-1">
         <ReceiptCapture onResult={handleOCRResult} />
         <ReceiptMulti />
       </div>
