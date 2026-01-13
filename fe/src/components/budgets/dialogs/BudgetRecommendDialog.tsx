@@ -12,13 +12,13 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
-import BudgetResultStep from '@/components/budget/steps/BudgetResultStep';
+import BudgetResultStep from '@/components/budgets/steps/BudgetResultStep';
 import { Button } from '@/components/ui/button';
-import ExpenseAnalysisStep from '@/components/budget/steps/ExpenseAnalysisStep';
+import ExpenseAnalysisStep from '@/components/budgets/steps/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
-import SavingGoalStep from '@/components/budget/steps/SavingGoalStep';
+import SavingGoalStep from '@/components/budgets/steps/SavingGoalStep';
 import { Spinner } from '@/components/ui/spinner';
-import TemplateSelectionStep from '@/components/budget/steps/TemplateSelectionStep';
+import TemplateSelectionStep from '@/components/budgets/steps/TemplateSelectionStep';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {

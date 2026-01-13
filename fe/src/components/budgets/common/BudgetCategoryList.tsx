@@ -1,5 +1,5 @@
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
-import BudgetCategoryItem from '@/components/budget/BudgetCategoryItem';
+import BudgetCategoryItem from '@/components/budgets/common/BudgetCategoryItem';
 import { BudgetWithCategory } from '@/types/analysis';
 import { Button } from '@/components/ui/button';
 import { ListPlus } from 'lucide-react';

@@ -2,6 +2,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetTitle,
 } from '@/components/ui/sheet';
 
@@ -18,6 +19,7 @@ const SheetSide = ({ children, open, onOpenChange }: PanelProps) => {
       >
         {/* DialogTitle 누락 방지 */}
         <SheetTitle className="sr-only">SheetSide</SheetTitle>
+        <SheetDescription className="sr-only">SheetSide</SheetDescription>
 
         <SheetClose asChild>
           <Button
@@ -29,7 +31,9 @@ const SheetSide = ({ children, open, onOpenChange }: PanelProps) => {
           </Button>
         </SheetClose>
 
-        {children}
+        <div className="scrollbar-hide flex min-h-0 flex-1 flex-col overflow-y-auto">
+          {children}
+        </div>
       </SheetContent>
     </Sheet>
   );

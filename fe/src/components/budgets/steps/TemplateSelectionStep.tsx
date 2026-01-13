@@ -2,7 +2,7 @@ import { CheckCircle2, Info } from 'lucide-react';
 
 import { BUDGET_TEMPLATES } from '@/constants/budgetTemplates';
 import { Card } from '@/components/ui/card';
-import DialogStepHeader from '@/components/budget/steps/DialogStepHeader';
+import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { TemplateId } from '@/types/budgetGuide';
 import { cn } from '@/lib/utils';
 

@@ -2,6 +2,7 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerTitle,
 } from '@/components/ui/drawer';
 
@@ -20,12 +21,13 @@ const DrawerBottom = ({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent
         className={cn(
-          'flex-col overflow-hidden outline-none',
+          'flex flex-col overflow-hidden outline-none',
           isFull ? 'h-screen' : 'h-[80vh]'
         )}
       >
         {/* DialogTitle 누락 방지 */}
         <DrawerTitle className="sr-only">DrawerBottom</DrawerTitle>
+        <DrawerDescription className="sr-only">DrawerBottom</DrawerDescription>
 
         <div className="flex justify-end pr-2">
           <DrawerClose asChild>

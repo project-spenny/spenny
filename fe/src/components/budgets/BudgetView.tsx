@@ -3,17 +3,17 @@ import { useMemo, useState } from 'react';
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
-import BudgetCategoryList from '@/components/budget/BudgetCategoryList';
+import BudgetCategoryList from '@/components/budgets/common/BudgetCategoryList';
+import BudgetCategorySetting from '@/components/budgets/BudgetCategorySetting';
 import BudgetOverview from './BudgetOverview';
-import BudgetRecommendDialog from '@/components/budget/BudgetRecommendDialog';
-import BudgetSetupDialog from '@/components/budget/BudgetSetupDialog';
+import BudgetRecommendDialog from '@/components/budgets/dialogs/BudgetRecommendDialog';
+import BudgetSetupDialog from '@/components/budgets/dialogs/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';
 import { Calculator } from 'lucide-react';
-import CategoryBudgetSetting from '@/components/budget/CategoryBudgetSetting';
-import ConfirmDialog from '@/components/budget/ConfirmDialog';
+import ConfirmDialog from '@/components/budgets/dialogs/ConfirmDialog';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
-import UnbudgetedList from '@/components/budget/UnbudgetedList';
+import UnbudgetedList from '@/components/budgets/common/UnbudgetedList';
 import { useAnalysisData } from '@/hooks/useAnalysisData';
 import useBudgetData from '@/hooks/useBudgetData';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
@@ -171,7 +171,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
           if (!open) setActiveCategoryKey(null);
         }}
       >
-        <CategoryBudgetSetting
+        <BudgetCategorySetting
           selectedDate={selectedDate}
           totalBudgetAmount={totalBudget?.amount || 0}
           initialCategoryKey={activeCategoryKey}
