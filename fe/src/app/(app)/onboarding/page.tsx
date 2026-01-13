@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -18,8 +17,6 @@ import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
 
 export default function OnboardingPage() {
-  const router = useRouter();
-
   const [phase, setPhase] = useState<'form' | 'intro'>('form');
   const [introStep, setIntroStep] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -29,7 +26,8 @@ export default function OnboardingPage() {
   const exitOnboarding = () => {
     if (isExiting) return;
     setIsExiting(true);
-    router.replace('/');
+
+    window.location.replace('/');
   };
 
   const handleProfileSubmit = async (values: OnboardingProfileValues) => {
