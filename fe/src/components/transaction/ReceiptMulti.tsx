@@ -235,7 +235,7 @@ export default function ReceiptMulti() {
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogTrigger asChild>
           <Button
-            className="h-16 w-16 cursor-pointer rounded-full hover:bg-gray-800"
+            className="h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
             asChild
           >
             {loading ? <Spinner /> : <Images size={12} />}

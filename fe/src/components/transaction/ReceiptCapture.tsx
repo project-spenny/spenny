@@ -53,7 +53,7 @@ export default function ReceipCapture({ onResult }: OCRProps) {
     <div>
       <Button
         onClick={() => inputRef.current?.click()}
-        className="h-16 w-16 cursor-pointer rounded-full hover:bg-gray-800"
+        className="h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
         asChild
       >
         {loading ? <Spinner /> : <Camera size={12} />}
