@@ -240,6 +240,7 @@ const BudgetRecommendDialog = ({
                   variant="outline"
                   className="h-12 flex-1 cursor-pointer text-base font-bold"
                   onClick={() => setStep(step - 1)}
+                  disabled={isSubmitting}
                 >
                   이전
                 </Button>
