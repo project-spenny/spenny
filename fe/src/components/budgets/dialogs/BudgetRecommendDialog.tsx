@@ -189,7 +189,13 @@ const BudgetRecommendDialog = ({
   const spendableBudget = goalData.income - goalData.savingsAmount;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (isSubmitting) return; // 저장 중 닫기 방지
+        onOpenChange(isOpen);
+      }}
+    >
       <DialogContent className="flex h-[800px] w-full flex-col md:max-w-2xl">
         {/* 상단 Step 표시 */}
         <div className="px-6 pt-6">
