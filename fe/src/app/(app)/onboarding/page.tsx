@@ -66,7 +66,7 @@ export default function OnboardingPage() {
 
       <div className="relative flex min-h-dvh items-center justify-center p-4">
         <div className="w-full max-w-lg md:max-w-3xl">
-          <Card>
+          <Card className="max-h-[90dvh] overflow-hidden">
             <CardHeader className="relative space-y-2">
               {phase === 'form' ? (
                 <>
@@ -97,8 +97,7 @@ export default function OnboardingPage() {
                 </>
               )}
             </CardHeader>
-
-            <CardContent>
+            <CardContent className="max-h-[70dvh] overflow-y-auto">
               {phase === 'form' && serverError && (
                 <p className="mb-4 text-sm text-red-500">{serverError}</p>
               )}
