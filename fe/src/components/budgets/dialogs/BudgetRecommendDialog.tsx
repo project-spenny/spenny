@@ -67,7 +67,7 @@ const BudgetRecommendDialog = ({
     }
   }, [processedData]); // processedData가 로드되는 순간 실행됨
 
-  // open 상태가 false가 될 때 step을 1로 리셋
+  // 다이얼로그가 닫힐 때 상태 리셋
   useEffect(() => {
     if (!open) {
       const timer = setTimeout(() => {
@@ -75,6 +75,12 @@ const BudgetRecommendDialog = ({
         setSelectedTemplateId('keep-pattern');
         setBudgetDraft([]);
         setIsAdjusted(false);
+
+        setGoalData({
+          income: 0,
+          savingsAmount: 0,
+        });
+        setConfirmedSavings(0);
       }, 300);
       return () => clearTimeout(timer);
     }
