@@ -286,6 +286,7 @@ export const Calendar = ({
           {panelState.view === 'edit' && (
             <div className="space-y-2">
               <Button
+                variant={'ghost'}
                 onClick={() => {
                   setPanelState({ view: 'list' });
                 }}
