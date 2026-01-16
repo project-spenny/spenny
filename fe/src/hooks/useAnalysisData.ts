@@ -21,6 +21,14 @@ type CategoryGroup = {
   [key: string]: number;
 };
 
+const safeSyncTransactions = async (date: Date, through: string) => {
+  try {
+    await syncByMonthClient(date, through);
+  } catch (err) {
+    console.warn(`${date.getMonth() + 1}월 고정비 동기화 실패:`, err);
+  }
+};
+
 export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
   const [data, setData] = useState<AnalysisState>({
     current: [],
@@ -52,8 +60,8 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         const lastMonthThrough = minDate(prevEnd, today);
 
         await Promise.all([
-          syncByMonthClient(selectedDate, today), // 현재 달 : 오늘까지 생성
-          syncByMonthClient(lastMonthDate, lastMonthThrough), // 이전 달 : 오늘(or 월말)까지 생성
+          safeSyncTransactions(selectedDate, today), // 현재 달 : 오늘까지 생성
+          safeSyncTransactions(lastMonthDate, lastMonthThrough), // 이전 달 : 오늘(or 월말)까지 생성
         ]);
 
         // 서비스 함수 호출
