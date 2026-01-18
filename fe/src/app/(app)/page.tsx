@@ -51,6 +51,7 @@ export default async function Home({ searchParams }: PageProps) {
               selectedDate={params.selected_date}
               monthDate={monthDate}
             />
+            {/* <CalendarSkeleton /> */}
           </Suspense>
         </CalendarProvider>
       </TransactionProvider>
