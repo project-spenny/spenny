@@ -75,7 +75,7 @@ export const POST = async (request: Request) => {
                 type: 'text',
                 text: promptText,
               },
-              { type: 'image_url', image_url: { url: image } },
+              { type: 'image_url', image_url: { url: image, detail: 'low' } },
             ],
           },
         ],
