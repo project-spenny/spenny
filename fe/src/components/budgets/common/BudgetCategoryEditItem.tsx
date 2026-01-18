@@ -73,6 +73,7 @@ const BudgetCategoryEditItem = ({
         <Input
           ref={inputRef}
           type="text"
+          inputMode="numeric"
           placeholder="0"
           value={
             isFocused
