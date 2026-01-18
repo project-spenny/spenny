@@ -3,8 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import BudgetCategoryEditItem from '@/components/budgets/common/BudgetCategoryEditItem';
 import BudgetSummary from '@/components/budgets/common/BudgetSummary';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
 import useBudgetData from '@/hooks/useBudgetData';
@@ -92,8 +90,7 @@ const BudgetCategorySetting = ({
       if (!targetInput) return;
 
       targetInput.focus();
-      targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [initialCategoryKey, isCategoriesLoading]);
@@ -128,48 +125,42 @@ const BudgetCategorySetting = ({
 
   return (
     <div className="flex h-full flex-col px-8">
-      <div className="bg-background sticky top-0 space-y-1 pb-4">
-        <p className="text-xl font-bold">카테고리별 예산 설정</p>
-        <p className="text-muted-foreground text-sm font-medium">
+      <div className="bg-background sticky top-0 z-10 space-y-1 border-b pb-4">
+        <p className="text-lg font-bold md:text-xl">카테고리별 예산 설정</p>
+        <p className="text-muted-foreground text-xs font-medium md:text-sm">
           항목별 목표 금액을 정해보세요.
         </p>
+      </div>
 
+      {/* 카테고리 예산 설정 */}
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-2 py-2">
         <BudgetSummary
           totalBudget={totalBudgetAmount}
           totalAllocated={totalAllocated}
           onEditTotal={onEditTotalBudget}
         />
+
+        {isCategoriesLoading ? (
+          <div>카테고리 목록 불러오는 중</div>
+        ) : (
+          allCategories?.map((category) => (
+            <BudgetCategoryEditItem
+              key={category.category_key}
+              category={category}
+              amount={amounts[category.category_key] ?? ''}
+              totalBudgetAmount={totalBudgetAmount}
+              onChange={handleAmountChange}
+              onReset={handleResetCategory}
+              inputRef={(el) => {
+                inputRefs.current[category.category_key] = el;
+              }}
+            />
+          ))
+        )}
       </div>
 
-      <Separator />
-
-      {/* 카테고리 예산 설정 */}
-      <ScrollArea className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-5 px-2 py-4">
-          {isCategoriesLoading ? (
-            <div>카테고리 목록 불러오는 중</div>
-          ) : (
-            allCategories?.map((category) => (
-              <BudgetCategoryEditItem
-                key={category.category_key}
-                category={category}
-                amount={amounts[category.category_key] ?? ''}
-                totalBudgetAmount={totalBudgetAmount}
-                onChange={handleAmountChange}
-                onReset={handleResetCategory}
-                inputRef={(el) => {
-                  inputRefs.current[category.category_key] = el;
-                }}
-              />
-            ))
-          )}
-        </div>
-      </ScrollArea>
-
-      <Separator />
-
       {/* 하단 버튼 영역 */}
-      <div className="bg-background sticky bottom-0 space-y-4 border-t p-4">
+      <div className="bg-background sticky bottom-0 space-y-2 border-t pt-2 pb-4">
         {isOverBudget ? (
           <p
             className={cn('text-center text-sm font-bold', THEME_COLOR.EXPENSE)}
@@ -178,7 +169,7 @@ const BudgetCategorySetting = ({
           </p>
         ) : (
           !isDirty && (
-            <p className="text-muted-foreground text-center text-sm">
+            <p className="text-muted-foreground text-center text-xs md:text-sm">
               {categoryBudgets.length === 0
                 ? '카테고리별 예산 금액을 입력해주세요.'
                 : '기존에 설정된 금액과 동일합니다.'}
@@ -188,7 +179,7 @@ const BudgetCategorySetting = ({
 
         <Button
           className={cn(
-            'h-12 w-full cursor-pointer text-base',
+            'h-10 w-full cursor-pointer text-xs md:h-12 md:text-sm',
             isOverBudget && 'bg-red-400 hover:bg-red-500'
           )}
           onClick={handleSave}

@@ -22,7 +22,7 @@ const BudgetSummary = ({
   return (
     <Card
       className={cn(
-        'mt-4 gap-0 p-5 transition-all',
+        'mt-2 gap-0 p-5 transition-all',
         isOverBudget ? 'bg-destructive/5' : 'bg-primary-foreground'
       )}
     >
