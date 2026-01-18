@@ -22,19 +22,19 @@ const BudgetSummary = ({
   return (
     <Card
       className={cn(
-        'mt-2 gap-0 p-5 transition-all',
+        'my-2 gap-2 p-5 transition-all',
         isOverBudget ? 'bg-destructive/5' : 'bg-primary-foreground'
       )}
     >
-      <div className="mb-4 flex items-end justify-between">
+      <div className="flex flex-col items-start gap-2 md:flex-row md:items-end md:justify-between">
         <div className="space-y-1">
           <p className="text-sm font-bold">총 예산</p>
 
           <div className="flex items-center gap-2 tracking-tight">
-            <span className="text-2xl font-bold">
+            <span className="font-bold md:text-lg">
               {totalAllocated.toLocaleString()}
             </span>
-            <div className="text-muted-foreground flex items-center text-sm">
+            <div className="text-muted-foreground flex items-center text-xs md:text-sm">
               /
               <div
                 className="hover:text-primary flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 transition-colors hover:underline"
@@ -47,18 +47,18 @@ const BudgetSummary = ({
           </div>
         </div>
 
-        <div className="text-right">
+        <div className="md:text-right">
           <p className="text-muted-foreground text-xs font-medium">남은 예산</p>
           <p
             className={cn(
-              'text-lg font-bold tracking-tight',
+              'font-bold tracking-tight md:text-lg',
               isOverBudget ? THEME_COLOR.EXPENSE : 'text-brand'
             )}
           >
             {isOverBudget
               ? `-${Math.abs(remaining).toLocaleString()}`
               : remaining.toLocaleString()}
-            원
+            <span className="text-sm">원</span>
           </p>
         </div>
       </div>
@@ -72,7 +72,12 @@ const BudgetSummary = ({
         />
 
         {isOverBudget && (
-          <p className={cn('mt-2 text-sm font-medium', THEME_COLOR.EXPENSE)}>
+          <p
+            className={cn(
+              'mt-2 text-xs font-medium md:text-sm',
+              THEME_COLOR.EXPENSE
+            )}
+          >
             ⚠️ 설정된 카테고리 예산이 총 예산을 초과했습니다.
           </p>
         )}

@@ -51,7 +51,7 @@ const BudgetCategoryEditItem = ({
 
       {/* 카테고리명 */}
       <div className="flex flex-1 items-center gap-1">
-        <p className="text-sm font-semibold">{category.name_ko}</p>
+        <p className="text-xs font-semibold md:text-sm">{category.name_ko}</p>
         {percent > 0 && (
           <Badge
             className={cn(
@@ -85,7 +85,7 @@ const BudgetCategoryEditItem = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onChange={(e) => onChange(category.category_key, e.target.value)}
-          className="focus-visible:ring-brand-soft h-9 pr-7 text-right"
+          className="focus-visible:ring-brand-soft h-9 pr-7 text-right text-sm"
         />
         {amount && (
           <Button

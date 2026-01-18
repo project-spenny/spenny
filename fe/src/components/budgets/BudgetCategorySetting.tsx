@@ -160,16 +160,14 @@ const BudgetCategorySetting = ({
       </div>
 
       {/* 하단 버튼 영역 */}
-      <div className="bg-background sticky bottom-0 space-y-2 border-t pt-2 pb-4">
+      <div className="bg-background sticky bottom-0 space-y-2 border-t pt-2 pb-4 text-xs md:text-sm">
         {isOverBudget ? (
-          <p
-            className={cn('text-center text-sm font-bold', THEME_COLOR.EXPENSE)}
-          >
+          <p className={cn('text-center font-bold', THEME_COLOR.EXPENSE)}>
             총 예산을 늘리거나 카테고리 금액을 조절해주세요.
           </p>
         ) : (
           !isDirty && (
-            <p className="text-muted-foreground text-center text-xs md:text-sm">
+            <p className="text-muted-foreground text-center">
               {categoryBudgets.length === 0
                 ? '카테고리별 예산 금액을 입력해주세요.'
                 : '기존에 설정된 금액과 동일합니다.'}
@@ -179,7 +177,7 @@ const BudgetCategorySetting = ({
 
         <Button
           className={cn(
-            'h-10 w-full cursor-pointer text-xs md:h-12 md:text-sm',
+            'h-10 w-full cursor-pointer md:h-12',
             isOverBudget && 'bg-red-400 hover:bg-red-500'
           )}
           onClick={handleSave}
