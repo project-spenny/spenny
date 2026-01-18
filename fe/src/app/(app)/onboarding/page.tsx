@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -18,8 +17,6 @@ import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
 
 export default function OnboardingPage() {
-  const router = useRouter();
-
   const [phase, setPhase] = useState<'form' | 'intro'>('form');
   const [introStep, setIntroStep] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -29,7 +26,8 @@ export default function OnboardingPage() {
   const exitOnboarding = () => {
     if (isExiting) return;
     setIsExiting(true);
-    router.replace('/');
+
+    window.location.replace('/');
   };
 
   const handleProfileSubmit = async (values: OnboardingProfileValues) => {
@@ -68,7 +66,7 @@ export default function OnboardingPage() {
 
       <div className="relative flex min-h-dvh items-center justify-center p-4">
         <div className="w-full max-w-lg md:max-w-3xl">
-          <Card>
+          <Card className="max-h-[90dvh] overflow-hidden">
             <CardHeader className="relative space-y-2">
               {phase === 'form' ? (
                 <>
@@ -99,8 +97,7 @@ export default function OnboardingPage() {
                 </>
               )}
             </CardHeader>
-
-            <CardContent>
+            <CardContent className="max-h-[70dvh] overflow-y-auto">
               {phase === 'form' && serverError && (
                 <p className="mb-4 text-sm text-red-500">{serverError}</p>
               )}

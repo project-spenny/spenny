@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import BudgetResultRow from '@/components/analysis/Budget/BudgetResultRow';
+import BudgetResultRow from '@/components/budgets/steps/BudgetResultRow';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';
 
 type BudgetResultSectionProps = {

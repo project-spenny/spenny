@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '../ui/button';
 import { supabase } from '@/utils/supabase/client';
@@ -14,6 +14,7 @@ import { TitleInput } from './common/TitleInput';
 import { TypeSelector } from './common/TypeSelector';
 import { CategorySelector } from './common/CategorySelector';
 import { QuickAmountButtons } from './common/QuickAmountButtons';
+import { Spinner } from '../ui/spinner';
 
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';
@@ -76,6 +77,8 @@ export default function TransactionSubmitForm({
     UpdateField,
   } = useTransactionForm(initialFormData);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     if (defaultValue) {
       setFormData({
@@ -91,13 +94,15 @@ export default function TransactionSubmitForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // 중복 제출 방지
 
     const errorMsg = validateFormData();
-
     if (errorMsg) {
       toast(errorMsg);
       return;
     }
+
+    setIsSubmitting(true);
     try {
       const {
         data: { user },
@@ -156,17 +161,19 @@ export default function TransactionSubmitForm({
         tags: [],
       });
       onSuccess();
-      onClose();
     } catch (error) {
       toast.warning('수정 실패');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
     if (!transaction) return;
+    if (isSubmitting) return;
 
     if (!confirm('삭제하시겠습니까?')) return;
-
+    setIsSubmitting(true);
     try {
       const { error } = await supabase
         .from('transactions')
@@ -180,76 +187,79 @@ export default function TransactionSubmitForm({
 
       toast.success('기록이 삭제되었습니다');
       onSuccess();
-      onClose();
     } catch (error) {
       toast.error('오류가 발생했습니다');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto flex h-full w-full flex-col space-y-6 p-10 pt-2"
+      className="mx-auto flex min-h-full w-full flex-1 flex-col px-10"
     >
-      <div className="bg-background sticky top-0 flex items-center justify-between border-b pb-4">
+      <div className="bg-background sticky top-0 z-10 flex items-center justify-between border-b pb-4">
         <Label className="text-xl">
           {mode === 'create' ? '가계부 작성' : '가계부 수정'}
         </Label>
       </div>
 
-      <TitleInput
-        value={formData.title}
-        onChange={(title) => UpdateField('title', title)}
-      />
-
-      <TypeSelector
-        value={formData.type}
-        onChange={(type) => {
-          UpdateField('type', type);
-          UpdateField('category_id', '');
-        }}
-      />
-
-      {formData.type !== '' && (
-        <CategorySelector
-          transactionType={formData.type}
-          value={formData.category_id}
-          open={categoryOpen}
-          onOpenChange={setCategoryOpen}
-          onChange={(category) => UpdateField('category_id', category)}
+      <div className="min-h-0 flex-1 space-y-6 py-6">
+        <TitleInput
+          value={formData.title}
+          onChange={(title) => UpdateField('title', title)}
         />
-      )}
 
-      <AmountInput
-        value={formData.amount}
-        onChange={(value) => UpdateField('amount', value)}
-      />
+        <TypeSelector
+          value={formData.type}
+          onChange={(type) => {
+            UpdateField('type', type);
+            UpdateField('category_id', '');
+          }}
+        />
 
-      <DatePicker
-        value={formData.date}
-        onChange={(date) => UpdateField('date', date)}
-      />
-
-      <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
-
-      <div className="mt-auto flex gap-2 border-t p-4">
-        {mode === 'edit' && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleDelete()}
-            className="h-12 w-12"
-          >
-            <Trash />
-          </Button>
+        {formData.type !== '' && (
+          <CategorySelector
+            transactionType={formData.type}
+            value={formData.category_id}
+            open={categoryOpen}
+            onOpenChange={setCategoryOpen}
+            onChange={(category) => UpdateField('category_id', category)}
+          />
         )}
-        <Button
-          type="submit"
-          className="h-12 flex-1"
-          onClick={(e) => handleSubmit(e)}
-        >
-          {mode === 'create' ? '저장' : '수정'}
-        </Button>
+
+        <AmountInput
+          value={formData.amount}
+          onChange={(value) => UpdateField('amount', value)}
+        />
+
+        <DatePicker
+          value={formData.date}
+          onChange={(date) => UpdateField('date', date)}
+        />
+
+        <TagInput tags={formData.tags} addTag={addTag} removeTag={removeTag} />
+      </div>
+
+      <div className="bg-background sticky bottom-0 z-10 border-t py-4">
+        <div className="flex gap-2">
+          {mode === 'edit' && (
+            <Button
+              type="button"
+              variant="outline"
+              className="hover:text-destructive"
+              onClick={handleDelete}
+              disabled={isSubmitting}
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
+          <Button type="submit" className="flex-1" disabled={isSubmitting}>
+            {isSubmitting && <Spinner />}
+            {mode === 'create' ? '저장' : '수정'}
+          </Button>
+        </div>
       </div>
     </form>
   );

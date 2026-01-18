@@ -32,17 +32,18 @@ const BudgetSetupDialog = ({
     defaultAmount ? defaultAmount.toLocaleString() : ''
   );
   const [isTouched, setIsTouched] = useState(false); // 사용자가 입력창을 건드렸는지 여부
+  const [isFocused, setIsFocused] = useState(false);
 
   const { saveBudget, isSaving } = useBudgetData(selectedDate);
 
   // 유효성 검사
-  const numericAmount = Number(amount.replace(/[^0-9]/g, ''));
+  const numericAmount = Number(amount);
   const isInvalid = numericAmount <= 0;
   // 변경 여부 확인 (기존 값과 비교)
   const isChanged = defaultAmount !== numericAmount;
 
   useEffect(() => {
-    if (open) setAmount(defaultAmount ? defaultAmount.toLocaleString() : '');
+    if (open) setAmount(defaultAmount ? defaultAmount.toString() : '');
 
     setIsTouched(false);
   }, [open, defaultAmount]);
@@ -69,14 +70,14 @@ const BudgetSetupDialog = ({
     if (!isTouched) setIsTouched(true);
 
     const value = e.target.value.replace(/[^0-9]/g, '');
-    setAmount(value ? Number(value).toLocaleString() : '');
+    setAmount(value);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">💰 월 예산 설정</DialogTitle>
+          <DialogTitle className="text-xl">월 예산 설정</DialogTitle>
           <DialogDescription>
             지출 계획을 세우기 위해 이번 달 총 예산을 입력해주세요.
           </DialogDescription>
@@ -89,10 +90,18 @@ const BudgetSetupDialog = ({
               id="total-amount"
               type="text"
               inputMode="numeric"
-              placeholder="예: 500,000"
-              value={amount}
+              placeholder="예: 1,000,000"
+              value={
+                isFocused
+                  ? amount
+                  : amount !== ''
+                    ? Number(amount).toLocaleString()
+                    : ''
+              }
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               onChange={handleAmountChange}
-              className="text-lg font-semibold"
+              className="focus-visible:ring-brand-soft text-lg font-semibold"
             />
 
             {isTouched && isInvalid && (

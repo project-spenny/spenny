@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import { Calendar as CalendarView } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { Day, type DayButton, getDefaultClassNames } from 'react-day-picker';
@@ -22,6 +22,7 @@ import { Item, ItemContent } from '../ui/item';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
+  children?: ReactNode;
 }
 
 interface DayData {
@@ -35,7 +36,8 @@ interface PanelState {
 }
 
 const CALENDAR_CELL_HEIGHT =
-  '[&_td]:!h-[60px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
+  '[&_td]:!h-[50px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
+
 const CustomDay = ({
   day,
   modifiers,
@@ -55,19 +57,20 @@ const CustomDay = ({
       data-selected-single={modifiers.selected}
       {...props}
       className={cn(
-        'flex flex-col items-center justify-start gap-1 p-2 pt-1',
-        'aspect-square w-full',
-        'h-full w-full',
+        'flex flex-col items-center justify-start gap-1',
+        'aspect-square h-full w-full',
+        'p-0.5 sm:p-2 sm:pt-1',
+        'gap-0 sm:gap-1',
         CALENDAR_CELL_HEIGHT,
         defaultClassNames.day
       )}
     >
-      <div className="flex flex-col gap-0.5 sm:gap-1 md:gap-2">
+      <div className="flex flex-col gap-0.5 sm:gap-0.5 md:gap-1">
         <span className="text-sm font-medium sm:text-base md:text-lg">
           {day.date.getDate()}
         </span>
         {dayData && (dayData.income > 0 || dayData.expense > 0) && (
-          <div className="flex flex-col text-[8px] sm:text-[10px] md:text-xs">
+          <div className="flex flex-col text-[7px] sm:text-[10px] md:text-xs">
             {dayData.income > 0 && (
               <span className="text-blue-500">
                 +{dayData.income.toLocaleString()}
@@ -85,7 +88,11 @@ const CustomDay = ({
   );
 };
 
-export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
+export const Calendar = ({
+  currentMonth,
+  transactions,
+  children,
+}: CalendarProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -198,11 +205,10 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
   };
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="flex flex-col items-center justify-center py-6 md:py-10">
+      <div className="flex flex-col items-center justify-center py-3 md:py-6">
         <span className="text-muted-foreground text-sm font-bold md:text-base">
           {year}
         </span>
-
         <div className="flex items-center justify-center gap-3">
           <Button
             variant="ghost"
@@ -225,7 +231,7 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
           </Button>
         </div>
       </div>
-
+      <div className="w-full">{children}</div>
       <CalendarView
         month={month}
         mode="single"
@@ -234,7 +240,7 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
         onMonthChange={handleMonthChange}
         onDayClick={(day) => open(day)}
         className={cn(
-          'w-full rounded-md border shadow-sm',
+          'w-full rounded-md border border-none shadow-sm',
           '[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden',
           '[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_td]:p-0',
           CALENDAR_CELL_HEIGHT
@@ -280,6 +286,7 @@ export const Calendar = ({ currentMonth, transactions }: CalendarProps) => {
           {panelState.view === 'edit' && (
             <div className="space-y-2">
               <Button
+                variant={'ghost'}
                 onClick={() => {
                   setPanelState({ view: 'list' });
                 }}

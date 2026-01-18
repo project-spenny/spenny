@@ -12,13 +12,13 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
-import BudgetResultStep from '@/components/analysis/Budget/BudgetResultStep';
+import BudgetResultStep from '@/components/budgets/steps/BudgetResultStep';
 import { Button } from '@/components/ui/button';
-import ExpenseAnalysisStep from '@/components/analysis/Budget/ExpenseAnalysisStep';
+import ExpenseAnalysisStep from '@/components/budgets/steps/ExpenseAnalysisStep';
 import { Progress } from '@/components/ui/progress';
-import SavingGoalStep from '@/components/analysis/Budget/SavingGoalStep';
+import SavingGoalStep from '@/components/budgets/steps/SavingGoalStep';
 import { Spinner } from '@/components/ui/spinner';
-import TemplateSelectionStep from '@/components/analysis/Budget/TemplateSelectionStep';
+import TemplateSelectionStep from '@/components/budgets/steps/TemplateSelectionStep';
 import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
@@ -67,7 +67,7 @@ const BudgetRecommendDialog = ({
     }
   }, [processedData]); // processedData가 로드되는 순간 실행됨
 
-  // open 상태가 false가 될 때 step을 1로 리셋
+  // 다이얼로그가 닫힐 때 상태 리셋
   useEffect(() => {
     if (!open) {
       const timer = setTimeout(() => {
@@ -75,6 +75,12 @@ const BudgetRecommendDialog = ({
         setSelectedTemplateId('keep-pattern');
         setBudgetDraft([]);
         setIsAdjusted(false);
+
+        setGoalData({
+          income: 0,
+          savingsAmount: 0,
+        });
+        setConfirmedSavings(0);
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -183,11 +189,17 @@ const BudgetRecommendDialog = ({
   const spendableBudget = goalData.income - goalData.savingsAmount;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (isSubmitting) return; // 저장 중 닫기 방지
+        onOpenChange(isOpen);
+      }}
+    >
       <DialogContent className="flex h-[800px] w-full flex-col md:max-w-2xl">
         {/* 상단 Step 표시 */}
         <div className="px-6 pt-6">
-          <Progress value={(step / 4) * 100} className="h-1" />
+          <Progress value={(step / 4) * 100} className="[&>div]:bg-brand h-2" />
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -240,6 +252,7 @@ const BudgetRecommendDialog = ({
                   variant="outline"
                   className="h-12 flex-1 cursor-pointer text-base font-bold"
                   onClick={() => setStep(step - 1)}
+                  disabled={isSubmitting}
                 >
                   이전
                 </Button>

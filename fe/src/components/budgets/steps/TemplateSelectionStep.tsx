@@ -1,12 +1,8 @@
 import { CheckCircle2, Info } from 'lucide-react';
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 import { BUDGET_TEMPLATES } from '@/constants/budgetTemplates';
 import { Card } from '@/components/ui/card';
+import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { TemplateId } from '@/types/budgetGuide';
 import { cn } from '@/lib/utils';
 
@@ -23,20 +19,12 @@ const TemplateSelectionStep = ({
 }: TemplateSelectionStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
-      <DialogHeader className="space-y-2 break-keep">
-        <div className="space-y-1">
-          <div className="text-primary font-bold uppercase">
-            Step 3. 예산 템플릿
-          </div>
-          <DialogTitle className="text-xl font-bold">
-            어떤 방식으로 예산을 짤까요?
-          </DialogTitle>
-        </div>
-
-        <DialogDescription>
-          선택하신 템플릿에 따라 가용 예산이 카테고리별로 자동 배분됩니다.
-        </DialogDescription>
-      </DialogHeader>
+      <DialogStepHeader
+        step={3}
+        subTitle="예산 템플릿"
+        title="어떤 방식으로 예산을 짤까요?"
+        description="선택하신 템플릿에 따라 가용 예산이 카테고리별로 자동 배분됩니다."
+      />
 
       {/* 템플릿 선택 섹션 */}
       <section className="flex flex-col gap-4">
@@ -48,10 +36,10 @@ const TemplateSelectionStep = ({
               key={template.id}
               onClick={() => onSelect(template.id)}
               className={cn(
-                'hover:border-primary/50 relative cursor-pointer gap-1 border-2 p-5 text-left transition-all',
+                'relative cursor-pointer gap-1 border-2 p-5 text-left transition-all',
                 isSelected
-                  ? 'border-primary bg-primary/5 shadow-md'
-                  : 'border-border'
+                  ? 'border-brand bg-brand-subtle dark:bg-brand/10 shadow-md'
+                  : 'hover:border-brand-soft border-border'
               )}
             >
               <div className="flex items-center justify-between">
@@ -59,13 +47,15 @@ const TemplateSelectionStep = ({
                   className={cn(
                     'rounded-full px-2 py-1 text-xs font-bold',
                     isSelected
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'bg-brand text-primary-foreground'
                       : 'bg-muted text-muted-foreground'
                   )}
                 >
                   {template.subtitle}
                 </span>
-                {isSelected && <CheckCircle2 className="h-5 w-5 shrink-0" />}
+                {isSelected && (
+                  <CheckCircle2 className="text-brand-strong h-5 w-5 shrink-0" />
+                )}
               </div>
 
               <div>

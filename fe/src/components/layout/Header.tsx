@@ -1,9 +1,12 @@
 'use client';
 
+import GuestModeNotice from '../common/GuestModeNotice';
+import Image from 'next/image';
+import Link from 'next/link';
+import ModeToggle from '../common/ModeToggle';
 import { Profile } from '@/schemas/profile';
 import ProfilePanelTrigger from '../common/ProfilePanelTrigger';
 import { useQuery } from '@tanstack/react-query';
-import GuestModeNotice from '../common/GuestModeNotice';
 
 async function fetchProfile(): Promise<Profile> {
   const res = await fetch('/api/profile');
@@ -21,8 +24,20 @@ const Header = () => {
   const isGuest = !!profile?.is_guest;
 
   return (
-    <header className="bg-secondary fixed top-0 z-10 flex h-16 w-full items-center justify-between border-b p-2">
-      <h1 className="px-4 text-2xl font-bold">Spenny</h1>
+    <header className="bg-background fixed top-0 z-10 flex h-16 w-full items-center justify-between border-b p-2">
+      <h1 className="shrink-0 px-2 pt-1">
+        <Link href="/">
+          <Image
+            src="/logo_horizontal.svg"
+            alt="Spenny"
+            width={180}
+            height={80}
+            draggable="false"
+            className="h-auto w-36 md:w-[180px]"
+            priority
+          />
+        </Link>
+      </h1>
       {isGuest ? <GuestModeNotice /> : <ProfilePanelTrigger />}
     </header>
   );

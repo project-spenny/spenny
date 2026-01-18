@@ -1,12 +1,8 @@
 import { AlertTriangle, BarChart3, BarChartHorizontal } from 'lucide-react';
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { GroupDisplayInfo, MonthlySummary } from '@/types/budgetGuide';
 
 import { Card } from '@/components/ui/card';
+import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
@@ -29,26 +25,20 @@ const ExpenseAnalysisStep = ({
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
-      <DialogHeader className="space-y-2 break-keep">
-        <div className="space-y-1">
-          <div className="text-primary font-bold uppercase">
-            Step 1. 소비 분석
-          </div>
-
-          <DialogTitle className="text-xl leading-tight font-bold">
+      <DialogStepHeader
+        step={1}
+        subTitle="소비 분석"
+        title={
+          <>
             최근 {activeMonths}개월간 월 평균{' '}
-            <span className="text-primary">
+            <span className="text-brand">
               {Math.floor(avgTotal).toLocaleString()}원
             </span>
             을 지출했어요
-          </DialogTitle>
-        </div>
-
-        <DialogDescription className="text-sm">
-          최근 {activeMonths}개월간의 소비 패턴을 분석해 현재 지출 흐름을
-          보여드려요.
-        </DialogDescription>
-      </DialogHeader>
+          </>
+        }
+        description={`최근 ${activeMonths}개월간의 소비 패턴을 분석해 현재 지출 흐름을 보여드려요.`}
+      />
 
       {/* 데이터 부족 알림 배너 (1~2개월인 경우에만 표시) */}
       {isFewData && (
@@ -81,14 +71,14 @@ const ExpenseAnalysisStep = ({
                 key={m.month}
                 className="flex h-full flex-1 flex-col items-center justify-end gap-2"
               >
-                <span className="text-muted-foreground text-xs font-bold tracking-tight">
+                <span className="text-xs font-bold tracking-tight">
                   {Math.floor(m.total).toLocaleString()}원
                 </span>
                 <div
                   style={{ height: `${height * 0.8}%` }}
-                  className="bg-primary/80 w-full max-w-10 rounded-t-md"
+                  className="bg-brand w-full max-w-10 rounded-t-md"
                 />
-                <span className="text-xs font-medium">
+                <span className="text-xs font-bold">
                   {Number(m.month.split('-')[1])}월
                 </span>
               </div>

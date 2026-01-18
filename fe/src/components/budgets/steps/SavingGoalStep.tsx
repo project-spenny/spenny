@@ -1,10 +1,5 @@
-import {
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-
 import { AlertTriangle } from 'lucide-react';
+import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 
@@ -63,20 +58,12 @@ const SavingGoalStep = ({
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300">
-      <DialogHeader className="space-y-2 break-keep">
-        <div className="space-y-1">
-          <div className="text-primary font-bold uppercase">
-            Step 2. 저축 및 가용 예산 목표 설정
-          </div>
-          <DialogTitle className="text-xl font-bold break-keep">
-            얼마를 저축하고 얼마를 쓰실 건가요?
-          </DialogTitle>
-        </div>
-
-        <DialogDescription className="break-keep">
-          {titleDesc}
-        </DialogDescription>
-      </DialogHeader>
+      <DialogStepHeader
+        step={2}
+        subTitle="저축 및 가용 예산 목표 설정"
+        title="얼마를 저축하고 얼마를 쓰실 건가요?"
+        description={titleDesc}
+      />
 
       {/* 수입 입력 섹션 */}
       <div className="flex items-center justify-between rounded-xl">
@@ -86,7 +73,7 @@ const SavingGoalStep = ({
           </Label>
         </div>
 
-        <div className="border-primary/20 focus-within:border-primary flex w-fit items-center gap-1 border-b-2">
+        <div className="border-primary/20 focus-within:border-brand flex w-fit items-center gap-1 border-b-2">
           <input
             id="income"
             type="text"
@@ -109,7 +96,7 @@ const SavingGoalStep = ({
             </Label>
           </div>
 
-          <div className="border-primary/20 focus-within:border-primary flex items-center gap-1 border-b-2">
+          <div className="border-primary/20 focus-within:border-brand flex items-center gap-1 border-b-2">
             <input
               id="saving"
               type="text"
@@ -129,7 +116,7 @@ const SavingGoalStep = ({
           onValueChange={handleSliderChange}
           max={70} // 최대 70%
           step={1}
-          className="py-2"
+          className="**:data-[slot=slider-range]:bg-brand py-2"
         />
 
         <div className="flex flex-col gap-2">
@@ -152,7 +139,7 @@ const SavingGoalStep = ({
       {/* 예산 미리보기 결과 */}
       <div className="space-y-2 py-2">
         <p className="font-bold">사용 가능한 한 달 예산</p>
-        <p className="text-primary mt-1 text-2xl font-black tracking-tight">
+        <p className="text-brand mt-1 text-2xl font-black tracking-tight">
           {Math.max(0, spendableBudget).toLocaleString()}원
         </p>
       </div>

@@ -1,3 +1,4 @@
+import { BudgetWithCategory } from '@/types/analysis';
 import { getMonthRange } from '@/utils/date';
 import { supabase } from '@/utils/supabase/client';
 
@@ -21,8 +22,11 @@ export const fetchBudgets = async (date: Date) => {
   const { data, error } = await supabase
     .from('budgets')
     .select(
-      `*, 
-      categories!category_id (
+      `id,
+      amount,
+      budget_month,
+      category_id,
+      category:categories!category_id (
         name_ko,
         category_key
       )`
@@ -31,7 +35,16 @@ export const fetchBudgets = async (date: Date) => {
     .eq('budget_month', startDate);
 
   if (error) throw error;
-  return data;
+
+  // 단일 객체로 정규화
+  const normalized: BudgetWithCategory[] = (data ?? []).map((t) => ({
+    ...t,
+    category: Array.isArray(t.category) // category가 배열인지 검사
+      ? (t.category[0] ?? null)
+      : (t.category ?? null),
+  }));
+
+  return normalized;
 };
 
 // 예산 데이터 저장 및 수정 (Upsert)

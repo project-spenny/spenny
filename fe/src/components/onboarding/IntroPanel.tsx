@@ -5,9 +5,21 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Spinner } from '../ui/spinner';
 
+type IntroMedia =
+  | {
+      src: string;
+      alt?: string;
+    }
+  | {
+      src: string;
+      alt?: string;
+      caption?: string;
+    };
+
 type IntroStep = {
   title: string;
   description: string;
+  media: readonly IntroMedia[];
 };
 
 type IntroPanelProps = {
@@ -29,9 +41,26 @@ export default function IntroPanel({
   onNext,
   onExit,
 }: IntroPanelProps) {
+  const step = steps[introStep];
+
   return (
     <div className="space-y-6">
-      <div className="h-100">설명 내용</div>
+      <div className="flex gap-3 overflow-hidden">
+        {step.media.map((item, index) => (
+          <div
+            key={`${introStep}-${index}`}
+            className="relative h-70 w-full md:h-90"
+          >
+            <Image
+              src={item.src}
+              alt={item.alt ?? step.title}
+              fill
+              unoptimized
+              className="object-contain"
+            />
+          </div>
+        ))}
+      </div>
       {/* 하단 컨트롤 */}
       <div className="grid grid-cols-3 items-center">
         {/* 왼쪽 */}

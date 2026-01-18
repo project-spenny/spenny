@@ -19,6 +19,7 @@ import {
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 import FixedCostDeleteDialog from './FixedCostDeleteDialog';
+import { Spinner } from '../ui/spinner';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -36,6 +37,7 @@ export default function FixedCostSubmitForm({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingPayload, setPendingPayload] =
     useState<CreateFixedRuleInput | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     formData,
@@ -47,6 +49,7 @@ export default function FixedCostSubmitForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // 중복 제출 방지
 
     const errorMsg = validateFormData();
     if (errorMsg) {
@@ -73,6 +76,7 @@ export default function FixedCostSubmitForm({
       setConfirmOpen(true);
       return;
     }
+    setIsSubmitting(true);
 
     try {
       await createFixedRule(payload);
@@ -80,6 +84,8 @@ export default function FixedCostSubmitForm({
       onSuccess(); // 고정비 목록 갱신
     } catch {
       toast.error('고정비 추가에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -90,7 +96,9 @@ export default function FixedCostSubmitForm({
 
   const handleApplyIncludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await updateFixedRuleWithScope({
         id: ruleId,
@@ -103,12 +111,16 @@ export default function FixedCostSubmitForm({
       onSuccess();
     } catch {
       toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleApplyExcludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await updateFixedRuleWithScope({
         id: ruleId,
@@ -121,12 +133,16 @@ export default function FixedCostSubmitForm({
       onSuccess();
     } catch {
       toast.error('고정비 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDeleteRule = async () => {
     if (!ruleId) return;
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await deleteFixedRule(ruleId);
       toast.success('고정비 규칙이 삭제되었습니다.');
@@ -135,27 +151,28 @@ export default function FixedCostSubmitForm({
       toast.error(
         '고정비 규칙 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.'
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex min-h-dvh flex-col px-6">
+    <div className="flex flex-1 flex-col">
       <form
         onSubmit={handleSubmit}
-        className="mx-auto flex min-h-dvh w-full flex-col p-10 pt-2"
+        className="mx-auto flex min-h-full w-full flex-1 flex-col px-10"
       >
-        <div className="sticky top-0 flex items-center justify-between border-b pb-4">
+        <div className="bg-background sticky top-0 z-10 flex items-center justify-between border-b pb-4">
           <Label className="text-xl">
             {mode === 'create' ? '고정비 추가' : '고정비 수정'}
           </Label>
         </div>
 
-        <div className="scrollbar-hide flex-1 space-y-6 overflow-y-auto pt-6 pb-24">
+        <div className="min-h-0 flex-1 space-y-6 py-6">
           <TitleInput
             value={formData.title}
             onChange={(title) => UpdateField('title', title)}
           />
-
           <TypeSelector
             value={formData.type}
             onChange={(type) => {
@@ -163,7 +180,6 @@ export default function FixedCostSubmitForm({
               UpdateField('category_id', '');
             }}
           />
-
           <CategorySelector
             transactionType={formData.type}
             value={formData.category_id}
@@ -171,12 +187,10 @@ export default function FixedCostSubmitForm({
             onOpenChange={setCategoryOpen}
             onChange={(category) => UpdateField('category_id', category)}
           />
-
           <AmountInput
             value={formData.amount}
             onChange={(amount) => UpdateField('amount', amount)}
           />
-
           {/* 고정비 영역 */}
           <FixedCostScheduleFields
             formData={formData}
@@ -184,15 +198,22 @@ export default function FixedCostSubmitForm({
           />
         </div>
 
-        <div className="bg-background sticky bottom-0 border-t pt-4 pb-4">
+        <div className="bg-background sticky bottom-0 z-10 border-t py-4">
           {mode === 'create' ? (
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && <Spinner />}
               저장
             </Button>
           ) : (
             <div className="flex items-center gap-2">
-              {ruleId && <FixedCostDeleteDialog onDelete={handleDeleteRule} />}
-              <Button type="submit" className="flex-1">
+              {ruleId && (
+                <FixedCostDeleteDialog
+                  onDelete={handleDeleteRule}
+                  disabled={isSubmitting}
+                />
+              )}
+              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                {isSubmitting && <Spinner />}
                 수정
               </Button>
             </div>
@@ -206,6 +227,7 @@ export default function FixedCostSubmitForm({
         cycle={formData.cycle as 'WEEKLY' | 'MONTHLY'}
         onApplyIncludeCurrent={handleApplyIncludeCurrent}
         onApplyExcludeCurrent={handleApplyExcludeCurrent}
+        pending={isSubmitting}
       />
     </div>
   );

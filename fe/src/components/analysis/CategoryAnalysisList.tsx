@@ -25,8 +25,8 @@ const CategoryAnalysisList = ({
             onClick={() => onSelect(i)}
             className={cn(
               'group cursor-pointer rounded-xl p-3 transition-all duration-200',
-              'hover:bg-muted/50',
-              isSelected && 'bg-secondary shadow-sm'
+              'hover:bg-brand-subtle dark:hover:bg-brand/10',
+              isSelected && 'bg-brand-subtle dark:bg-brand/10 shadow-sm'
             )}
           >
             <div className="flex items-center justify-between">
@@ -45,14 +45,12 @@ const CategoryAnalysisList = ({
                   <span
                     className={cn(
                       'text-sm transition-colors md:text-base',
-                      isSelected
-                        ? 'text-primary font-bold'
-                        : 'text-primary/90 font-medium'
+                      isSelected ? 'font-bold' : 'font-medium'
                     )}
                   >
                     {item.name}
                   </span>
-                  <span className="text-muted-foreground text-xs font-medium md:text-sm">
+                  <span className="text-brand text-xs font-medium md:text-sm">
                     {item.percentage.toFixed(1)}%
                   </span>
                 </div>
@@ -60,7 +58,7 @@ const CategoryAnalysisList = ({
 
               {/* 오른쪽: 금액 */}
               <div className="flex flex-col items-end">
-                <span className="text-primary/90 text-sm md:text-base">
+                <span className="text-sm md:text-base">
                   {item.amount.toLocaleString()}원
                 </span>
               </div>
