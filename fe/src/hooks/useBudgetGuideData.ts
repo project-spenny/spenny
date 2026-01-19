@@ -8,17 +8,17 @@ import { formatLocalDate, formatMonth } from '@/utils/date';
 
 import { EXPENSE_CATEGORY_GROUP_MAP } from '@/constants/analysis';
 import { fetchTransactionByRange } from '@/services/analysis/analysisService';
-import { getCurrentUser } from '@/services/analysis/budgetService';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/providers/AuthProvider';
 
 const useBudgetGuideData = (selectedDate: Date, targetSaving: number = 0) => {
+  const { userId, isLoading: authLoading } = useAuth();
+
   const { data: rawTransactionData, isLoading } = useQuery({
     queryKey: ['budget-guide', formatMonth(selectedDate)],
+    enabled: !authLoading && !!userId,
     queryFn: async () => {
-      // 현재 유저 정보 가져오기
-      const user = await getCurrentUser();
-
       // 전월 날짜 계산
       const prevMonthStart = new Date(
         selectedDate.getFullYear(),
@@ -41,13 +41,13 @@ const useBudgetGuideData = (selectedDate: Date, targetSaving: number = 0) => {
       // 서비스 함수 호출 (수입 - 지난 달, 지출 - 최근 3개월)
       const [incomeData, expenseData] = await Promise.all([
         fetchTransactionByRange(
-          user.id,
+          userId!,
           'income',
           formatLocalDate(prevMonthStart),
           formatLocalDate(prevMonthEnd)
         ),
         fetchTransactionByRange(
-          user.id,
+          userId!,
           'expense',
           formatLocalDate(threeMonthsStart),
           formatLocalDate(prevMonthEnd)

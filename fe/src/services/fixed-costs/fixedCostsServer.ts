@@ -1,17 +1,10 @@
 import { getMonthRange } from '@/utils/date';
 import type { IFixedRule } from '@/types/fixed-costs';
-import { createClient } from '@/utils/supabase/server';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 // 해당 월에 적용되는 고정비 규칙 조회 (서버용)
 export const fetchFixedRulesByMonthServer = async (monthDate: Date) => {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (!user || userError) throw new Error('로그인이 필요합니다');
+  const { supabase, user } = await requireUserServer();
 
   const { startDate, endDate } = getMonthRange(monthDate);
 

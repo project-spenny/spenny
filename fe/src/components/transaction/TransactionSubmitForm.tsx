@@ -15,6 +15,7 @@ import { TypeSelector } from './common/TypeSelector';
 import { CategorySelector } from './common/CategorySelector';
 import { QuickAmountButtons } from './common/QuickAmountButtons';
 import { Spinner } from '../ui/spinner';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface TransactionsSubmitFormProps {
   mode: 'create' | 'edit';
@@ -66,6 +67,8 @@ export default function TransactionSubmitForm({
     }
   }, [mode, transaction, defaultDate, defaultValue]);
 
+  const { userId, isLoading: authLoading } = useAuth();
+
   const {
     formData,
     setFormData,
@@ -102,23 +105,18 @@ export default function TransactionSubmitForm({
       return;
     }
 
+    if (authLoading) return;
+    if (!userId) return;
+
     setIsSubmitting(true);
     try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-      if (!user || authError) {
-        toast.warning('로그인이 필요합니다');
-        return;
-      }
       const year = formData.date.getFullYear();
       const month = String(formData.date.getMonth() + 1).padStart(2, '0');
       const day = String(formData.date.getDate()).padStart(2, '0');
       const formattedDate = `${year}-${month}-${day}`;
 
       const transactionData = {
-        user_id: user.id,
+        user_id: userId,
         title: formData.title.trim(),
         type: formData.type,
         amount: Number(formData.amount),

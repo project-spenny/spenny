@@ -1,7 +1,7 @@
 'use server';
 import { syncByMonthServer } from '@/services/fixed-costs/syncFixedTransactions.server';
 import { formatLocalDate } from '@/utils/date';
-import { createClient } from '@/utils/supabase/server';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
 import { revalidatePath } from 'next/cache';
 
 export interface TransactionFilters {
@@ -16,13 +16,7 @@ export const getTransaction = async (
   filters?: TransactionFilters,
   defaultMonth: boolean = true
 ) => {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('No User');
+  const { supabase, user } = await requireUserServer();
 
   let startDate = filters?.start_date;
   let endDate = filters?.end_date;

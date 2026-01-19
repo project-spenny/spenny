@@ -1,11 +1,9 @@
 import { getMonthRange } from '@/utils/date';
-import { createClient } from '@/utils/supabase/server';
 import type { Budget } from '@/types/analysis';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 export const fetchBudgetsServer = async (date: Date): Promise<Budget[]> => {
-  const supabase = await createClient();
-  const { data: auth, error: authError } = await supabase.auth.getUser();
-  if (authError || !auth.user) throw new Error('로그인이 필요합니다');
+  const { supabase, user } = await requireUserServer();
 
   const { startDate } = getMonthRange(date);
 
@@ -18,7 +16,7 @@ export const fetchBudgetsServer = async (date: Date): Promise<Budget[]> => {
          category_key
        )`
     )
-    .eq('user_id', auth.user.id)
+    .eq('user_id', user.id)
     .eq('budget_month', startDate);
 
   if (error) throw error;

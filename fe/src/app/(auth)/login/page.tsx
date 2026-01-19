@@ -3,7 +3,6 @@
 import AnimatedLogo from '@/components/login/AnimatedLogo';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/utils/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -14,7 +13,6 @@ type LoadingAction = 'google' | 'kakao' | 'guest' | null;
 
 export default function LoginPage() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [loadingAction, setLoadingAction] = useState<LoadingAction>(null);
   const isLoading = loadingAction !== null;
 
@@ -67,8 +65,6 @@ export default function LoginPage() {
         setLoadingAction(null);
         return;
       }
-
-      queryClient.removeQueries({ queryKey: ['profile'] });
 
       router.replace('/');
       router.refresh();
