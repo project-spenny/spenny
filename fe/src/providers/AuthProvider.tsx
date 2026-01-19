@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/utils/supabase/client';
 import { Profile } from '@/schemas/profile';
@@ -29,7 +36,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const inFlightRef = useRef(false);
+  const hasInitRef = useRef(false);
+
   const init = async () => {
+    if (hasInitRef.current) return;
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -47,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const p = await fetchProfile();
       setProfile(p);
+      hasInitRef.current = true;
     } catch (e) {
       if (e instanceof Error) {
         setError(e.message);
@@ -67,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // 로그인/로그아웃 등 인증 상태 변화 구독
     const { data: sub } = supabase.auth.onAuthStateChange(() => {
+      hasInitRef.current = false;
       init();
     });
 
