@@ -20,6 +20,7 @@ import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 import FixedCostDeleteDialog from './FixedCostDeleteDialog';
 import { Spinner } from '../ui/spinner';
+import { useAuth } from '@/providers/AuthProvider';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -34,6 +35,8 @@ export default function FixedCostSubmitForm({
   ruleId,
   onSuccess,
 }: FixedCostSubmitFormProps) {
+  const { userId, isLoading: authLoading } = useAuth();
+
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingPayload, setPendingPayload] =
     useState<CreateFixedRuleInput | null>(null);
@@ -57,6 +60,9 @@ export default function FixedCostSubmitForm({
       return;
     }
 
+    if (authLoading) return;
+    if (!userId) return;
+
     const payload: CreateFixedRuleInput = {
       title: formData.title.trim(),
       type: formData.type as 'income' | 'expense',
@@ -79,7 +85,7 @@ export default function FixedCostSubmitForm({
     setIsSubmitting(true);
 
     try {
-      await createFixedRule(payload);
+      await createFixedRule(userId, payload);
       toast.success('고정비가 추가되었습니다.');
       onSuccess(); // 고정비 목록 갱신
     } catch {
@@ -97,10 +103,13 @@ export default function FixedCostSubmitForm({
   const handleApplyIncludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
     if (isSubmitting) return;
+    if (authLoading) return;
+    if (!userId) return;
 
     setIsSubmitting(true);
     try {
       await updateFixedRuleWithScope({
+        userId,
         id: ruleId,
         ruleInput: pendingPayload,
         scope: 'INCLUDE_CURRENT',
@@ -119,10 +128,13 @@ export default function FixedCostSubmitForm({
   const handleApplyExcludeCurrent = async () => {
     if (!ruleId || !pendingPayload) return;
     if (isSubmitting) return;
+    if (authLoading) return;
+    if (!userId) return;
 
     setIsSubmitting(true);
     try {
       await updateFixedRuleWithScope({
+        userId,
         id: ruleId,
         ruleInput: pendingPayload,
         scope: 'EXCLUDE_CURRENT',
@@ -141,10 +153,12 @@ export default function FixedCostSubmitForm({
   const handleDeleteRule = async () => {
     if (!ruleId) return;
     if (isSubmitting) return;
+    if (authLoading) return;
+    if (!userId) return;
 
     setIsSubmitting(true);
     try {
-      await deleteFixedRule(ruleId);
+      await deleteFixedRule(userId, ruleId);
       toast.success('고정비 규칙이 삭제되었습니다.');
       onSuccess();
     } catch {

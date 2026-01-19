@@ -1,16 +1,15 @@
 import { supabase } from '@/utils/supabase/client';
 import { getMonthRange } from '@/utils/date';
-import { requireUserId } from './fixed-costs';
 import { syncByMonthShared } from './syncFixedTransactions.shared';
 import { PG_ERROR } from '@/constants/postgres';
 
 // 클라이언트 환경에서 고정비 규칙 기반 월별 거래 동기화
 export const syncByMonthClient = async (
+  userId: string,
   monthDate: Date,
   generateThroughDate?: string,
   options?: { isGuest?: boolean }
 ) => {
-  const userId = await requireUserId();
   const { startDate, endDate } = getMonthRange(monthDate);
 
   return syncByMonthShared(

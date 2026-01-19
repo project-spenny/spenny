@@ -3,24 +3,15 @@
 import GuestModeNotice from '../common/GuestModeNotice';
 import Image from 'next/image';
 import Link from 'next/link';
-import ModeToggle from '../common/ModeToggle';
-import { Profile } from '@/schemas/profile';
 import ProfilePanelTrigger from '../common/ProfilePanelTrigger';
-import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/providers/AuthProvider';
 
-async function fetchProfile(): Promise<Profile> {
-  const res = await fetch('/api/profile');
-  if (!res.ok) throw new Error('프로필 조회 실패');
-  return res.json();
+function HeaderRightSkeleton() {
+  return <div className="bg-muted h-9 w-9 animate-pulse rounded-full" />;
 }
 
 const Header = () => {
-  const { data: profile } = useQuery({
-    queryKey: ['profile'],
-    queryFn: fetchProfile,
-    retry: false,
-  });
-
+  const { profile, isLoading } = useAuth();
   const isGuest = !!profile?.is_guest;
 
   return (
@@ -38,7 +29,13 @@ const Header = () => {
           />
         </Link>
       </h1>
-      {isGuest ? <GuestModeNotice /> : <ProfilePanelTrigger />}
+      {isLoading ? (
+        <HeaderRightSkeleton />
+      ) : isGuest ? (
+        <GuestModeNotice />
+      ) : (
+        <ProfilePanelTrigger />
+      )}
     </header>
   );
 };

@@ -3,25 +3,31 @@ import { formatLocalDate, getMonthRange, minDate } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
 import { fetchTransactionByRange } from '@/services/analysis/analysisService';
-import { getCurrentUser } from '@/services/analysis/budgetService';
 import { syncByMonthClient } from '@/services/fixed-costs/syncFixedTransactions.client';
 import { toast } from 'sonner';
 import { transformAnalysisData } from '@/utils/analysis-transform';
+import { useAuth } from '@/providers/AuthProvider';
 
 type AnalysisState = {
   current: TransactionAnalysis[];
   prev: TransactionAnalysis[];
 };
 
-const safeSyncTransactions = async (date: Date, through: string) => {
+const safeSyncTransactions = async (
+  userId: string,
+  date: Date,
+  through: string
+) => {
   try {
-    await syncByMonthClient(date, through);
+    await syncByMonthClient(userId, date, through);
   } catch (err) {
     console.warn(`${date.getMonth() + 1}월 고정비 동기화 실패:`, err);
   }
 };
 
 export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
+  const { userId, isLoading: authLoading } = useAuth();
+
   const [data, setData] = useState<AnalysisState>({
     current: [],
     prev: [],
@@ -32,10 +38,11 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (authLoading) return;
+      if (!userId) return;
+
       try {
         setIsLoading(true);
-
-        const user = await getCurrentUser(); // 현재 로그인한 유저 정보 가져오기
 
         // 날짜 범위 계산
         const { startDate, endDate } = getMonthRange(selectedDate);
@@ -52,14 +59,14 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
         const lastMonthThrough = minDate(prevEnd, today);
 
         await Promise.all([
-          safeSyncTransactions(selectedDate, today), // 현재 달 : 오늘까지 생성
-          safeSyncTransactions(lastMonthDate, lastMonthThrough), // 이전 달 : 오늘(or 월말)까지 생성
+          safeSyncTransactions(userId, selectedDate, today), // 현재 달 : 오늘까지 생성
+          safeSyncTransactions(userId, lastMonthDate, lastMonthThrough), // 이전 달 : 오늘(or 월말)까지 생성
         ]);
 
         // 서비스 함수 호출
         const [currentMonthRes, prevMonthRes] = await Promise.all([
-          fetchTransactionByRange(user.id, type, startDate, endDate),
-          fetchTransactionByRange(user.id, type, prevStart, prevEnd),
+          fetchTransactionByRange(userId, type, startDate, endDate),
+          fetchTransactionByRange(userId, type, prevStart, prevEnd),
         ]);
 
         setData({
@@ -80,7 +87,7 @@ export const useAnalysisData = (selectedDate: Date, type: TransactionType) => {
     };
 
     fetchData();
-  }, [selectedDate, type]);
+  }, [authLoading, userId, selectedDate, type]);
 
   // 공통 가공 함수 호출
   const analysisResult = useMemo(

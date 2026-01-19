@@ -12,8 +12,10 @@ import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixed-costs';
 import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
 import { toast } from 'sonner';
 import { useMemo } from 'react';
+import { useAuth } from '@/providers/AuthProvider';
 
 const useBudgetData = (selectedDate: Date) => {
+  const { userId, isLoading: authLoading } = useAuth();
   const queryClient = useQueryClient();
   const monthKey = formatMonth(selectedDate); // 로컬 시간대 기준 'YYYY-MM' 문자열 생성
 
@@ -21,7 +23,8 @@ const useBudgetData = (selectedDate: Date) => {
   const { data, isLoading: isBudgetLoading } = useQuery({
     // 연-월이 바뀔 때마다 자동으로 새로운 데이터 fetch
     queryKey: ['budgets', monthKey],
-    queryFn: () => fetchBudgets(selectedDate),
+    enabled: !authLoading && !!userId,
+    queryFn: () => fetchBudgets(userId!, selectedDate),
     select: (data: BudgetWithCategory[]) => {
       const totalBudget =
         data?.find((item) => item.category_id === null) || null;
@@ -35,7 +38,8 @@ const useBudgetData = (selectedDate: Date) => {
   // 고정비 규칙 조회
   const { data: fixedRules = [], isLoading: isFixedLoading } = useQuery({
     queryKey: ['fixedRules', monthKey],
-    queryFn: () => fetchFixedRulesByMonth(selectedDate),
+    enabled: !authLoading && !!userId,
+    queryFn: () => fetchFixedRulesByMonth(userId!, selectedDate),
   });
 
   const futureFixedAmount = useMemo(() => {
@@ -62,7 +66,7 @@ const useBudgetData = (selectedDate: Date) => {
     }: {
       amount: number;
       categoryId: string | null;
-    }) => upsertBudget(selectedDate, amount, categoryId),
+    }) => upsertBudget(userId!, selectedDate, amount, categoryId),
     onSuccess: () => {
       // 저장 성공 시 해당 달의 예산 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
@@ -77,7 +81,7 @@ const useBudgetData = (selectedDate: Date) => {
   const { mutate: saveCategoryBudgets, isPending: isSavingCategories } =
     useMutation({
       mutationFn: (categoryData: { categoryId: string; amount: number }[]) =>
-        upsertCategoryBudgets(selectedDate, categoryData),
+        upsertCategoryBudgets(userId!, selectedDate, categoryData),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
         toast.success('카테고리별 예산이 모두 저장되었습니다.');
@@ -90,7 +94,7 @@ const useBudgetData = (selectedDate: Date) => {
   // 삭제
   const { mutate: removeBudget, isPending: isDeleting } = useMutation({
     mutationFn: (categoryId: string | string[] | null) =>
-      deleteBudgets(selectedDate, categoryId),
+      deleteBudgets(userId!, selectedDate, categoryId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets', monthKey] });
       toast.success('예산이 초기화 되었습니다.');
