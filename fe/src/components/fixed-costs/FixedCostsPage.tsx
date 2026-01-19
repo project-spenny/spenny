@@ -9,18 +9,20 @@ import { IFixedRule } from '@/types/fixed-costs';
 import { fetchFixedRules } from '@/services/fixed-costs/fixed-costs';
 import { toast } from 'sonner';
 import { mapFixedRuleToFormData } from '@/utils/fixed-costs';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function FixedCostsPage() {
+  const { userId, isLoading: authLoading } = useAuth();
   const [items, setItems] = useState<IFixedRule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [editingRule, setEditingRule] = useState<IFixedRule | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = async (userId: string) => {
     try {
       setIsLoading(true);
-      const data = await fetchFixedRules();
+      const data = await fetchFixedRules(userId);
       setItems(data);
     } catch {
       toast.error(
@@ -32,8 +34,10 @@ export default function FixedCostsPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (authLoading) return;
+    if (!userId) return;
+    fetchData(userId);
+  }, [authLoading, userId]);
 
   const handleCreateClick = () => {
     setFormMode('create');
@@ -42,7 +46,8 @@ export default function FixedCostsPage() {
   };
 
   const handleCreateSuccess = async () => {
-    await fetchData();
+    if (!userId) return;
+    await fetchData(userId);
     setIsPanelOpen(false);
   };
 
