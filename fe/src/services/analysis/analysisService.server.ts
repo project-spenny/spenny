@@ -1,20 +1,14 @@
 import { TransactionAnalysis, TransactionType } from '@/types/analysis';
 
-import { createClient } from '@/utils/supabase/server';
 import { getMonthRange } from '@/utils/date';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
 import { transformAnalysisData } from '@/utils/analysis-transform';
 
 export const getAnalysisData = async (
   selectedDate: Date,
   type: TransactionType
 ) => {
-  const supabase = await createClient();
-
-  // 유저 정보 가져오기
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error('No User');
+  const { supabase, user } = await requireUserServer();
 
   // 날짜 범위 계산
   const { startDate, endDate } = getMonthRange(selectedDate);
