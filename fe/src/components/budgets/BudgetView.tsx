@@ -170,6 +170,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
           setIsCategoryPanelOpen(open);
           if (!open) setActiveCategoryKey(null);
         }}
+        isFull
       >
         <BudgetCategorySetting
           selectedDate={selectedDate}
