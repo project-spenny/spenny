@@ -1,36 +1,32 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useRouter, useSearchParams } from 'next/navigation';
 
 import AnalysisView from '@/components/analysis/AnalysisView';
 import BudgetView from '@/components/budgets/BudgetView';
 import MonthNavigator from '@/components/common/MonthNavigator';
+import { useRouter } from 'next/navigation';
 
-const AnalysisClient = () => {
+type AnalysisClientProps = { initialYear: number; initialMonth: number };
+
+const AnalysisClient = ({ initialYear, initialMonth }: AnalysisClientProps) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const now = new Date();
 
-  // URL에서 읽어오되, 결과가 NaN이거나 0이면 현재 연/월을 사용
-  const yearParam = Number(searchParams.get('year')) || now.getFullYear();
-  const monthParam = Number(searchParams.get('month')) || now.getMonth() + 1;
-
-  // 숫자 범위 제한
-  const year = Math.min(Math.max(yearParam, 1900), 2100);
-  const month = Math.min(Math.max(monthParam, 1), 12);
+  const year = Math.min(Math.max(initialYear, 1900), 2100);
+  const month = Math.min(Math.max(initialMonth, 1), 12);
 
   const currentDate = new Date(year, month - 1);
 
   // 월 이동 및 URL 반영
   const moveMonth = (offset: number) => {
     const newDate = new Date(year, month - 1 + offset);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('year', newDate.getFullYear().toString());
-    params.set('month', (newDate.getMonth() + 1).toString());
+    const newYear = newDate.getFullYear();
+    const newMonth = newDate.getMonth() + 1;
 
     // URL 변경 (페이지 전체 새로고침 없이 URL만 바뀜)
-    router.push(`/analysis?${params.toString()}`, { scroll: false });
+    router.push(`/analysis?year=${newYear}&month=${newMonth}`, {
+      scroll: false,
+    });
   };
 
   const analysisTabs = [

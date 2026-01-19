@@ -1,12 +1,18 @@
 import AnalysisClient from '@/components/analysis/AnalysisClient';
-import { Suspense } from 'react';
 
-const AnalysisPage = () => {
-  return (
-    <Suspense fallback={<div>로딩 중...</div>}>
-      <AnalysisClient />
-    </Suspense>
-  );
+type AnalysisPageProps = {
+  searchParams: Promise<{ year?: string; month?: string }>;
+};
+
+const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
+  const { year: yearParam, month: monthParam } = await searchParams;
+
+  const now = new Date();
+
+  const year = Number(yearParam) || now.getFullYear();
+  const month = Number(monthParam) || now.getMonth() + 1;
+
+  return <AnalysisClient initialYear={year} initialMonth={month} />;
 };
 
 export default AnalysisPage;
