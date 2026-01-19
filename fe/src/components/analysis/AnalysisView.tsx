@@ -40,7 +40,7 @@ const AnalysisView = ({
   // 이번 달 내역(current)이 비어있으면 전체를 Empty 화면으로 교체
   if (current.length === 0) {
     return (
-      <div className="py-20">
+      <div className="animate-in fade-in slide-in-from-top-1 duration-500">
         <AnalysisEmpty
           title={`이번 달 ${config.label}이 없어요!`}
           description={config.emptyDescription}
@@ -54,7 +54,7 @@ const AnalysisView = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="animate-in fade-in slide-in-from-top-1 space-y-4 duration-500">
       <AnalysisSection
         title={`월별 ${config.label}`}
         icon={<Icon className={config.color} />}

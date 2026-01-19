@@ -67,7 +67,7 @@ const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
       {/* 달 이동 */}
       <MonthNavigator year={year} month={month} baseUrl="/analysis" />
 
-      <AnalysisTabs>
+      <AnalysisTabs key={`analysis-${year}-${month}`}>
         {ANALYSIS_TABS.map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
             <Suspense fallback={<AnalysisLoading />}>{tab.fetcher}</Suspense>
