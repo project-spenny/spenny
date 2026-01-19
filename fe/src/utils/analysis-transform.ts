@@ -1,10 +1,18 @@
 import { CategoryAnalysis, TransactionAnalysis } from '@/types/analysis';
 
-// 서버와 클라이언트에서 공통으로 사용할 분석 데이터 가공 로직
+export type TransformAnalysisResult = {
+  totalAmount: number;
+  prevAmount: number;
+  diff: number;
+  categoryData: CategoryAnalysis[];
+  categoryTotalsByKey: Record<string, number>;
+};
+
+// 분석 데이터 가공 로직
 export const transformAnalysisData = (
   current: TransactionAnalysis[],
   prev: TransactionAnalysis[]
-) => {
+): TransformAnalysisResult => {
   // 현재/이전 달 총액 계산
   const currentTotal = current.reduce(
     (sum, item) => sum + (item.amount || 0),
