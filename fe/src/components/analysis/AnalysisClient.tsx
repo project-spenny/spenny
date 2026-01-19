@@ -2,14 +2,26 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { AnalysisData } from '@/types/analysis';
 import AnalysisView from '@/components/analysis/AnalysisView';
 import BudgetView from '@/components/budgets/BudgetView';
 import MonthNavigator from '@/components/common/MonthNavigator';
 import { useRouter } from 'next/navigation';
 
-type AnalysisClientProps = { initialYear: number; initialMonth: number };
+type AnalysisClientProps = {
+  initialYear: number;
+  initialMonth: number;
+  initialData: {
+    expense: AnalysisData;
+    income: AnalysisData;
+  };
+};
 
-const AnalysisClient = ({ initialYear, initialMonth }: AnalysisClientProps) => {
+const AnalysisClient = ({
+  initialYear,
+  initialMonth,
+  initialData,
+}: AnalysisClientProps) => {
   const router = useRouter();
 
   const year = Math.min(Math.max(initialYear, 1900), 2100);
@@ -32,11 +44,23 @@ const AnalysisClient = ({ initialYear, initialMonth }: AnalysisClientProps) => {
   const analysisTabs = [
     {
       value: '지출',
-      content: <AnalysisView type="expense" selectedDate={currentDate} />,
+      content: (
+        <AnalysisView
+          type="expense"
+          selectedDate={currentDate}
+          initialData={initialData.expense}
+        />
+      ),
     },
     {
       value: '수입',
-      content: <AnalysisView type="income" selectedDate={currentDate} />,
+      content: (
+        <AnalysisView
+          type="income"
+          selectedDate={currentDate}
+          initialData={initialData.income}
+        />
+      ),
     },
     { value: '예산', content: <BudgetView selectedDate={currentDate} /> },
   ];

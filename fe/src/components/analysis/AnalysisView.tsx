@@ -1,10 +1,10 @@
 'use client';
 
+import { AnalysisData, TransactionType } from '@/types/analysis';
 import { useEffect, useState } from 'react';
 
 import { ANALYSIS_CONFIG } from '@/constants/analysis';
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
-import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import { Button } from '@/components/ui/button';
 import CategoryAnalysisList from '@/components/analysis/CategoryAnalysisList';
@@ -12,22 +12,23 @@ import CategoryChart from '@/components/analysis/CategoryChart';
 import Link from 'next/link';
 import { PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { TransactionType } from '@/types/analysis';
-import { useAnalysisData } from '@/hooks/useAnalysisData';
 
 type AnalysisViewProps = {
   type: TransactionType;
   selectedDate: Date;
+  initialData: AnalysisData;
 };
 
-const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
+const AnalysisView = ({
+  type,
+  selectedDate,
+  initialData,
+}: AnalysisViewProps) => {
   const config = ANALYSIS_CONFIG[type];
   const Icon = config.icon;
 
-  const { current, prev, totalAmount, diff, isLoading, categoryData } =
-    useAnalysisData(selectedDate, type);
+  const { current, prev, totalAmount, diff, categoryData } = initialData;
 
-  // 상태 끌어올리기
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   // 사용자가 달을 옮기면 '가장 많이 쓴 카테고리'부터 보여줌
   useEffect(() => {
@@ -35,15 +36,6 @@ const AnalysisView = ({ type, selectedDate }: AnalysisViewProps) => {
       setSelectedIndex(0);
     }
   }, [selectedDate]);
-
-  // 로딩 상태 처리
-  if (isLoading) {
-    return (
-      <div className="py-20">
-        <AnalysisLoading />
-      </div>
-    );
-  }
 
   // 이번 달 내역(current)이 비어있으면 전체를 Empty 화면으로 교체
   if (current.length === 0) {
