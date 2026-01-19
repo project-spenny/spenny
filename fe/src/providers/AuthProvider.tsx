@@ -24,8 +24,9 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
-async function fetchProfile() {
+async function fetchProfile(): Promise<Profile | null> {
   const res = await fetch('/api/profile', { credentials: 'include' });
+  if (res.status === 404) return null;
   if (!res.ok) throw new Error('프로필 조회 실패');
   return res.json();
 }
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setProfile(null);
     } finally {
+      inFlightRef.current = false;
       setIsLoading(false);
     }
   };
