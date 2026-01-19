@@ -12,6 +12,7 @@ type AuthState = {
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
+  setProfile: (profile: Profile | null) => void;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -82,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       error,
       refresh: init,
+      setProfile,
     }),
     [user, profile, isLoading, error]
   );
