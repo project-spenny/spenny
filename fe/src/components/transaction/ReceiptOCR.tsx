@@ -300,7 +300,7 @@ export default function ReceiptOCR() {
                   type="file"
                   accept="image/*"
                   capture="environment"
-                  onChange={handleUpload}
+                  onChange={handleFiles}
                   hidden
                 />
               </div>
