@@ -37,10 +37,10 @@ const AnalysisView = ({
     }
   }, [selectedDate]);
 
-  // 이번 달 내역(current)이 비어있으면 전체를 Empty 화면으로 교체
-  if (current.length === 0) {
-    return (
-      <div className="animate-in fade-in slide-in-from-top-1 duration-500">
+  return (
+    <div className="animate-in fade-in slide-in-from-top-1 space-y-4 duration-300">
+      {current.length === 0 ? (
+        // 이번 달 내역(current)이 비어있을 때 Empty 화면
         <AnalysisEmpty
           title={`이번 달 ${config.label}이 없어요!`}
           description={config.emptyDescription}
@@ -49,58 +49,59 @@ const AnalysisView = ({
             <Link href={'/'}>기록하러 가기</Link>
           </Button>
         </AnalysisEmpty>
-      </div>
-    );
-  }
+      ) : (
+        <>
+          <AnalysisSection
+            title={`월별 ${config.label}`}
+            icon={<Icon className={config.color} />}
+          >
+            {/* 월별 분석 */}
+            <div className="text-lg font-bold">
+              총 {config.label}{' '}
+              <span className={config.color}>
+                {totalAmount.toLocaleString()}
+              </span>
+              원
+            </div>
 
-  return (
-    <div className="animate-in fade-in slide-in-from-top-1 space-y-4 duration-500">
-      <AnalysisSection
-        title={`월별 ${config.label}`}
-        icon={<Icon className={config.color} />}
-      >
-        {/* 월별 분석 */}
-        <div className="text-lg font-bold">
-          총 {config.label}{' '}
-          <span className={config.color}>{totalAmount.toLocaleString()}</span>원
-        </div>
+            <div className="mt-2 text-base font-medium">
+              {prev.length === 0 ? (
+                <p>이전 달 {config.label} 내역이 없어요!</p>
+              ) : diff === 0 ? (
+                <p>지난 달과 총 {config.label} 금액이 똑같아요!</p>
+              ) : (
+                <p>
+                  지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
+                  {diff > 0 ? config.increaseText : config.decreaseText}
+                </p>
+              )}
+            </div>
+          </AnalysisSection>
 
-        <div className="mt-2 text-base font-medium">
-          {prev.length === 0 ? (
-            <p>이전 달 {config.label} 내역이 없어요!</p>
-          ) : diff === 0 ? (
-            <p>지난 달과 총 {config.label} 금액이 똑같아요!</p>
-          ) : (
-            <p>
-              지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
-              {diff > 0 ? config.increaseText : config.decreaseText}
-            </p>
-          )}
-        </div>
-      </AnalysisSection>
+          <AnalysisSection
+            title={`카테고리별 ${config.label}`}
+            icon={<PieChart className={config.color} />}
+          >
+            {/* 카테고리 차트 */}
+            <div className="flex items-center justify-center p-4">
+              <CategoryChart
+                data={categoryData}
+                selectedIndex={selectedIndex}
+                onSelect={setSelectedIndex}
+              />
+            </div>
 
-      <AnalysisSection
-        title={`카테고리별 ${config.label}`}
-        icon={<PieChart className={config.color} />}
-      >
-        {/* 카테고리 차트 */}
-        <div className="flex items-center justify-center p-4">
-          <CategoryChart
-            data={categoryData}
-            selectedIndex={selectedIndex}
-            onSelect={setSelectedIndex}
-          />
-        </div>
+            <Separator />
 
-        <Separator />
-
-        {/* 카테고리 리스트 */}
-        <CategoryAnalysisList
-          data={categoryData}
-          selectedIndex={selectedIndex}
-          onSelect={setSelectedIndex}
-        />
-      </AnalysisSection>
+            {/* 카테고리 리스트 */}
+            <CategoryAnalysisList
+              data={categoryData}
+              selectedIndex={selectedIndex}
+              onSelect={setSelectedIndex}
+            />
+          </AnalysisSection>
+        </>
+      )}
     </div>
   );
 };

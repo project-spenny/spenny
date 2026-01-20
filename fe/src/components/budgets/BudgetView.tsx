@@ -106,9 +106,9 @@ const BudgetView = ({
   };
 
   return (
-    <div className="space-y-4">
-      {/* 예산이 없을 때 보여줄 화면 */}
+    <div className="animate-in fade-in slide-in-from-top-1 space-y-4 duration-300">
       {!totalBudget ? (
+        // 예산이 없을 때 Empty 화면
         <AnalysisEmpty
           title="이번 달 예산을 설정해 주세요"
           description="지출을 관리하기 위해 먼저 한 달 총 예산을 정해볼까요?"
