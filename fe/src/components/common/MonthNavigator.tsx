@@ -30,6 +30,7 @@ const MonthNavigator = ({ year, month, baseUrl }: MonthNavigatorProps) => {
             buttonVariants({ variant: 'ghost', size: 'icon' }),
             'hover:bg-brand/10'
           )}
+          prefetch={false}
         >
           <ChevronLeft />
         </Link>
@@ -43,6 +44,7 @@ const MonthNavigator = ({ year, month, baseUrl }: MonthNavigatorProps) => {
             buttonVariants({ variant: 'ghost', size: 'icon' }),
             'hover:bg-brand/10'
           )}
+          prefetch={false}
         >
           <ChevronRight />
         </Link>
