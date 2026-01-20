@@ -322,6 +322,7 @@ export default function ReceiptOCR() {
                 <Camera />
                 촬영하기
               </Button>
+
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -331,7 +332,7 @@ export default function ReceiptOCR() {
               >
                 <Upload className="text-muted-foreground mx-auto mb-2" />
                 <p className="text-muted-foreground">
-                  클릭하거나 파일을 드래그하세요
+                  {isDragging ? '여기에 놓아주세요' : '클릭하거나 파일을 드래그하세요'}
                 </p>
                 <input
                   onChange={handleFiles}
@@ -349,6 +350,9 @@ export default function ReceiptOCR() {
                   onChange={handleCameraFiles}
                   hidden
                 />
+              <p className="text-xs text-muted-foreground mt-2">
+                · 이미지 파일만 가능 · 5MB 이하 권장
+              </p>
               </div>
               {/* 미리보기 영역 */}
               {previews.length > 0 && (
