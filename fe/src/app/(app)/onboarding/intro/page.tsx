@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -12,13 +12,36 @@ import { Button } from '@/components/ui/button';
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
 
+const INTRO_STEP_KEY = 'spenny:introStep';
+
 export default function OnboardingIntroPage() {
   const [introStep, setIntroStep] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
 
+  useEffect(() => {
+    const raw = localStorage.getItem(INTRO_STEP_KEY);
+    if (!raw) return;
+
+    const saved = Number(raw);
+    if (Number.isNaN(saved)) return;
+
+    const safeStep = Math.min(Math.max(0, saved), INTRO_STEPS.length - 1);
+
+    setIntroStep(safeStep);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(INTRO_STEP_KEY, String(introStep));
+  }, [introStep]);
+
+  const clearStep = () => {
+    localStorage.removeItem(INTRO_STEP_KEY);
+  };
+
   const exit = () => {
     if (isExiting) return;
     setIsExiting(true);
+    clearStep();
     window.location.replace('/');
   };
 
