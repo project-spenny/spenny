@@ -27,8 +27,10 @@ import { Progress } from '@/components/ui/progress';
 import { Label } from '../ui/label';
 
 interface ResultWithPreview {
-  result: OCRResult;
+  result: OCRResult | null;
   preview: string;
+  error?: boolean;
+  errorMessage?: string;
 }
 
 export default function ReceiptOCR() {
