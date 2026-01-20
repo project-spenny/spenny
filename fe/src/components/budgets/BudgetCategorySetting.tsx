@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import BudgetCategoryEditItem from '@/components/budgets/common/BudgetCategoryEditItem';
 import BudgetSummary from '@/components/budgets/common/BudgetSummary';
+import { BudgetWithCategory } from '@/types/analysis';
 import { Button } from '@/components/ui/button';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
@@ -13,6 +14,7 @@ import useCategories from '@/hooks/useCategories';
 type BudgetCategorySettingProps = {
   selectedDate: Date;
   totalBudgetAmount: number;
+  initialBudgets: BudgetWithCategory[];
   initialCategoryKey?: string | null;
   onSaveSuccess?: () => void;
   onEditTotalBudget?: () => void;
@@ -21,6 +23,7 @@ type BudgetCategorySettingProps = {
 const BudgetCategorySetting = ({
   selectedDate,
   totalBudgetAmount,
+  initialBudgets,
   initialCategoryKey,
   onSaveSuccess,
   onEditTotalBudget,
@@ -30,7 +33,8 @@ const BudgetCategorySetting = ({
     saveCategoryBudgets,
     isSavingCategories,
     removeBudget,
-  } = useBudgetData(selectedDate);
+  } = useBudgetData(selectedDate, initialBudgets);
+
   const { data: allCategories, isLoading: isCategoriesLoading } =
     useCategories('expense');
 
@@ -66,23 +70,20 @@ const BudgetCategorySetting = ({
 
   // 데이터 초기화
   useEffect(() => {
-    if (categoryBudgets && allCategories) {
+    if (categoryBudgets.length > 0) {
       const initialMap: Record<string, string> = {};
 
       categoryBudgets.forEach((budget) => {
-        // category_id와 일치하는 카테고리 정보 확인
-        const category = allCategories.find(
-          (c) => c.category_key === budget.category_id
-        );
+        const key = budget.category?.category_key;
 
-        if (category) {
-          initialMap[category.category_key] = budget.amount.toString();
+        if (key) {
+          initialMap[key] = budget.amount.toString();
         }
       });
 
       setAmounts(initialMap);
     }
-  }, [categoryBudgets, allCategories]);
+  }, [categoryBudgets]);
   // 초기 포커스
   useEffect(() => {
     if (!initialCategoryKey || isCategoriesLoading) return;
