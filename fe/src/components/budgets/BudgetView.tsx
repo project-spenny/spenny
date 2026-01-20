@@ -1,9 +1,10 @@
 'use client';
 
+import { BudgetGuideData, CalculatedBudgetItem } from '@/types/budgetGuide';
+import { BudgetWithCategory, TransactionAnalysis } from '@/types/analysis';
 import { useMemo, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
-import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import BudgetCategoryList from '@/components/budgets/common/BudgetCategoryList';
 import BudgetCategorySetting from '@/components/budgets/BudgetCategorySetting';
@@ -11,16 +12,29 @@ import BudgetOverview from './BudgetOverview';
 import BudgetRecommendDialog from '@/components/budgets/dialogs/BudgetRecommendDialog';
 import BudgetSetupDialog from '@/components/budgets/dialogs/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
-import { CalculatedBudgetItem } from '@/types/budgetGuide';
 import { Calculator } from 'lucide-react';
 import ConfirmDialog from '@/components/budgets/dialogs/ConfirmDialog';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import UnbudgetedList from '@/components/budgets/common/UnbudgetedList';
-import { useAnalysisData } from '@/hooks/useAnalysisData';
 import useBudgetData from '@/hooks/useBudgetData';
-import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
-const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
+type BudgetViewProps = {
+  selectedDate: Date;
+  initialBudgetData: BudgetWithCategory[];
+  initialBudgetGuideData: BudgetGuideData;
+  initialAnalysisData: {
+    totalAmount: number;
+    categoryTotalsByKey: Record<string, number>;
+    transactions: TransactionAnalysis[];
+  };
+};
+
+const BudgetView = ({
+  selectedDate,
+  initialBudgetData,
+  initialBudgetGuideData,
+  initialAnalysisData,
+}: BudgetViewProps) => {
   const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
@@ -36,25 +50,21 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     removeBudget,
     futureFixedAmount,
     applyRecommendTemplate,
-    isLoading: isBudgetLoading,
     isDeleting,
     isApplyingTemplate,
-  } = useBudgetData(selectedDate);
+  } = useBudgetData(selectedDate, initialBudgetData);
+
   const {
     totalAmount: totalExpense,
-    isLoading: isExpenseLoading,
     categoryTotalsByKey,
-    current: transactions,
-  } = useAnalysisData(selectedDate, 'expense');
-  const { processedData, isLoading: isAnalysisLoading } =
-    useBudgetGuideData(selectedDate);
+    transactions,
+  } = initialAnalysisData;
+  const processedData = initialBudgetGuideData;
 
   // 과거 데이터 유무 판단 (이번 달 제외 3개월)
   const hasPastData = useMemo(() => {
     return processedData && processedData.monthlyData.length > 0;
   }, [processedData]);
-
-  const isLoading = isBudgetLoading || isExpenseLoading || isAnalysisLoading;
 
   // 예산 미설정 지출 목록 구하기
   const unbudgetedExpenses = useMemo(() => {
@@ -95,43 +105,34 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
     });
   };
 
-  if (isLoading)
-    return (
-      <div className="py-20">
-        <AnalysisLoading />
-      </div>
-    );
-
   return (
     <div className="space-y-4">
       {/* 예산이 없을 때 보여줄 화면 */}
       {!totalBudget ? (
-        <div className="py-20">
-          <AnalysisEmpty
-            title="이번 달 예산을 설정해 주세요"
-            description="지출을 관리하기 위해 먼저 한 달 총 예산을 정해볼까요?"
-            icon={Calculator}
-          >
-            <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
-              {hasPastData && (
-                <Button
-                  variant="outline"
-                  className="cursor-pointer"
-                  onClick={() => setIsRecommendOpen(true)}
-                >
-                  추천 템플릿으로 시작
-                </Button>
-              )}
-
+        <AnalysisEmpty
+          title="이번 달 예산을 설정해 주세요"
+          description="지출을 관리하기 위해 먼저 한 달 총 예산을 정해볼까요?"
+          icon={Calculator}
+        >
+          <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
+            {hasPastData && (
               <Button
+                variant="outline"
                 className="cursor-pointer"
-                onClick={() => setIsDialogOpen(true)}
+                onClick={() => setIsRecommendOpen(true)}
               >
-                이번 달 예산 설정하기
+                추천 템플릿으로 시작
               </Button>
-            </div>
-          </AnalysisEmpty>
-        </div>
+            )}
+
+            <Button
+              className="cursor-pointer"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              이번 달 예산 설정하기
+            </Button>
+          </div>
+        </AnalysisEmpty>
       ) : (
         // 예산이 있을 때 보여줄 화면
         <>
@@ -195,7 +196,7 @@ const BudgetView = ({ selectedDate }: { selectedDate: Date }) => {
       <BudgetRecommendDialog
         open={isRecommendOpen}
         onOpenChange={setIsRecommendOpen}
-        selectedDate={selectedDate}
+        guideData={initialBudgetGuideData}
         onConfirm={handleRecommendConfirm}
         isSubmitting={isApplyingTemplate}
       />

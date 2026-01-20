@@ -11,10 +11,13 @@ import { BudgetWithCategory } from '@/types/analysis';
 import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixed-costs';
 import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
 import { toast } from 'sonner';
-import { useMemo } from 'react';
 import { useAuth } from '@/providers/AuthProvider';
+import { useMemo } from 'react';
 
-const useBudgetData = (selectedDate: Date) => {
+const useBudgetData = (
+  selectedDate: Date,
+  initialData?: BudgetWithCategory[]
+) => {
   const { userId, isLoading: authLoading } = useAuth();
   const queryClient = useQueryClient();
   const monthKey = formatMonth(selectedDate); // 로컬 시간대 기준 'YYYY-MM' 문자열 생성
@@ -25,6 +28,7 @@ const useBudgetData = (selectedDate: Date) => {
     queryKey: ['budgets', monthKey],
     enabled: !authLoading && !!userId,
     queryFn: () => fetchBudgets(userId!, selectedDate),
+    initialData: initialData, // 서버에서 가져온 데이터를 초기값으로 설정
     select: (data: BudgetWithCategory[]) => {
       const totalBudget =
         data?.find((item) => item.category_id === null) || null;
