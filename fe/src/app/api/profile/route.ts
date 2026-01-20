@@ -46,13 +46,30 @@ export async function GET() {
     .from('profiles')
     .select('nickname, birth_date, gender, profile_image_url, is_guest')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
-  if (selectError || !data) {
-    return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+  if (selectError) {
+    return NextResponse.json(
+      { ok: false, message: 'Failed to fetch profile' },
+      { status: 500 }
+    );
   }
 
-  return NextResponse.json(data);
+  // 온보딩 진행 중
+  if (!data) {
+    return NextResponse.json({
+      ok: true,
+      state: 'ONBOARDING',
+      profile: null,
+    });
+  }
+
+  // 온보딩 완료
+  return NextResponse.json({
+    ok: true,
+    state: 'ONBOARDED',
+    profile: data,
+  });
 }
 
 // onboarding - 프로필 수정
