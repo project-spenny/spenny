@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
-import { Images, Upload, X } from 'lucide-react';
+import { Images, Upload, X, Sparkles } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
@@ -31,7 +31,7 @@ interface ResultWithPreview {
   preview: string;
 }
 
-export default function ReceiptMulti() {
+export default function ReceiptOCR() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -238,7 +238,7 @@ export default function ReceiptMulti() {
             className="h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
             asChild
           >
-            {loading ? <Spinner /> : <Images size={12} />}
+            {loading ? <Spinner /> : <Sparkles size={12} />}
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-lg overflow-hidden border-none">

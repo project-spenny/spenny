@@ -6,17 +6,12 @@ import { Plus } from 'lucide-react';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import { useRouter } from 'next/navigation';
 import { useSelected } from './TransactionContext';
-import ReceiptCapture from '@/components/transaction/ReceiptCapture';
 import { useEffect, useState, useTransition } from 'react';
-import { OCRResult } from '@/types/transactions';
-import ReceiptMulti from '@/components/transaction/ReceiptMulti';
-import { Receipt } from 'lucide-react';
-import { X } from 'lucide-react';
+import ReceiptOCR from '@/components/transaction/ReceiptOCR';
 
 export default function TransactionClient() {
   const router = useRouter();
   const { selectedTransaction, isOpen, openCreate, close } = useSelected();
-  const [ocrData, setOcrData] = useState<OCRResult | null>(null);
   const [isPending, startTransition] = useTransition();
   const [closeAfterRefresh, setCloseAfterRefresh] = useState(false);
 
@@ -37,23 +32,16 @@ export default function TransactionClient() {
   useEffect(() => {
     if (closeAfterRefresh && !isPending) {
       close();
-      setOcrData(null);
       setCloseAfterRefresh(false);
     }
   }, [closeAfterRefresh, isPending, close]);
-
-  const handleOCRResult = (data: OCRResult) => {
-    setOcrData(data);
-    openCreate();
-  };
 
   const mode = selectedTransaction ? 'edit' : 'create';
 
   return (
     <>
       <div className="bg-foreground fixed bottom-0 z-50 m-4 flex gap-4 rounded-full p-1">
-        <ReceiptCapture onResult={handleOCRResult} />
-        <ReceiptMulti />
+        <ReceiptOCR />
       </div>
       <Button
         onClick={openCreate}
@@ -68,7 +56,6 @@ export default function TransactionClient() {
           transaction={selectedTransaction}
           onClose={() => handlePanelOpenChange(false)}
           onSuccess={handleSuccess}
-          defaultValue={ocrData}
         />
       </ResponsivePanel>
     </>
