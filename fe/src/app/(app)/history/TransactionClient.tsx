@@ -18,7 +18,6 @@ export default function TransactionClient() {
   const handlePanelOpenChange = (open: boolean) => {
     if (!open) {
       close();
-      setOcrData(null);
     }
   };
 

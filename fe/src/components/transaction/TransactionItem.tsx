@@ -2,11 +2,9 @@
 import { ITransaction } from '@/types/transactions';
 import {
   Item,
-  ItemActions,
   ItemContent,
   ItemTitle,
 } from '@/components/ui/item';
-import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDateKR } from '@/utils/date';

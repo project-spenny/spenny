@@ -7,7 +7,6 @@ import { getMonthRange } from '@/utils/date';
 import { CalendarProvider } from '@/context/CalendarContext';
 import { TransactionProvider } from './history/TransactionContext';
 import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
-import TestOCR from '@/components/transaction/ReceiptCapture';
 import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 import { getTotalBudgetAmount } from '@/utils/budget';
 import { fetchBudgetsServer } from '@/services/budgets/budget';
