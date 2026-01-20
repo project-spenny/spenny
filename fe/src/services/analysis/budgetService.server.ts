@@ -1,8 +1,11 @@
-import { BudgetWithCategory, TransactionAnalysis } from '@/types/analysis';
 import { formatLocalDate, getMonthRange } from '@/utils/date';
+import {
+  normalizeBudgetCategory,
+  normalizeTransactionCategory,
+  transformBudgetGuideData,
+} from '@/utils/analysis-transform';
 
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
-import { transformBudgetGuideData } from '@/utils/analysis-transform';
 
 // 특정 월의 예산 데이터 조회
 export const getBudgetData = async (selectedDate: Date) => {
@@ -23,15 +26,7 @@ export const getBudgetData = async (selectedDate: Date) => {
 
   if (error) throw error;
 
-  // 단일 객체로 정규화
-  const normalized: BudgetWithCategory[] = (data ?? []).map((t) => ({
-    ...t,
-    category: Array.isArray(t.category) // category가 배열인지 검사
-      ? (t.category[0] ?? null)
-      : (t.category ?? null),
-  }));
-
-  return normalized;
+  return normalizeBudgetCategory(data);
 };
 
 // 예산 설정을 위한 가이드 데이터 조회
@@ -89,15 +84,7 @@ export const getBudgetGuideData = async (
   if (incomeRes.error) throw incomeRes.error;
   if (expenseRes.error) throw expenseRes.error;
 
-  // 단일 객체로 정규화
-  const normalized: TransactionAnalysis[] = (expenseRes.data ?? []).map(
-    (t) => ({
-      ...t,
-      category: Array.isArray(t.category) // category가 배열인지 검사
-        ? (t.category[0] ?? null)
-        : (t.category ?? null),
-    })
-  );
+  const normalized = normalizeTransactionCategory(expenseRes.data);
 
   const lastMonthIncome = incomeRes.data.reduce(
     (sum, item) => sum + item.amount,

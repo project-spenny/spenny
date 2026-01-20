@@ -1,5 +1,5 @@
-import { BudgetWithCategory } from '@/types/analysis';
 import { getMonthRange } from '@/utils/date';
+import { normalizeBudgetCategory } from '@/utils/analysis-transform';
 import { supabase } from '@/utils/supabase/client';
 
 // 특정 월의 예산 데이터 가져오기 (Read)
@@ -24,15 +24,7 @@ export const fetchBudgets = async (userId: string, date: Date) => {
 
   if (error) throw error;
 
-  // 단일 객체로 정규화
-  const normalized: BudgetWithCategory[] = (data ?? []).map((t) => ({
-    ...t,
-    category: Array.isArray(t.category) // category가 배열인지 검사
-      ? (t.category[0] ?? null)
-      : (t.category ?? null),
-  }));
-
-  return normalized;
+  return normalizeBudgetCategory(data);
 };
 
 // 예산 데이터 저장 및 수정 (Upsert)

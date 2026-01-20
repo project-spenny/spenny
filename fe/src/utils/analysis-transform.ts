@@ -1,4 +1,8 @@
-import { CategoryAnalysis, TransactionAnalysis } from '@/types/analysis';
+import {
+  BudgetWithCategory,
+  CategoryAnalysis,
+  TransactionAnalysis,
+} from '@/types/analysis';
 import {
   CategoryBase,
   CategoryStat,
@@ -7,6 +11,40 @@ import {
 
 import { EXPENSE_CATEGORY_GROUP_MAP } from '@/constants/analysis';
 
+/* 데이터 정규화 */
+// 카테고리 필드가 배열 혹은 객체일 수 있음
+type CategoryField = {
+  category:
+    | { name_ko: string; category_key: string }
+    | { name_ko: string; category_key: string }[]
+    | null;
+};
+
+// 예산 데이터용 정규화
+export const normalizeBudgetCategory = (
+  data: (Omit<BudgetWithCategory, 'category'> & CategoryField)[]
+): BudgetWithCategory[] => {
+  return data.map((item) => ({
+    ...item,
+    category: Array.isArray(item.category)
+      ? (item.category[0] ?? null)
+      : (item.category ?? null),
+  })) as BudgetWithCategory[];
+};
+
+// 거래 데이터용 정규화
+export const normalizeTransactionCategory = (
+  data: (Omit<TransactionAnalysis, 'category'> & CategoryField)[]
+): TransactionAnalysis[] => {
+  return data.map((item) => ({
+    ...item,
+    category: Array.isArray(item.category)
+      ? (item.category[0] ?? null)
+      : (item.category ?? null),
+  })) as TransactionAnalysis[];
+};
+
+/* 데이터 가공 */
 export type TransformAnalysisResult = {
   totalAmount: number;
   prevAmount: number;

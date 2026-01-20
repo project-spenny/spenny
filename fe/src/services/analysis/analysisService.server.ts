@@ -1,8 +1,11 @@
-import { TransactionAnalysis, TransactionType } from '@/types/analysis';
+import {
+  normalizeTransactionCategory,
+  transformAnalysisData,
+} from '@/utils/analysis-transform';
 
+import { TransactionType } from '@/types/analysis';
 import { getMonthRange } from '@/utils/date';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
-import { transformAnalysisData } from '@/utils/analysis-transform';
 
 export const getAnalysisData = async (
   selectedDate: Date,
@@ -37,12 +40,7 @@ export const getAnalysisData = async (
 
   if (error) throw error;
 
-  const normalized: TransactionAnalysis[] = (data ?? []).map((t) => ({
-    ...t,
-    category: Array.isArray(t.category) // category가 배열인지 검사
-      ? (t.category[0] ?? null)
-      : (t.category ?? null),
-  }));
+  const normalized = normalizeTransactionCategory(data);
 
   // 이번 달과 지난 달 데이터 분리
   const current = normalized.filter(
