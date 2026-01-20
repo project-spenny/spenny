@@ -7,7 +7,7 @@ export type Category = {
   category_key: string;
   name_en: string;
   name_ko: string;
-  icon: string;
+  icon?: string;
 };
 
 export const CATEGORIES: ICATEGORIES = {
