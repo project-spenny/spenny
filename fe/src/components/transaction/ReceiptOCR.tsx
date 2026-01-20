@@ -528,13 +528,19 @@ export default function ReceiptOCR() {
                   ))}
                 </div>
                 <Button
-                  disabled={loading || results.length === 0}
+                  disabled={loading || results.length === 0 || checkedItems.size===0}
                   onClick={handleSubmit}
                   className="w-full"
                 >
                   {loading
                     ? '등록 중...'
                     : `${checkedItems.size} / ${results.length}개 데이터 등록`}
+                </Button>
+                <Button
+                  onClick={()=>setStep('upload')}
+                  className="w-full"
+                >
+                  처음으로 돌아가기
                 </Button>
               </div>
             </>
