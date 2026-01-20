@@ -1,3 +1,8 @@
+import {
+  getBudgetData,
+  getBudgetGuideData,
+} from '@/services/analysis/budgetService.server';
+
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisTabs from '@/components/analysis/AnalysisTabs';
 import AnalysisView from '@/components/analysis/AnalysisView';
@@ -38,8 +43,23 @@ const AnalysisDataSection = async ({
 };
 
 const BudgetDataSection = async ({ date }: { date: Date }) => {
-  // TODO: 예산 데이터 await
-  return <BudgetView selectedDate={date} />;
+  const [budgetData, budgetGuideData, analysisData] = await Promise.all([
+    getBudgetData(date), // 예산 데이터 조회
+    getBudgetGuideData(date), // 예산 설정을 위한 가이드 데이터 조회
+    getAnalysisData(date, 'expense'),
+  ]);
+  return (
+    <BudgetView
+      selectedDate={date}
+      initialBudgetData={budgetData}
+      initialBudgetGuideData={budgetGuideData}
+      initialAnalysisData={{
+        totalAmount: analysisData.totalAmount, // 이번 달 총액
+        categoryTotalsByKey: analysisData.categoryTotalsByKey, // 이번 달 카테고리별 합계
+        transactions: analysisData.current, // 이번 달 상세 내역
+      }}
+    />
+  );
 };
 
 const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
