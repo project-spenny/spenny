@@ -1,16 +1,11 @@
-import {
-  BudgetGuideData,
-  CategoryBase,
-  CategoryStat,
-  MonthlySummary,
-} from '@/types/budgetGuide';
 import { formatLocalDate, formatMonth } from '@/utils/date';
 
-import { EXPENSE_CATEGORY_GROUP_MAP } from '@/constants/analysis';
+import { BudgetGuideData } from '@/types/budgetGuide';
 import { fetchTransactionByRange } from '@/services/analysis/analysisService';
+import { transformBudgetGuideData } from '@/utils/analysis-transform';
+import { useAuth } from '@/providers/AuthProvider';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/providers/AuthProvider';
 
 const useBudgetGuideData = (selectedDate: Date, targetSaving: number = 0) => {
   const { userId, isLoading: authLoading } = useAuth();
@@ -30,8 +25,7 @@ const useBudgetGuideData = (selectedDate: Date, targetSaving: number = 0) => {
         selectedDate.getMonth(),
         0
       );
-
-      // 3게월 전 날짜
+      // 3개월 전 날짜
       const threeMonthsStart = new Date(
         selectedDate.getFullYear(),
         selectedDate.getMonth() - 3,
@@ -72,77 +66,11 @@ const useBudgetGuideData = (selectedDate: Date, targetSaving: number = 0) => {
 
     const { rawExpenseData, lastMonthIncome } = rawTransactionData;
 
-    // 월별/카테고리별 누적
-    const { monthlyMap, categoryMap } = rawExpenseData.reduce<{
-      monthlyMap: Record<string, MonthlySummary>;
-      categoryMap: Record<string, CategoryBase>;
-    }>(
-      (acc, item) => {
-        const month = item.date.substring(0, 7);
-        const categoryKey = item.category?.category_key || 'OTHER_EXPENSE';
-        const categoryName = item.category?.name_ko || '기타';
-        const groupId = EXPENSE_CATEGORY_GROUP_MAP[categoryKey] || 'flexible';
-
-        // 월별 누적
-        acc.monthlyMap[month] = acc.monthlyMap[month] || {
-          month,
-          total: 0,
-          essential: 0,
-          flexible: 0,
-        };
-        acc.monthlyMap[month].total += item.amount;
-        acc.monthlyMap[month][groupId] += item.amount;
-
-        // 카테고리별 누적
-        acc.categoryMap[categoryKey] = acc.categoryMap[categoryKey] || {
-          name: categoryName,
-          total: 0,
-          groupId,
-        };
-        acc.categoryMap[categoryKey].total += item.amount;
-
-        return acc;
-      },
-      { monthlyMap: {}, categoryMap: {} }
-    );
-
-    // 통계 계산 (3개월 평균)
-    const monthlyData = Object.values(monthlyMap).sort((a, b) =>
-      a.month.localeCompare(b.month)
-    );
-    const activeMonths = monthlyData.length || 1; // 데이터가 있는 달 기준 (최대 3)
-
-    const summary = {
-      avgTotal: monthlyData.reduce((sum, m) => sum + m.total, 0) / activeMonths,
-      groupAverages: {
-        essential:
-          monthlyData.reduce((sum, m) => sum + m.essential, 0) / activeMonths,
-        flexible:
-          monthlyData.reduce((sum, m) => sum + m.flexible, 0) / activeMonths,
-      },
-    };
-
-    const categoryStats = Object.entries(categoryMap).reduce<
-      Record<string, CategoryStat>
-    >((acc, [id, data]) => {
-      acc[id] = {
-        ...data,
-        avgAmount: data.total / activeMonths,
-      };
-      return acc;
-    }, {});
-
-    // 가용 예산 = (Income - Saving)
-    const spendableBudget = lastMonthIncome - targetSaving;
-
-    return {
+    return transformBudgetGuideData(
+      rawExpenseData,
       lastMonthIncome,
-      targetSaving,
-      spendableBudget,
-      monthlyData,
-      summary,
-      categoryStats,
-    };
+      targetSaving
+    );
   }, [rawTransactionData, targetSaving]);
 
   return { isLoading, processedData };
