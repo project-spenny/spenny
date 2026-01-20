@@ -43,6 +43,7 @@ export default function ReceiptOCR() {
   const [step, setStep] = useState<'upload' | 'result'>('upload');
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
+  const [isDragging, setIsDragging] = useState(false);
 
   const toggleCheck = (index: number) => {
     setCheckedItems((prev) => {
@@ -100,6 +101,22 @@ export default function ReceiptOCR() {
     if (inputRef.current) {
       inputRef.current.value = '';
     }
+  };
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    addFiles(droppedFiles);
   };
 
   // 업로드
@@ -262,7 +279,12 @@ export default function ReceiptOCR() {
                   내 PC/갤러리에서 찾기
                 </Button>
               </div>
-              <div className="cursor-pointer rounded-lg border-2 border-dashed p-16 text-center">
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`cursor-pointer rounded-lg border-2 border-dashed p-16 text-center ${isDragging && 'bg-brand-soft/30 border-solid'}`}
+              >
                 <Upload className="text-muted-foreground mx-auto mb-2" />
                 <p className="text-muted-foreground">
                   업로드 할 이미지를 드래그해주세요{' '}
