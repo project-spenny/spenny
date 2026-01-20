@@ -104,10 +104,15 @@ export default function ReceiptOCR() {
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
     addFiles(selectedFiles);
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
+    e.target.value = '';
   };
+
+  const handleCameraFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    addFiles(selectedFiles);
+    e.target.value = '';
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -291,7 +296,6 @@ export default function ReceiptOCR() {
         <DialogTrigger asChild>
           <Button
             className="h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
-            asChild
           >
             {loading ? <Spinner /> : <Sparkles size={12} />}
           </Button>
@@ -309,7 +313,11 @@ export default function ReceiptOCR() {
             <>
               <Button
                 className="flex-1"
-                onClick={() => cameraRef.current?.click()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  cameraRef.current?.click()
+                }}
+                type='button'
               >
                 <Camera />
                 촬영하기
@@ -337,8 +345,8 @@ export default function ReceiptOCR() {
                   ref={cameraRef}
                   type="file"
                   accept="image/*"
-                  capture="environment"
-                  onChange={handleFiles}
+                  capture
+                  onChange={handleCameraFiles}
                   hidden
                 />
               </div>
