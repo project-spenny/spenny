@@ -11,28 +11,32 @@ import {
 import { Button } from '@/components/ui/button';
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
+import { IntroPanelSkeleton } from '@/components/onboarding/IntroPanelSkeleton';
 
 const INTRO_STEP_KEY = 'spenny:introStep';
 
 export default function OnboardingIntroPage() {
   const [introStep, setIntroStep] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
+  const [isRestored, setIsRestored] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(INTRO_STEP_KEY);
-    if (!raw) return;
+    if (raw) {
+      const saved = Number(raw);
+      if (!Number.isNaN(saved)) {
+        const safeStep = Math.min(Math.max(0, saved), INTRO_STEPS.length - 1);
+        setIntroStep(safeStep);
+      }
+    }
 
-    const saved = Number(raw);
-    if (Number.isNaN(saved)) return;
-
-    const safeStep = Math.min(Math.max(0, saved), INTRO_STEPS.length - 1);
-
-    setIntroStep(safeStep);
+    setIsRestored(true);
   }, []);
 
   useEffect(() => {
+    if (!isRestored) return;
     localStorage.setItem(INTRO_STEP_KEY, String(introStep));
-  }, [introStep]);
+  }, [isRestored, introStep]);
 
   const clearStep = () => {
     localStorage.removeItem(INTRO_STEP_KEY);
@@ -51,6 +55,10 @@ export default function OnboardingIntroPage() {
     setIntroStep((s) => Math.min(INTRO_STEPS.length - 1, s + 1));
 
   const isLastIntro = introStep === INTRO_STEPS.length - 1;
+
+  if (!isRestored) {
+    return <IntroPanelSkeleton stepsCount={INTRO_STEPS.length} />;
+  }
 
   return (
     <div className="fixed inset-0 z-50">
