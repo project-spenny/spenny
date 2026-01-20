@@ -267,18 +267,13 @@ export default function ReceiptOCR() {
           </DialogHeader>
           {step === 'upload' && (
             <>
-              <div className="flex gap-2">
-                <Button
-                  className="flex-1"
-                  onClick={() => cameraRef.current?.click()}
-                >
-                  <Camera />
-                  촬영하기
-                </Button>
-                <Button className="flex-3" variant="secondary">
-                  내 PC/갤러리에서 찾기
-                </Button>
-              </div>
+              <Button
+                className="flex-1"
+                onClick={() => cameraRef.current?.click()}
+              >
+                <Camera />
+                촬영하기
+              </Button>
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -287,7 +282,7 @@ export default function ReceiptOCR() {
               >
                 <Upload className="text-muted-foreground mx-auto mb-2" />
                 <p className="text-muted-foreground">
-                  업로드 할 이미지를 드래그해주세요{' '}
+                  클릭하거나 파일을 드래그하세요
                 </p>
                 <input
                   onChange={handleFiles}
