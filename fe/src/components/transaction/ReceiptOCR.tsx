@@ -264,6 +264,9 @@ export default function ReceiptOCR() {
             <DialogTitle>
               {step === 'upload' ? `영수증 업로드` : '인식 결과'}
             </DialogTitle>
+            <p className="text-muted-foreground text-sm">
+              AI가 영수증 데이터를 자동으로 추출합니다
+            </p>
           </DialogHeader>
           {step === 'upload' && (
             <>
