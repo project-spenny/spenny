@@ -27,7 +27,7 @@ async function updateProfile(values: ProfilePatchValues): Promise<Profile> {
 
 export default function MyInfo() {
   const [isEditing, setIsEditing] = useState(false);
-  const { profile, isLoading, error, setProfile } = useAuth();
+  const { userId, profile, isLoading, error, setProfile } = useAuth();
 
   // 프로필 수정 뮤테이션
   const { mutateAsync } = useMutation({
@@ -47,11 +47,14 @@ export default function MyInfo() {
     setIsEditing(false);
   };
 
+  if (!userId) return null;
+  if (!profile) return null;
+
   if (isLoading) {
     return <MyInfoSkeleton />;
   }
 
-  if (error || !profile) {
+  if (error) {
     return (
       <div className="p-4 text-sm text-red-500">
         프로필을 불러오지 못했습니다.
