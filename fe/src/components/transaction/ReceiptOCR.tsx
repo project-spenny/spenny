@@ -119,7 +119,8 @@ export default function ReceiptOCR() {
     addFiles(droppedFiles);
   };
 
-  // 업로드
+  const BATCH_SIZE = 3;
+
   const handleUpload = async () => {
     // 파일 없을 때 예외처리
     if (files.length === 0) {
@@ -133,32 +134,46 @@ export default function ReceiptOCR() {
     setLoading(true);
     setProgress({ current: 0, total: files.length });
 
-    for (let i = 0; i < files.length; i++) {
-      try {
-        const base64 = await fileToBase64(files[i]);
-        const res = await fetch('/api/ocr', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64 }),
+    try {
+      for (let i = 0; i < files.length; i += BATCH_SIZE) {
+        const batch = files.slice(i, i + BATCH_SIZE);
+        const batchResults = await Promise.allSettled(
+          batch.map(async (file, batchIndex) => {
+            const base64 = await fileToBase64(file);
+            const res = await fetch('/api/ocr', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ image: base64 }),
+            });
+
+            if (!res.ok) {
+              throw new Error('영수증 인식 실패');
+            }
+
+            const data = await res.json();
+            return {
+              result: data,
+              preview: previews[i + batchIndex],
+            };
+          })
+        );
+
+        batchResults.forEach((result, batchIndex) => {
+          const globalIndex = i + batchIndex;
+          if (result.status === 'fulfilled') {
+            ocrResults.push(result.value);
+          } else {
+            errors.push(globalIndex + 1);
+          }
         });
 
-        if (!res.ok) {
-          throw new Error('영수증 인식에 실패했습니다');
-        }
-
-        const data = await res.json();
-        ocrResults.push({
-          result: data,
-          preview: previews[i],
-        });
-      } catch {
-        errors.push(i + 1);
+        setProgress({ current: i + batch.length, total: files.length });
       }
-
-      setProgress({ current: i + 1, total: files.length });
+    } catch (error) {
+      toast.error('처리 중 오류가 발생했습니다');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
 
     if (errors.length > 0) {
       toast.error(`${errors.join(', ')}번째 영수증 인식 실패`);
