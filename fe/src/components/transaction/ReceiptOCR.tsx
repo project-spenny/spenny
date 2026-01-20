@@ -27,7 +27,7 @@ import { Progress } from '@/components/ui/progress';
 import { Label } from '../ui/label';
 
 interface ResultWithPreview {
-  result: OCRResult | null;
+  result: OCRResult;
   preview: string;
   error?: boolean;
   errorMessage?: string;
@@ -61,7 +61,11 @@ export default function ReceiptOCR() {
 
   const toggleAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
-      setCheckedItems(new Set(results.map((_, i) => i)));
+      setCheckedItems(
+        new Set(
+          results.map((r, i) => (!r.error ? i : -1)).filter((i) => i !== -1)
+        )
+      );
     } else {
       setCheckedItems(new Set());
     }
@@ -156,6 +160,7 @@ export default function ReceiptOCR() {
             return {
               result: data,
               preview: previews[i + batchIndex],
+              error: false,
             };
           })
         );
@@ -165,7 +170,17 @@ export default function ReceiptOCR() {
           if (result.status === 'fulfilled') {
             ocrResults.push(result.value);
           } else {
-            errors.push(globalIndex + 1);
+            ocrResults.push({
+              result: {
+                title: '',
+                amount: 0,
+                date: new Date(),
+                category_id: '',
+              },
+              preview: previews[globalIndex],
+              error: true,
+              errorMessage: '영수증 인식에 실패했습니다',
+            });
           }
         });
 
@@ -184,7 +199,11 @@ export default function ReceiptOCR() {
     if (ocrResults.length > 0) {
       toast.success(`${ocrResults.length}개 영수증 인식 완료`);
       setResults(ocrResults);
-      setCheckedItems(new Set(ocrResults.map((_, i) => i)));
+      setCheckedItems(
+        new Set(
+          ocrResults.map((r, i) => (!r.error ? i : -1)).filter((i) => i !== -1)
+        )
+      );
       setStep('result');
     }
   };
@@ -211,13 +230,14 @@ export default function ReceiptOCR() {
 
       const transactionsData = results
         .filter((_, index) => checkedItems.has(index))
+        .filter((item) => !item.error)
         .map((item) => ({
           user_id: user.id,
-          title: item.result.title,
+          title: item.result?.title,
           type: 'expense',
-          amount: Number(item.result.amount),
-          date: item.result.date,
-          category_id: item.result.category_id,
+          amount: Number(item.result?.amount),
+          date: item.result?.date,
+          category_id: item.result?.category_id,
           tags: null,
         }));
 
@@ -384,99 +404,114 @@ export default function ReceiptOCR() {
                         checked={checkedItems.has(index)}
                         onCheckedChange={() => toggleCheck(index)}
                         className="h-5 w-5"
+                        disabled={item.error}
                       />
                       <img
                         src={item.preview}
                         onClick={() => setSelectedImage(item.preview)}
                         className="h-32 w-24 cursor-pointer rounded object-cover hover:opacity-70"
                       />
-                      <div className="flex flex-1 flex-col gap-2">
-                        <div className="flex items-center">
-                          <Label className="w-20 shrink-0">거래처</Label>
-                          <Input
-                            value={item.result.title}
-                            onChange={(e) =>
-                              updateResult(index, 'title', e.target.value)
-                            }
-                            placeholder="가게명"
-                          />
+                      {item.error ? (
+                        <div className="flex flex-1 flex-col justify-center gap-2">
+                          <p className="text-destructive font-medium">
+                            {item.errorMessage}
+                          </p>
+                          <p className="text-muted-foreground text-sm">
+                            이미지를 확인하고 다시 시도해주세요
+                          </p>
                         </div>
-                        <div className="flex items-center">
-                          <Label className="w-20 shrink-0">날짜</Label>
-                          <DatePicker
-                            value={
-                              typeof item.result.date === 'string'
-                                ? new Date(item.result.date)
-                                : item.result.date
-                            }
-                            onChange={(date) => {
-                              const formatted = formatLocalDate(date);
-                              updateResult(index, 'date', formatted);
-                            }}
-                            hideLabel
-                          />
-                        </div>
-
-                        <div className="flex gap-4">
+                      ) : (
+                        <div className="flex flex-1 flex-col gap-2">
                           <div className="flex items-center">
-                            <Label className="w-20 shrink-0">금액</Label>
+                            <Label className="w-20 shrink-0">거래처</Label>
                             <Input
-                              type="number"
-                              value={item.result.amount}
+                              value={item.result.title}
                               onChange={(e) =>
-                                updateResult(
-                                  index,
-                                  'amount',
-                                  Number(e.target.value)
-                                )
+                                updateResult(index, 'title', e.target.value)
                               }
-                              placeholder="금액"
+                              placeholder="가게명"
                             />
-                            <span className="text-muted-foreground ml-2 text-sm">
-                              원
-                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <Label className="w-20 shrink-0">날짜</Label>
+                            <DatePicker
+                              value={
+                                typeof item.result.date === 'string'
+                                  ? new Date(item.result.date)
+                                  : item.result.date
+                              }
+                              onChange={(date) => {
+                                const formatted = formatLocalDate(date);
+                                updateResult(index, 'date', formatted);
+                              }}
+                              hideLabel
+                            />
+                          </div>
+
+                          <div className="flex gap-4">
+                            <div className="flex items-center">
+                              <Label className="w-20 shrink-0">금액</Label>
+                              <Input
+                                type="number"
+                                value={item.result.amount}
+                                onChange={(e) =>
+                                  updateResult(
+                                    index,
+                                    'amount',
+                                    Number(e.target.value)
+                                  )
+                                }
+                                placeholder="금액"
+                              />
+                              <span className="text-muted-foreground ml-2 text-sm">
+                                원
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center">
+                            <Label className="w-20 shrink-0">카테고리</Label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className="flex-1 justify-start text-center"
+                                >
+                                  {item.result.category_id
+                                    ? CATEGORIES.expense.find(
+                                        (cat) =>
+                                          cat.category_key ===
+                                          item.result.category_id
+                                      )?.name_ko || '선택'
+                                    : '선택'}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-0"
+                                align="end"
+                              >
+                                <div className="grid grid-cols-3">
+                                  {CATEGORIES.expense.map((cat) => (
+                                    <div
+                                      key={cat.category_key}
+                                      onClick={() => {
+                                        updateResult(
+                                          index,
+                                          'category_id',
+                                          cat.category_key
+                                        );
+                                      }}
+                                      className="flex h-12 w-20 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
+                                    >
+                                      {cat.name_ko}
+                                    </div>
+                                  ))}
+                                </div>
+                              </PopoverContent>
+                            </Popover>
                           </div>
                         </div>
-                        <div className="flex items-center">
-                          <Label className="w-20 shrink-0">카테고리</Label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className="flex-1 justify-start text-center"
-                              >
-                                {item.result.category_id
-                                  ? CATEGORIES.expense.find(
-                                      (cat) =>
-                                        cat.category_key ===
-                                        item.result.category_id
-                                    )?.name_ko || '선택'
-                                  : '선택'}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="end">
-                              <div className="grid grid-cols-3">
-                                {CATEGORIES.expense.map((cat) => (
-                                  <div
-                                    key={cat.category_key}
-                                    onClick={() => {
-                                      updateResult(
-                                        index,
-                                        'category_id',
-                                        cat.category_key
-                                      );
-                                    }}
-                                    className="flex h-12 w-20 cursor-pointer items-center justify-center text-center text-sm hover:bg-gray-100"
-                                  >
-                                    {cat.name_ko}
-                                  </div>
-                                ))}
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>
