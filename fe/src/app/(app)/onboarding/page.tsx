@@ -15,8 +15,10 @@ import { OnboardingProfileValues } from '@/schemas/profile';
 
 import IntroPanel from '@/components/onboarding/IntroPanel';
 import { INTRO_STEPS } from '@/constants/onboarding';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function OnboardingPage() {
+  const { refresh } = useAuth();
   const [phase, setPhase] = useState<'form' | 'intro'>('form');
   const [introStep, setIntroStep] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -46,6 +48,9 @@ export default function OnboardingPage() {
     }
 
     toast.success('기본 정보가 저장되었어요');
+
+    // 전역 Auth 상태(profile) 동기화
+    await refresh();
 
     // 온보딩 소개 단계로 전환
     setIntroStep(0);

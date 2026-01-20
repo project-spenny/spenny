@@ -24,11 +24,22 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+type ProfileApiResponse =
+  | { ok: true; state: 'ONBOARDING'; profile: null }
+  | { ok: true; state: 'ONBOARDED'; profile: Profile }
+  | { ok: false; message: string };
+
 async function fetchProfile(): Promise<Profile | null> {
   const res = await fetch('/api/profile', { credentials: 'include' });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error('프로필 조회 실패');
-  return res.json();
+  const json = (await res
+    .json()
+    .catch(() => null)) as ProfileApiResponse | null;
+  if (!json) throw new Error('프로필 응답 처리 실패');
+
+  if (!res.ok || json.ok === false) {
+    throw new Error(json.ok === false ? json.message : '프로필 조회 실패');
+  }
+  return json.state === 'ONBOARDED' ? json.profile : null;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -57,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!nextUser) {
         setProfile(null);
+        hasInitRef.current = true;
         return;
       }
 
