@@ -197,12 +197,8 @@ export default function ReceiptOCR() {
       setLoading(false);
     }
 
-    if (errors.length > 0) {
-      toast.error(`${errors.join(', ')}번째 영수증 인식 실패`);
-    }
-
     if (ocrResults.length > 0) {
-      toast.success(`${ocrResults.length}개 영수증 인식 완료`);
+      toast.success(`${ocrResults.length}개 중 ${errors.length}개 분석에 성공했습니다`);
       setResults(ocrResults);
       setCheckedItems(
         new Set(
@@ -303,11 +299,18 @@ export default function ReceiptOCR() {
         <DialogContent className="max-w-lg overflow-hidden border-none">
           <DialogHeader>
             <DialogTitle>
-              {step === 'upload' ? `영수증 업로드` : '인식 결과'}
+              {step === 'upload' ? `영수증 업로드` : '영수증 분석 결과'}
             </DialogTitle>
-            <p className="text-muted-foreground text-sm">
+            {(step==='upload')?(<p className="text-muted-foreground text-sm">
               AI가 영수증 데이터를 자동으로 추출합니다
-            </p>
+            </p>):(
+              <p className="text-muted-foreground text-sm pt-2">
+              {`성공 ${results.filter(e=> !e.error).length} 실패 ${results.filter(e=> e.error).length}`}
+              </p>)
+            }
+            
+            
+            
           </DialogHeader>
           {step === 'upload' && (
             <>
@@ -398,7 +401,7 @@ export default function ReceiptOCR() {
             <>
               <div className="max-h-[60vh] space-y-3 overflow-y-auto">
                 <div className="flex items-center justify-between">
-                  <label className="flex cursor-pointer items-center gap-2">
+                  <label className="w-full text-right flex cursor-pointer items-center gap-2">
                     <Checkbox
                       checked={checkedItems.size === results.length}
                       onCheckedChange={toggleAll}
