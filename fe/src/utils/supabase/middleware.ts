@@ -50,6 +50,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthPath = pathname.startsWith('/auth');
   const isLoginPath = pathname.startsWith('/login');
   const isOnboardingPath = pathname.startsWith('/onboarding');
+  const isOnboardingIntroPath = pathname.startsWith('/onboarding/intro');
 
   if (!user) {
     if (!isLoginPath && !isAuthPath) {
@@ -91,7 +92,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // 온보딩 완료면 onboarding 접근 차단
-  if (hasProfile && isOnboardingPath) {
+  if (hasProfile && isOnboardingPath && !isOnboardingIntroPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
