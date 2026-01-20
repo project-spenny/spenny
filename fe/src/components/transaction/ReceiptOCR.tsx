@@ -308,7 +308,7 @@ export default function ReceiptOCR() {
               {/* 미리보기 영역 */}
               {previews.length > 0 && (
                 <>
-                  <div className="grid grid-cols-4 gap-6 overflow-y-scroll">
+                  <div className="grid h-40 grid-cols-4 gap-6 overflow-y-scroll">
                     {previews.map((src, index) => (
                       <div key={index} className="group relative">
                         <img
