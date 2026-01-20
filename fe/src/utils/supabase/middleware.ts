@@ -1,10 +1,29 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const isPublicAsset = (pathname: string) => {
+  // Next 내부 정적 자원, 파비콘 등
+  if (
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml'
+  )
+    return true;
+
+  // 이미지 파일
+  return /\.(png|jpg|jpeg|gif|svg|webp|ico)$/.test(pathname);
+};
+
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  const pathname = request.nextUrl.pathname;
+
+  // 정적 자원은 인증/세션 로직 제외
+  if (isPublicAsset(pathname)) {
+    return NextResponse.next({ request });
+  }
+
+  let supabaseResponse = NextResponse.next({ request });
 
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
@@ -20,9 +39,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
@@ -40,18 +57,12 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  const pathname = request.nextUrl.pathname;
-
-  // 정적 이미지 파일은 인증 체크 제외
-  if (pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico)$/)) {
-    return supabaseResponse;
-  }
-
   const isAuthPath = pathname.startsWith('/auth');
   const isLoginPath = pathname.startsWith('/login');
   const isOnboardingPath = pathname.startsWith('/onboarding');
   const isOnboardingIntroPath = pathname.startsWith('/onboarding/intro');
 
+  // 비로그인 : login/auth만 허용
   if (!user) {
     if (!isLoginPath && !isAuthPath) {
       // no user, potentially respond by redirecting the user to the login page
@@ -64,14 +75,19 @@ export async function updateSession(request: NextRequest) {
 
   const userId = user.sub; // claims의 subject = auth uid(uuid)
 
-  // 유저 프로필 존재 여부 조회
+  // 로그인 : 프로필 존재 여부 조회
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id')
     .eq('id', userId)
     .maybeSingle();
 
-  const hasProfile = !!profile && !profileError;
+  if (profileError) {
+    console.error('[middleware] profile fetch error', profileError);
+    return supabaseResponse;
+  }
+
+  const hasProfile = !!profile;
 
   // 로그인 상태에서 login 페이지 접근 차단
   if (isLoginPath) {
@@ -92,7 +108,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // 온보딩 완료면 onboarding 접근 차단
-  if (hasProfile && isOnboardingPath && !isOnboardingIntroPath) {
+  if (isOnboardingPath && !isOnboardingIntroPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
