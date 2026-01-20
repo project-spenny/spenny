@@ -281,6 +281,7 @@ export default function ReceiptOCR() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
+                onClick={() => inputRef.current?.click()}
                 className={`cursor-pointer rounded-lg border-2 border-dashed p-16 text-center ${isDragging && 'bg-brand-soft/30 border-solid'}`}
               >
                 <Upload className="text-muted-foreground mx-auto mb-2" />
@@ -317,7 +318,7 @@ export default function ReceiptOCR() {
                         />
                         <button
                           onClick={() => removeFile(index)}
-                          className="bg-destructive absolute top-1 right-1 cursor-pointer rounded-full p-1 text-white opacity-0 group-hover:opacity-60 hover:opacity-95"
+                          className="bg-destructive absolute top-1 right-1 cursor-pointer rounded-full p-1 text-white opacity-60 group-hover:opacity-60 hover:opacity-95"
                         >
                           <X size={16} />
                         </button>
