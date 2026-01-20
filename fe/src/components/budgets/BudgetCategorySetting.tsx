@@ -6,6 +6,7 @@ import BudgetCategoryEditItem from '@/components/budgets/common/BudgetCategoryEd
 import BudgetSummary from '@/components/budgets/common/BudgetSummary';
 import { BudgetWithCategory } from '@/types/analysis';
 import { Button } from '@/components/ui/button';
+import { Category } from '@/constants/categories';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
 import useBudgetData from '@/hooks/useBudgetData';
@@ -15,6 +16,7 @@ type BudgetCategorySettingProps = {
   selectedDate: Date;
   totalBudgetAmount: number;
   initialBudgets: BudgetWithCategory[];
+  initialCategories: Category[];
   initialCategoryKey?: string | null;
   onSaveSuccess?: () => void;
   onEditTotalBudget?: () => void;
@@ -24,6 +26,7 @@ const BudgetCategorySetting = ({
   selectedDate,
   totalBudgetAmount,
   initialBudgets,
+  initialCategories,
   initialCategoryKey,
   onSaveSuccess,
   onEditTotalBudget,
@@ -35,8 +38,10 @@ const BudgetCategorySetting = ({
     removeBudget,
   } = useBudgetData(selectedDate, initialBudgets);
 
-  const { data: allCategories, isLoading: isCategoriesLoading } =
-    useCategories('expense');
+  const { data: allCategories = [] } = useCategories(
+    'expense',
+    initialCategories
+  );
 
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({}); // 각 카테고리 Input 참조
@@ -86,7 +91,7 @@ const BudgetCategorySetting = ({
   }, [categoryBudgets]);
   // 초기 포커스
   useEffect(() => {
-    if (!initialCategoryKey || isCategoriesLoading) return;
+    if (!initialCategoryKey) return;
 
     const timer = setTimeout(() => {
       const targetInput = inputRefs.current[initialCategoryKey];
@@ -96,7 +101,7 @@ const BudgetCategorySetting = ({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [initialCategoryKey, isCategoriesLoading]);
+  }, [initialCategoryKey]);
 
   // 핸들러
   const handleAmountChange = (category: string, value: string) => {
@@ -143,8 +148,10 @@ const BudgetCategorySetting = ({
           onEditTotal={onEditTotalBudget}
         />
 
-        {isCategoriesLoading ? (
-          <div>카테고리 목록 불러오는 중</div>
+        {allCategories.length === 0 ? (
+          <p className="text-muted-foreground py-10 text-center">
+            카테고리 정보를 불러올 수 없습니다.
+          </p>
         ) : (
           allCategories?.map((category) => (
             <BudgetCategoryEditItem

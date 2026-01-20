@@ -12,6 +12,7 @@ import { Suspense } from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { TransactionType } from '@/types/analysis';
 import { getAnalysisData } from '@/services/analysis/analysisService.server';
+import { getCategories } from '@/services/categoryService.server';
 
 type AnalysisPageProps = {
   searchParams: Promise<{ year?: string; month?: string }>;
@@ -43,11 +44,13 @@ const AnalysisDataSection = async ({
 };
 
 const BudgetDataSection = async ({ date }: { date: Date }) => {
-  const [budgetData, budgetGuideData, analysisData] = await Promise.all([
-    getBudgetData(date), // 예산 데이터 조회
-    getBudgetGuideData(date), // 예산 설정을 위한 가이드 데이터 조회
-    getAnalysisData(date, 'expense'),
-  ]);
+  const [budgetData, budgetGuideData, analysisData, categories] =
+    await Promise.all([
+      getBudgetData(date), // 예산 데이터 조회
+      getBudgetGuideData(date), // 예산 설정을 위한 가이드 데이터 조회
+      getAnalysisData(date, 'expense'),
+      getCategories('expense'),
+    ]);
   return (
     <BudgetView
       selectedDate={date}
@@ -58,6 +61,7 @@ const BudgetDataSection = async ({ date }: { date: Date }) => {
         categoryTotalsByKey: analysisData.categoryTotalsByKey, // 이번 달 카테고리별 합계
         transactions: analysisData.current, // 이번 달 상세 내역
       }}
+      initialCategories={categories}
     />
   );
 };

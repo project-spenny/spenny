@@ -13,6 +13,7 @@ import BudgetRecommendDialog from '@/components/budgets/dialogs/BudgetRecommendD
 import BudgetSetupDialog from '@/components/budgets/dialogs/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
 import { Calculator } from 'lucide-react';
+import { Category } from '@/constants/categories';
 import ConfirmDialog from '@/components/budgets/dialogs/ConfirmDialog';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import UnbudgetedList from '@/components/budgets/common/UnbudgetedList';
@@ -27,6 +28,7 @@ type BudgetViewProps = {
     categoryTotalsByKey: Record<string, number>;
     transactions: TransactionAnalysis[];
   };
+  initialCategories: Category[];
 };
 
 const BudgetView = ({
@@ -34,6 +36,7 @@ const BudgetView = ({
   initialBudgetData,
   initialBudgetGuideData,
   initialAnalysisData,
+  initialCategories,
 }: BudgetViewProps) => {
   const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -179,6 +182,7 @@ const BudgetView = ({
           selectedDate={selectedDate}
           totalBudgetAmount={totalBudget?.amount || 0}
           initialBudgets={initialBudgetData}
+          initialCategories={initialCategories}
           initialCategoryKey={activeCategoryKey}
           onSaveSuccess={() => setIsCategoryPanelOpen(false)}
           onEditTotalBudget={() => setIsDialogOpen(true)}
