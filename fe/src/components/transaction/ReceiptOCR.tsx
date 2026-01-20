@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
-import { Images, Upload, X, Sparkles } from 'lucide-react';
+import { Camera, Upload, X, Sparkles } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
@@ -36,6 +36,7 @@ export default function ReceiptOCR() {
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [results, setResults] = useState<ResultWithPreview[]>([]);
@@ -249,9 +250,18 @@ export default function ReceiptOCR() {
           </DialogHeader>
           {step === 'upload' && (
             <>
-              <Button onClick={() => inputRef.current?.click()}>
-                내 PC/갤러리에서 찾기
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1"
+                  onClick={() => cameraRef.current?.click()}
+                >
+                  <Camera />
+                  촬영하기
+                </Button>
+                <Button className="flex-3" variant="secondary">
+                  내 PC/갤러리에서 찾기
+                </Button>
+              </div>
               <div className="cursor-pointer rounded-lg border-2 border-dashed p-16 text-center">
                 <Upload className="text-muted-foreground mx-auto mb-2" />
                 <p className="text-muted-foreground">
@@ -263,6 +273,14 @@ export default function ReceiptOCR() {
                   type="file"
                   accept="image/*"
                   multiple
+                  hidden
+                />
+                <input
+                  ref={cameraRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleUpload}
                   hidden
                 />
               </div>
