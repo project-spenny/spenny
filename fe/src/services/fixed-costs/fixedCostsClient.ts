@@ -6,18 +6,6 @@ import type {
 } from '@/types/fixed-costs';
 import { getMonthRange, getWeekRange } from '@/utils/date';
 
-// 고정비 규칙 목록 조회
-export const fetchFixedRules = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('fixed_rules')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return (data ?? []) as IFixedRule[];
-};
-
 // 고정비 규칙 생성
 export const createFixedRule = async (
   userId: string,
