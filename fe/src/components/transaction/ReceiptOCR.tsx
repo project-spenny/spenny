@@ -198,9 +198,6 @@ export default function ReceiptOCR() {
     }
 
     if (ocrResults.length > 0) {
-      toast.success(
-        `${ocrResults.length}개 중 ${errors.length}개 분석에 성공했습니다`
-      );
       setResults(ocrResults);
       setCheckedItems(
         new Set(
