@@ -254,6 +254,7 @@ export default function ReceiptOCR() {
 
       toast.success(`등록 완료!`);
       setOpen(false);
+      reset();
       router.refresh();
     } catch (error) {
       toast.error('등록 중 오류가 발생했습니다');
