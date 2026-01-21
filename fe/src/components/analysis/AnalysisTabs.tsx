@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 const TABS_CONFIG = [
   { value: '지출', label: '지출' },
   { value: '수입', label: '수입' },
-  { value: '예산', label: '예산' },
 ];
 
 const AnalysisTabs = ({ children }: { children: React.ReactNode }) => {
@@ -16,7 +15,7 @@ const AnalysisTabs = ({ children }: { children: React.ReactNode }) => {
       defaultValue="지출"
       className="mx-auto w-full max-w-4xl px-6 md:px-12"
     >
-      <TabsList className="bg-brand-subtle dark:bg-brand/10 flex h-12 w-full gap-2 p-2">
+      <TabsList className="bg-brand-subtle dark:bg-brand/10 flex h-12 w-full gap-2 p-2 md:h-14">
         {TABS_CONFIG.map((tab) => (
           <TabsTrigger
             key={tab.value}

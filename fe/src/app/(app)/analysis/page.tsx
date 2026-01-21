@@ -1,20 +1,18 @@
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisTabs from '@/components/analysis/AnalysisTabs';
 import AnalysisView from '@/components/analysis/AnalysisView';
-import BudgetView from '@/components/budgets/BudgetView';
 import MonthNavigator from '@/components/analysis/common/MonthNavigator';
 import { Suspense } from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { TransactionType } from '@/types/analysis';
 import { getAnalysisData } from '@/services/analysis/analysisService.server';
-import { getBudgetBundle } from '@/services/analysis/budgetService.server';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 type AnalysisPageProps = {
   searchParams: Promise<{ year?: string; month?: string }>;
 };
 
-// 연/월 범위 제한
+// 날짜 검증 (연/월 범위 제한)
 const validateDate = (yearParam?: string, monthParam?: string) => {
   const now = new Date();
   const year = Math.min(
@@ -37,27 +35,12 @@ const AnalysisDataSection = async ({
 }) => {
   const { supabase, user } = await requireUserServer();
   const data = await getAnalysisData(supabase, user.id, date, type);
+
   return <AnalysisView type={type} selectedDate={date} initialData={data} />;
-};
-
-const BudgetDataSection = async ({ date }: { date: Date }) => {
-  const { budgetData, budgetGuideData, analysisData, categories } =
-    await getBudgetBundle(date);
-
-  return (
-    <BudgetView
-      selectedDate={date}
-      initialBudgetData={budgetData}
-      initialBudgetGuideData={budgetGuideData}
-      initialAnalysisData={analysisData}
-      initialCategories={categories}
-    />
-  );
 };
 
 const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
   const { year: yearParam, month: monthParam } = await searchParams;
-
   const { year, month, currentDate } = validateDate(yearParam, monthParam);
 
   const ANALYSIS_TABS = [
@@ -68,10 +51,6 @@ const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
     {
       value: '수입',
       fetcher: <AnalysisDataSection date={currentDate} type="income" />,
-    },
-    {
-      value: '예산',
-      fetcher: <BudgetDataSection date={currentDate} />,
     },
   ];
 
