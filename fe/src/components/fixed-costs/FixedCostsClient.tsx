@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useRef, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import FixedCostsAddButton from './FixedCostsAddButton';
@@ -14,23 +14,23 @@ export default function FixedCostsClient() {
   const { selectedRule, isOpen, openCreate, close } = useFixedCosts();
 
   const [isPending, startTransition] = useTransition();
-  const [closeAfterRefresh, setCloseAfterRefresh] = useState(false);
+  const closeAfterRefreshRef = useRef(false);
 
   const handlePanelOpenChange = (open: boolean) => {
     if (!open) close();
   };
 
   const handleSuccess = () => {
-    setCloseAfterRefresh(true);
+    closeAfterRefreshRef.current = true;
     startTransition(() => router.refresh());
   };
 
   useEffect(() => {
-    if (closeAfterRefresh && !isPending) {
+    if (closeAfterRefreshRef.current && !isPending) {
       close();
-      setCloseAfterRefresh(false);
+      closeAfterRefreshRef.current = false;
     }
-  }, [closeAfterRefresh, isPending, close]);
+  }, [isPending, close]);
 
   const mode = selectedRule ? 'edit' : 'create';
 
