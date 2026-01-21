@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
-import { Camera, Upload, X, Sparkles } from 'lucide-react';
+import { Camera, Upload, X, Sparkles, Router } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ import { Input } from '../ui/input';
 import { DatePicker } from './common/DatePicker';
 import { Checkbox } from '../ui/checkbox';
 import { formatLocalDate } from '@/utils/date';
+import { useRouter } from 'next/navigation';
 import {
   Popover,
   PopoverContent,
@@ -46,6 +47,7 @@ export default function ReceiptOCR() {
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [isDragging, setIsDragging] = useState(false);
+  const router = useRouter();
 
   const toggleCheck = (index: number) => {
     setCheckedItems((prev) => {
@@ -252,6 +254,7 @@ export default function ReceiptOCR() {
 
       toast.success(`등록 완료!`);
       setOpen(false);
+      router.refresh();
     } catch (error) {
       toast.error('등록 중 오류가 발생했습니다');
     } finally {
