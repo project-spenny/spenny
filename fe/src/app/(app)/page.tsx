@@ -70,49 +70,32 @@ async function DataCalendar({
   const transactions = await getTransaction(filters, true);
   const today = new Date();
   const isCurrentMonth = currentMonth === formatMonth(today);
-  if (!isCurrentMonth) {
-    return (
-      <div className="flex w-full flex-col gap-3">
-        <Calendar
-          currentMonth={currentMonth}
-          transactions={transactions}
-        ></Calendar>
-      </div>
-    );
-  }
 
   return (
     <div className="flex w-full flex-col gap-3">
       <Calendar currentMonth={currentMonth} transactions={transactions}>
-        <DailyRecData
-          transactions={transactions}
-          monthDate={monthDate}
-          today={today}
-        />
+        <DailyRecData/>
       </Calendar>
     </div>
   );
 }
 
-async function DailyRecData({
-  transactions,
-  monthDate,
-  today,
-}: {
-  transactions: Awaited<ReturnType<typeof getTransaction>>;
-  monthDate: Date;
-  today: Date;
-}) {
-  const [budgets, fixedRules] = await Promise.all([
-    fetchBudgetsServer(monthDate),
-    fetchFixedRulesByMonthServer(monthDate),
+async function DailyRecData() {
+
+  const today = new Date();
+  const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const { startDate, endDate } = getMonthRange(currentMonth);
+  const [transactions, budgets, fixedRules] = await Promise.all([
+    getTransaction({ start_date: startDate, end_date: endDate }, true),
+    fetchBudgetsServer(currentMonth),
+    fetchFixedRulesByMonthServer(currentMonth),
   ]);
 
   const budget = getTotalBudgetAmount(budgets);
 
   const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
     fixedRules,
-    monthDate
+    currentMonth
   );
 
   const lookbackDays = 56;
@@ -167,7 +150,7 @@ async function DailyRecData({
   );
 
   const dailyChartData = buildDailyRecChartData({
-    monthDate,
+    monthDate : currentMonth,
     transactions,
     today,
     budget,
