@@ -389,10 +389,10 @@ export default function ReceiptOCR() {
                 </>
               )}
               {loading && (
-                <div className="space-y-2">
-                  <Progress value={(progress.current / progress.total) * 100} />
+                <div className="flex flex-col items-center space-y-2">
+                  <Spinner className="h-8 w-8" />
                   <p className="text-muted-foreground text-center text-sm">
-                    {progress.current} / {progress.total} 처리 중...
+                    AI가 영수증을 분석하고 있습니다
                   </p>
                 </div>
               )}
