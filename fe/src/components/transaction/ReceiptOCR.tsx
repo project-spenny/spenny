@@ -198,7 +198,9 @@ export default function ReceiptOCR() {
     }
 
     if (ocrResults.length > 0) {
-      toast.success(`${ocrResults.length}개 중 ${errors.length}개 분석에 성공했습니다`);
+      toast.success(
+        `${ocrResults.length}개 중 ${errors.length}개 분석에 성공했습니다`
+      );
       setResults(ocrResults);
       setCheckedItems(
         new Set(
@@ -290,9 +292,7 @@ export default function ReceiptOCR() {
     <>
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogTrigger asChild>
-          <Button
-            className="h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
-          >
+          <Button className="h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100">
             {loading ? <Spinner /> : <Sparkles size={12} />}
           </Button>
         </DialogTrigger>
@@ -301,16 +301,15 @@ export default function ReceiptOCR() {
             <DialogTitle>
               {step === 'upload' ? `영수증 업로드` : '영수증 분석 결과'}
             </DialogTitle>
-            {(step==='upload')?(<p className="text-muted-foreground text-sm">
-              AI가 영수증 데이터를 자동으로 추출합니다
-            </p>):(
-              <p className="text-muted-foreground text-sm pt-2">
-              {`성공 ${results.filter(e=> !e.error).length} 실패 ${results.filter(e=> e.error).length}`}
-              </p>)
-            }
-            
-            
-            
+            {step === 'upload' ? (
+              <p className="text-muted-foreground text-sm">
+                AI가 영수증 데이터를 자동으로 추출합니다
+              </p>
+            ) : (
+              <p className="text-muted-foreground pt-2 text-sm">
+                {`성공 ${results.filter((e) => !e.error).length} 실패 ${results.filter((e) => e.error).length}`}
+              </p>
+            )}
           </DialogHeader>
           {step === 'upload' && (
             <>
@@ -318,9 +317,9 @@ export default function ReceiptOCR() {
                 className="flex-1"
                 onClick={(e) => {
                   e.stopPropagation();
-                  cameraRef.current?.click()
+                  cameraRef.current?.click();
                 }}
-                type='button'
+                type="button"
               >
                 <Camera />
                 촬영하기
@@ -335,7 +334,9 @@ export default function ReceiptOCR() {
               >
                 <Upload className="text-muted-foreground mx-auto mb-2" />
                 <p className="text-muted-foreground">
-                  {isDragging ? '여기에 놓아주세요' : '클릭하거나 파일을 드래그하세요'}
+                  {isDragging
+                    ? '여기에 놓아주세요'
+                    : '클릭하거나 파일을 드래그하세요'}
                 </p>
                 <input
                   onChange={handleFiles}
@@ -353,9 +354,9 @@ export default function ReceiptOCR() {
                   onChange={handleCameraFiles}
                   hidden
                 />
-              <p className="text-xs text-muted-foreground mt-2">
-                · 이미지 파일만 가능 · 5MB 이하 권장
-              </p>
+                <p className="text-muted-foreground mt-2 text-xs">
+                  · 이미지 파일만 가능 · 5MB 이하 권장
+                </p>
               </div>
               {/* 미리보기 영역 */}
               {previews.length > 0 && (
@@ -401,7 +402,7 @@ export default function ReceiptOCR() {
             <>
               <div className="max-h-[60vh] space-y-3 overflow-y-auto">
                 <div className="flex items-center justify-between">
-                  <label className="w-full text-right flex cursor-pointer items-center gap-2">
+                  <label className="flex w-full cursor-pointer items-center gap-2 text-right">
                     <Checkbox
                       checked={checkedItems.size === results.length}
                       onCheckedChange={toggleAll}
@@ -531,7 +532,9 @@ export default function ReceiptOCR() {
                   ))}
                 </div>
                 <Button
-                  disabled={loading || results.length === 0 || checkedItems.size===0}
+                  disabled={
+                    loading || results.length === 0 || checkedItems.size === 0
+                  }
                   onClick={handleSubmit}
                   className="w-full"
                 >
@@ -539,10 +542,7 @@ export default function ReceiptOCR() {
                     ? '등록 중...'
                     : `${checkedItems.size} / ${results.length}개 데이터 등록`}
                 </Button>
-                <Button
-                  onClick={()=>setStep('upload')}
-                  className="w-full"
-                >
+                <Button onClick={() => setStep('upload')} className="w-full">
                   처음으로 돌아가기
                 </Button>
               </div>
