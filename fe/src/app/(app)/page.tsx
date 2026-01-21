@@ -19,7 +19,20 @@ import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs';
 import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
 import { SpendingTransaction } from '@/services/daily-recommendation/spendingPattern';
+import { cache } from 'react';
 
+const getCachedTransaction = cache(
+  async (startDate: string, endDate: string, includeFixed: boolean) => {
+    return await getTransaction({ start_date: startDate, end_date: endDate }, includeFixed);
+  }
+);
+const getCachedBudgets = cache(async (monthDate: Date) => {
+  return await fetchBudgetsServer(monthDate);
+});
+
+const getCachedFixedRules = cache(async (monthDate: Date) => {
+  return await fetchFixedRulesByMonthServer(monthDate);
+});
 interface PageProps {
   searchParams: Promise<{
     month?: string;
@@ -34,18 +47,14 @@ export default async function Home({ searchParams }: PageProps) {
   const monthDate = new Date(`${currentMonth}-01`);
   const { startDate, endDate } = getMonthRange(monthDate);
 
-  const filters: TransactionFilters = {
-    start_date: startDate,
-    end_date: endDate,
-  };
-
   return (
     <div className="flex min-h-screen w-full max-w-6xl self-start">
       <CalendarProvider>
         <TransactionProvider>
           <Suspense fallback={<CalendarSkeleton />}>
             <DataCalendar
-              filters={filters}
+              startDate={startDate}
+              endDate={endDate}
               currentMonth={currentMonth}
               selectedDate={params.selected_date}
               monthDate={monthDate}
@@ -58,16 +67,17 @@ export default async function Home({ searchParams }: PageProps) {
 }
 
 async function DataCalendar({
-  filters,
+  startDate,
+  endDate,
   currentMonth,
-  monthDate,
 }: {
-  filters: TransactionFilters;
+  startDate: string;
+  endDate: string;
   currentMonth: string;
   selectedDate?: string;
   monthDate: Date;
 }) {
-  const transactions = await getTransaction(filters, true);
+  const transactions = await getCachedTransaction(startDate, endDate, true);
   const today = new Date();
   const isCurrentMonth = currentMonth === formatMonth(today);
 
@@ -86,9 +96,9 @@ async function DailyRecData() {
   const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const { startDate, endDate } = getMonthRange(currentMonth);
   const [transactions, budgets, fixedRules] = await Promise.all([
-    getTransaction({ start_date: startDate, end_date: endDate }, true),
-    fetchBudgetsServer(currentMonth),
-    fetchFixedRulesByMonthServer(currentMonth),
+    getCachedTransaction(startDate, endDate, true),
+    getCachedBudgets(currentMonth),
+    getCachedFixedRules(currentMonth),
   ]);
 
   const budget = getTotalBudgetAmount(budgets);
