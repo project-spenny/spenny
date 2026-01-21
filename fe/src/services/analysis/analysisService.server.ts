@@ -1,11 +1,29 @@
+import { formatLocalDate, getMonthRange, minDate } from '@/utils/date';
 import {
   normalizeTransactionCategory,
   transformAnalysisData,
 } from '@/utils/analysis-transform';
 
 import { TransactionType } from '@/types/analysis';
-import { getMonthRange } from '@/utils/date';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
+import { syncByMonthServer } from '@/services/fixed-costs/syncFixedTransactions.server';
+
+// 고정비 동기화 실패 시 에러를 던지지 않고 경고만 남김 (동기화 실패해도 조회는 가능하도록)
+const safeSyncServer = async (params: {
+  monthDate: Date;
+  startDate: string;
+  endDate: string;
+  generateThroughDate?: string;
+}) => {
+  try {
+    return await syncByMonthServer(params);
+  } catch (error) {
+    console.warn(
+      `[FixedSync] ${params.monthDate.getMonth() + 1}월 동기화 실패:`,
+      error
+    );
+  }
+};
 
 export const getAnalysisData = async (
   selectedDate: Date,
@@ -23,6 +41,24 @@ export const getAnalysisData = async (
     );
     const { startDate: prevStart, endDate: prevEnd } =
       getMonthRange(lastMonthDate);
+
+    // 고정비 동기화
+    const today = formatLocalDate(new Date());
+    await Promise.all([
+      // 지난 달: 전체 기간 동기화
+      safeSyncServer({
+        monthDate: lastMonthDate,
+        startDate: prevStart,
+        endDate: prevEnd,
+      }),
+      // 이번 달: 오늘 날짜까지만 동기화
+      safeSyncServer({
+        monthDate: selectedDate,
+        startDate,
+        endDate,
+        generateThroughDate: today,
+      }),
+    ]);
 
     // 데이터 조회 (지난달 시작일 ~ 이번달 종료일)
     const { data, error } = await supabase
