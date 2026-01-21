@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Edit } from 'lucide-react';
+import PercentageBadge from '@/components/budgets/common/PercentageBadge';
 import { Progress } from '@/components/ui/progress';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
@@ -35,16 +35,7 @@ const BudgetCategoryItem = ({
         <div className="space-y-1">
           <div className="flex items-center gap-1 text-sm">
             <span className="font-bold">{name}</span>
-            <Badge
-              className={cn(
-                'px-2 py-0.5 font-semibold',
-                usagePercentage >= 90
-                  ? 'bg-destructive/10 text-destructive'
-                  : 'bg-brand-subtle dark:bg-brand/10 text-brand'
-              )}
-            >
-              {usagePercentage}%
-            </Badge>
+            <PercentageBadge percentage={usagePercentage} />
           </div>
 
           <div className="flex items-center gap-2 tracking-tight">
