@@ -36,10 +36,12 @@ const FixedCostItemSkeleton = () => (
 
 export default function FixedCostsListSkeleton({ count = 5 }: Props) {
   return (
-    <div className="space-y-6">
-      {Array.from({ length: count }).map((_, i) => (
-        <FixedCostItemSkeleton key={i} />
-      ))}
+    <div className="flex w-full flex-col items-center space-y-6 p-4 md:p-6 lg:p-8">
+      <div className="w-full max-w-xl space-y-6">
+        {Array.from({ length: count }).map((_, i) => (
+          <FixedCostItemSkeleton key={i} />
+        ))}
+      </div>
     </div>
   );
 }

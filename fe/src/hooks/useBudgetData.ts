@@ -8,7 +8,7 @@ import { formatLocalDate, formatMonth } from '@/utils/date';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { BudgetWithCategory } from '@/types/analysis';
-import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixed-costs';
+import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixedCostsClient';
 import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
 import { toast } from 'sonner';
 import { useAuth } from '@/providers/AuthProvider';
