@@ -26,6 +26,7 @@ import {
 } from '../ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '../ui/label';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface ResultWithPreview {
   result: OCRResult;
@@ -35,6 +36,8 @@ interface ResultWithPreview {
 }
 
 export default function ReceiptOCR() {
+  const { userId, isLoading: authLoading } = useAuth();
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -217,24 +220,17 @@ export default function ReceiptOCR() {
       return;
     }
 
+    if (authLoading) return;
+    if (!userId) return;
+    setLoading(true);
+
+    setLoading(true);
     try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (!user || authError) {
-        toast.warning('로그인이 필요합니다');
-        return;
-      }
-
-      setLoading(true);
-
       const transactionsData = results
         .filter((_, index) => checkedItems.has(index))
         .filter((item) => !item.error)
         .map((item) => ({
-          user_id: user.id,
+          user_id: userId,
           title: item.result?.title,
           type: 'expense',
           amount: Number(item.result?.amount),
