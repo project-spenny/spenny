@@ -1,31 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import FixedCostsAddButton from './FixedCostsAddButton';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import FixedCostSubmitForm from './FixedCostSubmitForm';
+import { useFixedCosts } from '@/app/(app)/fixed-costs/FixedCostsContext';
+import { mapFixedRuleToFormData } from '@/utils/fixed-costs';
 
 export default function FixedCostsClient() {
   const router = useRouter();
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const { selectedRule, isOpen, openCreate, close } = useFixedCosts();
 
-  const handleCreateClick = () => {
-    setIsPanelOpen(true);
+  const [isPending, startTransition] = useTransition();
+  const [closeAfterRefresh, setCloseAfterRefresh] = useState(false);
+
+  const handlePanelOpenChange = (open: boolean) => {
+    if (!open) close();
   };
 
-  const handleCreateSuccess = async () => {
-    setIsPanelOpen(false);
-    router.refresh();
+  const handleSuccess = () => {
+    setCloseAfterRefresh(true);
+    startTransition(() => router.refresh());
   };
+
+  useEffect(() => {
+    if (closeAfterRefresh && !isPending) {
+      close();
+      setCloseAfterRefresh(false);
+    }
+  }, [closeAfterRefresh, isPending, close]);
+
+  const mode = selectedRule ? 'edit' : 'create';
 
   return (
     <>
-      <FixedCostsAddButton onClick={handleCreateClick} />
+      <FixedCostsAddButton onClick={openCreate} />
 
-      <ResponsivePanel isOpen={isPanelOpen} setIsOpen={setIsPanelOpen}>
-        <FixedCostSubmitForm mode="create" onSuccess={handleCreateSuccess} />
+      <ResponsivePanel isOpen={isOpen} setIsOpen={handlePanelOpenChange}>
+        <FixedCostSubmitForm
+          mode={mode}
+          ruleId={selectedRule?.id}
+          initialData={
+            selectedRule ? mapFixedRuleToFormData(selectedRule) : undefined
+          }
+          onSuccess={handleSuccess}
+        />
       </ResponsivePanel>
     </>
   );
