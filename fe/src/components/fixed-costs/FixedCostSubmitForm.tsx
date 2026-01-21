@@ -15,7 +15,7 @@ import {
   createFixedRule,
   deleteFixedRule,
   updateFixedRuleWithScope,
-} from '@/services/fixed-costs/fixed-costs';
+} from '@/services/fixed-costs/fixedCostsClient';
 import { useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 import FixedCostDeleteDialog from './FixedCostDeleteDialog';
