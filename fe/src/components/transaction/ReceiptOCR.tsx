@@ -296,7 +296,10 @@ export default function ReceiptOCR() {
             {loading ? <Spinner /> : <Sparkles size={12} />}
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-lg overflow-hidden border-none">
+        <DialogContent
+          onClick={(e) => e.stopPropagation()}
+          className="max-w-lg overflow-hidden border-none"
+        >
           <DialogHeader>
             <DialogTitle>
               {step === 'upload' ? `영수증 업로드` : '영수증 분석 결과'}
@@ -317,6 +320,7 @@ export default function ReceiptOCR() {
                 className="flex-1"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   cameraRef.current?.click();
                 }}
                 type="button"
@@ -324,12 +328,23 @@ export default function ReceiptOCR() {
                 <Camera />
                 촬영하기
               </Button>
+              <input
+                ref={cameraRef}
+                type="file"
+                accept="image/*"
+                capture
+                onChange={handleCameraFiles}
+                hidden
+              />
 
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => inputRef.current?.click()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  inputRef.current?.click();
+                }}
                 className={`cursor-pointer rounded-lg border-2 border-dashed p-16 text-center ${isDragging && 'bg-brand-soft/30 border-solid'}`}
               >
                 <Upload className="text-muted-foreground mx-auto mb-2" />
@@ -344,14 +359,6 @@ export default function ReceiptOCR() {
                   type="file"
                   accept="image/*"
                   multiple
-                  hidden
-                />
-                <input
-                  ref={cameraRef}
-                  type="file"
-                  accept="image/*"
-                  capture
-                  onChange={handleCameraFiles}
                   hidden
                 />
                 <p className="text-muted-foreground mt-2 text-xs">
