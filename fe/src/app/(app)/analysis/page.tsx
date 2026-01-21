@@ -7,7 +7,7 @@ import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisTabs from '@/components/analysis/AnalysisTabs';
 import AnalysisView from '@/components/analysis/AnalysisView';
 import BudgetView from '@/components/budgets/BudgetView';
-import MonthNavigator from '@/components/common/MonthNavigator';
+import MonthNavigator from '@/components/analysis/common/MonthNavigator';
 import { Suspense } from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { TransactionType } from '@/types/analysis';
