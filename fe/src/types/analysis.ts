@@ -1,4 +1,5 @@
 import { ITransaction } from '@/types/transactions';
+import { TransformAnalysisResult } from '@/utils/analysis-transform';
 
 /**
  * 거래 내역의 타입 (지출 또는 수입)
@@ -25,6 +26,12 @@ export type CategoryAnalysis = {
   name: string;
   amount: number;
   percentage: number;
+};
+
+/** 가공된 분석 통계와 원본 내역을 모두 포함하는 데이터 타입 */
+export type AnalysisData = TransformAnalysisResult & {
+  current: TransactionAnalysis[];
+  prev: TransactionAnalysis[];
 };
 
 /**

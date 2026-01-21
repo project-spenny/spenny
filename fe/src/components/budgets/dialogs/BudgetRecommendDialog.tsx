@@ -1,5 +1,6 @@
 import { ArrowRight, Info } from 'lucide-react';
 import {
+  BudgetGuideData,
   CalculatedBudgetItem,
   CategoryGroupId,
   TemplateId,
@@ -19,12 +20,11 @@ import { Progress } from '@/components/ui/progress';
 import SavingGoalStep from '@/components/budgets/steps/SavingGoalStep';
 import { Spinner } from '@/components/ui/spinner';
 import TemplateSelectionStep from '@/components/budgets/steps/TemplateSelectionStep';
-import useBudgetGuideData from '@/hooks/useBudgetGuideData';
 
 type BudgetRecommendDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  selectedDate: Date;
+  guideData: BudgetGuideData;
   onConfirm: (budgetDraft: CalculatedBudgetItem[], totalBudget: number) => void;
   isSubmitting: boolean;
 };
@@ -32,7 +32,7 @@ type BudgetRecommendDialogProps = {
 const BudgetRecommendDialog = ({
   open,
   onOpenChange,
-  selectedDate,
+  guideData,
   onConfirm,
   isSubmitting = false,
 }: BudgetRecommendDialogProps) => {
@@ -41,17 +41,13 @@ const BudgetRecommendDialog = ({
     income: 0,
     savingsAmount: 0,
   });
-  const [confirmedSavings, setConfirmedSavings] = useState(0);
   const [isAdjusted, setIsAdjusted] = useState(false);
 
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<TemplateId>('keep-pattern'); // 선택된 템플릿
   const [budgetDraft, setBudgetDraft] = useState<CalculatedBudgetItem[]>([]); // 계산된 예산 초안
 
-  const { processedData, isLoading: isAnalysisLoading } = useBudgetGuideData(
-    selectedDate,
-    confirmedSavings
-  );
+  const processedData = guideData;
 
   useEffect(() => {
     // 초기값 설정
@@ -63,9 +59,8 @@ const BudgetRecommendDialog = ({
         income: initialIncome,
         savingsAmount: initialSavings,
       });
-      setConfirmedSavings(initialSavings);
     }
-  }, [processedData]); // processedData가 로드되는 순간 실행됨
+  }, [processedData, goalData.income]); // processedData가 로드되는 순간 실행됨
 
   // 다이얼로그가 닫힐 때 상태 리셋
   useEffect(() => {
@@ -80,7 +75,6 @@ const BudgetRecommendDialog = ({
           income: 0,
           savingsAmount: 0,
         });
-        setConfirmedSavings(0);
       }, 300);
       return () => clearTimeout(timer);
     }
@@ -99,7 +93,6 @@ const BudgetRecommendDialog = ({
   // step 이동 버튼 핸들러
   const handleNextStep = () => {
     if (step === 2) {
-      setConfirmedSavings(goalData.savingsAmount);
       setStep(step + 1);
     } else if (step === 3 && processedData) {
       let result: CalculatedBudgetItem[] = [];
@@ -173,12 +166,7 @@ const BudgetRecommendDialog = ({
     });
   }, [processedData]);
 
-  if (isAnalysisLoading)
-    return (
-      <div className="text-muted-foreground p-10 text-center text-sm">
-        소비 패턴 분석 중...
-      </div>
-    );
+  if (!processedData) return null;
 
   const monthlyData = processedData?.monthlyData || [];
   const summary = processedData?.summary || { avgTotal: 0, groupAverages: {} };

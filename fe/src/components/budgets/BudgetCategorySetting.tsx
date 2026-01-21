@@ -1,8 +1,12 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 
 import BudgetCategoryEditItem from '@/components/budgets/common/BudgetCategoryEditItem';
 import BudgetSummary from '@/components/budgets/common/BudgetSummary';
+import { BudgetWithCategory } from '@/types/analysis';
 import { Button } from '@/components/ui/button';
+import { Category } from '@/constants/categories';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
 import useBudgetData from '@/hooks/useBudgetData';
@@ -11,6 +15,8 @@ import useCategories from '@/hooks/useCategories';
 type BudgetCategorySettingProps = {
   selectedDate: Date;
   totalBudgetAmount: number;
+  initialBudgets: BudgetWithCategory[];
+  initialCategories: Category[];
   initialCategoryKey?: string | null;
   onSaveSuccess?: () => void;
   onEditTotalBudget?: () => void;
@@ -19,6 +25,8 @@ type BudgetCategorySettingProps = {
 const BudgetCategorySetting = ({
   selectedDate,
   totalBudgetAmount,
+  initialBudgets,
+  initialCategories,
   initialCategoryKey,
   onSaveSuccess,
   onEditTotalBudget,
@@ -28,9 +36,12 @@ const BudgetCategorySetting = ({
     saveCategoryBudgets,
     isSavingCategories,
     removeBudget,
-  } = useBudgetData(selectedDate);
-  const { data: allCategories, isLoading: isCategoriesLoading } =
-    useCategories('expense');
+  } = useBudgetData(selectedDate, initialBudgets);
+
+  const { data: allCategories = [] } = useCategories(
+    'expense',
+    initialCategories
+  );
 
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({}); // 각 카테고리 Input 참조
@@ -64,26 +75,23 @@ const BudgetCategorySetting = ({
 
   // 데이터 초기화
   useEffect(() => {
-    if (categoryBudgets && allCategories) {
+    if (categoryBudgets.length > 0) {
       const initialMap: Record<string, string> = {};
 
       categoryBudgets.forEach((budget) => {
-        // category_id와 일치하는 카테고리 정보 확인
-        const category = allCategories.find(
-          (c) => c.category_key === budget.category_id
-        );
+        const key = budget.category?.category_key;
 
-        if (category) {
-          initialMap[category.category_key] = budget.amount.toString();
+        if (key) {
+          initialMap[key] = budget.amount.toString();
         }
       });
 
       setAmounts(initialMap);
     }
-  }, [categoryBudgets, allCategories]);
+  }, [categoryBudgets]);
   // 초기 포커스
   useEffect(() => {
-    if (!initialCategoryKey || isCategoriesLoading) return;
+    if (!initialCategoryKey) return;
 
     const timer = setTimeout(() => {
       const targetInput = inputRefs.current[initialCategoryKey];
@@ -93,7 +101,7 @@ const BudgetCategorySetting = ({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [initialCategoryKey, isCategoriesLoading]);
+  }, [initialCategoryKey]);
 
   // 핸들러
   const handleAmountChange = (category: string, value: string) => {
@@ -140,8 +148,10 @@ const BudgetCategorySetting = ({
           onEditTotal={onEditTotalBudget}
         />
 
-        {isCategoriesLoading ? (
-          <div>카테고리 목록 불러오는 중</div>
+        {allCategories.length === 0 ? (
+          <p className="text-muted-foreground py-10 text-center">
+            카테고리 정보를 불러올 수 없습니다.
+          </p>
         ) : (
           allCategories?.map((category) => (
             <BudgetCategoryEditItem
