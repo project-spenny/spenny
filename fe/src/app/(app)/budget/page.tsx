@@ -9,10 +9,15 @@ type BudgetPageProps = {
   searchParams: Promise<{ year?: string; month?: string }>;
 };
 
-// 예산 데이터 페칭 섹션
+// 예산 데이터 패칭 섹션
 const BudgetDataSection = async ({ date }: { date: Date }) => {
-  const { budgetData, budgetGuideData, analysisData, categories } =
-    await getBudgetBundle(date);
+  const {
+    budgetData,
+    budgetGuideData,
+    analysisData,
+    categories,
+    futureFixedAmount,
+  } = await getBudgetBundle(date);
 
   return (
     <BudgetView
@@ -21,6 +26,7 @@ const BudgetDataSection = async ({ date }: { date: Date }) => {
       initialBudgetGuideData={budgetGuideData}
       initialAnalysisData={analysisData}
       initialCategories={categories}
+      initialFutureFixedAmount={futureFixedAmount}
     />
   );
 };
