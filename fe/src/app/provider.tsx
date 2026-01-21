@@ -1,5 +1,6 @@
 'use client';
 
+import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -26,7 +27,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableSystem
         disableTransitionOnChange // 테마 변경 시 스타일 깜빡임 방지
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>
     </QueryClientProvider>

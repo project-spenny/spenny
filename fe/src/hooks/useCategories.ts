@@ -1,8 +1,9 @@
+import { Category } from '@/constants/categories';
 import { TransactionType } from '@/types/analysis';
 import { supabase } from '@/utils/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
-const useCategories = (type?: TransactionType) => {
+const useCategories = (type?: TransactionType, initialData?: Category[]) => {
   return useQuery({
     queryKey: ['categories', type],
     queryFn: async () => {
@@ -15,6 +16,7 @@ const useCategories = (type?: TransactionType) => {
       if (error) throw error;
       return data;
     },
+    initialData,
   });
 };
 

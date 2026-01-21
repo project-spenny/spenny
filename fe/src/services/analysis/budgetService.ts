@@ -1,21 +1,9 @@
-import { BudgetWithCategory } from '@/types/analysis';
 import { getMonthRange } from '@/utils/date';
+import { normalizeBudgetCategory } from '@/utils/analysis-transform';
 import { supabase } from '@/utils/supabase/client';
 
-// 현재 로그인한 유저 정보 가져오기
-export const getCurrentUser = async () => {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (!user || error) throw new Error('로그인이 필요합니다');
-  return user;
-};
-
 // 특정 월의 예산 데이터 가져오기 (Read)
-export const fetchBudgets = async (date: Date) => {
-  const user = await getCurrentUser();
-
+export const fetchBudgets = async (userId: string, date: Date) => {
   // 해당 월의 1일
   const { startDate } = getMonthRange(date);
 
@@ -31,35 +19,27 @@ export const fetchBudgets = async (date: Date) => {
         category_key
       )`
     )
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('budget_month', startDate);
 
   if (error) throw error;
 
-  // 단일 객체로 정규화
-  const normalized: BudgetWithCategory[] = (data ?? []).map((t) => ({
-    ...t,
-    category: Array.isArray(t.category) // category가 배열인지 검사
-      ? (t.category[0] ?? null)
-      : (t.category ?? null),
-  }));
-
-  return normalized;
+  return normalizeBudgetCategory(data);
 };
 
 // 예산 데이터 저장 및 수정 (Upsert)
 export const upsertBudget = async (
+  userId: string,
   date: Date,
   amount: number,
   categoryId: string | null = null
 ) => {
-  const user = await getCurrentUser();
   const { startDate } = getMonthRange(date);
 
   const { data, error } = await supabase.from('budgets').upsert(
     [
       {
-        user_id: user.id,
+        user_id: userId,
         budget_month: startDate,
         category_id: categoryId,
         amount: amount,
@@ -76,14 +56,14 @@ export const upsertBudget = async (
 
 // 카테고리 예산 일괄 저장 (배열)
 export const upsertCategoryBudgets = async (
+  userId: string,
   date: Date,
   categoryData: { categoryId: string; amount: number }[]
 ) => {
-  const user = await getCurrentUser();
   const { startDate } = getMonthRange(date);
 
   const upsertRows = categoryData.map((item) => ({
-    user_id: user.id,
+    user_id: userId,
     budget_month: startDate,
     category_id: item.categoryId,
     amount: item.amount,
@@ -99,16 +79,16 @@ export const upsertCategoryBudgets = async (
 
 // 예산 삭제 (Delete)
 export const deleteBudgets = async (
+  userId: string,
   date: Date,
   categoryId: string | string[] | null = null
 ) => {
-  const user = await getCurrentUser();
   const { startDate } = getMonthRange(date);
 
   let query = supabase
     .from('budgets')
     .delete()
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('budget_month', startDate);
 
   if (categoryId === 'ALL_CATEGORIES') {

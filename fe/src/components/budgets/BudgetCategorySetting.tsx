@@ -1,10 +1,12 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 
 import BudgetCategoryEditItem from '@/components/budgets/common/BudgetCategoryEditItem';
 import BudgetSummary from '@/components/budgets/common/BudgetSummary';
+import { BudgetWithCategory } from '@/types/analysis';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+import { Category } from '@/constants/categories';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
 import useBudgetData from '@/hooks/useBudgetData';
@@ -13,6 +15,8 @@ import useCategories from '@/hooks/useCategories';
 type BudgetCategorySettingProps = {
   selectedDate: Date;
   totalBudgetAmount: number;
+  initialBudgets: BudgetWithCategory[];
+  initialCategories: Category[];
   initialCategoryKey?: string | null;
   onSaveSuccess?: () => void;
   onEditTotalBudget?: () => void;
@@ -21,6 +25,8 @@ type BudgetCategorySettingProps = {
 const BudgetCategorySetting = ({
   selectedDate,
   totalBudgetAmount,
+  initialBudgets,
+  initialCategories,
   initialCategoryKey,
   onSaveSuccess,
   onEditTotalBudget,
@@ -30,9 +36,12 @@ const BudgetCategorySetting = ({
     saveCategoryBudgets,
     isSavingCategories,
     removeBudget,
-  } = useBudgetData(selectedDate);
-  const { data: allCategories, isLoading: isCategoriesLoading } =
-    useCategories('expense');
+  } = useBudgetData(selectedDate, initialBudgets);
+
+  const { data: allCategories = [] } = useCategories(
+    'expense',
+    initialCategories
+  );
 
   const [amounts, setAmounts] = useState<Record<string, string>>({});
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({}); // 각 카테고리 Input 참조
@@ -66,37 +75,33 @@ const BudgetCategorySetting = ({
 
   // 데이터 초기화
   useEffect(() => {
-    if (categoryBudgets && allCategories) {
+    if (categoryBudgets.length > 0) {
       const initialMap: Record<string, string> = {};
 
       categoryBudgets.forEach((budget) => {
-        // category_id와 일치하는 카테고리 정보 확인
-        const category = allCategories.find(
-          (c) => c.category_key === budget.category_id
-        );
+        const key = budget.category?.category_key;
 
-        if (category) {
-          initialMap[category.category_key] = budget.amount.toString();
+        if (key) {
+          initialMap[key] = budget.amount.toString();
         }
       });
 
       setAmounts(initialMap);
     }
-  }, [categoryBudgets, allCategories]);
+  }, [categoryBudgets]);
   // 초기 포커스
   useEffect(() => {
-    if (!initialCategoryKey || isCategoriesLoading) return;
+    if (!initialCategoryKey) return;
 
     const timer = setTimeout(() => {
       const targetInput = inputRefs.current[initialCategoryKey];
       if (!targetInput) return;
 
       targetInput.focus();
-      targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+    }, 200);
 
     return () => clearTimeout(timer);
-  }, [initialCategoryKey, isCategoriesLoading]);
+  }, [initialCategoryKey]);
 
   // 핸들러
   const handleAmountChange = (category: string, value: string) => {
@@ -128,57 +133,51 @@ const BudgetCategorySetting = ({
 
   return (
     <div className="flex h-full flex-col px-8">
-      <div className="bg-background sticky top-0 space-y-1 pb-4">
-        <p className="text-xl font-bold">카테고리별 예산 설정</p>
-        <p className="text-muted-foreground text-sm font-medium">
+      <div className="bg-background sticky top-0 z-10 space-y-1 border-b pb-4">
+        <p className="text-lg font-bold md:text-xl">카테고리별 예산 설정</p>
+        <p className="text-muted-foreground text-xs font-medium md:text-sm">
           항목별 목표 금액을 정해보세요.
         </p>
+      </div>
 
+      {/* 카테고리 예산 설정 */}
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-2 py-2">
         <BudgetSummary
           totalBudget={totalBudgetAmount}
           totalAllocated={totalAllocated}
           onEditTotal={onEditTotalBudget}
         />
+
+        {allCategories.length === 0 ? (
+          <p className="text-muted-foreground py-10 text-center">
+            카테고리 정보를 불러올 수 없습니다.
+          </p>
+        ) : (
+          allCategories?.map((category) => (
+            <BudgetCategoryEditItem
+              key={category.category_key}
+              category={category}
+              amount={amounts[category.category_key] ?? ''}
+              totalBudgetAmount={totalBudgetAmount}
+              onChange={handleAmountChange}
+              onReset={handleResetCategory}
+              inputRef={(el) => {
+                inputRefs.current[category.category_key] = el;
+              }}
+            />
+          ))
+        )}
       </div>
 
-      <Separator />
-
-      {/* 카테고리 예산 설정 */}
-      <ScrollArea className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-5 px-2 py-4">
-          {isCategoriesLoading ? (
-            <div>카테고리 목록 불러오는 중</div>
-          ) : (
-            allCategories?.map((category) => (
-              <BudgetCategoryEditItem
-                key={category.category_key}
-                category={category}
-                amount={amounts[category.category_key] ?? ''}
-                totalBudgetAmount={totalBudgetAmount}
-                onChange={handleAmountChange}
-                onReset={handleResetCategory}
-                inputRef={(el) => {
-                  inputRefs.current[category.category_key] = el;
-                }}
-              />
-            ))
-          )}
-        </div>
-      </ScrollArea>
-
-      <Separator />
-
       {/* 하단 버튼 영역 */}
-      <div className="bg-background sticky bottom-0 space-y-4 border-t p-4">
+      <div className="bg-background sticky bottom-0 space-y-2 border-t pt-2 pb-4 text-xs md:text-sm">
         {isOverBudget ? (
-          <p
-            className={cn('text-center text-sm font-bold', THEME_COLOR.EXPENSE)}
-          >
+          <p className={cn('text-center font-bold', THEME_COLOR.EXPENSE)}>
             총 예산을 늘리거나 카테고리 금액을 조절해주세요.
           </p>
         ) : (
           !isDirty && (
-            <p className="text-muted-foreground text-center text-sm">
+            <p className="text-muted-foreground text-center">
               {categoryBudgets.length === 0
                 ? '카테고리별 예산 금액을 입력해주세요.'
                 : '기존에 설정된 금액과 동일합니다.'}
@@ -188,7 +187,7 @@ const BudgetCategorySetting = ({
 
         <Button
           className={cn(
-            'h-12 w-full cursor-pointer text-base',
+            'h-10 w-full cursor-pointer md:h-12',
             isOverBudget && 'bg-red-400 hover:bg-red-500'
           )}
           onClick={handleSave}

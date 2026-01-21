@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -7,28 +8,15 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-
 import ProfileForm from '@/components/onboarding/ProfileForm';
 import { OnboardingProfileValues } from '@/schemas/profile';
-
-import IntroPanel from '@/components/onboarding/IntroPanel';
-import { INTRO_STEPS } from '@/constants/onboarding';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function OnboardingPage() {
-  const [phase, setPhase] = useState<'form' | 'intro'>('form');
-  const [introStep, setIntroStep] = useState(0);
-  const [isExiting, setIsExiting] = useState(false);
-
+  const router = useRouter();
+  const { refresh } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
-
-  const exitOnboarding = () => {
-    if (isExiting) return;
-    setIsExiting(true);
-
-    window.location.replace('/');
-  };
 
   const handleProfileSubmit = async (values: OnboardingProfileValues) => {
     setServerError(null); // 서버 에러 상태 초기화
@@ -47,17 +35,12 @@ export default function OnboardingPage() {
 
     toast.success('기본 정보가 저장되었어요');
 
+    // 전역 Auth 상태(profile) 동기화
+    await refresh();
+
     // 온보딩 소개 단계로 전환
-    setIntroStep(0);
-    setPhase('intro');
+    router.replace('/onboarding/intro');
   };
-
-  // 온보딩 단계 이동 함수
-  const goPrev = () => setIntroStep((s) => Math.max(0, s - 1));
-  const goNext = () =>
-    setIntroStep((s) => Math.min(INTRO_STEPS.length - 1, s + 1));
-
-  const isLastIntro = introStep === INTRO_STEPS.length - 1;
 
   return (
     <div className="fixed inset-0 z-50">
@@ -68,60 +51,23 @@ export default function OnboardingPage() {
         <div className="w-full max-w-lg md:max-w-3xl">
           <Card className="max-h-[90dvh] overflow-hidden">
             <CardHeader className="relative space-y-2">
-              {phase === 'form' ? (
-                <>
-                  <CardTitle className="text-xl">기본 정보 설정</CardTitle>
-                  <CardDescription>
-                    서비스를 시작하기 위해 필수 정보만 먼저 입력해주세요.
-                  </CardDescription>
-                </>
-              ) : (
-                <>
-                  {!isLastIntro && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      disabled={isExiting}
-                      className="absolute -top-3 right-2"
-                      onClick={exitOnboarding}
-                    >
-                      건너뛰기
-                    </Button>
-                  )}
-                  <CardTitle className="text-xl">
-                    {INTRO_STEPS[introStep].title}
-                  </CardTitle>
-                  <CardDescription>
-                    {INTRO_STEPS[introStep].description}
-                  </CardDescription>
-                </>
-              )}
+              <CardTitle className="text-xl">기본 정보 설정</CardTitle>
+              <CardDescription>
+                서비스를 시작하기 위해 필수 정보만 먼저 입력해주세요.
+              </CardDescription>
             </CardHeader>
             <CardContent className="max-h-[70dvh] overflow-y-auto">
-              {phase === 'form' && serverError && (
+              {serverError && (
                 <p className="mb-4 text-sm text-red-500">{serverError}</p>
               )}
-
-              {phase === 'form' ? (
-                <ProfileForm
-                  defaultValues={{
-                    nickname: '',
-                    birth_date: '',
-                    gender: 'male',
-                  }}
-                  onSubmit={handleProfileSubmit}
-                />
-              ) : (
-                <IntroPanel
-                  steps={INTRO_STEPS}
-                  introStep={introStep}
-                  isLastIntro={isLastIntro}
-                  isExiting={isExiting}
-                  onPrev={goPrev}
-                  onNext={goNext}
-                  onExit={exitOnboarding}
-                />
-              )}
+              <ProfileForm
+                defaultValues={{
+                  nickname: '',
+                  birth_date: '',
+                  gender: 'male',
+                }}
+                onSubmit={handleProfileSubmit}
+              />
             </CardContent>
           </Card>
         </div>

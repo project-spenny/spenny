@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import { Profile, ProfilePatchValues } from '@/schemas/profile';
 import { Separator } from '@/components/ui/separator';
@@ -11,13 +11,7 @@ import ProfileView from './ProfileView';
 import MyInfoSkeleton from './MyInfoSkeleton';
 import { toast } from 'sonner';
 import ModeToggle from '../common/ModeToggle';
-
-// 프로필 조회 함수
-async function fetchProfile(): Promise<Profile> {
-  const res = await fetch('/api/profile', { method: 'GET' });
-  if (!res.ok) throw new Error('프로필 조회 실패');
-  return res.json();
-}
+import { useAuth } from '@/providers/AuthProvider';
 
 // 프로필 수정 함수
 async function updateProfile(values: ProfilePatchValues): Promise<Profile> {
@@ -33,25 +27,13 @@ async function updateProfile(values: ProfilePatchValues): Promise<Profile> {
 
 export default function MyInfo() {
   const [isEditing, setIsEditing] = useState(false);
-
-  // 프로필 데이터 조회
-  const {
-    data: profile,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ['profile'],
-    queryFn: fetchProfile,
-    retry: false,
-  });
-
-  const queryClient = useQueryClient();
+  const { userId, profile, isLoading, error, setProfile } = useAuth();
 
   // 프로필 수정 뮤테이션
   const { mutateAsync } = useMutation({
     mutationFn: updateProfile,
     onSuccess: (updated) => {
-      queryClient.setQueryData(['profile'], updated);
+      setProfile(updated);
       toast.success('프로필이 저장되었어요.');
     },
     onError: () => {
@@ -65,11 +47,14 @@ export default function MyInfo() {
     setIsEditing(false);
   };
 
+  if (!userId) return null;
+  if (!profile) return null;
+
   if (isLoading) {
     return <MyInfoSkeleton />;
   }
 
-  if (isError || !profile) {
+  if (error) {
     return (
       <div className="p-4 text-sm text-red-500">
         프로필을 불러오지 못했습니다.

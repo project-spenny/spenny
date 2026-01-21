@@ -1,6 +1,6 @@
-import { createClient } from '@/utils/supabase/server';
 import { syncByMonthShared } from './syncFixedTransactions.shared';
 import { PG_ERROR } from '@/constants/postgres';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 // 서버 환경에서 고정비 규칙 기반 월별 거래 동기화
 export const syncByMonthServer = async ({
@@ -14,13 +14,7 @@ export const syncByMonthServer = async ({
   endDate: string;
   generateThroughDate?: string;
 }) => {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('User not authenticated');
+  const { supabase, user } = await requireUserServer();
 
   const { data: profile } = await supabase
     .from('profiles')
