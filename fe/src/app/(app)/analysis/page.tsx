@@ -1,8 +1,3 @@
-import {
-  getBudgetData,
-  getBudgetGuideData,
-} from '@/services/analysis/budgetService.server';
-
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisTabs from '@/components/analysis/AnalysisTabs';
 import AnalysisView from '@/components/analysis/AnalysisView';
@@ -12,7 +7,8 @@ import { Suspense } from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { TransactionType } from '@/types/analysis';
 import { getAnalysisData } from '@/services/analysis/analysisService.server';
-import { getCategories } from '@/services/categoryService.server';
+import { getBudgetBundle } from '@/services/analysis/budgetService.server';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 type AnalysisPageProps = {
   searchParams: Promise<{ year?: string; month?: string }>;
@@ -39,28 +35,21 @@ const AnalysisDataSection = async ({
   date: Date;
   type: TransactionType;
 }) => {
-  const data = await getAnalysisData(date, type);
+  const { supabase, user } = await requireUserServer();
+  const data = await getAnalysisData(supabase, user.id, date, type);
   return <AnalysisView type={type} selectedDate={date} initialData={data} />;
 };
 
 const BudgetDataSection = async ({ date }: { date: Date }) => {
-  const [budgetData, budgetGuideData, analysisData, categories] =
-    await Promise.all([
-      getBudgetData(date), // 예산 데이터 조회
-      getBudgetGuideData(date), // 예산 설정을 위한 가이드 데이터 조회
-      getAnalysisData(date, 'expense'),
-      getCategories('expense'),
-    ]);
+  const { budgetData, budgetGuideData, analysisData, categories } =
+    await getBudgetBundle(date);
+
   return (
     <BudgetView
       selectedDate={date}
       initialBudgetData={budgetData}
       initialBudgetGuideData={budgetGuideData}
-      initialAnalysisData={{
-        totalAmount: analysisData.totalAmount, // 이번 달 총액
-        categoryTotalsByKey: analysisData.categoryTotalsByKey, // 이번 달 카테고리별 합계
-        transactions: analysisData.current, // 이번 달 상세 내역
-      }}
+      initialAnalysisData={analysisData}
       initialCategories={categories}
     />
   );

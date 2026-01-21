@@ -1,11 +1,11 @@
-import { formatLocalDate, getMonthRange, minDate } from '@/utils/date';
+import { formatLocalDate, getMonthRange } from '@/utils/date';
 import {
   normalizeTransactionCategory,
   transformAnalysisData,
 } from '@/utils/analysis-transform';
 
+import { SupabaseClient } from '@supabase/supabase-js';
 import { TransactionType } from '@/types/analysis';
-import { requireUserServer } from '@/utils/supabase/requireUserServer';
 import { syncByMonthServer } from '@/services/fixed-costs/syncFixedTransactions.server';
 
 // 고정비 동기화 실패 시 에러를 던지지 않고 경고만 남김 (동기화 실패해도 조회는 가능하도록)
@@ -26,12 +26,12 @@ const safeSyncServer = async (params: {
 };
 
 export const getAnalysisData = async (
+  supabase: SupabaseClient,
+  userId: string,
   selectedDate: Date,
   type: TransactionType
 ) => {
   try {
-    const { supabase, user } = await requireUserServer();
-
     // 날짜 범위 계산
     const { startDate, endDate } = getMonthRange(selectedDate);
     const lastMonthDate = new Date(
@@ -69,7 +69,7 @@ export const getAnalysisData = async (
           category_key
         )`
       )
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('type', type)
       .gte('date', prevStart)
       .lte('date', endDate)

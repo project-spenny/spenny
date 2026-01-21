@@ -1,10 +1,11 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { TransactionType } from '@/types/analysis';
-import { createClient } from '@/utils/supabase/server';
 
-export const getCategories = async (type?: TransactionType) => {
+export const getCategories = async (
+  supabase: SupabaseClient,
+  type?: TransactionType
+) => {
   try {
-    const supabase = await createClient();
-
     let query = supabase.from('categories').select('*');
 
     if (type) query = query.eq('type', type);

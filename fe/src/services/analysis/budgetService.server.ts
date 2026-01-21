@@ -5,13 +5,18 @@ import {
   transformBudgetGuideData,
 } from '@/utils/analysis-transform';
 
+import { SupabaseClient } from '@supabase/supabase-js';
+import { getAnalysisData } from '@/services/analysis/analysisService.server';
+import { getCategories } from '@/services/categoryService.server';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 // 특정 월의 예산 데이터 조회
-export const getBudgetData = async (selectedDate: Date) => {
+export const getBudgetData = async (
+  supabase: SupabaseClient,
+  userId: string,
+  selectedDate: Date
+) => {
   try {
-    const { supabase, user } = await requireUserServer();
-
     const { startDate } = getMonthRange(selectedDate);
 
     const { data, error } = await supabase
@@ -22,7 +27,7 @@ export const getBudgetData = async (selectedDate: Date) => {
         category_key
       )`
       )
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('budget_month', startDate);
 
     if (error) throw error;
@@ -37,12 +42,12 @@ export const getBudgetData = async (selectedDate: Date) => {
 
 // 예산 설정을 위한 가이드 데이터 조회
 export const getBudgetGuideData = async (
+  supabase: SupabaseClient,
+  userId: string,
   selectedDate: Date,
   targetSaving: number = 0
 ) => {
   try {
-    const { supabase, user } = await requireUserServer();
-
     // 전월 날짜 계산
     const prevMonthStart = new Date(
       selectedDate.getFullYear(),
@@ -66,7 +71,7 @@ export const getBudgetGuideData = async (
       supabase
         .from('transactions')
         .select('amount')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('type', 'income')
         .gte('date', formatLocalDate(prevMonthStart))
         .lte('date', formatLocalDate(prevMonthEnd)),
@@ -81,7 +86,7 @@ export const getBudgetGuideData = async (
             )
           `
         )
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('type', 'expense')
         .gte('date', formatLocalDate(threeMonthsStart))
         .lte('date', formatLocalDate(prevMonthEnd))
@@ -104,4 +109,29 @@ export const getBudgetGuideData = async (
       cause: error,
     });
   }
+};
+
+// 예산 탭에 필요한 모든 데이터를 한 번에 조회하는 번들 함수
+export const getBudgetBundle = async (date: Date) => {
+  const { supabase, user } = await requireUserServer(); // 인증 1회 수행
+
+  // 모든 서비스 함수에 동일한 supabase, user.id 주입
+  const [budgetData, budgetGuideData, analysisData, categories] =
+    await Promise.all([
+      getBudgetData(supabase, user.id, date),
+      getBudgetGuideData(supabase, user.id, date),
+      getAnalysisData(supabase, user.id, date, 'expense'),
+      getCategories(supabase, 'expense'),
+    ]);
+
+  return {
+    budgetData,
+    budgetGuideData,
+    analysisData: {
+      totalAmount: analysisData.totalAmount,
+      categoryTotalsByKey: analysisData.categoryTotalsByKey,
+      transactions: analysisData.current,
+    },
+    categories,
+  };
 };
