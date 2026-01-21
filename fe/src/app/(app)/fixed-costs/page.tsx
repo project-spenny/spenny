@@ -1,8 +1,7 @@
 import FixedCostsClient from '@/components/fixed-costs/FixedCostsClient';
 import FixedCostsList from '@/components/fixed-costs/FixedCostsList';
 import FixedCostsListSkeleton from '@/components/fixed-costs/FixedCostsListSkeleton';
-import { fetchFixedRules } from '@/services/fixed-costs/fixed-costs';
-import { requireUserServer } from '@/utils/supabase/requireUserServer';
+import { fetchFixedRulesServer } from '@/services/fixed-costs/fixedCostsServer';
 import { Suspense } from 'react';
 
 export default function FixedCostsPage() {
@@ -25,8 +24,7 @@ export default function FixedCostsPage() {
 }
 
 async function FixedCostsListWrapper() {
-  const { user } = await requireUserServer();
-  const items = await fetchFixedRules(user.id);
+  const items = await fetchFixedRulesServer();
 
   return <FixedCostsList items={items} isLoading={false} onEdit={() => {}} />;
 }
