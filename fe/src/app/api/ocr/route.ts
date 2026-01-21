@@ -5,28 +5,56 @@ const expenseCATEGORIES = CATEGORIES.expense
   .join('|');
 
 const promptText = `
-한국의 영수증 OCR 분석
-이 영수증 이미지를 정확하게 분석해줘
+Extract receipt data from this image and return only a valid JSON Object
 
-규칙:
-1. 금액은 숫자만 추출
-2. 품목의 모든 결제 금액을 더해 총액을 계산
-3. 모든 품목의 금액 총합과 총 결제 금액으로 명시된 금액을 비교하여 판단
-4. 아래 JSON 형식으로 결과를 출력
-5. 영수증이 아니라고 인식되었을 경우 에러처리
-JSON 형식:
-영수증이 아닌 경우 :
+
+CRITICAL DATE PARSING RULES:
+1. Date formats commonly found on Korean receipts:
+  - YY/MM/DD (e.g., 26/02/22 = 2026-02-22)
+  - YY.MM.DD (e.g., 26.02.22 = 2026-02-22)
+  - YYYY/MM/DD, YYYY.MM.DD, YYYY-MM-DD
+  - YY년 MM월 DD일
+
+2. Year interpretation (CRITICAL):
+  - Current date context: ${new Date().toISOString().split('T')[0]}
+  - If 2-digit year (YY):
+    * 00-40 → 20YY (2000-2040)
+    * 41-99 → 19YY (1941-1999)
+  - Example: 26/02/22 → 2026-02-22 (NOT 1926)
+  - Example: 95/12/31 → 1995-12-31
+
+3. Ambiguous date formats (DD/MM/YY vs MM/DD/YY):
+  - Korean receipts typically use YY/MM/DD or DD/MM/YY
+  - If day > 12, it must be DD/MM/YY format
+  - Example: 26/02/22 → day=26, so format is DD/MM/YY → 2022-02-26
+  - Example: 05/03/24 → ambiguous, assume DD/MM/YY → 2024-03-05
+
+4. Validation:
+  - Month must be 01-12
+  - Day must be valid for that month
+  - If date seems future (>1 year from now), check interpretation
+  - If date seems too old (>5 years), check interpretation
+
+
+Rules
+1. extract total amount, remove non numeric characters
+2. title is clean store name , remove special characters
+3. category_id is in ${expenseCATEGORIES}
+
+Output JSON Format
+{
+  "title": "store name(string)",
+  "date": "YYYY-MM-DD"(ISO-format, apply rules above),
+  "category_id": ${expenseCATEGORIES}
+  "amount" 결제금액
+}
+
+if not receipt
 {
   "error" : "영수증이 아닙니다"
 }
-영수증인 경우 :
-{
-  "title": "가게명/거래처 명",
-  "date": "YYYY-MM-DD",
-  "category_id": ${expenseCATEGORIES} 중 하나,
-  "amount" 결제금액
-}
-다른 대답 없이 JSON 형식으로만 추출할 것  
+
+Return ONLY the JSON obejct, no explanation
 `;
 export const POST = async (request: Request) => {
   try {
@@ -47,7 +75,7 @@ export const POST = async (request: Request) => {
                 type: 'text',
                 text: promptText,
               },
-              { type: 'image_url', image_url: { url: image } },
+              { type: 'image_url', image_url: { url: image, detail: 'low' } },
             ],
           },
         ],
