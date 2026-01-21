@@ -13,17 +13,20 @@ type AnalysisPageProps = {
 };
 
 // 날짜 검증 (연/월 범위 제한)
-const validateDate = (yearParam?: string, monthParam?: string) => {
+export const validateDateParams = (yearParam?: string, monthParam?: string) => {
   const now = new Date();
-  const year = Math.min(
-    Math.max(Number(yearParam) || now.getFullYear(), 2010),
-    now.getFullYear() + 5
-  );
-  const month = Math.min(
-    Math.max(Number(monthParam) || now.getMonth() + 1, 1),
-    12
-  );
-  return { year, month, currentDate: new Date(year, month - 1) };
+
+  const year = parseInt(yearParam || '') || now.getFullYear();
+  const month = parseInt(monthParam || '') || now.getMonth() + 1;
+
+  const validYear = Math.min(Math.max(year, 2010), now.getFullYear() + 5);
+  const validMonth = Math.min(Math.max(month, 1), 12);
+
+  return {
+    year: validYear,
+    month: validMonth,
+    currentDate: new Date(validYear, validMonth - 1),
+  };
 };
 
 const AnalysisDataSection = async ({
@@ -40,8 +43,11 @@ const AnalysisDataSection = async ({
 };
 
 const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
-  const { year: yearParam, month: monthParam } = await searchParams;
-  const { year, month, currentDate } = validateDate(yearParam, monthParam);
+  const params = await searchParams;
+  const { year, month, currentDate } = validateDateParams(
+    params.year,
+    params.month
+  );
 
   const ANALYSIS_TABS = [
     {

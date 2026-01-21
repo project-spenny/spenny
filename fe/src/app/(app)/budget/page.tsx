@@ -3,23 +3,10 @@ import BudgetView from '@/components/budgets/BudgetView';
 import MonthNavigator from '@/components/analysis/common/MonthNavigator';
 import { Suspense } from 'react';
 import { getBudgetBundle } from '@/services/analysis/budgetService.server';
+import { validateDateParams } from '../analysis/page';
 
 type BudgetPageProps = {
   searchParams: Promise<{ year?: string; month?: string }>;
-};
-
-// 날짜 검증 (연/월 범위 제한)
-const validateDate = (yearParam?: string, monthParam?: string) => {
-  const now = new Date();
-  const year = Math.min(
-    Math.max(Number(yearParam) || now.getFullYear(), 2010),
-    now.getFullYear() + 5
-  );
-  const month = Math.min(
-    Math.max(Number(monthParam) || now.getMonth() + 1, 1),
-    12
-  );
-  return { year, month, currentDate: new Date(year, month - 1) };
 };
 
 // 예산 데이터 페칭 섹션
@@ -39,8 +26,11 @@ const BudgetDataSection = async ({ date }: { date: Date }) => {
 };
 
 const BudgetPage = async ({ searchParams }: BudgetPageProps) => {
-  const { year: yearParam, month: monthParam } = await searchParams;
-  const { year, month, currentDate } = validateDate(yearParam, monthParam);
+  const params = await searchParams;
+  const { year, month, currentDate } = validateDateParams(
+    params.year,
+    params.month
+  );
 
   return (
     <div className="flex min-h-screen w-full flex-col py-4">
