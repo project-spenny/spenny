@@ -37,7 +37,10 @@ const BudgetPage = async ({ searchParams }: BudgetPageProps) => {
       <MonthNavigator year={year} month={month} baseUrl="/budget" />
 
       <div className="mx-auto w-full max-w-4xl px-6 md:px-12">
-        <Suspense fallback={<AnalysisLoading />}>
+        <Suspense
+          key={`budget-${year}-${month}`}
+          fallback={<AnalysisLoading />}
+        >
           <BudgetDataSection date={currentDate} />
         </Suspense>
       </div>
