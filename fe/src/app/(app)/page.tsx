@@ -41,19 +41,18 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="flex min-h-screen w-full max-w-6xl self-start">
-      <TransactionProvider>
-        <CalendarProvider>
-          <Suspense key={currentMonth} fallback={<CalendarSkeleton />}>
+      <CalendarProvider>
+        <TransactionProvider>
+          <Suspense fallback={<CalendarSkeleton />}>
             <DataCalendar
               filters={filters}
               currentMonth={currentMonth}
               selectedDate={params.selected_date}
               monthDate={monthDate}
             />
-            {/* <CalendarSkeleton /> */}
           </Suspense>
-        </CalendarProvider>
-      </TransactionProvider>
+        </TransactionProvider>
+      </CalendarProvider>
     </div>
   );
 }
@@ -61,7 +60,6 @@ export default async function Home({ searchParams }: PageProps) {
 async function DataCalendar({
   filters,
   currentMonth,
-  selectedDate,
   monthDate,
 }: {
   filters: TransactionFilters;
@@ -69,28 +67,53 @@ async function DataCalendar({
   selectedDate?: string;
   monthDate: Date;
 }) {
-  const [transactions, budgets, fixedRules] = await Promise.all([
-    getTransaction(filters, true),
+  const transactions = await getTransaction(filters, true);
+  const today = new Date();
+  const isCurrentMonth = currentMonth === formatMonth(today);
+  if (!isCurrentMonth) {
+    return (
+      <div className="flex w-full flex-col gap-3">
+        <Calendar
+          currentMonth={currentMonth}
+          transactions={transactions}
+        ></Calendar>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-3">
+      <Calendar currentMonth={currentMonth} transactions={transactions}>
+        <DailyRecData
+          transactions={transactions}
+          monthDate={monthDate}
+          today={today}
+        />
+      </Calendar>
+    </div>
+  );
+}
+
+async function DailyRecData({
+  transactions,
+  monthDate,
+  today,
+}: {
+  transactions: Awaited<ReturnType<typeof getTransaction>>;
+  monthDate: Date;
+  today: Date;
+}) {
+  const [budgets, fixedRules] = await Promise.all([
     fetchBudgetsServer(monthDate),
     fetchFixedRulesByMonthServer(monthDate),
   ]);
 
   const budget = getTotalBudgetAmount(budgets);
 
-  const today = new Date();
-  const isCurrentMonth = currentMonth === formatMonth(today);
-
   const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
     fixedRules,
     monthDate
   );
-  if (!isCurrentMonth) {
-    return (
-      <div className="flex w-full flex-col gap-3">
-        <Calendar currentMonth={currentMonth} transactions={transactions} />
-      </div>
-    );
-  }
 
   const lookbackDays = 56;
 
@@ -151,12 +174,5 @@ async function DataCalendar({
     fixedPlannedThisMonth,
     spendingTransactions,
   });
-
-  return (
-    <div className="flex w-full flex-col gap-3">
-      <Calendar currentMonth={currentMonth} transactions={transactions}>
-        <DailyRecBar daily={daily} dailyChartData={dailyChartData} />
-      </Calendar>
-    </div>
-  );
+  return <DailyRecBar daily={daily} dailyChartData={dailyChartData} />;
 }
