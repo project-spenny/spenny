@@ -3,6 +3,7 @@ import { syncByMonthServer } from '@/services/fixed-costs/syncFixedTransactions.
 import { formatLocalDate } from '@/utils/date';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 import { revalidatePath } from 'next/cache';
+import { getMonthRange } from '@/utils/date';
 
 export interface TransactionFilters {
   type?: 'income' | 'expense';
@@ -78,7 +79,20 @@ export const getTransaction = async (
 
   return data || [];
 };
-
+export const getMonthTransactions= async(month : string)=>{
+  const { supabase, user } = await requireUserServer();
+  const { startDate, endDate} = getMonthRange(new Date(`${month}-1`))
+  
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('user_id', user.id)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: false });
+    if (error) throw error;
+    return data || [];
+}
 export async function revalidateTransactions() {
   revalidatePath('/history');
   revalidatePath('/');
