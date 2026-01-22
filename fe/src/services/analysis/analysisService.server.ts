@@ -1,4 +1,4 @@
-import { formatLocalDate, getMonthRange } from '@/utils/date';
+import { getMonthRange } from '@/utils/date';
 import {
   normalizeTransactionCategory,
   transformAnalysisData,
@@ -7,6 +7,7 @@ import {
 import { SupabaseClient } from '@supabase/supabase-js';
 import { TransactionType } from '@/types/analysis';
 import { syncByMonthServer } from '@/services/fixed-costs/syncFixedTransactions.server';
+import { getFixedSyncThroughDate } from '@/utils/fixed-costs';
 
 // 고정비 동기화 실패 시 에러를 던지지 않고 경고만 남김 (동기화 실패해도 조회는 가능하도록)
 const safeSyncServer = async (params: {
@@ -43,7 +44,8 @@ export const getAnalysisData = async (
       getMonthRange(lastMonthDate);
 
     // 고정비 동기화
-    const today = formatLocalDate(new Date());
+    const generateThroughDate = getFixedSyncThroughDate(selectedDate);
+
     await Promise.all([
       // 지난 달: 전체 기간 동기화
       safeSyncServer({
@@ -56,7 +58,7 @@ export const getAnalysisData = async (
         monthDate: selectedDate,
         startDate,
         endDate,
-        generateThroughDate: today,
+        generateThroughDate,
       }),
     ]);
 
