@@ -1,6 +1,6 @@
 import { IFixedCostFormData } from '@/hooks/useFixedCostForm';
 import { ApplyScope, IFixedRule } from '@/types/fixed-costs';
-import { parseLocalDate } from './date';
+import { formatLocalDate, parseLocalDate } from './date';
 import {
   startOfMonth,
   endOfMonth,
@@ -108,4 +108,14 @@ export const getFixedPlannedExpenseByMonth = (
       const occurrences = getFixedRuleDates(r, monthDate).length;
       return sum + r.amount * occurrences;
     }, 0);
+};
+
+// 고정비 동기화 생성 상한 날짜
+export const getFixedSyncThroughDate = (monthDate: Date) => {
+  const today = new Date();
+  const isCurrentMonth =
+    monthDate.getFullYear() === today.getFullYear() &&
+    monthDate.getMonth() === today.getMonth();
+
+  return isCurrentMonth ? formatLocalDate(today) : undefined;
 };
