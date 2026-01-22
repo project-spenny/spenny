@@ -1,31 +1,32 @@
 import AnalysisLoading from '@/components/analysis/common/AnalysisLoading';
 import AnalysisTabs from '@/components/analysis/AnalysisTabs';
 import AnalysisView from '@/components/analysis/AnalysisView';
-import BudgetView from '@/components/budgets/BudgetView';
 import MonthNavigator from '@/components/analysis/common/MonthNavigator';
 import { Suspense } from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { TransactionType } from '@/types/analysis';
 import { getAnalysisData } from '@/services/analysis/analysisService.server';
-import { getBudgetBundle } from '@/services/analysis/budgetService.server';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 type AnalysisPageProps = {
   searchParams: Promise<{ year?: string; month?: string }>;
 };
 
-// 연/월 범위 제한
-const validateDate = (yearParam?: string, monthParam?: string) => {
+// 날짜 검증 (연/월 범위 제한)
+export const validateDateParams = (yearParam?: string, monthParam?: string) => {
   const now = new Date();
-  const year = Math.min(
-    Math.max(Number(yearParam) || now.getFullYear(), 2010),
-    now.getFullYear() + 5
-  );
-  const month = Math.min(
-    Math.max(Number(monthParam) || now.getMonth() + 1, 1),
-    12
-  );
-  return { year, month, currentDate: new Date(year, month - 1) };
+
+  const year = parseInt(yearParam || '') || now.getFullYear();
+  const month = parseInt(monthParam || '') || now.getMonth() + 1;
+
+  const validYear = Math.min(Math.max(year, 2010), now.getFullYear() + 5);
+  const validMonth = Math.min(Math.max(month, 1), 12);
+
+  return {
+    year: validYear,
+    month: validMonth,
+    currentDate: new Date(validYear, validMonth - 1),
+  };
 };
 
 const AnalysisDataSection = async ({
@@ -37,28 +38,16 @@ const AnalysisDataSection = async ({
 }) => {
   const { supabase, user } = await requireUserServer();
   const data = await getAnalysisData(supabase, user.id, date, type);
+
   return <AnalysisView type={type} selectedDate={date} initialData={data} />;
 };
 
-const BudgetDataSection = async ({ date }: { date: Date }) => {
-  const { budgetData, budgetGuideData, analysisData, categories } =
-    await getBudgetBundle(date);
-
-  return (
-    <BudgetView
-      selectedDate={date}
-      initialBudgetData={budgetData}
-      initialBudgetGuideData={budgetGuideData}
-      initialAnalysisData={analysisData}
-      initialCategories={categories}
-    />
-  );
-};
-
 const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
-  const { year: yearParam, month: monthParam } = await searchParams;
-
-  const { year, month, currentDate } = validateDate(yearParam, monthParam);
+  const params = await searchParams;
+  const { year, month, currentDate } = validateDateParams(
+    params.year,
+    params.month
+  );
 
   const ANALYSIS_TABS = [
     {
@@ -68,10 +57,6 @@ const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
     {
       value: '수입',
       fetcher: <AnalysisDataSection date={currentDate} type="income" />,
-    },
-    {
-      value: '예산',
-      fetcher: <BudgetDataSection date={currentDate} />,
     },
   ];
 

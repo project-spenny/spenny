@@ -4,15 +4,12 @@ import {
   upsertBudget,
   upsertCategoryBudgets,
 } from '@/services/analysis/budgetService';
-import { formatLocalDate, formatMonth } from '@/utils/date';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { BudgetWithCategory } from '@/types/analysis';
-import { fetchFixedRulesByMonth } from '@/services/fixed-costs/fixedCostsClient';
-import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
+import { formatMonth } from '@/utils/date';
 import { toast } from 'sonner';
 import { useAuth } from '@/providers/AuthProvider';
-import { useMemo } from 'react';
 
 const useBudgetData = (
   selectedDate: Date,
@@ -38,29 +35,6 @@ const useBudgetData = (
       return { totalBudget, categoryBudgets };
     },
   });
-
-  // 고정비 규칙 조회
-  const { data: fixedRules = [], isLoading: isFixedLoading } = useQuery({
-    queryKey: ['fixedRules', monthKey],
-    enabled: !authLoading && !!userId,
-    queryFn: () => fetchFixedRulesByMonth(userId!, selectedDate),
-  });
-
-  const futureFixedAmount = useMemo(() => {
-    const today = formatLocalDate(new Date()); // 오늘 날짜 문자열 (YYYY-MM-DD)
-
-    return fixedRules
-      .filter((rule) => rule.type === 'expense')
-      .reduce((total, rule) => {
-        // 해당 규칙의 이번 달 발생 날짜들 계산
-        const futureDates = getFixedRuleDates(rule, selectedDate).filter(
-          // 오늘 이후(미래) 날짜만 필터링
-          (date) => date > today
-        );
-
-        return total + rule.amount * futureDates.length; // (금액 * 미래 발생 횟수) 더하기
-      }, 0);
-  }, [fixedRules, selectedDate]);
 
   // 저장/수정
   const { mutate: saveBudget, isPending: isSaving } = useMutation({
@@ -133,8 +107,7 @@ const useBudgetData = (
   return {
     totalBudget: data?.totalBudget ?? null,
     categoryBudgets: data?.categoryBudgets ?? [],
-    futureFixedAmount,
-    isLoading: isBudgetLoading || isFixedLoading,
+    isBudgetLoading,
     isSaving,
     saveBudget,
     isDeleting,

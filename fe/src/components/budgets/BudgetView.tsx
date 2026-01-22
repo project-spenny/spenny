@@ -29,6 +29,7 @@ type BudgetViewProps = {
     transactions: TransactionAnalysis[];
   };
   initialCategories: Category[];
+  initialFutureFixedAmount: number;
 };
 
 const BudgetView = ({
@@ -37,6 +38,7 @@ const BudgetView = ({
   initialBudgetGuideData,
   initialAnalysisData,
   initialCategories,
+  initialFutureFixedAmount,
 }: BudgetViewProps) => {
   const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,7 +53,6 @@ const BudgetView = ({
     totalBudget,
     categoryBudgets,
     removeBudget,
-    futureFixedAmount,
     applyRecommendTemplate,
     isDeleting,
     isApplyingTemplate,
@@ -143,7 +144,7 @@ const BudgetView = ({
           <BudgetOverview
             totalAmount={totalBudget.amount}
             totalExpense={totalExpense}
-            futureFixedAmount={futureFixedAmount}
+            futureFixedAmount={initialFutureFixedAmount}
             onEdit={() => setIsDialogOpen(true)}
             onReset={() => setIsTotalConfirmOpen(true)}
           />

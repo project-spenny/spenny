@@ -6,8 +6,10 @@ import {
 } from '@/utils/analysis-transform';
 
 import { SupabaseClient } from '@supabase/supabase-js';
+import { fetchFixedRulesByMonthServer } from '../fixed-costs/fixedCostsServer';
 import { getAnalysisData } from '@/services/analysis/analysisService.server';
 import { getCategories } from '@/services/categoryService.server';
+import { getFixedRuleDates } from '../fixed-costs/getRuleDates';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 // 특정 월의 예산 데이터 조회
@@ -111,18 +113,53 @@ export const getBudgetGuideData = async (
   }
 };
 
+// 해당 월의 남은 지출 예정 고정비 합계 계산
+export const getFutureFixedAmount = async (date: Date) => {
+  try {
+    const fixedRules = await fetchFixedRulesByMonthServer(date); // 고정비 규칙 가져오기
+
+    // 데이터가 없는 경우 0 반환
+    if (!fixedRules || fixedRules.length === 0) return 0;
+
+    const today = formatLocalDate(new Date());
+
+    // 미래에 발생할 금액 계산
+    const futureFixedAmount = fixedRules
+      .filter((rule) => rule.type === 'expense')
+      .reduce((total, rule) => {
+        // 해당 규칙의 발생 날짜들 중 오늘 이후 날짜만 필터링
+        const futureDates = getFixedRuleDates(rule, date).filter(
+          (d) => d > today
+        );
+        return total + rule.amount * futureDates.length;
+      }, 0);
+
+    return futureFixedAmount;
+  } catch (error) {
+    throw new Error('[getFutureFixedAmount] 고정비 규칙 조회 및 계산 실패', {
+      cause: error,
+    });
+  }
+};
+
 // 예산 탭에 필요한 모든 데이터를 한 번에 조회하는 번들 함수
 export const getBudgetBundle = async (date: Date) => {
   const { supabase, user } = await requireUserServer(); // 인증 1회 수행
 
   // 모든 서비스 함수에 동일한 supabase, user.id 주입
-  const [budgetData, budgetGuideData, analysisData, categories] =
-    await Promise.all([
-      getBudgetData(supabase, user.id, date),
-      getBudgetGuideData(supabase, user.id, date),
-      getAnalysisData(supabase, user.id, date, 'expense'),
-      getCategories(supabase, 'expense'),
-    ]);
+  const [
+    budgetData,
+    budgetGuideData,
+    analysisData,
+    categories,
+    futureFixedAmount,
+  ] = await Promise.all([
+    getBudgetData(supabase, user.id, date),
+    getBudgetGuideData(supabase, user.id, date),
+    getAnalysisData(supabase, user.id, date, 'expense'),
+    getCategories(supabase, 'expense'),
+    getFutureFixedAmount(date),
+  ]);
 
   return {
     budgetData,
@@ -133,5 +170,6 @@ export const getBudgetBundle = async (date: Date) => {
       transactions: analysisData.current,
     },
     categories,
+    futureFixedAmount,
   };
 };
