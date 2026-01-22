@@ -51,6 +51,7 @@ export const getAnalysisData = async (
         monthDate: lastMonthDate,
         startDate: prevStart,
         endDate: prevEnd,
+        generateThroughDate: today,
       }),
       // 이번 달: 오늘 날짜까지만 동기화
       safeSyncServer({
