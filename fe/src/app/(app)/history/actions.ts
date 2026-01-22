@@ -1,7 +1,6 @@
 'use server';
 import { syncByMonthServer } from '@/services/fixed-costs/syncFixedTransactions.server';
-import { parseLocalDate } from '@/utils/date';
-import { getFixedSyncThroughDate } from '@/utils/fixed-costs';
+import { formatLocalDate, parseLocalDate } from '@/utils/date';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 import { revalidatePath } from 'next/cache';
 
@@ -37,10 +36,10 @@ export const getTransaction = async (
     endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
   }
 
-  // 월별 거래 조회 전에, 해당 월 고정비 거래를 동기화
+  // 고정비 동기화 (오늘까지)
   if (startDate && endDate) {
     const monthDate = parseLocalDate(startDate)!;
-    const generateThroughDate = getFixedSyncThroughDate(monthDate);
+    const generateThroughDate = formatLocalDate(new Date());
 
     await syncByMonthServer({
       monthDate,
