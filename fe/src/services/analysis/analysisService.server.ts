@@ -44,6 +44,7 @@ export const getAnalysisData = async (
 
     // 고정비 동기화
     const today = formatLocalDate(new Date());
+    const queryEndDate = endDate > today ? today : endDate;
     await Promise.all([
       // 지난 달: 전체 기간 동기화
       safeSyncServer({
@@ -72,7 +73,7 @@ export const getAnalysisData = async (
       .eq('user_id', userId)
       .eq('type', type)
       .gte('date', prevStart)
-      .lte('date', endDate)
+      .lte('date', queryEndDate)
       .order('date', { ascending: false });
 
     if (error) throw error;
@@ -81,10 +82,11 @@ export const getAnalysisData = async (
 
     // 이번 달과 지난 달 데이터 분리
     const current = normalized.filter(
-      (t) => t.date >= startDate && t.date <= endDate
+      (t) => t.date >= startDate && t.date <= queryEndDate
     );
     const prev = normalized.filter(
-      (t) => t.date >= prevStart && t.date <= prevEnd
+      (t) =>
+        t.date >= prevStart && t.date <= (prevEnd > today ? today : prevEnd)
     );
 
     return {
