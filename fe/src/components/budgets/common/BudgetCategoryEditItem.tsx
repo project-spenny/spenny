@@ -1,11 +1,10 @@
 import { CATEGORIES, Category } from '@/constants/categories';
 import { HelpCircle, X } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import PercentageBadge from '@/components/budgets/common/PercentageBadge';
 import { useState } from 'react';
 
 type BudgetCategoryEditItemProps = {
@@ -52,20 +51,7 @@ const BudgetCategoryEditItem = ({
       {/* 카테고리명 */}
       <div className="flex flex-1 items-center gap-1">
         <p className="text-xs font-semibold md:text-sm">{category.name_ko}</p>
-        {percent > 0 && (
-          <Badge
-            className={cn(
-              'px-2 py-0.5 font-semibold',
-              Number(amount) > totalBudgetAmount
-                ? 'bg-destructive/10 text-destructive dark:bg-destructive/10'
-                : 'bg-brand-subtle dark:bg-brand/10 text-brand'
-            )}
-          >
-            {Number(amount) > totalBudgetAmount
-              ? `+${Math.min(percent, 100)}%`
-              : `${percent}%`}
-          </Badge>
-        )}
+        {percent > 0 && <PercentageBadge percentage={percent} />}
       </div>
 
       {/* 금액 입력부 */}
