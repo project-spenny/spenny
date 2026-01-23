@@ -16,7 +16,7 @@ import {
   deleteFixedRule,
   updateFixedRuleWithScope,
 } from '@/services/fixed-costs/fixedCostsClient';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 import FixedCostDeleteDialog from './FixedCostDeleteDialog';
 import { Spinner } from '../ui/spinner';
@@ -170,6 +170,21 @@ export default function FixedCostSubmitForm({
     }
   };
 
+  const initialScheduleRef = useRef({
+    cycle: initialData?.cycle ?? null,
+    weekday: initialData?.weekday ?? null,
+    monthday: initialData?.monthday ?? null,
+  });
+
+  const hasScheduleChange = () => {
+    const init = initialScheduleRef.current;
+    return (
+      init.cycle !== formData.cycle ||
+      (formData.cycle === 'WEEKLY' && init.weekday !== formData.weekday) ||
+      (formData.cycle === 'MONTHLY' && init.monthday !== formData.monthday)
+    );
+  };
+
   return (
     <div className="flex flex-1 flex-col">
       <form
@@ -238,6 +253,7 @@ export default function FixedCostSubmitForm({
       <FixedCostEditConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
+        hasScheduleChange={hasScheduleChange()}
         cycle={formData.cycle as 'WEEKLY' | 'MONTHLY'}
         onApplyIncludeCurrent={handleApplyIncludeCurrent}
         onApplyExcludeCurrent={handleApplyExcludeCurrent}
