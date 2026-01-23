@@ -36,7 +36,7 @@ async function InitialDataLoader({currentMonth}: {currentMonth: string} ) {
 
   // 당월 데이터 fetch
   const [transactions, budgets, fixedRules] = await Promise.all([
-    getMonthTransactions(`${currentMonth}-01`),
+    getMonthTransactions(currentMonth),
     fetchBudgetsServer(currentMonthDate),
     fetchFixedRulesByMonthServer(currentMonthDate),
   ]);
