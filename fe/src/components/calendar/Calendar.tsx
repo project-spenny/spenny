@@ -23,6 +23,7 @@ import { queryClient } from '@/stores/query-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { CalendarSkeleton } from './CalendarSkeleton';
 import { CalendarDay } from './CalendarDay';
+import { useCalendarData } from '@/hooks/useCalendarData';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -53,52 +54,11 @@ export const Calendar = ({
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { selectedDate, isOpen, open, close } = useCalendar();
   const [panelState, setPanelState] = useState<PanelState>({ view: 'list' });
+  const {groupedTransaction, TransactionSummary} = useCalendarData(transactions);
 
   useEffect(() => {
     setMonth(new Date(`${currentMonth}-01`));
   }, [currentMonth]);
-
-  const groupedTransaction = useMemo(() => {
-    const grouped: Record<string, DayData> = {};
-
-    transactions.forEach((transaction) => {
-      const dateKey = transaction.date;
-
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = {
-          income: 0,
-          expense: 0,
-          transactions: [],
-        };
-      }
-
-      if (transaction.type === 'income') {
-        grouped[dateKey].income += transaction.amount;
-      } else if (transaction.type === 'expense') {
-        grouped[dateKey].expense += transaction.amount;
-      }
-
-      grouped[dateKey].transactions.push(transaction);
-    });
-
-    return grouped;
-  }, [transactions]);
-
-  const TransactionSummary = useMemo(() => {
-    const summary = transactions.reduce(
-      (acc, transaction) => {
-        if (transaction.type === 'income') {
-          acc.income += transaction.amount;
-        } else if (transaction.type === 'expense') {
-          acc.expense += transaction.amount;
-        }
-        return acc;
-      },
-      { income: 0, expense: 0 }
-    );
-
-    return summary;
-  }, [transactions]);
 
   const selectedDayTransactions = useMemo(() => {
     if (!selectedDate) return [];
