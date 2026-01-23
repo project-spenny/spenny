@@ -33,14 +33,12 @@ export function CalendarClient({
     <CalendarProvider>
       <TransactionProvider>
         <div className="flex w-full flex-col gap-3">
-          {month === currentMonth && (
-            <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
-          )}
-          
+          <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
           <Calendar
             currentMonth={month}
             transactions={transactions || []}
-            // loading state, month setState 추가
+            isLoading={isLoading}
+            onMonthChange={setMonth}
           />
         </div>
       </TransactionProvider>

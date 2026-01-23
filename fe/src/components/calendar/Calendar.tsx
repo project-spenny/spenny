@@ -19,9 +19,13 @@ import { formatMonth } from '@/utils/date';
 import TransactionSubmitForm from '../transaction/TransactionSubmitForm';
 import { revalidateTransactions } from '@/app/(app)/history/actions';
 import { Item, ItemContent } from '../ui/item';
+import { queryClient } from '@/stores/query-client';
+import { useQueryClient } from '@tanstack/react-query';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
+  isLoading : boolean;
+  onMonthChange : (month:string)=> void;
 }
 
 interface DayData {
@@ -90,14 +94,13 @@ const CustomDay = ({
 export const Calendar = ({
   currentMonth,
   transactions,
+  isLoading,
+  onMonthChange
 }: CalendarProps) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
+  const queryClient = useQueryClient();
   const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { selectedDate, isOpen, open, close } = useCalendar();
-
   const [panelState, setPanelState] = useState<PanelState>({ view: 'list' });
 
   useEffect(() => {
@@ -162,16 +165,19 @@ export const Calendar = ({
 
   const handleMonthChange = (newMonth: Date) => {
     setMonth(newMonth);
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('month', formatMonth(newMonth));
-
-    router.push(`?${params.toString()}`);
+    const monthString = formatMonth(newMonth);
+    onMonthChange(monthString);
   };
 
   const moveMonth = (offset: number) => {
     const newDate = new Date(month.getFullYear(), month.getMonth() + offset, 1);
     handleMonthChange(newDate);
+  };
+  const handleTransactionSuccess = async () => {
+    await queryClient.invalidateQueries({ 
+      queryKey: ['transactions', formatMonth(month)] 
+    });
+    setPanelState({ view: 'list' });
   };
 
   const { income, expense } = TransactionSummary;
@@ -183,6 +189,7 @@ export const Calendar = ({
     close();
     setPanelState({ view: 'list' });
   };
+
   const CustomCaption = (props: MonthCaptionProps) => {
     return (
       <div className="flex w-full gap-2 p-2 sm:flex-row sm:gap-4">
@@ -294,10 +301,7 @@ export const Calendar = ({
               </Button>
               <TransactionSubmitForm
                 transaction={panelState.editingTransaction}
-                onSuccess={async () => {
-                  await revalidateTransactions();
-                  setPanelState({ view: 'list' });
-                }}
+                onSuccess={handleTransactionSuccess}
                 onClose={() => {
                   setPanelState({ view: 'list' });
                 }}
@@ -319,10 +323,7 @@ export const Calendar = ({
               </Button>
               <TransactionSubmitForm
                 defaultDate={selectedDate ?? undefined}
-                onSuccess={async () => {
-                  await revalidateTransactions();
-                  setPanelState({ view: 'list' });
-                }}
+                onSuccess={handleTransactionSuccess}
                 onClose={() => {
                   setPanelState({ view: 'list' });
                 }}
