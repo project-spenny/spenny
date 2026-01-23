@@ -63,6 +63,7 @@ const buildMissingInserts = ({
         user_id: userId,
         fixed_rule_id: rule.id,
         date,
+        origin_date: date,
         title: rule.title,
         type: rule.type,
         amount: rule.amount,

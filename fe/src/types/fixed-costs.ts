@@ -39,6 +39,7 @@ export type FixedTransactionInsert = {
   user_id: string;
   fixed_rule_id: string;
   date: string;
+  origin_date?: string;
   title: string;
   type: 'income' | 'expense';
   amount: number;
