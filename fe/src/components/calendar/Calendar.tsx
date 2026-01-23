@@ -24,6 +24,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CalendarSkeleton } from './CalendarSkeleton';
 import { CalendarDay } from './CalendarDay';
 import { useCalendarData } from '@/hooks/useCalendarData';
+import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
@@ -50,15 +51,18 @@ export const Calendar = ({
   onMonthChange
 }: CalendarProps) => {
   const queryClient = useQueryClient();
-  const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const { selectedDate, isOpen, open, close } = useCalendar();
   const [panelState, setPanelState] = useState<PanelState>({ view: 'list' });
   const {groupedTransaction, TransactionSummary} = useCalendarData(transactions);
-
-  useEffect(() => {
-    setMonth(new Date(`${currentMonth}-01`));
-  }, [currentMonth]);
+  const {
+    month,
+    date,
+    setDate,
+    year,
+    displayMonth,
+    handleMonthChange,
+    moveMonth,
+  } = useCalendarNavigation(currentMonth,onMonthChange);
 
   const selectedDayTransactions = useMemo(() => {
     if (!selectedDate) return [];
@@ -73,17 +77,6 @@ export const Calendar = ({
 
     return <CalendarDay {...props} dayData={dayData} />;
   };
-
-  const handleMonthChange = (newMonth: Date) => {
-    setMonth(newMonth);
-    const monthString = formatMonth(newMonth);
-    onMonthChange(monthString);
-  };
-
-  const moveMonth = (offset: number) => {
-    const newDate = new Date(month.getFullYear(), month.getMonth() + offset, 1);
-    handleMonthChange(newDate);
-  };
   const handleTransactionSuccess = async () => {
     await queryClient.invalidateQueries({ 
       queryKey: ['transactions', formatMonth(month)] 
@@ -92,9 +85,6 @@ export const Calendar = ({
   };
 
   const { income, expense } = TransactionSummary;
-
-  const year = month.getFullYear();
-  const displayMonth = month.getMonth() + 1;
 
   const handleClose = () => {
     close();
