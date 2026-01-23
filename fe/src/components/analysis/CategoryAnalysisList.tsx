@@ -23,7 +23,6 @@ const CategoryAnalysisList = ({
   return (
     <Accordion
       type="single"
-      collapsible
       value={`item-${selectedIndex}`}
       onValueChange={(value) => {
         const index = Number(value.replace('item-', ''));
