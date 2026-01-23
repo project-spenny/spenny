@@ -12,6 +12,7 @@ import CategoryChart from '@/components/analysis/CategoryChart';
 import Link from 'next/link';
 import { PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { getMonthRange } from '@/utils/date';
 
 type AnalysisViewProps = {
   type: TransactionType;
@@ -37,6 +38,14 @@ const AnalysisView = ({
     }
   }, [selectedDate]);
 
+  // 선택된 월 기준으로 history 페이지 이동용 URL 생성
+  const { startDate, endDate } = getMonthRange(selectedDate);
+  const historyParams = new URLSearchParams({
+    start_date: startDate,
+    end_date: endDate,
+  }).toString();
+  const historyUrl = `/history?${historyParams}`;
+
   return (
     <div className="animate-in fade-in slide-in-from-top-1 space-y-4 duration-300">
       {current.length === 0 ? (
@@ -46,7 +55,7 @@ const AnalysisView = ({
           description={config.emptyDescription}
         >
           <Button asChild>
-            <Link href={'/'}>기록하러 가기</Link>
+            <Link href={historyUrl}>기록하러 가기</Link>
           </Button>
         </AnalysisEmpty>
       ) : (
