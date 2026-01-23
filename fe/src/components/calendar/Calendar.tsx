@@ -1,15 +1,13 @@
 'use client';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef, ReactNode } from 'react';
+import { useState } from 'react';
 import { Calendar as CalendarView } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { Day, type DayButton, getDefaultClassNames } from 'react-day-picker';
+import { type DayButton } from 'react-day-picker';
 import { Button } from '../ui/button';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import { useCalendar } from '@/context/CalendarContext';
 import { ITransaction } from '@/types/transactions';
 import { useMemo } from 'react';
-import { CaptionLabelProps } from 'react-day-picker';
 import { formatDateKR, formatLocalDate } from '@/utils/date';
 import { Card, CardTitle, CardContent } from '../ui/card';
 import { MonthCaptionProps } from 'react-day-picker';
@@ -17,14 +15,12 @@ import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
 import { formatMonth } from '@/utils/date';
 import TransactionSubmitForm from '../transaction/TransactionSubmitForm';
-import { revalidateTransactions } from '@/app/(app)/history/actions';
 import { Item, ItemContent } from '../ui/item';
-import { queryClient } from '@/stores/query-client';
 import { useQueryClient } from '@tanstack/react-query';
-import { CalendarSkeleton } from './CalendarSkeleton';
 import { CalendarDay } from './CalendarDay';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
+
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
