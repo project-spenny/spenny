@@ -105,6 +105,7 @@ const AnalysisView = ({
             {/* 카테고리 리스트 */}
             <CategoryAnalysisList
               data={categoryData}
+              allTransactions={current}
               selectedIndex={selectedIndex}
               onSelect={setSelectedIndex}
             />
