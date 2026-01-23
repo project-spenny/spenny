@@ -55,6 +55,23 @@ export const syncByMonthServer = async ({
         );
       },
 
+      fetchOverrideKeys: async ({ userId, ruleIds, startDate, endDate }) => {
+        const { data, error } = await supabase
+          .from('fixed_transaction_overrides')
+          .select('fixed_rule_id, origin_date')
+          .eq('user_id', userId)
+          .in('fixed_rule_id', ruleIds)
+          .gte('origin_date', startDate)
+          .lte('origin_date', endDate)
+          .eq('action', 'deleted');
+
+        if (error) throw error;
+
+        return new Set(
+          (data ?? []).map((r) => `${r.fixed_rule_id}__${r.origin_date}`)
+        );
+      },
+
       // 누락된 거래만 transactions에 insert
       insertTransactions: async ({ rows }) => {
         const { error } = await supabase.from('transactions').insert(rows);
