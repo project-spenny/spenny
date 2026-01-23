@@ -22,7 +22,6 @@ import { Item, ItemContent } from '../ui/item';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
-  children?: ReactNode;
 }
 
 interface DayData {
@@ -91,7 +90,6 @@ const CustomDay = ({
 export const Calendar = ({
   currentMonth,
   transactions,
-  children,
 }: CalendarProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -231,7 +229,6 @@ export const Calendar = ({
           </Button>
         </div>
       </div>
-      <div className="w-full">{children}</div>
       <CalendarView
         month={month}
         mode="single"

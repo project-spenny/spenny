@@ -14,6 +14,7 @@ import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs';
 import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
 import { SpendingTransaction } from '@/services/daily-recommendation/spendingPattern';
+import { CalendarClient } from '@/components/calendar/CalendarClient';
 
 export default async function Home() {
   const today = new Date();
@@ -107,6 +108,12 @@ async function InitialDataLoader({currentMonth}: {currentMonth: string} ) {
     spendingTransactions,
   });
 
-  // Calendar Client 생성 후 수정
-  return <DailyRecBar daily={daily} dailyChartData={dailyChartData} />;
+  return (
+    <CalendarClient
+      currentMonth={currentMonth}
+      initialTransactions={transactions}
+      dailyRec={daily}
+      dailyChartData={dailyChartData}
+    />
+  )
 }
