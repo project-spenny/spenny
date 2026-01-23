@@ -197,6 +197,7 @@ export const updateFixedRuleWithScope = async ({
   const createdRule = await createFixedRule(userId, {
     ...ruleInput,
     start_date: nextStartDate,
+    group_id: prevRule.group_id,
   });
 
   return createdRule;

@@ -17,6 +17,7 @@ export interface IFixedRule {
   end_date: string | null;
   created_at: string;
   updated_at: string;
+  group_id: string;
 }
 
 // 고정비 항목 생성에 필요한 입력 타입
@@ -32,6 +33,8 @@ export type CreateFixedRuleInput = {
 
   start_date: string;
   end_date: string | null;
+
+  group_id?: string;
 };
 
 // 고정비 규칙으로부터 생성되는 거래 insert 타입
