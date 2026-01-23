@@ -21,13 +21,14 @@ import { revalidateTransactions } from '@/app/(app)/history/actions';
 import { Item, ItemContent } from '../ui/item';
 import { queryClient } from '@/stores/query-client';
 import { useQueryClient } from '@tanstack/react-query';
+import { CalendarSkeleton } from './CalendarSkeleton';
+import { CalendarDay } from './CalendarDay';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
   isLoading : boolean;
   onMonthChange : (month:string)=> void;
 }
-
 interface DayData {
   income: number;
   expense: number;
@@ -40,56 +41,6 @@ interface PanelState {
 
 const CALENDAR_CELL_HEIGHT =
   '[&_td]:!h-[50px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
-
-const CustomDay = ({
-  day,
-  modifiers,
-  dayData,
-  ...props
-}: React.ComponentProps<typeof DayButton> & { dayData?: DayData }) => {
-  const ref = useRef<HTMLButtonElement>(null);
-  const defaultClassNames = getDefaultClassNames();
-  useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
-  }, [modifiers.focused]);
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      data-day={formatLocalDate(day.date)}
-      data-selected-single={modifiers.selected}
-      {...props}
-      className={cn(
-        'flex flex-col items-center justify-start gap-1',
-        'aspect-square h-full w-full',
-        'p-0.5 sm:p-2 sm:pt-1',
-        'gap-0 sm:gap-1',
-        CALENDAR_CELL_HEIGHT,
-        defaultClassNames.day
-      )}
-    >
-      <div className="flex flex-col gap-0.5 sm:gap-0.5 md:gap-1">
-        <span className="text-sm font-medium sm:text-base md:text-lg">
-          {day.date.getDate()}
-        </span>
-        {dayData && (dayData.income > 0 || dayData.expense > 0) && (
-          <div className="flex flex-col text-[7px] sm:text-[10px] md:text-xs">
-            {dayData.income > 0 && (
-              <span className="text-blue-500">
-                +{dayData.income.toLocaleString()}
-              </span>
-            )}
-            {dayData.expense > 0 && (
-              <span className="text-red-500">
-                -{dayData.expense.toLocaleString()}
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-    </Button>
-  );
-};
 
 export const Calendar = ({
   currentMonth,
@@ -160,7 +111,7 @@ export const Calendar = ({
     const dateKey = formatLocalDate(props.day.date);
     const dayData = groupedTransaction[dateKey];
 
-    return <CustomDay {...props} dayData={dayData} />;
+    return <CalendarDay {...props} dayData={dayData} />;
   };
 
   const handleMonthChange = (newMonth: Date) => {
