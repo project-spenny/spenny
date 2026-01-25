@@ -7,12 +7,12 @@ import { TransactionProvider } from '@/app/(app)/history/TransactionContext';
 import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 import { useMonthTransactions } from '@/hooks/useMonthTransactions';
 import { ITransaction } from '@/types/transactions';
-
+import { DailyRecResult, DailyRecChartData } from '@/types/dailyRec';
 interface CalendarClientProps {
   currentMonth: string;
   initialTransactions: ITransaction[];
-  dailyRec: any;
-  dailyChartData: any;
+  dailyRec: DailyRecResult;
+  dailyChartData: DailyRecChartData;
 }
 
 export function CalendarClient({
