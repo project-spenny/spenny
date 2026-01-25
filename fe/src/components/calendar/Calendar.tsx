@@ -24,8 +24,9 @@ import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
-  isLoading : boolean;
-  onMonthChange : (month:string)=> void;
+  isLoading: boolean;
+  onMonthChange: (month: string) => void;
+  children?: React.ReactNode;
 }
 interface DayData {
   income: number;
@@ -44,12 +45,14 @@ export const Calendar = ({
   currentMonth,
   transactions,
   isLoading,
-  onMonthChange
+  onMonthChange,
+  children,
 }: CalendarProps) => {
   const queryClient = useQueryClient();
   const { selectedDate, isOpen, open, close } = useCalendar();
   const [panelState, setPanelState] = useState<PanelState>({ view: 'list' });
-  const {groupedTransaction, TransactionSummary} = useCalendarData(transactions);
+  const { groupedTransaction, TransactionSummary } =
+    useCalendarData(transactions);
   const {
     month,
     date,
@@ -58,7 +61,7 @@ export const Calendar = ({
     displayMonth,
     handleMonthChange,
     moveMonth,
-  } = useCalendarNavigation(currentMonth,onMonthChange);
+  } = useCalendarNavigation(currentMonth, onMonthChange);
 
   const selectedDayTransactions = useMemo(() => {
     if (!selectedDate) return [];
@@ -74,8 +77,8 @@ export const Calendar = ({
     return <CalendarDay {...props} dayData={dayData} />;
   };
   const handleTransactionSuccess = async () => {
-    await queryClient.invalidateQueries({ 
-      queryKey: ['transactions', formatMonth(month)] 
+    await queryClient.invalidateQueries({
+      queryKey: ['transactions', formatMonth(month)],
     });
     setPanelState({ view: 'list' });
   };
@@ -87,52 +90,70 @@ export const Calendar = ({
     setPanelState({ view: 'list' });
   };
 
-  const CustomCaption = (props: MonthCaptionProps) => {
+  const CustomCaption = () => {
     return (
-      <div className="flex w-full gap-2 p-2 sm:flex-row sm:gap-4">
-        <Card className="w-full items-center gap-2">
-          <CardTitle className="text-xs sm:text-base">이번 달 수입</CardTitle>
-          <CardContent className="text-xs text-blue-600 sm:text-base">
-            {income.toLocaleString()}원
-          </CardContent>
-        </Card>
-        <Card className="w-full items-center gap-2">
-          <CardTitle className="text-xs sm:text-base">이번 달 지출</CardTitle>
-          <CardContent className="text-xs text-red-600 sm:text-base">
-            {expense.toLocaleString()}원
-          </CardContent>
-        </Card>
+      <div className="mb-4 w-full">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row">
+          <div
+            className={cn(
+              'flex items-center justify-between rounded-md px-4 py-3 sm:flex-1',
+              'bg-brand-subtle dark:bg-muted/40',
+              'dark:border-border border border-transparent',
+              'border-l-brand border-l-4'
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-brand-soft/40 h-8 w-8"
+                onClick={() => moveMonth(-1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              <span className="text-xl font-semibold tracking-tight sm:text-2xl">
+                {displayMonth}월
+              </span>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-brand-soft/40 h-8 w-8"
+                onClick={() => moveMonth(1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-1 text-right">
+              <div className="flex items-baseline justify-end gap-2">
+                <span className="text-muted-foreground text-xs font-medium sm:text-sm">
+                  수입
+                </span>
+                <span className="text-sm font-semibold tracking-tight text-blue-500 sm:text-base">
+                  {income.toLocaleString()}원
+                </span>
+              </div>
+
+              <div className="flex items-baseline justify-end gap-2">
+                <span className="text-muted-foreground text-xs font-medium sm:text-sm">
+                  지출
+                </span>
+                <span className="text-sm font-semibold tracking-tight text-red-400 sm:text-base">
+                  {expense.toLocaleString()}원
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {children}
+        </div>
       </div>
     );
   };
   return (
-    <div className="flex w-full flex-col items-center">
-      <div className="flex flex-col items-center justify-center py-3 md:py-6">
-        <span className="text-muted-foreground text-sm font-bold md:text-base">
-          {year}
-        </span>
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer"
-            onClick={() => moveMonth(-1)}
-          >
-            <ChevronLeft />
-          </Button>
-
-          <span className="text-2xl font-bold">{displayMonth}월</span>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer"
-            onClick={() => moveMonth(1)}
-          >
-            <ChevronRight />
-          </Button>
-        </div>
-      </div>
+    <div className="flex w-full flex-col">
       <CalendarView
         month={month}
         mode="single"
