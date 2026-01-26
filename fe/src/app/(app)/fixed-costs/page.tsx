@@ -14,6 +14,7 @@ interface PageProps {
     cycle?: string;
     start_date?: string;
     end_date?: string;
+    query?: string;
   }>;
 }
 
@@ -34,6 +35,7 @@ export default async function FixedCostsPage({ searchParams }: PageProps) {
         : undefined,
     start_date: startDate ? formatLocalDate(startDate) : undefined,
     end_date: endDate ? formatLocalDate(endDate) : undefined,
+    query: params.query?.trim() ? params.query.trim() : undefined,
   };
 
   return (

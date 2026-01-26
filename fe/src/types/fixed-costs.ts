@@ -55,4 +55,5 @@ export type FixedCostsFilters = {
   cycle?: 'WEEKLY' | 'MONTHLY';
   start_date?: string;
   end_date?: string;
+  query?: string;
 };

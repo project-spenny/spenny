@@ -63,6 +63,10 @@ export const fetchFixedRulesServer = async (
       return false;
     });
   }
+  if (filters.query) {
+    const q = filters.query.toLowerCase();
+    rules = rules.filter((rule) => rule.title.toLowerCase().includes(q));
+  }
 
   // group_id가 아직 없는 데이터 대비 대표 rule 선택
   const groupMap = new Map<string, IFixedRule[]>();

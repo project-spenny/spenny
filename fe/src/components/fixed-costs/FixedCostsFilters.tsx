@@ -20,6 +20,7 @@ type LocalFilters = {
   cycle: string;
   start?: Date;
   end?: Date;
+  query: string;
 };
 
 export default function FixedCostsFilters() {
@@ -31,6 +32,7 @@ export default function FixedCostsFilters() {
     cycle: searchParams.get('cycle') || 'all',
     start: parseLocalDate(searchParams.get('start_date')),
     end: parseLocalDate(searchParams.get('end_date')),
+    query: searchParams.get('query') ?? '',
   });
 
   const [endEnabled, setEndEnabled] = React.useState<boolean>(
@@ -47,6 +49,7 @@ export default function FixedCostsFilters() {
       cycle: searchParams.get('cycle') || 'all',
       start: nextStart,
       end: nextEnd,
+      query: searchParams.get('query') ?? '',
     });
 
     // URL에 end_date가 있으면 토글 ON, 없으면 OFF
@@ -70,6 +73,7 @@ export default function FixedCostsFilters() {
         cycle: localFilters.cycle,
         start_date: 'all',
         end_date: 'all',
+        query: localFilters.query || 'all',
       });
       return;
     }
@@ -80,7 +84,7 @@ export default function FixedCostsFilters() {
         type: localFilters.type,
         cycle: localFilters.cycle,
         start_date: startStr,
-        end_date: 'all',
+        query: localFilters.query || 'all',
       });
       return;
     }
@@ -94,6 +98,7 @@ export default function FixedCostsFilters() {
       cycle: localFilters.cycle,
       start_date: from,
       end_date: to,
+      query: localFilters.query || 'all',
     });
   };
 
@@ -103,6 +108,7 @@ export default function FixedCostsFilters() {
       cycle: 'all',
       start: undefined,
       end: undefined,
+      query: '',
     });
     setEndEnabled(false);
     updateFilters({
@@ -110,6 +116,7 @@ export default function FixedCostsFilters() {
       cycle: 'all',
       start_date: 'all',
       end_date: 'all',
+      query: 'all',
     });
   };
 
@@ -120,6 +127,13 @@ export default function FixedCostsFilters() {
         <div className="group relative">
           <Search className="text-brand-neutral group-focus-within:text-brand absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors" />
           <Input
+            value={localFilters.query}
+            onChange={(e) =>
+              setLocalFilters((prev) => ({
+                ...prev,
+                query: e.target.value,
+              }))
+            }
             placeholder="어떤 내역을 찾으시나요?"
             className="ring-brand-neutral/20 focus-visible:ring-brand-soft placeholder:text-brand-neutral h-10 border-none bg-white pl-11 shadow-sm ring-1"
           />
