@@ -5,7 +5,9 @@ export const useCalendarNavigation = (
   currentMonth: string,
   onMonthChange: (month: string) => void
 ) => {
-  const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
+  const [month, setMonth] = useState<Date>(
+    () => new Date(`${currentMonth}-01`)
+  );
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
@@ -13,13 +15,18 @@ export const useCalendarNavigation = (
   }, [currentMonth]);
 
   const handleMonthChange = (newMonth: Date) => {
-      setMonth(newMonth);
-      const monthString = formatMonth(newMonth);
-      onMonthChange(monthString);
- };
+    setMonth(newMonth);
+    const monthString = formatMonth(newMonth);
+    onMonthChange(monthString);
+  };
 
   const moveMonth = (offset: number) => {
     const newDate = new Date(month.getFullYear(), month.getMonth() + offset, 1);
+    handleMonthChange(newDate);
+  };
+
+  const navigateMonth = (target: number) => {
+    const newDate = new Date(month.getFullYear(), target - 1, 1);
     handleMonthChange(newDate);
   };
 
@@ -34,5 +41,6 @@ export const useCalendarNavigation = (
     displayMonth,
     handleMonthChange,
     moveMonth,
+    navigateMonth,
   };
 };

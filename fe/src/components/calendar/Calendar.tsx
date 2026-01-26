@@ -20,6 +20,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CalendarDay } from './CalendarDay';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface CalendarProps {
   currentMonth: string;
@@ -37,7 +42,10 @@ interface PanelState {
   view: 'list' | 'create' | 'edit';
   editingTransaction?: ITransaction;
 }
-
+const MONTHS = Array.from({ length: 12 }, (_, i) => ({
+  month: i + 1,
+  monthDisplay: `${i + 1}월`,
+}));
 const CALENDAR_CELL_HEIGHT =
   '[&_td]:!h-[50px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
 
@@ -61,6 +69,7 @@ export const Calendar = ({
     displayMonth,
     handleMonthChange,
     moveMonth,
+    navigateMonth,
   } = useCalendarNavigation(currentMonth, onMonthChange);
 
   const selectedDayTransactions = useMemo(() => {
@@ -91,6 +100,22 @@ export const Calendar = ({
   };
 
   const CustomCaption = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [mode, setMode] = useState<'month' | 'year'>('month');
+    const handleMonthSelect = (selectedDate: Date | undefined) => {
+      if (selectedDate) {
+        handleMonthChange(selectedDate);
+        setIsOpen(false);
+      }
+    };
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+
+    const handleYearSelect = (selectedYear: number) => {
+      const newDate = new Date(selectedYear, month.getMonth(), 1);
+      handleMonthChange(newDate);
+      setMode('month');
+    };
     return (
       <div className="mb-4 w-full">
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
@@ -102,30 +127,81 @@ export const Calendar = ({
               'border-l-brand border-l-4'
             )}
           >
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-brand-soft/40 h-8 w-8"
-                onClick={() => moveMonth(-1)}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+            <div className="flex flex-col items-center">
+              <span className="text-muted-foreground text-xs">{year}</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-brand-soft/40 h-8 w-8"
+                  onClick={() => moveMonth(-1)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
 
-              <span className="text-xl font-semibold tracking-tight sm:text-2xl">
-                {displayMonth}월
-              </span>
+                <Popover open={isOpen} onOpenChange={setIsOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        'hover:bg-brand-soft/40 w-10 justify-center font-semibold',
+                        'text-xl tracking-tight sm:text-2xl'
+                      )}
+                    >
+                      {displayMonth}월
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    {mode === 'month' ? (
+                      <div className="grid grid-cols-3">
+                        <div
+                          onClick={() => setMode('year')}
+                          className="col-span-3 cursor-pointer p-2 text-center font-bold hover:bg-gray-100"
+                        >
+                          {year}
+                        </div>
+                        {MONTHS.map(({ month, monthDisplay }) => (
+                          <div
+                            className="flex h-12 w-12 cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs hover:bg-gray-100"
+                            onClick={() => navigateMonth(month)}
+                            key={month}
+                          >
+                            {monthDisplay}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 p-2">
+                        <div
+                          className="col-span-3 cursor-pointer p-2 text-center font-bold hover:bg-gray-100"
+                          onClick={() => setMode('month')}
+                        >
+                          {displayMonth}월
+                        </div>
+                        {years.map((y) => (
+                          <div
+                            key={y}
+                            className="flex h-12 w-12 cursor-pointer items-center justify-center text-sm hover:bg-gray-100"
+                            onClick={() => handleYearSelect(y)}
+                          >
+                            {y}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-brand-soft/40 h-8 w-8"
-                onClick={() => moveMonth(1)}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-brand-soft/40 h-8 w-8"
+                  onClick={() => moveMonth(1)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-
             <div className="space-y-1 text-right">
               <div className="flex items-baseline justify-end gap-2">
                 <span className="text-muted-foreground text-xs font-medium sm:text-sm">
