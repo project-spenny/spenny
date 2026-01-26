@@ -42,6 +42,9 @@ export const fetchFixedRulesServer = async (
   if (filters.type) {
     rules = rules.filter((r) => r.type === filters.type);
   }
+  if (filters.cycle) {
+    rules = rules.filter((r) => r.cycle === filters.cycle);
+  }
 
   // group_id가 아직 없는 데이터 대비 대표 rule 선택
   const groupMap = new Map<string, IFixedRule[]>();

@@ -52,4 +52,5 @@ export type FixedTransactionInsert = {
 // 고정비 규칙 필터링 타입
 export type FixedCostsFilters = {
   type?: 'income' | 'expense';
+  cycle?: 'WEEKLY' | 'MONTHLY';
 };

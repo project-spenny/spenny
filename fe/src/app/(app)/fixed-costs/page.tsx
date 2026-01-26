@@ -10,6 +10,7 @@ import type { FixedCostsFilters as Filters } from '@/types/fixed-costs';
 interface PageProps {
   searchParams: Promise<{
     type?: string;
+    cycle?: string;
   }>;
 }
 
@@ -20,6 +21,10 @@ export default async function FixedCostsPage({ searchParams }: PageProps) {
     type:
       params.type === 'income' || params.type === 'expense'
         ? params.type
+        : undefined,
+    cycle:
+      params.cycle === 'WEEKLY' || params.cycle === 'MONTHLY'
+        ? params.cycle
         : undefined,
   };
 
