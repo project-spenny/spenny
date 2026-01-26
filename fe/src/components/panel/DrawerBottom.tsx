@@ -13,7 +13,7 @@ import { X } from 'lucide-react';
 const DrawerBottom = ({ children, open, onOpenChange }: PanelProps) => {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex h-dvh max-h-dvh flex-col overflow-hidden outline-none">
+      <DrawerContent className="fixed inset-0 flex h-full flex-col overflow-hidden rounded-none border-none outline-none">
         {/* DialogTitle 누락 방지 */}
         <DrawerTitle className="sr-only">DrawerBottom</DrawerTitle>
         <DrawerDescription className="sr-only">DrawerBottom</DrawerDescription>
