@@ -173,6 +173,24 @@ export default function TransactionSubmitForm({
     if (!confirm('삭제하시겠습니까?')) return;
     setIsSubmitting(true);
     try {
+      // 고정비 거래 삭제
+      if (transaction.fixed_rule_id) {
+        const { error } = await supabase.rpc(
+          'delete_fixed_transaction_with_override',
+          { p_transaction_id: transaction.id }
+        );
+
+        if (error) {
+          toast.warning('삭제에 실패했습니다');
+          return;
+        }
+
+        toast.success('기록이 삭제되었습니다');
+        onSuccess();
+        return;
+      }
+
+      // 일반 거래 삭제
       const { error } = await supabase
         .from('transactions')
         .delete()
