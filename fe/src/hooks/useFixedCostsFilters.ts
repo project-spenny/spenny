@@ -18,5 +18,17 @@ export function useFixedCostsFilters() {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
-  return { searchParams, updateFilter };
+  const updateFilters = (next: Record<string, string | undefined | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    Object.entries(next).forEach(([key, value]) => {
+      if (!value || value === 'all') params.delete(key);
+      else params.set(key, value);
+    });
+
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+
+  return { searchParams, updateFilter, updateFilters };
 }
