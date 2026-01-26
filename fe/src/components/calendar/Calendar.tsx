@@ -122,7 +122,7 @@ export const Calendar = ({
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <div
             className={cn(
-              'flex items-center justify-between rounded-md px-4 py-3 sm:flex-1',
+              'flex flex-2 items-center justify-between rounded-md px-4 py-3 sm:flex-1',
               'bg-brand-subtle dark:bg-muted/40',
               'dark:border-border border border-transparent',
               'border-l-brand border-l-4'
@@ -145,7 +145,7 @@ export const Calendar = ({
                     <Button
                       variant="ghost"
                       className={cn(
-                        'hover:bg-brand-soft/40 w-10 justify-center font-semibold',
+                        'hover:bg-brand-soft/40 w-16 justify-center font-semibold',
                         'text-xl tracking-tight sm:text-2xl'
                       )}
                     >
@@ -224,7 +224,7 @@ export const Calendar = ({
             </div>
           </div>
 
-          {children}
+          <div className="flex-1">{children}</div>
         </div>
       </div>
     );
