@@ -20,6 +20,7 @@ import { useRef, useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 import FixedCostDeleteDialog from './FixedCostDeleteDialog';
 import { Spinner } from '../ui/spinner';
+import { isEndedFixedRule } from '@/utils/fixed-costs';
 import { useAuth } from '@/providers/AuthProvider';
 
 type FixedCostSubmitFormProps = {
@@ -42,6 +43,8 @@ export default function FixedCostSubmitForm({
     useState<CreateFixedRuleInput | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isEndedRule = mode === 'edit' && isEndedFixedRule(initialData);
+
   const {
     formData,
     categoryOpen,
@@ -52,6 +55,10 @@ export default function FixedCostSubmitForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isEndedRule) {
+      toast.error('종료된 고정비 규칙은 수정할 수 없습니다.');
+      return;
+    }
     if (isSubmitting) return; // 중복 제출 방지
 
     const errorMsg = validateFormData();
@@ -78,6 +85,11 @@ export default function FixedCostSubmitForm({
     };
 
     if (mode === 'edit') {
+      if (isEndedRule) {
+        toast.error('종료된 고정비 규칙은 수정할 수 없습니다.');
+        return;
+      }
+
       setPendingPayload(payload);
       setConfirmOpen(true);
       return;
@@ -195,6 +207,11 @@ export default function FixedCostSubmitForm({
           <Label className="text-xl">
             {mode === 'create' ? '고정비 추가' : '고정비 수정'}
           </Label>
+          {isEndedRule && (
+            <div className="bg-muted text-muted-foreground rounded-md px-3 py-2 text-sm">
+              종료된 고정비 규칙은 수정할 수 없습니다.
+            </div>
+          )}
         </div>
 
         <div className="min-h-0 flex-1 space-y-6 py-6">
@@ -241,7 +258,11 @@ export default function FixedCostSubmitForm({
                   disabled={isSubmitting}
                 />
               )}
-              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={isSubmitting || isEndedRule}
+              >
                 {isSubmitting && <Spinner />}
                 수정
               </Button>

@@ -1,6 +1,6 @@
 import { IFixedCostFormData } from '@/hooks/useFixedCostForm';
 import { ApplyScope, IFixedRule } from '@/types/fixed-costs';
-import { parseLocalDate } from './date';
+import { formatLocalDate, parseLocalDate } from './date';
 import {
   startOfMonth,
   endOfMonth,
@@ -109,3 +109,19 @@ export const getFixedPlannedExpenseByMonth = (
       return sum + r.amount * occurrences;
     }, 0);
 };
+
+type EndDateInput = { end_date?: string | Date | null } | undefined | null;
+
+// 종료된 고정비 규칙인지 판단
+export function isEndedFixedRule(target: EndDateInput): boolean {
+  if (!target?.end_date) return false;
+
+  const today = formatLocalDate(new Date());
+
+  const endDateStr =
+    target.end_date instanceof Date
+      ? formatLocalDate(target.end_date)
+      : target.end_date;
+
+  return endDateStr < today;
+}

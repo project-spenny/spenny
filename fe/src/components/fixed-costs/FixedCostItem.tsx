@@ -4,9 +4,10 @@ import { Item, ItemContent, ItemTitle } from '@/components/ui/item';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { IFixedRule } from '@/types/fixed-costs';
-import { formatFixedRuleCycle } from '@/utils/fixed-costs';
+import { formatFixedRuleCycle, isEndedFixedRule } from '@/utils/fixed-costs';
 import { THEME_COLOR } from '@/constants/colors';
 import { CATEGORIES } from '@/constants/categories';
+import { Badge } from '../ui/badge';
 
 type FixedCostItemProps = {
   rule: IFixedRule;
@@ -14,6 +15,8 @@ type FixedCostItemProps = {
 };
 
 export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
+  const isEnded = isEndedFixedRule(rule);
+
   const handleClick = () => {
     onEdit?.(rule);
   };
@@ -25,7 +28,10 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
   return (
     <Item
       variant="outline"
-      className="hover:border-brand-soft cursor-pointer transition-colors"
+      className={cn(
+        'hover:border-brand-soft cursor-pointer transition-colors',
+        isEnded ? 'opacity-60' : ''
+      )}
       onClick={handleClick}
     >
       <ItemContent className="flex flex-row items-center">
@@ -50,7 +56,14 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
           <ItemTitle className="text-muted-foreground pl-2 text-left text-xs">
             {categoryName}
           </ItemTitle>
-          <ItemTitle className="p-2 text-left">{rule.title}</ItemTitle>
+          <ItemTitle className="p-2 text-left">
+            {rule.title}
+            {isEnded && (
+              <Badge variant="secondary" className="h-5 px-2 text-xs">
+                종료됨
+              </Badge>
+            )}
+          </ItemTitle>
         </div>
 
         {/* 우측 */}
