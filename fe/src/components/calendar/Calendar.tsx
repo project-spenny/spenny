@@ -9,8 +9,6 @@ import { useCalendar } from '@/context/CalendarContext';
 import { ITransaction } from '@/types/transactions';
 import { useMemo } from 'react';
 import { formatDateKR, formatLocalDate } from '@/utils/date';
-import { Card, CardTitle, CardContent } from '../ui/card';
-import { MonthCaptionProps } from 'react-day-picker';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
 import { formatMonth } from '@/utils/date';
@@ -20,12 +18,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CalendarDay } from './CalendarDay';
 import { useCalendarData } from '@/hooks/useCalendarData';
 import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Spinner } from '../ui/spinner';
+import { CalendarCaption } from './CalendarCaption';
 
 interface CalendarProps {
   currentMonth: string;
@@ -34,19 +28,10 @@ interface CalendarProps {
   onMonthChange: (month: string) => void;
   children?: React.ReactNode;
 }
-interface DayData {
-  income: number;
-  expense: number;
-  transactions: ITransaction[];
-}
 interface PanelState {
   view: 'list' | 'create' | 'edit';
   editingTransaction?: ITransaction;
 }
-const MONTHS = Array.from({ length: 12 }, (_, i) => ({
-  month: i + 1,
-  monthDisplay: `${i + 1}월`,
-}));
 const CALENDAR_CELL_HEIGHT =
   '[&_td]:!h-[50px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
 
@@ -100,135 +85,22 @@ export const Calendar = ({
     setPanelState({ view: 'list' });
   };
 
-  const CustomCaption = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [mode, setMode] = useState<'month' | 'year'>('month');
-    const handleMonthSelect = (selectedDate: Date | undefined) => {
-      if (selectedDate) {
-        handleMonthChange(selectedDate);
-        setIsOpen(false);
-      }
-    };
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
-
-    const handleYearSelect = (selectedYear: number) => {
-      const newDate = new Date(selectedYear, month.getMonth(), 1);
-      handleMonthChange(newDate);
-      setMode('month');
-    };
-    return (
-      <div className="mb-4 w-full">
-        <div className="flex flex-col-reverse gap-2 sm:flex-row">
-          <div
-            className={cn(
-              'flex items-center justify-between rounded-md px-4 py-3 sm:flex-1',
-              'bg-brand-subtle dark:bg-muted/40',
-              'dark:border-border border border-transparent',
-              'border-l-brand border-l-4'
-            )}
-          >
-            <div className="flex flex-col items-center">
-              <span className="text-muted-foreground text-xs">{year}</span>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-brand-soft/40 h-8 w-8"
-                  onClick={() => moveMonth(-1)}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-
-                <Popover open={isOpen} onOpenChange={setIsOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        'hover:bg-brand-soft/40 w-16 justify-center font-semibold',
-                        'text-xl tracking-tight sm:text-2xl'
-                      )}
-                    >
-                      {displayMonth}월
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    {mode === 'month' ? (
-                      <div className="grid grid-cols-3 p-2">
-                        <div
-                          onClick={() => setMode('year')}
-                          className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer p-2 text-center font-bold"
-                        >
-                          {year}
-                        </div>
-                        {MONTHS.map(({ month, monthDisplay }) => (
-                          <div
-                            className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs"
-                            onClick={() => navigateMonth(month)}
-                            key={month}
-                          >
-                            {monthDisplay}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-3 p-2">
-                        <div
-                          className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer p-2 text-center font-bold"
-                          onClick={() => setMode('month')}
-                        >
-                          {displayMonth}월
-                        </div>
-                        {years.map((y) => (
-                          <div
-                            key={y}
-                            className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer items-center justify-center text-sm"
-                            onClick={() => handleYearSelect(y)}
-                          >
-                            {y}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </PopoverContent>
-                </Popover>
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:bg-brand-soft/40 h-8 w-8"
-                  onClick={() => moveMonth(1)}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-1 text-right">
-              <div className="flex items-baseline justify-end gap-2">
-                <span className="text-muted-foreground text-xs font-medium sm:text-sm">
-                  수입
-                </span>
-                <span className="text-sm font-semibold tracking-tight text-blue-500 sm:text-base">
-                  {income.toLocaleString()}원
-                </span>
-              </div>
-
-              <div className="flex items-baseline justify-end gap-2">
-                <span className="text-muted-foreground text-xs font-medium sm:text-sm">
-                  지출
-                </span>
-                <span className="text-sm font-semibold tracking-tight text-red-400 sm:text-base">
-                  {expense.toLocaleString()}원
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1">{children}</div>
-        </div>
-      </div>
-    );
-  };
+  const CustomCaption = () => (
+    <>
+      <CalendarCaption
+        year={year}
+        displayMonth={displayMonth}
+        month={month}
+        income={income}
+        expense={expense}
+        moveMonth={moveMonth}
+        navigateMonth={navigateMonth}
+        handleMonthChange={handleMonthChange}
+      >
+        {children}
+      </CalendarCaption>
+    </>
+  );
   return (
     <div className="flex w-full flex-col">
       {isLoading && (
