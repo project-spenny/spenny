@@ -118,7 +118,7 @@ export default function RangeDatePicker({
             onClick={() =>
               onChange({ start: undefined, end: undefined, endEnabled: false })
             }
-            className="text-brand-neutral hover:text-brand-strong hover:bg-brand-subtle text-xs"
+            className="text-brand-neutral hover:text-brand-strong hover:bg-brand-subtle text-xs dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
           >
             <RotateCcw className="mr-1 h-3 w-3" />
             초기화

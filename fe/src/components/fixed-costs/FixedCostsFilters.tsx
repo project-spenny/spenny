@@ -121,7 +121,7 @@ export default function FixedCostsFilters() {
   };
 
   return (
-    <section className="bg-brand-subtle/30 border-brand-soft/20 w-full rounded-lg border p-4 shadow-sm">
+    <section className="bg-brand-subtle/30 border-brand-soft/20 w-full rounded-lg border p-4 shadow-sm dark:bg-neutral-900 dark:text-neutral-100">
       <div className="flex flex-col gap-4">
         {/* 검색창 */}
         <div className="group relative">
@@ -196,7 +196,7 @@ export default function FixedCostsFilters() {
             variant="ghost"
             size="sm"
             onClick={handleReset}
-            className="text-brand-neutral hover:text-brand-strong hover:bg-brand-soft/20 h-9 px-4"
+            className="text-brand-neutral hover:text-brand-strong hover:bg-brand-soft/20 h-9 px-4 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
           >
             <RotateCcw className="mr-1 h-3.5 w-3.5" />
             초기화
