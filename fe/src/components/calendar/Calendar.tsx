@@ -25,6 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Spinner } from '../ui/spinner';
 
 interface CalendarProps {
   currentMonth: string;
@@ -230,6 +231,13 @@ export const Calendar = ({
   };
   return (
     <div className="flex w-full flex-col">
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <Spinner className="text-brand h-12 w-12" />
+          </div>
+        </div>
+      )}
       <CalendarView
         month={month}
         mode="single"
