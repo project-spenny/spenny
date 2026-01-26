@@ -48,13 +48,15 @@ export const fetchFixedRulesServer = async (
   const rangeStart = parseLocalDate(filters.start_date);
   const rangeEnd = parseLocalDate(filters.end_date);
 
-  if (rangeStart && rangeEnd) {
+  if (rangeStart) {
+    const effectiveEnd = rangeEnd ?? new Date(2100, 0, 1);
+
     rules = rules.filter((rule) => {
       if (rule.cycle === 'MONTHLY') {
-        return hasMonthlyOccurrence(rule, rangeStart, rangeEnd);
+        return hasMonthlyOccurrence(rule, rangeStart, effectiveEnd);
       }
       if (rule.cycle === 'WEEKLY') {
-        return hasWeeklyOccurrence(rule, rangeStart, rangeEnd);
+        return hasWeeklyOccurrence(rule, rangeStart, effectiveEnd);
       }
       return false;
     });
