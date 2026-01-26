@@ -10,9 +10,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, RotateCcw } from 'lucide-react';
 import { formatLocalDate } from '@/utils/date';
 import type { DateRange } from 'react-day-picker';
+import { cn } from '@/lib/utils';
 
 type Props = {
   start?: Date;
@@ -34,23 +35,19 @@ export default function RangeDatePicker({
   const label = React.useMemo(() => {
     if (!start) return '기간 선택';
     if (!endEnabled || !end) return formatLocalDate(start);
-    return `${formatLocalDate(start)} → ${formatLocalDate(end)}`;
+    return `${formatLocalDate(start)} ~ ${formatLocalDate(end)}`;
   }, [start, end, endEnabled]);
 
   const handleToggleEnd = (checked: boolean) => {
     if (!checked) {
-      // 종료일 기능 OFF : end 제거
       onChange({ start, end: undefined, endEnabled: false });
       return;
     }
-
-    // 종료일 기능 ON : start가 있으면 end 기본값을 start로 설정
-    if (start) {
-      onChange({ start, end: end ?? start, endEnabled: true });
-    } else {
-      // start가 없으면 토글만 켜두고, 사용자가 날짜를 찍으면 start부터 잡히게
+    if (!start) {
       onChange({ start: undefined, end: undefined, endEnabled: true });
+      return;
     }
+    onChange({ start, end: end ?? start, endEnabled: true });
   };
 
   return (
@@ -59,14 +56,19 @@ export default function RangeDatePicker({
         <Button
           type="button"
           variant="outline"
-          className="min-w-[180px] flex-1 justify-start text-left"
+          className={cn(
+            'ring-brand-neutral/20 focus:ring-brand min-w-[220px] flex-1 justify-start border-none bg-white ring-1 hover:bg-white'
+          )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          <span className={!start ? 'text-muted-foreground' : ''}>{label}</span>
+          <CalendarIcon className={'text-brand mr-0.5 h-4 w-4 opacity-60'} />
+          <span className="font-normal">{label}</span>
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-auto p-3" align="start">
+      <PopoverContent
+        className="border-brand-soft/20 w-auto rounded-2xl p-4 shadow-xl"
+        align="start"
+      >
         <Calendar
           mode="range"
           selected={selected}
@@ -93,12 +95,23 @@ export default function RangeDatePicker({
             });
           }}
           numberOfMonths={1}
+          className="rounded-md border-none"
         />
 
-        <div className="mt-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Label className="text-sm">종료일</Label>
-            <Switch checked={endEnabled} onCheckedChange={handleToggleEnd} />
+        <div className="border-brand-subtle mt-4 flex items-center justify-between gap-4 border-t pt-4">
+          <div className="flex items-center gap-3">
+            <Label
+              htmlFor="end-date-toggle"
+              className="text-brand-strong text-sm"
+            >
+              종료일 설정
+            </Label>
+            <Switch
+              id="end-date-toggle"
+              checked={endEnabled}
+              onCheckedChange={handleToggleEnd}
+              className="data-[state=checked]:bg-brand"
+            />
           </div>
 
           <Button
@@ -108,7 +121,9 @@ export default function RangeDatePicker({
             onClick={() =>
               onChange({ start: undefined, end: undefined, endEnabled: false })
             }
+            className="text-brand-neutral hover:text-brand-strong hover:bg-brand-subtle text-xs"
           >
+            <RotateCcw className="mr-1 h-3 w-3" />
             초기화
           </Button>
         </div>

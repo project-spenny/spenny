@@ -11,26 +11,84 @@ import {
 import { useFixedCostsFilters } from '@/hooks/useFixedCostsFilters';
 import { formatLocalDate, parseLocalDate } from '@/utils/date';
 import RangeDatePicker from './RangeDatePicker';
-import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
-import { Filter, RotateCcw } from 'lucide-react';
+import { Search, LayoutGrid, Repeat, RotateCcw, Check } from 'lucide-react';
 import { Button } from '../ui/button';
 
+type LocalFilters = {
+  type: string;
+  cycle: string;
+  start?: Date;
+  end?: Date;
+};
+
 export default function FixedCostsFilters() {
-  const { searchParams, updateFilter, updateFilters } = useFixedCostsFilters();
-  const type = searchParams.get('type') || 'all';
-  const cycle = searchParams.get('cycle') || 'all';
-  const start = parseLocalDate(searchParams.get('start_date'));
-  const end = parseLocalDate(searchParams.get('end_date'));
+  const { searchParams, updateFilters } = useFixedCostsFilters();
 
-  const [endEnabled, setEndEnabled] = React.useState<boolean>(!!end);
-  React.useEffect(() => {
-    if (!end) setEndEnabled(false);
-  }, [end]);
+  // 내부 로컬 상태로 관리
+  const [localFilters, setLocalFilters] = React.useState<LocalFilters>({
+    type: searchParams.get('type') || 'all',
+    cycle: searchParams.get('cycle') || 'all',
+    start: parseLocalDate(searchParams.get('start_date')),
+    end: parseLocalDate(searchParams.get('end_date')),
+  });
 
-  const resetFilters = () => {
+  const [endEnabled, setEndEnabled] = React.useState<boolean>(
+    !!localFilters.end
+  );
+
+  // 검색 실행 함수
+  const handleApply = () => {
+    const startStr = localFilters.start
+      ? formatLocalDate(localFilters.start)
+      : 'all';
+    const endStr =
+      endEnabled && localFilters.end
+        ? formatLocalDate(localFilters.end)
+        : 'all';
+
+    // start가 없으면 기간은 둘 다 해제
+    if (startStr === 'all') {
+      updateFilters({
+        type: localFilters.type,
+        cycle: localFilters.cycle,
+        start_date: 'all',
+        end_date: 'all',
+      });
+      return;
+    }
+
+    // end가 없으면 start만 유지
+    if (endStr === 'all') {
+      updateFilters({
+        type: localFilters.type,
+        cycle: localFilters.cycle,
+        start_date: startStr,
+        end_date: 'all',
+      });
+      return;
+    }
+
+    // 둘 다 있으면 swap 보정
+    const from = endStr < startStr ? endStr : startStr;
+    const to = endStr < startStr ? startStr : endStr;
+
+    updateFilters({
+      type: localFilters.type,
+      cycle: localFilters.cycle,
+      start_date: from,
+      end_date: to,
+    });
+  };
+
+  const handleReset = () => {
+    setLocalFilters({
+      type: 'all',
+      cycle: 'all',
+      start: undefined,
+      end: undefined,
+    });
     setEndEnabled(false);
-
     updateFilters({
       type: 'all',
       cycle: 'all',
@@ -40,113 +98,88 @@ export default function FixedCostsFilters() {
   };
 
   return (
-    <section className="w-full rounded-xl border p-3">
-      <div className="mb-3 flex items-center justify-between">
-        <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
-          <Filter className="h-4 w-4" />
-          필터
+    <section className="bg-brand-subtle/30 border-brand-soft/20 w-full rounded-lg border p-4 shadow-sm">
+      <div className="flex flex-col gap-4">
+        {/* 검색창 */}
+        <div className="group relative">
+          <Search className="text-brand-neutral group-focus-within:text-brand absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transition-colors" />
+          <Input
+            placeholder="어떤 내역을 찾으시나요?"
+            className="ring-brand-neutral/20 focus-visible:ring-brand-soft placeholder:text-brand-neutral h-10 border-none bg-white pl-11 shadow-sm ring-1"
+          />
         </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8"
-          onClick={resetFilters}
-        >
-          <RotateCcw className="mr-1 h-4 w-4" />
-          초기화
-        </Button>
-      </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {/* 타입 */}
-        <Select
-          value={type}
-          onValueChange={(value) => updateFilter('type', value)}
-        >
-          <SelectTrigger
-            className={cn(
-              'min-w-[96px]',
-              type === 'all' && 'text-muted-foreground'
-            )}
+        {/* 필터 컨트롤 그룹 */}
+        <div className="flex flex-wrap items-center gap-3">
+          <Select
+            value={localFilters.type}
+            onValueChange={(v) =>
+              setLocalFilters((prev) => ({ ...prev, type: v }))
+            }
           >
-            <SelectValue>
-              {type === 'all' ? '타입' : type === 'income' ? '수입' : '지출'}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">전체</SelectItem>
-            <SelectItem value="income">수입</SelectItem>
-            <SelectItem value="expense">지출</SelectItem>
-          </SelectContent>
-        </Select>
+            <SelectTrigger className="ring-brand-neutral/20 focus:ring-brand h-10 min-w-[120px] flex-1 border-none bg-white ring-1 md:w-[140px] md:flex-none">
+              <div className="flex items-center gap-2">
+                <LayoutGrid className="text-brand h-4 w-4 opacity-60" />
+                <SelectValue placeholder="타입" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체 타입</SelectItem>
+              <SelectItem value="income">수입</SelectItem>
+              <SelectItem value="expense">지출</SelectItem>
+            </SelectContent>
+          </Select>
 
-        {/* 반복 주기 */}
-        <Select
-          value={cycle}
-          onValueChange={(value) => updateFilter('cycle', value)}
-        >
-          <SelectTrigger
-            className={cn(
-              'min-w-[96px]',
-              cycle === 'all' && 'text-muted-foreground'
-            )}
+          <Select
+            value={localFilters.cycle}
+            onValueChange={(v) =>
+              setLocalFilters((prev) => ({ ...prev, cycle: v }))
+            }
           >
-            <SelectValue>
-              {cycle === 'all' ? '주기' : cycle === 'MONTHLY' ? '월간' : '주간'}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">전체</SelectItem>
-            <SelectItem value="MONTHLY">월간</SelectItem>
-            <SelectItem value="WEEKLY">주간</SelectItem>
-          </SelectContent>
-        </Select>
+            <SelectTrigger className="ring-brand-neutral/20 focus:ring-brand h-10 min-w-[120px] flex-1 border-none bg-white ring-1 md:w-[140px] md:flex-none">
+              <div className="flex items-center gap-2">
+                <Repeat className="text-brand h-4 w-4 opacity-60" />
+                <SelectValue placeholder="주기" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체 주기</SelectItem>
+              <SelectItem value="MONTHLY">월간</SelectItem>
+              <SelectItem value="WEEKLY">주간</SelectItem>
+            </SelectContent>
+          </Select>
 
-        {/* 기간 */}
-        <RangeDatePicker
-          start={start}
-          end={end}
-          endEnabled={endEnabled}
-          onChange={({ start, end, endEnabled }) => {
-            setEndEnabled(endEnabled);
+          <RangeDatePicker
+            start={localFilters.start}
+            end={localFilters.end}
+            endEnabled={endEnabled}
+            onChange={({ start, end, endEnabled }) => {
+              setEndEnabled(endEnabled);
+              setLocalFilters((prev) => ({ ...prev, start, end }));
+            }}
+          />
+        </div>
 
-            // start가 없으면 전체 초기화
-            if (!start) {
-              updateFilters({ start_date: 'all', end_date: 'all' });
-              return;
-            }
-
-            const startStr = formatLocalDate(start);
-
-            // 토글 OFF면 end는 제거
-            if (!endEnabled) {
-              updateFilters({ start_date: startStr, end_date: 'all' });
-              return;
-            }
-
-            // 토글 ON인데 end가 아직 없으면: start만 유지하고 end는 비움
-            if (!end) {
-              updateFilters({ start_date: startStr, end_date: 'all' });
-              return;
-            }
-
-            const endStr = formatLocalDate(end);
-
-            // end < start면 swap
-            if (endStr < startStr) {
-              updateFilters({ start_date: endStr, end_date: startStr });
-              return;
-            }
-
-            updateFilters({ start_date: startStr, end_date: endStr });
-          }}
-        />
-      </div>
-
-      {/* 검색 */}
-      <div className="mt-2 min-w-[180px] flex-1">
-        <Input placeholder="검색..." className="h-9" />
+        {/* 액션 버튼 그룹 */}
+        <div className="border-brand-soft/10 flex items-center justify-end gap-2 border-t pt-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            className="text-brand-neutral hover:text-brand-strong hover:bg-brand-soft/20 h-9 px-4"
+          >
+            <RotateCcw className="mr-1 h-3.5 w-3.5" />
+            초기화
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleApply}
+            className="bg-brand hover:bg-brand-strong h-9 rounded-lg px-6 text-white shadow-md transition-all active:scale-95"
+          >
+            <Check className="mr-1.5 h-4 w-4" />
+            조건 적용하기
+          </Button>
+        </div>
       </div>
     </section>
   );
