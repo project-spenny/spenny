@@ -59,10 +59,10 @@ export default function RangeDatePicker({
         <Button
           type="button"
           variant="outline"
-          className="w-[260px] justify-start text-left font-normal"
+          className="min-w-[180px] flex-1 justify-start text-left"
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          <span>{label}</span>
+          <span className={!start ? 'text-muted-foreground' : ''}>{label}</span>
         </Button>
       </PopoverTrigger>
 
