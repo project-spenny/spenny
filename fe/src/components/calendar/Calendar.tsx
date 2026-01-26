@@ -122,7 +122,7 @@ export const Calendar = ({
         <div className="flex flex-col-reverse gap-2 sm:flex-row">
           <div
             className={cn(
-              'flex flex-2 items-center justify-between rounded-md px-4 py-3 sm:flex-1',
+              'flex items-center justify-between rounded-md px-4 py-3 sm:flex-1',
               'bg-brand-subtle dark:bg-muted/40',
               'dark:border-border border border-transparent',
               'border-l-brand border-l-4'
@@ -154,16 +154,16 @@ export const Calendar = ({
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     {mode === 'month' ? (
-                      <div className="grid grid-cols-3">
+                      <div className="grid grid-cols-3 p-2">
                         <div
                           onClick={() => setMode('year')}
-                          className="col-span-3 cursor-pointer p-2 text-center font-bold hover:bg-gray-100"
+                          className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer p-2 text-center font-bold"
                         >
                           {year}
                         </div>
                         {MONTHS.map(({ month, monthDisplay }) => (
                           <div
-                            className="flex h-12 w-12 cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs hover:bg-gray-100"
+                            className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs"
                             onClick={() => navigateMonth(month)}
                             key={month}
                           >
@@ -174,7 +174,7 @@ export const Calendar = ({
                     ) : (
                       <div className="grid grid-cols-3 p-2">
                         <div
-                          className="col-span-3 cursor-pointer p-2 text-center font-bold hover:bg-gray-100"
+                          className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer p-2 text-center font-bold"
                           onClick={() => setMode('month')}
                         >
                           {displayMonth}월
@@ -182,7 +182,7 @@ export const Calendar = ({
                         {years.map((y) => (
                           <div
                             key={y}
-                            className="flex h-12 w-12 cursor-pointer items-center justify-center text-sm hover:bg-gray-100"
+                            className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer items-center justify-center text-sm"
                             onClick={() => handleYearSelect(y)}
                           >
                             {y}
