@@ -183,33 +183,12 @@ export const updateFixedRuleWithScope = async ({
   }
 
   // 제외 : 반복 일정 변경 있음
-  const { startDate: currentPeriodStart, endDate: currentPeriodEnd } =
-    getCurrentPeriod(prevRule.cycle);
+  const { endDate: currentPeriodEnd } = getCurrentPeriod(prevRule.cycle);
 
   const isFutureRule = prevRule.start_date > currentPeriodEnd;
-
-  console.log({
-    ruleId: id,
-    prevStart: prevRule.start_date,
-    prevEnd: prevRule.end_date,
-    currentPeriodStart,
-    currentPeriodEnd,
-    nextStartDate: getNextPeriodStartDate(prevRule.cycle),
-    isFutureRule,
-    scope,
-    scheduleChanged,
-    prevCycle: prevRule.cycle,
-    nextCycle: ruleInput.cycle,
-    prevMonthday: prevRule.monthday,
-    nextMonthday: ruleInput.monthday,
-    prevWeekday: prevRule.weekday,
-    nextWeekday: ruleInput.weekday,
-  });
-
   if (isFutureRule) {
     return await updateFixedRule(userId, id, ruleInput);
   }
-  const nextStartDate = getNextPeriodStartDate(prevRule.cycle);
 
   const prevEndDate =
     prevRule.end_date && prevRule.end_date < currentPeriodEnd
@@ -224,6 +203,8 @@ export const updateFixedRuleWithScope = async ({
     .eq('user_id', userId);
 
   if (endDateError) throw endDateError;
+
+  const nextStartDate = getNextPeriodStartDate(ruleInput.cycle);
 
   // 새 규칙 생성
   const createdRule = await createFixedRule(userId, {
