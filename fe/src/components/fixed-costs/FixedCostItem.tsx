@@ -15,6 +15,12 @@ type FixedCostItemProps = {
   onEdit?: (rule: IFixedRule) => void;
 };
 
+function formatRuleRange(rule: IFixedRule) {
+  const start = rule.start_date;
+  const end = rule.end_date ?? '';
+  return end ? `${start} ~ ${end}` : `${start} ~`;
+}
+
 export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
   const isEnded = isEndedFixedRule(rule);
 
@@ -30,48 +36,56 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
     <Item
       variant="outline"
       className={cn(
-        'hover:border-brand-soft cursor-pointer transition-colors',
-        isEnded ? 'opacity-60' : ''
+        'hover:border-brand-soft relative cursor-pointer transition-colors',
+        isEnded && 'opacity-60'
       )}
       onClick={handleClick}
     >
-      <ItemContent className="flex flex-row items-center">
-        {/* 좌측: 주기 + 금액 */}
-        <div className="flex w-32 flex-col gap-1">
-          <span className="text-muted-foreground text-xs">
-            {formatFixedRuleCycle(rule)}
-          </span>
-          <span
-            className={cn(
-              'text-sm font-bold',
-              rule.type === 'income' ? THEME_COLOR.INCOME : THEME_COLOR.EXPENSE
-            )}
-          >
-            {rule.type === 'income' ? '+' : '-'}
-            {rule.amount.toLocaleString()}원
-          </span>
+      <ItemContent className="flex flex-col gap-2">
+        {/* 상단: 기간 / 상태 뱃지 */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="h-5 px-2 text-xs">
+            {formatRuleRange(rule)}
+          </Badge>
+
+          {isEnded && (
+            <Badge variant="secondary" className="h-5 px-2 text-xs">
+              종료됨
+            </Badge>
+          )}
         </div>
 
-        {/* 중앙: 카테고리 + 제목 */}
-        <div className="pl-2">
-          <ItemTitle className="text-muted-foreground pl-2 text-left text-xs">
-            {categoryName}
-          </ItemTitle>
-          <ItemTitle className="p-2 text-left">
-            {rule.title}
-            {isEnded && (
-              <Badge variant="secondary" className="h-5 px-2 text-xs">
-                종료됨
-              </Badge>
-            )}
-          </ItemTitle>
-        </div>
+        {/* 본문 */}
+        <div className="flex flex-row items-center">
+          <div className="flex w-32 flex-col gap-1">
+            <span className="text-muted-foreground text-xs">
+              {formatFixedRuleCycle(rule)}
+            </span>
+            <span
+              className={cn(
+                'text-sm font-bold',
+                rule.type === 'income'
+                  ? THEME_COLOR.INCOME
+                  : THEME_COLOR.EXPENSE
+              )}
+            >
+              {rule.type === 'income' ? '+' : '-'}
+              {rule.amount.toLocaleString()}원
+            </span>
+          </div>
 
-        {/* 우측 */}
-        <div className="ml-auto">
-          <ChevronRight />
+          <div className="min-w-0 flex-1 pl-2">
+            <ItemTitle className="text-muted-foreground text-xs">
+              {categoryName}
+            </ItemTitle>
+            <ItemTitle className="line-clamp-2 text-sm font-medium">
+              {rule.title}
+            </ItemTitle>
+          </div>
         </div>
       </ItemContent>
+
+      <ChevronRight className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
     </Item>
   );
 }
