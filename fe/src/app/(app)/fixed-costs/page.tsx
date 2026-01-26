@@ -5,8 +5,24 @@ import { fetchFixedRulesServer } from '@/services/fixed-costs/fixedCostsServer';
 import { Suspense } from 'react';
 import { FixedCostsProvider } from './FixedCostsContext';
 import FixedCostsFilters from '@/components/fixed-costs/FixedCostsFilters';
+import type { FixedCostsFilters as Filters } from '@/types/fixed-costs';
 
-export default function FixedCostsPage() {
+interface PageProps {
+  searchParams: Promise<{
+    type?: string;
+  }>;
+}
+
+export default async function FixedCostsPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+
+  const filters: Filters = {
+    type:
+      params.type === 'income' || params.type === 'expense'
+        ? params.type
+        : undefined,
+  };
+
   return (
     <FixedCostsProvider>
       <div className="flex min-h-screen w-full flex-col">
@@ -21,15 +37,15 @@ export default function FixedCostsPage() {
         <FixedCostsClient />
 
         <Suspense fallback={<FixedCostsListSkeleton />}>
-          <FixedCostsListWrapper />
+          <FixedCostsListWrapper filters={filters} />
         </Suspense>
       </div>
     </FixedCostsProvider>
   );
 }
 
-async function FixedCostsListWrapper() {
-  const items = await fetchFixedRulesServer();
+async function FixedCostsListWrapper({ filters }: { filters: Filters }) {
+  const items = await fetchFixedRulesServer(filters);
 
   return <FixedCostsList items={items} />;
 }

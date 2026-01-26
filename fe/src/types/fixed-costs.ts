@@ -48,3 +48,8 @@ export type FixedTransactionInsert = {
   amount: number;
   category_id: string;
 };
+
+// 고정비 규칙 필터링 타입
+export type FixedCostsFilters = {
+  type?: 'income' | 'expense';
+};

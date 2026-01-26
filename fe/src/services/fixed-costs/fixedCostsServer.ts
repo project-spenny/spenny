@@ -1,5 +1,5 @@
 import { getMonthRange } from '@/utils/date';
-import type { IFixedRule } from '@/types/fixed-costs';
+import type { FixedCostsFilters, IFixedRule } from '@/types/fixed-costs';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 
 // group_id별 대표 rule 선택
@@ -21,7 +21,9 @@ const pickRepresentativeRule = (rules: IFixedRule[]) => {
 };
 
 // 고정비 규칙 목록 조회
-export const fetchFixedRulesServer = async () => {
+export const fetchFixedRulesServer = async (
+  filters: FixedCostsFilters = {}
+) => {
   const { supabase, user } = await requireUserServer();
 
   const { data, error } = await supabase
@@ -32,7 +34,14 @@ export const fetchFixedRulesServer = async () => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  const rules = (data ?? []) as IFixedRule[];
+
+  // 필터링 전 전체 데이터
+  let rules = (data ?? []) as IFixedRule[];
+
+  // 필터링 적용
+  if (filters.type) {
+    rules = rules.filter((r) => r.type === filters.type);
+  }
 
   // group_id가 아직 없는 데이터 대비 대표 rule 선택
   const groupMap = new Map<string, IFixedRule[]>();
