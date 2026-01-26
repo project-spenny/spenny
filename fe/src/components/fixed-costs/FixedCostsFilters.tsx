@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import {
   Select,
   SelectContent,
@@ -14,6 +14,7 @@ import RangeDatePicker from './RangeDatePicker';
 import { Input } from '../ui/input';
 import { Search, LayoutGrid, Repeat, RotateCcw, Check } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useFixedCosts } from '@/app/(app)/fixed-costs/FixedCostsContext';
 
 type LocalFilters = {
   type: string;
@@ -26,8 +27,16 @@ type LocalFilters = {
 export default function FixedCostsFilters() {
   const { searchParams, updateFilters } = useFixedCostsFilters();
 
+  const [isPending, startTransition] = useTransition();
+  const { setIsFiltering } = useFixedCosts();
+
+  // transition 상태를 Context에 반영
+  useEffect(() => {
+    setIsFiltering(isPending);
+  }, [isPending, setIsFiltering]);
+
   // 로컬 상태로 필터 초기값 설정
-  const [localFilters, setLocalFilters] = React.useState<LocalFilters>({
+  const [localFilters, setLocalFilters] = useState<LocalFilters>({
     type: searchParams.get('type') || 'all',
     cycle: searchParams.get('cycle') || 'all',
     start: parseLocalDate(searchParams.get('start_date')),
@@ -35,12 +44,10 @@ export default function FixedCostsFilters() {
     query: searchParams.get('query') ?? '',
   });
 
-  const [endEnabled, setEndEnabled] = React.useState<boolean>(
-    !!localFilters.end
-  );
+  const [endEnabled, setEndEnabled] = useState<boolean>(!!localFilters.end);
 
   // URL(searchParams)이 바뀌면 로컬 상태도 동기화
-  React.useEffect(() => {
+  useEffect(() => {
     const nextStart = parseLocalDate(searchParams.get('start_date'));
     const nextEnd = parseLocalDate(searchParams.get('end_date'));
 
@@ -203,11 +210,16 @@ export default function FixedCostsFilters() {
           </Button>
           <Button
             size="sm"
-            onClick={handleApply}
+            onClick={() =>
+              startTransition(() => {
+                handleApply();
+              })
+            }
+            disabled={isPending}
             className="bg-brand hover:bg-brand-strong h-9 rounded-lg px-6 text-white shadow-md transition-all active:scale-95"
           >
             <Check className="mr-1.5 h-4 w-4" />
-            조건 적용하기
+            {isPending ? '적용 중…' : '조건 적용하기'}
           </Button>
         </div>
       </div>
