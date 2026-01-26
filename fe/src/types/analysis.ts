@@ -11,7 +11,7 @@ export type TransactionType = 'expense' | 'income';
  */
 export type TransactionAnalysis = Pick<
   ITransaction,
-  'amount' | 'date' | 'type' | 'category_id'
+  'id' | 'title' | 'amount' | 'date' | 'type' | 'category_id'
 > & {
   category: {
     name_ko: string;

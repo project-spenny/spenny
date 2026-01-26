@@ -82,7 +82,7 @@ export const getBudgetGuideData = async (
       supabase
         .from('transactions')
         .select(
-          `amount, date, type, category_id, category:categories!category_id (
+          `id, title, amount, date, type, category_id, category:categories!category_id (
               name_ko,
               category_key
             )
