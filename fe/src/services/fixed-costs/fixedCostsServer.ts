@@ -30,25 +30,21 @@ export const fetchFixedRulesServer = async (
 ) => {
   const { supabase, user } = await requireUserServer();
 
-  const { data, error } = await supabase
-    .from('fixed_rules')
-    .select('*')
-    .eq('user_id', user.id)
+  let q = supabase.from('fixed_rules').select('*').eq('user_id', user.id);
+
+  // 필터링 조건 적용
+  if (filters.type) q = q.eq('type', filters.type);
+  if (filters.cycle) q = q.eq('cycle', filters.cycle);
+  if (filters.query) q = q.ilike('title', `%${filters.query}%`);
+
+  const { data, error } = await q
     .order('start_date', { ascending: false })
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-
-  // 필터링 전 전체 데이터
   let rules = (data ?? []) as IFixedRule[];
 
-  // 필터링 적용
-  if (filters.type) {
-    rules = rules.filter((r) => r.type === filters.type);
-  }
-  if (filters.cycle) {
-    rules = rules.filter((r) => r.cycle === filters.cycle);
-  }
+  // 기간 필터링 적용
   const rangeStart = parseLocalDate(filters.start_date);
   const rangeEnd = parseLocalDate(filters.end_date);
 
@@ -62,10 +58,6 @@ export const fetchFixedRulesServer = async (
       }
       return false;
     });
-  }
-  if (filters.query) {
-    const q = filters.query.toLowerCase();
-    rules = rules.filter((rule) => rule.title.toLowerCase().includes(q));
   }
 
   // group_id가 아직 없는 데이터 대비 대표 rule 선택
