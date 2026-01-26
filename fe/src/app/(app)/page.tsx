@@ -15,7 +15,7 @@ import {
   sumFixedExpenseUntilYesterday,
 } from '@/utils/transaction';
 import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
-import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs';
+import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs/fixedCosts';
 import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
 import { SpendingTransaction } from '@/services/daily-recommendation/spendingPattern';

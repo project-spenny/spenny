@@ -4,12 +4,12 @@ import type {
   CreateFixedRuleInput,
   IFixedRule,
 } from '@/types/fixed-costs';
+import { formatLocalDate, getMonthRange } from '@/utils/date';
 import {
-  formatLocalDate,
-  getMonthRange,
-  getWeekRange,
-  parseLocalDate,
-} from '@/utils/date';
+  getCurrentPeriod,
+  getNextPeriodStartDate,
+} from '@/utils/fixed-costs/period';
+import { hasScheduleChanged } from '@/utils/fixed-costs/rule';
 
 // 고정비 규칙 생성
 export const createFixedRule = async (
@@ -66,37 +66,6 @@ type UpdateFixedRuleInPeriod = Pick<
   CreateFixedRuleInput,
   'title' | 'type' | 'amount' | 'category_id'
 >;
-
-// cycle 기준으로 "이번 기간"의 날짜 범위를 반환
-function getCurrentPeriod(cycle: IFixedRule['cycle']) {
-  return cycle === 'MONTHLY'
-    ? getMonthRange(new Date()) // 이번달 범위
-    : getWeekRange(new Date()); // 이번주 범위
-}
-
-// cycle 기준 "다음 기간 시작일" 반환
-function getNextPeriodStartDate(cycle: IFixedRule['cycle']) {
-  const now = new Date();
-
-  if (cycle === 'MONTHLY') {
-    return formatLocalDate(new Date(now.getFullYear(), now.getMonth() + 1, 1));
-  }
-
-  const { endDate } = getWeekRange(now);
-  const end = parseLocalDate(endDate)!;
-  end.setDate(end.getDate() + 1);
-  return formatLocalDate(end);
-}
-
-// 반복 일정(cycle/weekday/monthday) 변경 여부 판단
-function hasScheduleChanged(prev: IFixedRule, next: CreateFixedRuleInput) {
-  if (prev.cycle !== next.cycle) return true;
-
-  if (next.cycle === 'WEEKLY') return prev.weekday !== next.weekday;
-  if (next.cycle === 'MONTHLY') return prev.monthday !== next.monthday;
-
-  return false;
-}
 
 // '포함' 옵션일 때, 이번달/이번주에 생성된 고정비 거래를 새 규칙 값으로 동기화
 export const updateFixedRuleInPeriod = async ({

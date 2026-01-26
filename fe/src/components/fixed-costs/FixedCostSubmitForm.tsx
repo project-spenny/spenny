@@ -20,8 +20,8 @@ import { useRef, useState } from 'react';
 import FixedCostEditConfirmDialog from './FixedCostEditConfirmDialog';
 import FixedCostDeleteDialog from './FixedCostDeleteDialog';
 import { Spinner } from '../ui/spinner';
-import { isEndedFixedRule } from '@/utils/fixed-costs';
 import { useAuth } from '@/providers/AuthProvider';
+import { isEndedFixedRule } from '@/utils/fixed-costs/rule';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
