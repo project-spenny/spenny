@@ -43,15 +43,32 @@ export const syncByMonthServer = async ({
       fetchExistingKeys: async ({ userId, ruleIds, startDate, endDate }) => {
         const { data, error } = await supabase
           .from('transactions')
-          .select('fixed_rule_id, date')
+          .select('fixed_rule_id, origin_date')
           .eq('user_id', userId)
           .in('fixed_rule_id', ruleIds)
-          .gte('date', startDate)
-          .lte('date', endDate);
+          .gte('origin_date', startDate)
+          .lte('origin_date', endDate);
 
         if (error) throw error;
         return new Set(
-          (data ?? []).map((t) => `${t.fixed_rule_id}__${t.date}`)
+          (data ?? []).map((t) => `${t.fixed_rule_id}__${t.origin_date}`)
+        );
+      },
+
+      fetchOverrideKeys: async ({ userId, ruleIds, startDate, endDate }) => {
+        const { data, error } = await supabase
+          .from('fixed_transaction_overrides')
+          .select('fixed_rule_id, origin_date')
+          .eq('user_id', userId)
+          .in('fixed_rule_id', ruleIds)
+          .gte('origin_date', startDate)
+          .lte('origin_date', endDate)
+          .eq('action', 'deleted');
+
+        if (error) throw error;
+
+        return new Set(
+          (data ?? []).map((r) => `${r.fixed_rule_id}__${r.origin_date}`)
         );
       },
 

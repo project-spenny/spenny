@@ -16,6 +16,13 @@ type SyncDeps = {
     endDate: string;
   }) => Promise<Set<string>>;
 
+  fetchOverrideKeys: (args: {
+    userId: string;
+    ruleIds: string[];
+    startDate: string;
+    endDate: string;
+  }) => Promise<Set<string>>;
+
   insertTransactions: (args: {
     rows: FixedTransactionInsert[];
   }) => Promise<void>;
@@ -39,12 +46,14 @@ const buildMissingInserts = ({
   rules,
   ruleDatesMap,
   existingSet,
+  overrideSet,
   endDate,
 }: {
   userId: string;
   rules: IFixedRule[];
   ruleDatesMap: Map<string, string[]>;
   existingSet: Set<string>;
+  overrideSet: Set<string>;
   endDate: string;
 }) => {
   const inserts: FixedTransactionInsert[] = [];
@@ -58,11 +67,13 @@ const buildMissingInserts = ({
 
       const key = `${rule.id}__${date}`;
       if (existingSet.has(key)) continue;
+      if (overrideSet.has(key)) continue;
 
       inserts.push({
         user_id: userId,
         fixed_rule_id: rule.id,
         date,
+        origin_date: date,
         title: rule.title,
         type: rule.type,
         amount: rule.amount,
@@ -124,12 +135,21 @@ export const syncByMonthShared = async (
     endDate: effectiveEndDate,
   });
 
+  // 삭제 override 조회
+  const overrideSet = await deps.fetchOverrideKeys({
+    userId,
+    ruleIds,
+    startDate,
+    endDate: effectiveEndDate,
+  });
+
   // 누락된 날짜만 insert payload 생성
   const inserts = buildMissingInserts({
     userId,
     rules,
     ruleDatesMap,
     existingSet,
+    overrideSet,
     endDate: effectiveEndDate,
   });
 

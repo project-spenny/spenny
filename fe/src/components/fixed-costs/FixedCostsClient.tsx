@@ -7,7 +7,7 @@ import FixedCostsAddButton from './FixedCostsAddButton';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import FixedCostSubmitForm from './FixedCostSubmitForm';
 import { useFixedCosts } from '@/app/(app)/fixed-costs/FixedCostsContext';
-import { mapFixedRuleToFormData } from '@/utils/fixed-costs';
+import { mapFixedRuleToFormData } from '@/utils/fixed-costs/fixedCosts';
 
 export default function FixedCostsClient() {
   const router = useRouter();

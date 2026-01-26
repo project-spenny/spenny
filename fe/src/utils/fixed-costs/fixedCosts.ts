@@ -1,6 +1,6 @@
 import { IFixedCostFormData } from '@/hooks/useFixedCostForm';
 import { ApplyScope, IFixedRule } from '@/types/fixed-costs';
-import { parseLocalDate } from './date';
+import { formatLocalDate, parseLocalDate } from '../date';
 import {
   startOfMonth,
   endOfMonth,
