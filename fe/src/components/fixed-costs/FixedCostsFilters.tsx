@@ -25,7 +25,7 @@ type LocalFilters = {
 export default function FixedCostsFilters() {
   const { searchParams, updateFilters } = useFixedCostsFilters();
 
-  // 내부 로컬 상태로 관리
+  // 로컬 상태로 필터 초기값 설정
   const [localFilters, setLocalFilters] = React.useState<LocalFilters>({
     type: searchParams.get('type') || 'all',
     cycle: searchParams.get('cycle') || 'all',
@@ -36,6 +36,22 @@ export default function FixedCostsFilters() {
   const [endEnabled, setEndEnabled] = React.useState<boolean>(
     !!localFilters.end
   );
+
+  // URL(searchParams)이 바뀌면 로컬 상태도 동기화
+  React.useEffect(() => {
+    const nextStart = parseLocalDate(searchParams.get('start_date'));
+    const nextEnd = parseLocalDate(searchParams.get('end_date'));
+
+    setLocalFilters({
+      type: searchParams.get('type') || 'all',
+      cycle: searchParams.get('cycle') || 'all',
+      start: nextStart,
+      end: nextEnd,
+    });
+
+    // URL에 end_date가 있으면 토글 ON, 없으면 OFF
+    setEndEnabled(!!nextEnd);
+  }, [searchParams.toString()]);
 
   // 검색 실행 함수
   const handleApply = () => {
