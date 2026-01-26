@@ -66,8 +66,8 @@ export default function RangeDatePicker({
       </PopoverTrigger>
 
       <PopoverContent
-        className="border-brand-soft/20 w-auto rounded-2xl p-4 shadow-xl"
-        align="start"
+        className="border-brand-soft/20 w-auto p-2 shadow-xl"
+        align="center"
       >
         <Calendar
           mode="range"
@@ -98,12 +98,9 @@ export default function RangeDatePicker({
           className="rounded-md border-none"
         />
 
-        <div className="border-brand-subtle mt-4 flex items-center justify-between gap-4 border-t pt-4">
+        <div className="border-brand-subtle mt-2 flex items-center justify-between gap-4 border-t px-2 pt-2">
           <div className="flex items-center gap-3">
-            <Label
-              htmlFor="end-date-toggle"
-              className="text-brand-strong text-sm"
-            >
+            <Label htmlFor="end-date-toggle" className="text-sm font-normal">
               종료일 설정
             </Label>
             <Switch
