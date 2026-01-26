@@ -9,22 +9,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { PanelProps } from '@/types/panel';
 import { X } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-const DrawerBottom = ({
-  children,
-  open,
-  onOpenChange,
-  isFull = false,
-}: PanelProps) => {
+const DrawerBottom = ({ children, open, onOpenChange }: PanelProps) => {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent
-        className={cn(
-          'flex flex-col overflow-hidden outline-none',
-          isFull ? 'h-screen' : 'h-[80vh]'
-        )}
-      >
+      <DrawerContent className="flex h-dvh max-h-dvh flex-col overflow-hidden outline-none">
         {/* DialogTitle 누락 방지 */}
         <DrawerTitle className="sr-only">DrawerBottom</DrawerTitle>
         <DrawerDescription className="sr-only">DrawerBottom</DrawerDescription>

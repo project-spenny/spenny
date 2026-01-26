@@ -15,7 +15,6 @@ interface ExternalResponsivePanelProps extends ResponsivePanelProps {
 const ResponsivePanel = ({
   trigger,
   children,
-  isFull = false,
   isOpen: externalIsOpen,
   setIsOpen: externalSetIsOpen,
 }: ExternalResponsivePanelProps) => {
@@ -41,11 +40,7 @@ const ResponsivePanel = ({
 
       <ResponsiveWrapper
         mobile={
-          <DrawerBottom
-            open={isPanelOpen}
-            onOpenChange={setIsPanelOpen}
-            isFull={isFull}
-          >
+          <DrawerBottom open={isPanelOpen} onOpenChange={setIsPanelOpen}>
             {children}
           </DrawerBottom>
         }
