@@ -150,6 +150,13 @@ export const updateFixedRuleWithScope = async ({
   const prevRule = await fetchFixedRuleById(userId, id);
   const scheduleChanged = hasScheduleChanged(prevRule, ruleInput);
 
+  const today = formatLocalDate(new Date());
+
+  const isEndedRule = prevRule.end_date !== null && prevRule.end_date < today;
+  if (isEndedRule) {
+    throw new Error('종료된 고정비 규칙은 수정할 수 없습니다.');
+  }
+
   // 포함 : 기존 규칙 업데이트 + 이번 기간 거래 내용 반영
   if (scope === 'INCLUDE_CURRENT') {
     const updatedRule = await updateFixedRule(userId, id, ruleInput);
