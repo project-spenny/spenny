@@ -1,152 +1,62 @@
 'use client';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect, useRef, ReactNode } from 'react';
+import { useState } from 'react';
 import { Calendar as CalendarView } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { Day, type DayButton, getDefaultClassNames } from 'react-day-picker';
+import { type DayButton } from 'react-day-picker';
 import { Button } from '../ui/button';
 import ResponsivePanel from '../panel/ResponsivePanel';
 import { useCalendar } from '@/context/CalendarContext';
 import { ITransaction } from '@/types/transactions';
 import { useMemo } from 'react';
-import { CaptionLabelProps } from 'react-day-picker';
 import { formatDateKR, formatLocalDate } from '@/utils/date';
-import { Card, CardTitle, CardContent } from '../ui/card';
-import { MonthCaptionProps } from 'react-day-picker';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { TransactionList } from '../transaction/TransactionList';
 import { formatMonth } from '@/utils/date';
 import TransactionSubmitForm from '../transaction/TransactionSubmitForm';
-import { revalidateTransactions } from '@/app/(app)/history/actions';
 import { Item, ItemContent } from '../ui/item';
+import { useQueryClient } from '@tanstack/react-query';
+import { CalendarDay } from './CalendarDay';
+import { useCalendarData } from '@/hooks/useCalendarData';
+import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
+import { Spinner } from '../ui/spinner';
+import { CalendarCaption } from './CalendarCaption';
+
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
-  children?: ReactNode;
-}
-
-interface DayData {
-  income: number;
-  expense: number;
-  transactions: ITransaction[];
+  isLoading: boolean;
+  onMonthChange: (month: string) => void;
+  children?: React.ReactNode;
 }
 interface PanelState {
   view: 'list' | 'create' | 'edit';
   editingTransaction?: ITransaction;
 }
-
 const CALENDAR_CELL_HEIGHT =
   '[&_td]:!h-[50px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
-
-const CustomDay = ({
-  day,
-  modifiers,
-  dayData,
-  ...props
-}: React.ComponentProps<typeof DayButton> & { dayData?: DayData }) => {
-  const ref = useRef<HTMLButtonElement>(null);
-  const defaultClassNames = getDefaultClassNames();
-  useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
-  }, [modifiers.focused]);
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      data-day={formatLocalDate(day.date)}
-      data-selected-single={modifiers.selected}
-      {...props}
-      className={cn(
-        'flex flex-col items-center justify-start gap-1',
-        'aspect-square h-full w-full',
-        'p-0.5 sm:p-2 sm:pt-1',
-        'gap-0 sm:gap-1',
-        CALENDAR_CELL_HEIGHT,
-        defaultClassNames.day
-      )}
-    >
-      <div className="flex flex-col gap-0.5 sm:gap-0.5 md:gap-1">
-        <span className="text-sm font-medium sm:text-base md:text-lg">
-          {day.date.getDate()}
-        </span>
-        {dayData && (dayData.income > 0 || dayData.expense > 0) && (
-          <div className="flex flex-col text-[7px] sm:text-[10px] md:text-xs">
-            {dayData.income > 0 && (
-              <span className="text-blue-500">
-                +{dayData.income.toLocaleString()}
-              </span>
-            )}
-            {dayData.expense > 0 && (
-              <span className="text-red-500">
-                -{dayData.expense.toLocaleString()}
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-    </Button>
-  );
-};
 
 export const Calendar = ({
   currentMonth,
   transactions,
+  isLoading,
+  onMonthChange,
   children,
 }: CalendarProps) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [month, setMonth] = useState<Date>(new Date(`${currentMonth}-01`));
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const queryClient = useQueryClient();
   const { selectedDate, isOpen, open, close } = useCalendar();
-
   const [panelState, setPanelState] = useState<PanelState>({ view: 'list' });
-
-  useEffect(() => {
-    setMonth(new Date(`${currentMonth}-01`));
-  }, [currentMonth]);
-
-  const groupedTransaction = useMemo(() => {
-    const grouped: Record<string, DayData> = {};
-
-    transactions.forEach((transaction) => {
-      const dateKey = transaction.date;
-
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = {
-          income: 0,
-          expense: 0,
-          transactions: [],
-        };
-      }
-
-      if (transaction.type === 'income') {
-        grouped[dateKey].income += transaction.amount;
-      } else if (transaction.type === 'expense') {
-        grouped[dateKey].expense += transaction.amount;
-      }
-
-      grouped[dateKey].transactions.push(transaction);
-    });
-
-    return grouped;
-  }, [transactions]);
-
-  const TransactionSummary = useMemo(() => {
-    const summary = transactions.reduce(
-      (acc, transaction) => {
-        if (transaction.type === 'income') {
-          acc.income += transaction.amount;
-        } else if (transaction.type === 'expense') {
-          acc.expense += transaction.amount;
-        }
-        return acc;
-      },
-      { income: 0, expense: 0 }
-    );
-
-    return summary;
-  }, [transactions]);
+  const { groupedTransaction, TransactionSummary } =
+    useCalendarData(transactions);
+  const {
+    month,
+    date,
+    setDate,
+    year,
+    displayMonth,
+    handleMonthChange,
+    moveMonth,
+    navigateMonth,
+  } = useCalendarNavigation(currentMonth, onMonthChange);
 
   const selectedDayTransactions = useMemo(() => {
     if (!selectedDate) return [];
@@ -159,79 +69,47 @@ export const Calendar = ({
     const dateKey = formatLocalDate(props.day.date);
     const dayData = groupedTransaction[dateKey];
 
-    return <CustomDay {...props} dayData={dayData} />;
+    return <CalendarDay {...props} dayData={dayData} />;
   };
-
-  const handleMonthChange = (newMonth: Date) => {
-    setMonth(newMonth);
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('month', formatMonth(newMonth));
-
-    router.push(`?${params.toString()}`);
-  };
-
-  const moveMonth = (offset: number) => {
-    const newDate = new Date(month.getFullYear(), month.getMonth() + offset, 1);
-    handleMonthChange(newDate);
+  const handleTransactionSuccess = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ['transactions', formatMonth(month)],
+    });
+    setPanelState({ view: 'list' });
   };
 
   const { income, expense } = TransactionSummary;
-
-  const year = month.getFullYear();
-  const displayMonth = month.getMonth() + 1;
 
   const handleClose = () => {
     close();
     setPanelState({ view: 'list' });
   };
-  const CustomCaption = (props: MonthCaptionProps) => {
-    return (
-      <div className="flex w-full gap-2 p-2 sm:flex-row sm:gap-4">
-        <Card className="w-full items-center gap-2">
-          <CardTitle className="text-xs sm:text-base">이번 달 수입</CardTitle>
-          <CardContent className="text-xs text-blue-600 sm:text-base">
-            {income.toLocaleString()}원
-          </CardContent>
-        </Card>
-        <Card className="w-full items-center gap-2">
-          <CardTitle className="text-xs sm:text-base">이번 달 지출</CardTitle>
-          <CardContent className="text-xs text-red-600 sm:text-base">
-            {expense.toLocaleString()}원
-          </CardContent>
-        </Card>
-      </div>
-    );
-  };
+
+  const CustomCaption = () => (
+    <>
+      <CalendarCaption
+        year={year}
+        displayMonth={displayMonth}
+        month={month}
+        income={income}
+        expense={expense}
+        moveMonth={moveMonth}
+        navigateMonth={navigateMonth}
+        handleMonthChange={handleMonthChange}
+      >
+        {children}
+      </CalendarCaption>
+    </>
+  );
   return (
-    <div className="flex w-full flex-col items-center">
-      <div className="flex flex-col items-center justify-center py-3 md:py-6">
-        <span className="text-muted-foreground text-sm font-bold md:text-base">
-          {year}
-        </span>
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer"
-            onClick={() => moveMonth(-1)}
-          >
-            <ChevronLeft />
-          </Button>
-
-          <span className="text-2xl font-bold">{displayMonth}월</span>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer"
-            onClick={() => moveMonth(1)}
-          >
-            <ChevronRight />
-          </Button>
+    <div className="flex w-full flex-col">
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <Spinner className="text-brand h-12 w-12" />
+          </div>
         </div>
-      </div>
-      <div className="w-full">{children}</div>
+      )}
       <CalendarView
         month={month}
         mode="single"
@@ -297,10 +175,7 @@ export const Calendar = ({
               </Button>
               <TransactionSubmitForm
                 transaction={panelState.editingTransaction}
-                onSuccess={async () => {
-                  await revalidateTransactions();
-                  setPanelState({ view: 'list' });
-                }}
+                onSuccess={handleTransactionSuccess}
                 onClose={() => {
                   setPanelState({ view: 'list' });
                 }}
@@ -322,10 +197,7 @@ export const Calendar = ({
               </Button>
               <TransactionSubmitForm
                 defaultDate={selectedDate ?? undefined}
-                onSuccess={async () => {
-                  await revalidateTransactions();
-                  setPanelState({ view: 'list' });
-                }}
+                onSuccess={handleTransactionSuccess}
                 onClose={() => {
                   setPanelState({ view: 'list' });
                 }}

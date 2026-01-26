@@ -1,11 +1,6 @@
-import { Calendar } from '@/components/calendar/Calendar';
-import { getTransaction } from './history/actions';
-import { TransactionFilters } from './history/actions';
+import { getTransaction,getMonthTransactions } from './history/actions';
 import { Suspense } from 'react';
 import { formatLocalDate, formatMonth } from '@/utils/date';
-import { getMonthRange } from '@/utils/date';
-import { CalendarProvider } from '@/context/CalendarContext';
-import { TransactionProvider } from './history/TransactionContext';
 import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
 import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 import { getTotalBudgetAmount } from '@/utils/budget';
@@ -19,81 +14,42 @@ import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs/fixedCosts';
 import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
 import { SpendingTransaction } from '@/services/daily-recommendation/spendingPattern';
+import { CalendarClient } from '@/components/calendar/CalendarClient';
 
-interface PageProps {
-  searchParams: Promise<{
-    month?: string;
-    selected_date?: string;
-  }>;
-}
-
-export default async function Home({ searchParams }: PageProps) {
-  const params = await searchParams;
-
-  const currentMonth = params.month || formatMonth(new Date());
-  const monthDate = new Date(`${currentMonth}-01`);
-  const { startDate, endDate } = getMonthRange(monthDate);
-
-  const filters: TransactionFilters = {
-    start_date: startDate,
-    end_date: endDate,
-  };
+export default async function Home() {
+  const today = new Date();
+  const currentMonth = formatMonth(today);
 
   return (
     <div className="flex min-h-screen w-full max-w-6xl self-start">
-      <TransactionProvider>
-        <CalendarProvider>
-          <Suspense key={currentMonth} fallback={<CalendarSkeleton />}>
-            <DataCalendar
-              filters={filters}
-              currentMonth={currentMonth}
-              selectedDate={params.selected_date}
-              monthDate={monthDate}
-            />
-            {/* <CalendarSkeleton /> */}
-          </Suspense>
-        </CalendarProvider>
-      </TransactionProvider>
+      <Suspense fallback={<CalendarSkeleton />}>
+        <InitialDataLoader
+          currentMonth={currentMonth}
+        />
+      </Suspense>
     </div>
   );
 }
 
-async function DataCalendar({
-  filters,
-  currentMonth,
-  selectedDate,
-  monthDate,
-}: {
-  filters: TransactionFilters;
-  currentMonth: string;
-  selectedDate?: string;
-  monthDate: Date;
-}) {
+async function InitialDataLoader({currentMonth}: {currentMonth: string} ) {
+  const today = new Date();
+  const currentMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  // 당월 데이터 fetch
   const [transactions, budgets, fixedRules] = await Promise.all([
-    getTransaction(filters, true),
-    fetchBudgetsServer(monthDate),
-    fetchFixedRulesByMonthServer(monthDate),
+    getMonthTransactions(currentMonth),
+    fetchBudgetsServer(currentMonthDate),
+    fetchFixedRulesByMonthServer(currentMonthDate),
   ]);
 
   const budget = getTotalBudgetAmount(budgets);
-
-  const today = new Date();
-  const isCurrentMonth = currentMonth === formatMonth(today);
-
   const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
     fixedRules,
-    monthDate
+    currentMonthDate
   );
-  if (!isCurrentMonth) {
-    return (
-      <div className="flex w-full flex-col gap-3">
-        <Calendar currentMonth={currentMonth} transactions={transactions} />
-      </div>
-    );
-  }
 
+  // 소비패턴
   const lookbackDays = 56;
-
   const lookbackEndDateString = formatLocalDate(today);
   const lookbackStartDate = new Date(today);
   lookbackStartDate.setDate(lookbackStartDate.getDate() - (lookbackDays - 1));
@@ -144,7 +100,7 @@ async function DataCalendar({
   );
 
   const dailyChartData = buildDailyRecChartData({
-    monthDate,
+    monthDate : currentMonthDate,
     transactions,
     today,
     budget,
@@ -153,10 +109,11 @@ async function DataCalendar({
   });
 
   return (
-    <div className="flex w-full flex-col gap-3">
-      <Calendar currentMonth={currentMonth} transactions={transactions}>
-        <DailyRecBar daily={daily} dailyChartData={dailyChartData} />
-      </Calendar>
-    </div>
-  );
+    <CalendarClient
+      currentMonth={currentMonth}
+      initialTransactions={transactions}
+      dailyRec={daily}
+      dailyChartData={dailyChartData}
+    />
+  )
 }
