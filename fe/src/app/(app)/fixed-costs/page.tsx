@@ -4,6 +4,7 @@ import FixedCostsListSkeleton from '@/components/fixed-costs/FixedCostsListSkele
 import { fetchFixedRulesServer } from '@/services/fixed-costs/fixedCostsServer';
 import { Suspense } from 'react';
 import { FixedCostsProvider } from './FixedCostsContext';
+import FixedCostsFilters from '@/components/fixed-costs/FixedCostsFilters';
 
 export default function FixedCostsPage() {
   return (
@@ -14,6 +15,7 @@ export default function FixedCostsPage() {
             <header>
               <h1 className="text-xl font-semibold">고정비 관리</h1>
             </header>
+            <FixedCostsFilters />
           </div>
         </div>
         <FixedCostsClient />
