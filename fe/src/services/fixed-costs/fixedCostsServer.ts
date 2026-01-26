@@ -1,6 +1,10 @@
-import { getMonthRange } from '@/utils/date';
+import { getMonthRange, parseLocalDate } from '@/utils/date';
 import type { FixedCostsFilters, IFixedRule } from '@/types/fixed-costs';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
+import {
+  hasMonthlyOccurrence,
+  hasWeeklyOccurrence,
+} from '@/utils/fixed-costs/period';
 
 // group_id별 대표 rule 선택
 const pickRepresentativeRule = (rules: IFixedRule[]) => {
@@ -44,6 +48,20 @@ export const fetchFixedRulesServer = async (
   }
   if (filters.cycle) {
     rules = rules.filter((r) => r.cycle === filters.cycle);
+  }
+  const rangeStart = parseLocalDate(filters.start_date);
+  const rangeEnd = parseLocalDate(filters.end_date);
+
+  if (rangeStart && rangeEnd) {
+    rules = rules.filter((rule) => {
+      if (rule.cycle === 'MONTHLY') {
+        return hasMonthlyOccurrence(rule, rangeStart, rangeEnd);
+      }
+      if (rule.cycle === 'WEEKLY') {
+        return hasWeeklyOccurrence(rule, rangeStart, rangeEnd);
+      }
+      return false;
+    });
   }
 
   // group_id가 아직 없는 데이터 대비 대표 rule 선택

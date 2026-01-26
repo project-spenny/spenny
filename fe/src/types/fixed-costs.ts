@@ -53,4 +53,6 @@ export type FixedTransactionInsert = {
 export type FixedCostsFilters = {
   type?: 'income' | 'expense';
   cycle?: 'WEEKLY' | 'MONTHLY';
+  start_date?: string;
+  end_date?: string;
 };

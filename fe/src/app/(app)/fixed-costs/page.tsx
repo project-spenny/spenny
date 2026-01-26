@@ -6,16 +6,22 @@ import { Suspense } from 'react';
 import { FixedCostsProvider } from './FixedCostsContext';
 import FixedCostsFilters from '@/components/fixed-costs/FixedCostsFilters';
 import type { FixedCostsFilters as Filters } from '@/types/fixed-costs';
+import { formatLocalDate, parseLocalDate } from '@/utils/date';
 
 interface PageProps {
   searchParams: Promise<{
     type?: string;
     cycle?: string;
+    start_date?: string;
+    end_date?: string;
   }>;
 }
 
 export default async function FixedCostsPage({ searchParams }: PageProps) {
   const params = await searchParams;
+
+  const startDate = parseLocalDate(params.start_date);
+  const endDate = parseLocalDate(params.end_date);
 
   const filters: Filters = {
     type:
@@ -26,6 +32,8 @@ export default async function FixedCostsPage({ searchParams }: PageProps) {
       params.cycle === 'WEEKLY' || params.cycle === 'MONTHLY'
         ? params.cycle
         : undefined,
+    start_date: startDate ? formatLocalDate(startDate) : undefined,
+    end_date: endDate ? formatLocalDate(endDate) : undefined,
   };
 
   return (
