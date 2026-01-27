@@ -79,10 +79,21 @@ export const getTransaction = async (
 
   return data || [];
 };
-export const getMonthTransactions= async(month : string)=>{
+export const getMonthTransactions = async (month: string) => {
   const { supabase, user } = await requireUserServer();
-  const { startDate, endDate} = getMonthRange(new Date(`${month}-1`))
-  
+
+  const monthDate = new Date(`${month}-01`);
+  const { startDate, endDate } = getMonthRange(monthDate);
+
+  // 고정비 동기화 (오늘까지)
+  const generateThroughDate = formatLocalDate(new Date());
+  await syncByMonthServer({
+    monthDate,
+    startDate,
+    endDate,
+    generateThroughDate,
+  });
+
   const { data, error } = await supabase
     .from('transactions')
     .select('*')
@@ -90,9 +101,9 @@ export const getMonthTransactions= async(month : string)=>{
     .gte('date', startDate)
     .lte('date', endDate)
     .order('date', { ascending: false });
-    if (error) throw error;
-    return data || [];
-}
+  if (error) throw error;
+  return data || [];
+};
 export async function revalidateTransactions() {
   revalidatePath('/history');
   revalidatePath('/');
