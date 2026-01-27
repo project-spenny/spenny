@@ -20,14 +20,14 @@ export function ScheduledFixedInfo({
   if (items.length === 0) return null;
 
   return (
-    <div className="border-brand-soft/30 bg-brand-subtle/50 mx-4 mt-2 overflow-hidden rounded-lg border md:mx-6 lg:mx-8">
+    <div className="border-brand-soft/30 dark:bg-brand-soft/5 bg-brand-subtle/50 mx-4 mt-2 overflow-hidden rounded-lg border md:mx-6 lg:mx-8">
       {/* 헤더 */}
-      <div className="border-brand-soft/20 bg-brand-soft/10 flex items-center gap-2 border-b px-4 py-3">
-        <CalendarClock className="text-brand-strong h-4 w-4" />
-        <h4 className="text-brand-strong text-sm font-bold">예정된 고정비</h4>
+      <div className="border-brand-soft/20 bg-brand-soft/10 dark:text-brand text-brand-strong dark:bg-brand-soft/5 flex items-center gap-2 border-b px-4 py-3">
+        <CalendarClock className="h-4 w-4" />
+        <h4 className="text-sm font-bold">예정된 고정비</h4>
         <Badge
           variant="outline"
-          className="border-brand-soft text-brand-strong ml-auto bg-white/50 text-xs"
+          className="border-brand-soft text-brand-strong dark:text-brand-soft ml-auto bg-white/50 text-xs dark:bg-transparent"
         >
           {items.length}건
         </Badge>
@@ -58,7 +58,7 @@ export function ScheduledFixedInfo({
                       {categoryName}
                     </span>
                   </div>
-                  <span className="text-sm font-semibold text-slate-700">
+                  <span className="text-foreground text-sm font-semibold">
                     {item.title}
                   </span>
                 </div>
