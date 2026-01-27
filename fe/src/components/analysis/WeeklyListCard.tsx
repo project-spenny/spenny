@@ -15,6 +15,7 @@ type WeeklyListCardProps = {
     period: string;
     amount: number;
     transactions: TransactionAnalysis[];
+    isCurrentWeek: boolean;
   };
 };
 
@@ -24,12 +25,23 @@ const WeeklyListCard = ({ index, detail }: WeeklyListCardProps) => {
       {/* 요약 헤더 */}
       <div className="flex w-full items-center justify-between gap-2 p-4">
         <div className="pl-2">
-          <div className="font-bold">{detail.label}</div>
+          <div className="flex items-center gap-2">
+            <span className="text-base font-bold tracking-tight">
+              {detail.label}
+            </span>
+
+            {detail.isCurrentWeek && (
+              <div className="bg-brand/10 text-brand ring-brand/20 items-center rounded-full px-2 py-0.5 text-xs font-bold ring-1 ring-inset">
+                이번 주
+              </div>
+            )}
+          </div>
+
           <span className="text-muted-foreground text-xs">
             ({detail.period})
           </span>
         </div>
-        <div className="text-sm font-semibold md:text-base">
+        <div className="shrink-0 text-sm font-semibold md:text-base">
           {detail.amount.toLocaleString()}원
         </div>
       </div>
