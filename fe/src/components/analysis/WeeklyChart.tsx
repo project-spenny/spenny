@@ -14,8 +14,6 @@ import {
 import { CHART_COLORS } from '@/constants/colors';
 import { Line } from 'react-chartjs-2';
 import { TransactionAnalysis } from '@/types/analysis';
-import { getWeeksInMonth } from '@/utils/date';
-import { useMemo } from 'react';
 import { useTheme } from 'next-themes';
 
 // Line Chart에 필요한 요소 등록
@@ -28,36 +26,28 @@ ChartJS.register(
   Filler
 );
 
-type WeeklyChartProps = {
+type WeeklyData = {
+  label: string;
+  period: string;
+  amount: number;
   transactions: TransactionAnalysis[];
-  selectedDate: Date;
+};
+
+type WeeklyChartProps = {
+  data: WeeklyData[];
   type: string;
+  selectedIndex: number;
+  onSelect: (index: number) => void;
 };
 
 const WeeklyChart = ({
-  transactions,
-  selectedDate,
+  data,
   type,
+  selectedIndex,
+  onSelect,
 }: WeeklyChartProps) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-
-  // 주차별 데이터 가공
-  const weeklyData = useMemo(() => {
-    const weeks = getWeeksInMonth(selectedDate);
-
-    return weeks.map((week) => {
-      const totalAmount = transactions
-        .filter((t) => t.date >= week.startDate && t.date <= week.endDate)
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      return {
-        label: `${week.weekNumber}주차`,
-        period: `${week.startDate} ~ ${week.endDate}`,
-        amount: totalAmount,
-      };
-    });
-  }, [transactions, selectedDate]);
 
   // 차트 색상
   const lineColor =
@@ -67,20 +57,21 @@ const WeeklyChart = ({
 
   // 차트 데이터 구성
   const chartData = {
-    labels: weeklyData.map((d) => d.label),
+    labels: data.map((d) => d.label),
     datasets: [
       {
         label: '금액',
-        data: weeklyData.map((d) => d.amount),
+        data: data.map((d) => d.amount),
         borderColor: lineColor, // 선 색상
         backgroundColor: fillColor, // 채워지는 영역 색상
         fill: true, // 영역 채우기 활성화
         tension: 0.4, // 곡선
-        pointRadius: 5, // 점 크기
         pointBackgroundColor: lineColor, // 점 색상
-        pointBorderWidth: 2,
+        pointBorderWidth: 1,
         pointBorderColor: '#fff', // 점 테두리
         borderWidth: 2, // 선 두께
+        pointRadius: data.map((_, i) => (i === selectedIndex ? 6 : 4)),
+        pointHoverRadius: 6,
       },
     ],
   };
@@ -98,7 +89,7 @@ const WeeklyChart = ({
         callbacks: {
           title: (tooltipItems) => {
             const index = tooltipItems[0].dataIndex;
-            return `${weeklyData[index].label} (${weeklyData[index].period})`;
+            return `${data[index].label} (${data[index].period})`;
           },
           label: (context) => ` ${context.raw?.toLocaleString()}원`,
         },
@@ -130,6 +121,18 @@ const WeeklyChart = ({
         },
         beginAtZero: true,
       },
+    },
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        const index = elements[0].index;
+        onSelect(index);
+      }
+    },
+    onHover: (event, chartElement) => {
+      if (event.native) {
+        const target = event.native.target as HTMLElement;
+        target.style.cursor = chartElement.length ? 'pointer' : 'default';
+      }
     },
   };
 
