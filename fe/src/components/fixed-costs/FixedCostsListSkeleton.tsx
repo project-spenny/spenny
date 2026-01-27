@@ -15,7 +15,7 @@ const FixedCostItemSkeleton = () => (
         <Skeleton className="h-5 w-28 rounded-md" />
       </div>
 
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center pr-5">
         {/* 좌측: 주기 + 금액 */}
         <div className="flex w-32 flex-col gap-1">
           <Skeleton className="h-3 w-20" />
@@ -35,7 +35,7 @@ const FixedCostItemSkeleton = () => (
     </ItemContent>
     {/* 우측: chevron 자리 */}
     <div className="absolute top-1/2 right-3 -translate-y-1/2">
-      <Skeleton className="h-5 w-5" />
+      <Skeleton className="h-6 w-6" />
     </div>
   </Item>
 );

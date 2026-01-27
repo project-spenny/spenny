@@ -56,7 +56,7 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
         </div>
 
         {/* 본문 */}
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center pr-5">
           <div className="flex w-32 flex-col gap-1">
             <span className="text-muted-foreground text-xs">
               {formatFixedRuleCycle(rule)}
@@ -85,7 +85,7 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
         </div>
       </ItemContent>
 
-      <ChevronRight className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+      <ChevronRight className="absolute top-1/2 right-3 -translate-y-1/2" />
     </Item>
   );
 }
