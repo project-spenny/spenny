@@ -1,7 +1,7 @@
 'use client';
 
 import { AnalysisData, TransactionType } from '@/types/analysis';
-import { getMonthRange, getWeeksInMonth } from '@/utils/date';
+import { formatLocalDate, getMonthRange, getWeeksInMonth } from '@/utils/date';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ANALYSIS_CONFIG } from '@/constants/analysis';
@@ -38,6 +38,7 @@ const AnalysisView = ({
   // 주차별 데이터 가공
   const weeklyData = useMemo(() => {
     const weeks = getWeeksInMonth(selectedDate);
+    const todayStr = formatLocalDate(new Date());
 
     return weeks.map((week) => {
       const weekTransactions = current.filter(
@@ -55,6 +56,7 @@ const AnalysisView = ({
         transactions: weekTransactions.sort((a, b) =>
           a.date.localeCompare(b.date)
         ),
+        isCurrentWeek: todayStr >= week.startDate && todayStr <= week.endDate,
       };
     });
   }, [current, selectedDate]);
@@ -65,7 +67,10 @@ const AnalysisView = ({
   // 달이 바뀌면 선택 인덱스 초기화
   useEffect(() => {
     if (categoryData && categoryData.length > 0) setSelectedIndex(0);
-    setSelectedWeekIndex(0);
+
+    // 이번 달이라면 오늘이 포함된 주차, 아니면 1주차
+    const currentIndex = weeklyData.findIndex((w) => w.isCurrentWeek);
+    setSelectedWeekIndex(currentIndex !== -1 ? currentIndex : 0);
   }, [selectedDate]);
 
   // 선택된 월 기준으로 history 페이지 이동용 URL 생성
