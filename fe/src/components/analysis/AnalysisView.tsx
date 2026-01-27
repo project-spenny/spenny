@@ -11,7 +11,6 @@ import CategoryAnalysisList from '@/components/analysis/CategoryAnalysisList';
 import CategoryChart from '@/components/analysis/CategoryChart';
 import Link from 'next/link';
 import { PieChart } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 import { getMonthRange } from '@/utils/date';
 
 type AnalysisViewProps = {
@@ -91,24 +90,26 @@ const AnalysisView = ({
             title={`카테고리별 ${config.label}`}
             icon={<PieChart className={config.color} />}
           >
-            {/* 카테고리 차트 */}
-            <div className="flex items-center justify-center p-4">
-              <CategoryChart
-                data={categoryData}
-                selectedIndex={selectedIndex}
-                onSelect={setSelectedIndex}
-              />
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              {/* 카테고리 차트 */}
+              <div className="flex items-center justify-center lg:flex-1">
+                <CategoryChart
+                  data={categoryData}
+                  selectedIndex={selectedIndex}
+                  onSelect={setSelectedIndex}
+                />
+              </div>
+
+              <div className="lg:flex-1">
+                {/* 카테고리 리스트 */}
+                <CategoryAnalysisList
+                  data={categoryData}
+                  allTransactions={current}
+                  selectedIndex={selectedIndex}
+                  onSelect={setSelectedIndex}
+                />
+              </div>
             </div>
-
-            <Separator />
-
-            {/* 카테고리 리스트 */}
-            <CategoryAnalysisList
-              data={categoryData}
-              allTransactions={current}
-              selectedIndex={selectedIndex}
-              onSelect={setSelectedIndex}
-            />
           </AnalysisSection>
         </>
       )}
