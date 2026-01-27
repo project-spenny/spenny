@@ -1,6 +1,7 @@
 'use client';
 
 import { AnalysisData, TransactionType } from '@/types/analysis';
+import { Info, PieChart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { ANALYSIS_CONFIG } from '@/constants/analysis';
@@ -10,7 +11,8 @@ import { Button } from '@/components/ui/button';
 import CategoryAnalysisList from '@/components/analysis/CategoryAnalysisList';
 import CategoryChart from '@/components/analysis/CategoryChart';
 import Link from 'next/link';
-import { PieChart } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import WeeklyChart from '@/components/analysis/WeeklyChart';
 import { getMonthRange } from '@/utils/date';
 
 type AnalysisViewProps = {
@@ -83,6 +85,19 @@ const AnalysisView = ({
                   {diff > 0 ? config.increaseText : config.decreaseText}
                 </p>
               )}
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* 주간 차트 */}
+            <div className="space-y-3">
+              <p className="font-semibold md:text-lg">주간 {config.label}</p>
+
+              <WeeklyChart
+                transactions={current}
+                selectedDate={selectedDate}
+                type={type}
+              />
             </div>
           </AnalysisSection>
 
