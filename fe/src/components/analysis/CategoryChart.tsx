@@ -44,12 +44,18 @@ const CategoryChart = ({
         hoverBackgroundColor: data.map((_, i) =>
           i < 5 ? CHART_COLORS.TOP_5[i] : CHART_COLORS.GRAY.LIGHT
         ),
-        borderWidth: data.map((_, i) => (i === selectedIndex ? 2 : 1)),
+        borderWidth:
+          data.length === 1
+            ? 0
+            : data.map((_, i) => (i === selectedIndex ? 0 : 1)),
         borderColor: isDark
           ? CHART_COLORS.BORDER.DARK
           : CHART_COLORS.BORDER.LIGHT,
-        offset: data.map((_, i) => (i === selectedIndex ? 25 : 0)), // 선택된 인덱스만 튀어나오도록
-        hoverOffset: 15, // 마우스 올렸을 때 튀어나오는 효과
+        offset:
+          data.length === 1
+            ? 0
+            : data.map((_, i) => (i === selectedIndex ? 20 : 0)), // 선택된 인덱스만 튀어나오도록
+        hoverOffset: data.length === 1 ? 0 : 15, // 마우스 올렸을 때 튀어나오는 효과
       },
     ],
   };
