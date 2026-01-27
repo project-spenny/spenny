@@ -1,4 +1,4 @@
-import { getTransaction,getMonthTransactions } from './history/actions';
+import { getTransaction, getMonthTransactions } from './history/actions';
 import { Suspense } from 'react';
 import { formatLocalDate, formatMonth } from '@/utils/date';
 import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
@@ -23,20 +23,18 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen w-full max-w-6xl self-start">
       <Suspense fallback={<CalendarSkeleton />}>
-        <InitialDataLoader
-          currentMonth={currentMonth}
-        />
+        <InitialDataLoader currentMonth={currentMonth} />
       </Suspense>
     </div>
   );
 }
 
-async function InitialDataLoader({currentMonth}: {currentMonth: string} ) {
+async function InitialDataLoader({ currentMonth }: { currentMonth: string }) {
   const today = new Date();
   const currentMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
   // 당월 데이터 fetch
-  const [transactions, budgets, fixedRules] = await Promise.all([
+  const [{ transactions }, budgets, fixedRules] = await Promise.all([
     getMonthTransactions(currentMonth),
     fetchBudgetsServer(currentMonthDate),
     fetchFixedRulesByMonthServer(currentMonthDate),
@@ -100,7 +98,7 @@ async function InitialDataLoader({currentMonth}: {currentMonth: string} ) {
   );
 
   const dailyChartData = buildDailyRecChartData({
-    monthDate : currentMonthDate,
+    monthDate: currentMonthDate,
     transactions,
     today,
     budget,
@@ -115,5 +113,5 @@ async function InitialDataLoader({currentMonth}: {currentMonth: string} ) {
       dailyRec={daily}
       dailyChartData={dailyChartData}
     />
-  )
+  );
 }
