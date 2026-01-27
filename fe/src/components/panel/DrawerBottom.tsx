@@ -9,21 +9,27 @@ import {
 import { Button } from '@/components/ui/button';
 import { PanelProps } from '@/types/panel';
 import { X } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-const DrawerBottom = ({
-  children,
-  open,
-  onOpenChange,
-  isFull = false,
-}: PanelProps) => {
+const DrawerBottom = ({ children, open, onOpenChange }: PanelProps) => {
+  // 모바일 키보드 노출 시 input focus 스크롤 보정
+  const handleAutoScroll = (e: React.FocusEvent) => {
+    const target = e.target as HTMLElement;
+
+    if (target.tagName === 'INPUT') {
+      setTimeout(() => {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
+      }, 200); // 키보드가 올라오는 시간 고려
+    }
+  };
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <DrawerContent
-        className={cn(
-          'flex flex-col overflow-hidden outline-none',
-          isFull ? 'h-screen' : 'h-[80vh]'
-        )}
+        className="fixed inset-0 flex h-full flex-col overflow-hidden rounded-none border-none outline-none"
+        onFocus={handleAutoScroll}
       >
         {/* DialogTitle 누락 방지 */}
         <DrawerTitle className="sr-only">DrawerBottom</DrawerTitle>

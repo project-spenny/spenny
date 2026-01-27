@@ -5,11 +5,9 @@ export interface PanelProps {
   children: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  isFull?: boolean;
 }
 
 export interface ResponsivePanelProps {
   trigger?: React.ReactNode; // 패널을 열 버튼 등 트리거
   children: React.ReactNode; // 패널 내부에 들어갈 내용
-  isFull?: boolean;
 }
