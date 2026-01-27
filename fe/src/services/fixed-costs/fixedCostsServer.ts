@@ -1,6 +1,10 @@
-import { getMonthRange } from '@/utils/date';
-import type { IFixedRule } from '@/types/fixed-costs';
+import { getMonthRange, parseLocalDate } from '@/utils/date';
+import type { FixedCostsFilters, IFixedRule } from '@/types/fixed-costs';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
+import {
+  hasMonthlyOccurrence,
+  hasWeeklyOccurrence,
+} from '@/utils/fixed-costs/period';
 
 // group_id별 대표 rule 선택
 const pickRepresentativeRule = (rules: IFixedRule[]) => {
@@ -21,18 +25,42 @@ const pickRepresentativeRule = (rules: IFixedRule[]) => {
 };
 
 // 고정비 규칙 목록 조회
-export const fetchFixedRulesServer = async () => {
+export const fetchFixedRulesServer = async (
+  filters: FixedCostsFilters = {}
+) => {
   const { supabase, user } = await requireUserServer();
 
-  const { data, error } = await supabase
-    .from('fixed_rules')
-    .select('*')
-    .eq('user_id', user.id)
+  let q = supabase.from('fixed_rules').select('*').eq('user_id', user.id);
+
+  // 필터링 조건 적용
+  if (filters.type) q = q.eq('type', filters.type);
+  if (filters.cycle) q = q.eq('cycle', filters.cycle);
+  if (filters.query) q = q.ilike('title', `%${filters.query}%`);
+
+  const { data, error } = await q
     .order('start_date', { ascending: false })
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  const rules = (data ?? []) as IFixedRule[];
+  let rules = (data ?? []) as IFixedRule[];
+
+  // 기간 필터링 적용
+  const rangeStart = parseLocalDate(filters.start_date);
+  const rangeEnd = parseLocalDate(filters.end_date);
+
+  if (rangeStart) {
+    const effectiveEnd = rangeEnd ?? new Date(2100, 0, 1);
+
+    rules = rules.filter((rule) => {
+      if (rule.cycle === 'MONTHLY') {
+        return hasMonthlyOccurrence(rule, rangeStart, effectiveEnd);
+      }
+      if (rule.cycle === 'WEEKLY') {
+        return hasWeeklyOccurrence(rule, rangeStart, effectiveEnd);
+      }
+      return false;
+    });
+  }
 
   // group_id가 아직 없는 데이터 대비 대표 rule 선택
   const groupMap = new Map<string, IFixedRule[]>();

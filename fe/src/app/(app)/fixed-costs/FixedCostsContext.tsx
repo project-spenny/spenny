@@ -9,6 +9,8 @@ interface FixedCostsContextType {
   openCreate: () => void;
   openEdit: (rule: IFixedRule) => void;
   close: () => void;
+  isFiltering: boolean;
+  setIsFiltering: (v: boolean) => void;
 }
 
 const FixedCostsContext = createContext<FixedCostsContextType | undefined>(
@@ -18,6 +20,7 @@ const FixedCostsContext = createContext<FixedCostsContextType | undefined>(
 export function FixedCostsProvider({ children }: { children: ReactNode }) {
   const [selectedRule, setSelectedRule] = useState<IFixedRule | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   const openCreate = () => {
     setSelectedRule(null);
@@ -33,7 +36,15 @@ export function FixedCostsProvider({ children }: { children: ReactNode }) {
 
   return (
     <FixedCostsContext.Provider
-      value={{ selectedRule, isOpen, openCreate, openEdit, close }}
+      value={{
+        selectedRule,
+        isOpen,
+        openCreate,
+        openEdit,
+        close,
+        isFiltering,
+        setIsFiltering,
+      }}
     >
       {children}
     </FixedCostsContext.Provider>
