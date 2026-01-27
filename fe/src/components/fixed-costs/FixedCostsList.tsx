@@ -18,7 +18,7 @@ export default function FixedCostsList({ items }: { items: IFixedRule[] }) {
           </div>
         )}
 
-        <div className={isFiltering ? 'hidden' : ''}>
+        <div className={isFiltering ? 'hidden' : 'space-y-6'}>
           {items.length === 0 ? (
             <p className="text-muted-foreground text-center">
               등록된 고정비가 없습니다

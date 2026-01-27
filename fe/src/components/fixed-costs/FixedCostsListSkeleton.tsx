@@ -1,6 +1,6 @@
 'use client';
 
-import { Item, ItemContent, ItemTitle } from '@/components/ui/item';
+import { Item, ItemContent } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type Props = {
@@ -8,29 +8,35 @@ type Props = {
 };
 
 const FixedCostItemSkeleton = () => (
-  <Item variant="outline">
-    <ItemContent className="flex flex-row items-center">
-      {/* 좌측: 주기 + 금액 */}
-      <div className="flex w-32 flex-col gap-2">
-        <Skeleton className="h-3 w-20" />
-        <Skeleton className="h-4 w-28" />
+  <Item variant="outline" className="relative">
+    <ItemContent className="flex flex-col gap-2">
+      {/* 상단: 기간/상태 뱃지 영역 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Skeleton className="h-5 w-28 rounded-md" />
       </div>
 
-      {/* 중앙: 카테고리 + 제목 */}
-      <div className="pl-2">
-        <ItemTitle className="pl-2">
-          <Skeleton className="h-3 w-24" />
-        </ItemTitle>
-        <ItemTitle className="p-2">
-          <Skeleton className="h-4 w-40" />
-        </ItemTitle>
-      </div>
+      <div className="flex flex-row items-center">
+        {/* 좌측: 주기 + 금액 */}
+        <div className="flex w-32 flex-col gap-1">
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-4 w-28" />
+        </div>
 
-      {/* 우측: chevron 자리 */}
-      <div className="ml-auto">
-        <Skeleton className="h-8 w-8" />
+        {/* 중앙: 카테고리 + 제목 */}
+        <div className="min-w-0 flex-1 gap-2 pl-2">
+          <div className="text-sm">
+            <Skeleton className="h-4 w-20" />
+          </div>
+          <div className="mt-1">
+            <Skeleton className="h-5 w-2/3" />
+          </div>
+        </div>
       </div>
     </ItemContent>
+    {/* 우측: chevron 자리 */}
+    <div className="absolute top-1/2 right-3 -translate-y-1/2">
+      <Skeleton className="h-5 w-5" />
+    </div>
   </Item>
 );
 
