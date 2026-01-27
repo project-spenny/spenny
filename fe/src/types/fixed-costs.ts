@@ -57,3 +57,15 @@ export type FixedCostsFilters = {
   end_date?: string;
   query?: string;
 };
+
+// 예정된 고정비 정보 타입
+export type ScheduledFixedInfo = {
+  fixed_rule_id: string;
+  title: string;
+  amount: number;
+  type: 'income' | 'expense';
+  category_id: string;
+};
+
+// 날짜별 예정된 고정비 정보 맵 타입
+export type ScheduledFixedByDateMap = Record<string, ScheduledFixedInfo[]>;
