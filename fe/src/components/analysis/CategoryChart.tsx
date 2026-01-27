@@ -85,14 +85,16 @@ const CategoryChart = ({
   const selectedItem = data[selectedIndex] || data[0];
 
   return (
-    <div className="relative mx-auto flex items-center justify-center">
+    <div className="relative mx-auto flex h-[250px] items-center justify-center md:h-[300px]">
       <Doughnut data={chartData} options={options} />
 
       <div className="pointer-events-none absolute flex flex-col items-center justify-center text-center">
         {selectedItem ? (
           <>
-            <span className="text-base font-semibold">{selectedItem.name}</span>
-            <span className="text-brand animate-in zoom-in text-xl font-bold duration-300">
+            <span className="text-sm font-semibold md:text-base">
+              {selectedItem.name}
+            </span>
+            <span className="text-brand animate-in zoom-in font-bold duration-300 md:text-lg">
               {selectedItem.percentage.toFixed(1)}%
             </span>
           </>
