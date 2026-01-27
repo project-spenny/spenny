@@ -84,15 +84,15 @@ export function CalendarClient({
             className="w-full"
           >
             <div className="flex justify-center px-4">
-              <TabsList className="bg-brand rounded-full">
+              <TabsList className="bg-brand-soft rounded-full">
                 <TabsTrigger
-                  className="cursor-pointer rounded-full px-3 text-xs"
+                  className="data-[state=active]:bg-brand cursor-pointer rounded-full px-3 text-xs text-white"
                   value="calendar"
                 >
                   캘린더
                 </TabsTrigger>
                 <TabsTrigger
-                  className="cursor-pointer rounded-full px-3 text-xs active:bg-red-400"
+                  className="data-[state=active]:bg-brand cursor-pointer rounded-full px-3 text-xs text-white"
                   value="list"
                 >
                   리스트
