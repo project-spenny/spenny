@@ -8,9 +8,11 @@ import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 import { useMonthTransactions } from '@/hooks/useMonthTransactions';
 import { ITransaction } from '@/types/transactions';
 import { DailyRecResult, DailyRecChartData } from '@/types/dailyRec';
+import { ScheduledFixedByDateMap } from '@/types/fixed-costs';
 interface CalendarClientProps {
   currentMonth: string;
   initialTransactions: ITransaction[];
+  initialScheduledFixedByDateMap: ScheduledFixedByDateMap;
   dailyRec: DailyRecResult;
   dailyChartData: DailyRecChartData;
 }
@@ -18,16 +20,21 @@ interface CalendarClientProps {
 export function CalendarClient({
   currentMonth,
   initialTransactions,
+  initialScheduledFixedByDateMap,
   dailyRec,
   dailyChartData,
 }: CalendarClientProps) {
   const [month, setMonth] = useState(currentMonth);
 
-  const { data: transactions, isLoading } = useMonthTransactions({
+  const { data, isLoading } = useMonthTransactions({
     month,
     currentMonth,
     initialTransactions,
+    initialScheduledFixedByDateMap,
   });
+
+  const transactions = data?.transactions ?? [];
+  const scheduledFixedByDateMap = data?.scheduledFixedByDateMap ?? {};
 
   return (
     <CalendarProvider>
@@ -35,7 +42,8 @@ export function CalendarClient({
         <div className="flex w-full flex-col gap-3">
           <Calendar
             currentMonth={month}
-            transactions={transactions || []}
+            transactions={transactions}
+            scheduledFixedByDateMap={scheduledFixedByDateMap}
             isLoading={isLoading}
             onMonthChange={setMonth}
           >

@@ -34,11 +34,12 @@ async function InitialDataLoader({ currentMonth }: { currentMonth: string }) {
   const currentMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
 
   // 당월 데이터 fetch
-  const [{ transactions }, budgets, fixedRules] = await Promise.all([
-    getMonthTransactions(currentMonth),
-    fetchBudgetsServer(currentMonthDate),
-    fetchFixedRulesByMonthServer(currentMonthDate),
-  ]);
+  const [{ transactions, scheduledFixedByDateMap }, budgets, fixedRules] =
+    await Promise.all([
+      getMonthTransactions(currentMonth),
+      fetchBudgetsServer(currentMonthDate),
+      fetchFixedRulesByMonthServer(currentMonthDate),
+    ]);
 
   const budget = getTotalBudgetAmount(budgets);
   const fixedPlannedThisMonth = getFixedPlannedExpenseByMonth(
@@ -110,6 +111,7 @@ async function InitialDataLoader({ currentMonth }: { currentMonth: string }) {
     <CalendarClient
       currentMonth={currentMonth}
       initialTransactions={transactions}
+      initialScheduledFixedByDateMap={scheduledFixedByDateMap}
       dailyRec={daily}
       dailyChartData={dailyChartData}
     />
