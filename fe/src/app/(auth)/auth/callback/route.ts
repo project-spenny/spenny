@@ -34,25 +34,36 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login`);
   }
 
-  // 유저 프로필 존재 여부 조회
+  // 유저 프로필 존재 여부 조회 (로그인 직후 1회만)
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')
     .eq('id', user.id)
     .maybeSingle();
 
-  const nextPath = profile ? next : '/onboarding';
+  const onboarded = !!profile;
+  const nextPath = onboarded ? next : '/onboarding';
 
   const forwardedHost = request.headers.get('x-forwarded-host'); // original origin before load balancer
   const isLocalEnv = process.env.NODE_ENV === 'development';
 
+  let redirectUrl: string;
   if (isLocalEnv) {
     // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-    return NextResponse.redirect(`${origin}${nextPath}`);
+    redirectUrl = `${origin}${nextPath}`;
+  } else if (forwardedHost) {
+    redirectUrl = `https://${forwardedHost}${nextPath}`;
+  } else {
+    redirectUrl = `${origin}${nextPath}`;
   }
 
-  if (forwardedHost) {
-    return NextResponse.redirect(`https://${forwardedHost}${nextPath}`);
-  }
-  return NextResponse.redirect(`${origin}${nextPath}`);
+  const response = NextResponse.redirect(redirectUrl);
+  response.cookies.set('onboarded', onboarded ? '1' : '0', {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: !isLocalEnv,
+  });
+
+  return response;
 }
