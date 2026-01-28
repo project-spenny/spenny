@@ -66,7 +66,8 @@ const MonthPicker = ({
 
   return (
     <div className="flex flex-col items-center">
-      <span className="text-brand text-sm font-bold">{year}</span>
+      <span className="text-brand text-sm font-bold md:text-base">{year}</span>
+
       <div className="flex items-center gap-2">
         {/* 이전 달 이동 버튼 */}
         <Button
@@ -85,7 +86,7 @@ const MonthPicker = ({
               variant="ghost"
               className={cn(
                 'hover:bg-brand-soft/40 w-16 justify-center font-semibold',
-                'text-xl tracking-tight sm:text-2xl'
+                'text-lg tracking-tight md:text-xl'
               )}
             >
               {month}월
