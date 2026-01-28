@@ -44,12 +44,18 @@ const CategoryChart = ({
         hoverBackgroundColor: data.map((_, i) =>
           i < 5 ? CHART_COLORS.TOP_5[i] : CHART_COLORS.GRAY.LIGHT
         ),
-        borderWidth: data.map((_, i) => (i === selectedIndex ? 2 : 1)),
+        borderWidth:
+          data.length === 1
+            ? 0
+            : data.map((_, i) => (i === selectedIndex ? 0 : 1)),
         borderColor: isDark
           ? CHART_COLORS.BORDER.DARK
           : CHART_COLORS.BORDER.LIGHT,
-        offset: data.map((_, i) => (i === selectedIndex ? 25 : 0)), // 선택된 인덱스만 튀어나오도록
-        hoverOffset: 15, // 마우스 올렸을 때 튀어나오는 효과
+        offset:
+          data.length === 1
+            ? 0
+            : data.map((_, i) => (i === selectedIndex ? 20 : 0)), // 선택된 인덱스만 튀어나오도록
+        hoverOffset: data.length === 1 ? 0 : 15, // 마우스 올렸을 때 튀어나오는 효과
       },
     ],
   };
@@ -79,14 +85,16 @@ const CategoryChart = ({
   const selectedItem = data[selectedIndex] || data[0];
 
   return (
-    <div className="relative mx-auto flex items-center justify-center">
+    <div className="relative mx-auto flex h-[250px] items-center justify-center md:h-[300px]">
       <Doughnut data={chartData} options={options} />
 
       <div className="pointer-events-none absolute flex flex-col items-center justify-center text-center">
         {selectedItem ? (
           <>
-            <span className="text-base font-semibold">{selectedItem.name}</span>
-            <span className="text-brand animate-in zoom-in text-xl font-bold duration-300">
+            <span className="text-sm font-semibold md:text-base">
+              {selectedItem.name}
+            </span>
+            <span className="text-brand animate-in zoom-in font-bold duration-300 md:text-lg">
               {selectedItem.percentage.toFixed(1)}%
             </span>
           </>
