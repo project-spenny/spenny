@@ -62,6 +62,10 @@ export async function updateSession(request: NextRequest) {
   const isOnboardingPath = pathname.startsWith('/onboarding');
   const isOnboardingIntroPath = pathname.startsWith('/onboarding/intro');
 
+  // 온보딩 완료 여부 판단 쿠키
+  const onboardedCookie = request.cookies.get('onboarded')?.value;
+  const isOnboarded = onboardedCookie === '1';
+
   // 비로그인 : login/auth만 허용
   if (!user) {
     if (!isLoginPath && !isAuthPath) {
@@ -73,31 +77,15 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  const userId = user.sub; // claims의 subject = auth uid(uuid)
-
-  // 로그인 : 프로필 존재 여부 조회
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (profileError) {
-    console.error('[middleware] profile fetch error', profileError);
-    return supabaseResponse;
-  }
-
-  const hasProfile = !!profile;
-
-  // 로그인 상태에서 login 페이지 접근 차단
+  // 로그인 상태에서 /login 접근 차단
   if (isLoginPath) {
     const url = request.nextUrl.clone();
-    url.pathname = hasProfile ? '/' : '/onboarding';
+    url.pathname = isOnboarded ? '/' : '/onboarding';
     return NextResponse.redirect(url);
   }
 
-  // 온보딩 미완료면 onboarding만 허용
-  if (!hasProfile) {
+  // 온보딩 미완료면 /onboarding만 허용
+  if (!isOnboarded) {
     // /auth는 OAuth 플로우 때문에 허용
     if (!isOnboardingPath && !isAuthPath) {
       const url = request.nextUrl.clone();
@@ -107,7 +95,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // 온보딩 완료면 onboarding 접근 차단
+  // 온보딩 완료면 /onboarding 접근 차단
   if (isOnboardingPath && !isOnboardingIntroPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
