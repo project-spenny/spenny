@@ -98,68 +98,84 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <AnimatedLogo />
-      <div className="flex flex-col gap-4">
-        <button
-          type="button"
-          onClick={() => signInWithProvider('google')}
-          disabled={isLoading}
-          className="relative flex h-11 w-75 cursor-pointer items-center justify-center rounded-sm border disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Image
-            src="/google_logo.svg"
-            alt="Google"
-            width={20}
-            height={20}
-            className="absolute left-3"
-          />
-          <span className="inline-flex items-center gap-2 whitespace-nowrap">
-            <span>{loadingAction === 'google' && <Spinner />}</span>
-            구글로 시작하기
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={() => signInWithProvider('kakao')}
-          disabled={isLoading}
-          className="relative flex h-11 w-75 cursor-pointer items-center justify-center rounded-sm bg-[#FEE500] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Image
-            src="/kakao_symbol.svg"
-            alt="Kakao"
-            width={20}
-            height={20}
-            className="absolute left-3"
-          />
-          <span className="inline-flex items-center gap-2 whitespace-nowrap">
-            <span>{loadingAction === 'kakao' && <Spinner />}</span>
-            카카오로 시작하기
-          </span>
-        </button>
-      </div>
+      {/* 로그인 섹션 */}
+      <div className="flex flex-[0.8] flex-col items-center justify-center rounded-t-[40px] bg-white p-6 lg:rounded-t-none lg:rounded-l-[40px]">
+        <div className="flex h-full w-full max-w-[340px] flex-col justify-center">
+          <div className="flex justify-center">
+            <AnimatedLogo />
+          </div>
+          <div className="mb-8 flex flex-col items-center text-center lg:items-start lg:text-left">
+            <h2 className="text-brand-strong text-3xl font-extrabold tracking-tight">
+              환영합니다
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              간편 로그인으로 서비스를 시작하세요.
+            </p>
+          </div>
 
-      <div className="flex items-center gap-2 text-xs text-gray-400">
-        <span className="h-px w-12 bg-gray-200" />
-        또는
-        <span className="h-px w-12 bg-gray-200" />
-      </div>
+          {/* 소셜 로그인 */}
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => signInWithProvider('google')}
+              disabled={isLoading}
+              className="relative flex h-11 w-full cursor-pointer items-center justify-center rounded-xl border text-sm font-semibold text-black disabled:opacity-60"
+            >
+              <Image
+                src="/google_logo.svg"
+                alt="Google"
+                width={20}
+                height={20}
+                className="absolute left-5"
+              />
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                <span>{loadingAction === 'google' && <Spinner />}</span>
+                구글로 시작하기
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => signInWithProvider('kakao')}
+              disabled={isLoading}
+              className="relative flex h-11 w-full cursor-pointer items-center justify-center rounded-xl border text-sm font-semibold text-black disabled:opacity-60"
+            >
+              <Image
+                src="/kakao_symbol.svg"
+                alt="Kakao"
+                width={20}
+                height={20}
+                className="absolute left-5"
+              />
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                <span>{loadingAction === 'kakao' && <Spinner />}</span>
+                카카오로 시작하기
+              </span>
+            </button>
+          </div>
 
-      <div className="flex flex-col items-center gap-1">
-        <button
-          type="button"
-          onClick={signInAsGuest}
-          disabled={isLoading}
-          className="flex h-11 w-75 items-center justify-center rounded-sm border text-sm text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <span className="inline-flex items-center gap-2 whitespace-nowrap">
-            <span>{loadingAction === 'guest' && <Spinner />}</span>
-            체험해보기
-          </span>
-        </button>
+          {/* 구분선 */}
+          <div className="relative my-7 flex items-center justify-center">
+            <div className="absolute w-full border-t border-slate-200"></div>
+            <span className="relative bg-white px-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+              OR
+            </span>
+          </div>
 
-        <p className="mt-1 text-xs text-gray-400">
-          회원가입 없이 데모 계정으로 서비스를 체험할 수 있어요.
-        </p>
+          {/* 게스트 로그인 */}
+          <div className="space-y-4">
+            <button
+              onClick={signInAsGuest}
+              disabled={isLoading}
+              className="bg-brand-subtle text-brand-strong hover:bg-brand-soft/30 flex h-11 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold disabled:opacity-50"
+            >
+              {loadingAction === 'guest' ? <Spinner /> : '서비스 둘러보기'}
+            </button>
+            <p className="text-center text-xs leading-relaxed text-gray-400">
+              체험 계정은 읽기 전용 모드입니다. <br />
+              직접 수입과 지출을 관리하려면 본인 계정으로 시작해 보세요.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
