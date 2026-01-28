@@ -74,7 +74,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 overflow-x-hidden">
+    <div className="bg-brand min-h-screen w-full overflow-hidden lg:flex">
+      {/* 브랜드 섹션 */}
+      <div className="px-6 pt-14 pb-10 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-16">
+        <h1 className="text-4xl leading-tight font-extrabold tracking-tighter text-white lg:text-6xl lg:leading-[1.05]">
+          어제보다 더 나은 <br />
+          <span className="text-brand-soft">소비 생활</span>
+        </h1>
+
+        <div className="text-brand-subtle mt-5 text-base lg:mt-8 lg:text-xl">
+          <span className="mb-2 flex items-center">
+            <Image
+              src="/logo_text.svg"
+              alt="SPENNY"
+              width={120}
+              height={225}
+              priority
+              className="mr-2 lg:w-38"
+            />
+            와 함께
+          </span>
+          똑똑한 자산 관리 습관을 만들어보세요.
+        </div>
+      </div>
+
       <AnimatedLogo />
       <div className="flex flex-col gap-4">
         <button
