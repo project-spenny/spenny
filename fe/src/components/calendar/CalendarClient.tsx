@@ -11,6 +11,7 @@ import { ITransaction } from '@/types/transactions';
 import { DailyRecResult, DailyRecChartData } from '@/types/dailyRec';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { TransactionList } from '@/components/transaction/TransactionList';
+import TransactionClient from '@/app/(app)/history/TransactionClient';
 
 type TabValue = 'calendar' | 'list';
 
@@ -113,6 +114,7 @@ export function CalendarClient({
 
             <TabsContent value="list">
               <TransactionList transactions={transactions || []} compact />
+              <TransactionClient />
             </TabsContent>
           </Tabs>
         </div>
