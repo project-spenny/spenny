@@ -54,7 +54,8 @@ export const getTransaction = async (
     .from('transactions')
     .select('*')
     .eq('user_id', user.id)
-    .order('date', { ascending: false });
+    .order('date', { ascending: false })
+    .order('updated_at', { ascending: false });
 
   if (startDate) {
     query = query.gte('date', startDate);
@@ -79,20 +80,20 @@ export const getTransaction = async (
 
   return data || [];
 };
-export const getMonthTransactions= async(month : string)=>{
+export const getMonthTransactions = async (month: string) => {
   const { supabase, user } = await requireUserServer();
-  const { startDate, endDate} = getMonthRange(new Date(`${month}-1`))
-  
+  const { startDate, endDate } = getMonthRange(new Date(`${month}-1`));
+
   const { data, error } = await supabase
     .from('transactions')
     .select('*')
     .eq('user_id', user.id)
     .gte('date', startDate)
     .lte('date', endDate)
-    .order('date', { ascending: false });
-    if (error) throw error;
-    return data || [];
-}
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+};
 export async function revalidateTransactions() {
   revalidatePath('/history');
   revalidatePath('/');
