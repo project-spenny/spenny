@@ -43,7 +43,7 @@ export const CalendarCaption = ({
             onDateChange={(selectedYear, selectedMonth) => {
               // 연도가 바뀌었을 때
               if (selectedYear !== year) {
-                const newDate = new Date(selectedYear, month.getMonth(), 1);
+                const newDate = new Date(selectedYear, selectedMonth - 1, 1);
                 handleMonthChange(newDate);
               }
               // 월이 바뀌었을 때
