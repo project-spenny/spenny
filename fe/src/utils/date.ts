@@ -1,4 +1,10 @@
-import { startOfWeek, endOfWeek } from 'date-fns';
+import {
+  eachWeekOfInterval,
+  endOfMonth,
+  endOfWeek,
+  startOfMonth,
+  startOfWeek,
+} from 'date-fns';
 
 /** 선택된 날짜를 바탕으로 해당 월의 시작일과 종료일을 YYYY-MM-DD 형식으로 반환 */
 export const getMonthRange = (date: Date) => {
@@ -24,6 +30,31 @@ export const getWeekRange = (date: Date) => {
     startDate: formatLocalDate(start),
     endDate: formatLocalDate(end),
   };
+};
+
+// 해당 월의 모든 주차 범위
+export const getWeeksInMonth = (date: Date) => {
+  const monthStart = startOfMonth(date);
+  const monthEnd = endOfMonth(date);
+
+  // 해당 월의 모든 월요일(주 시작점) 가져옴
+  const weekStarts = eachWeekOfInterval(
+    { start: monthStart, end: monthEnd },
+    { weekStartsOn: 1 }
+  );
+
+  return weekStarts.map((weekStart, index) => {
+    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+
+    // 월 범위를 벗어나지 않도록 날짜 조정
+    return {
+      weekNumber: index + 1,
+      startDate: formatLocalDate(
+        weekStart < monthStart ? monthStart : weekStart
+      ),
+      endDate: formatLocalDate(weekEnd > monthEnd ? monthEnd : weekEnd),
+    };
+  });
 };
 
 // Date 객체를 'YYYY-MM-DD' 문자열로 변환
