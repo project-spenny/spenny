@@ -56,7 +56,7 @@ export function CalendarClient({
     setActiveTab(newTab);
 
     const params = new URLSearchParams(window.location.search);
-    if (newTab === 'calendar') {
+    if (newTab === 'list') {
       params.delete('view');
     } else {
       params.set('view', newTab);
@@ -88,15 +88,15 @@ export function CalendarClient({
               <TabsList className="bg-brand-soft rounded-full">
                 <TabsTrigger
                   className="data-[state=active]:bg-brand cursor-pointer rounded-full px-3 text-xs text-white"
-                  value="calendar"
+                  value="list"
                 >
-                  캘린더
+                  가계부
                 </TabsTrigger>
                 <TabsTrigger
                   className="data-[state=active]:bg-brand cursor-pointer rounded-full px-3 text-xs text-white"
-                  value="list"
+                  value="calendar"
                 >
-                  리스트
+                  캘린더
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -107,12 +107,13 @@ export function CalendarClient({
                 transactions={transactions || []}
                 isLoading={isLoading}
                 onMonthChange={setMonth}
-              >
-                <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
-              </Calendar>
+              ></Calendar>
             </TabsContent>
 
             <TabsContent value="list">
+              <div>
+                <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
+              </div>
               <TransactionList transactions={transactions || []} />
               <TransactionClient />
             </TabsContent>
