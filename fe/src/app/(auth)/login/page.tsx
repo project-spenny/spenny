@@ -1,7 +1,6 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import AnimatedLogo from '@/components/login/AnimatedLogo';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/utils/supabase/client';
 import Image from 'next/image';
@@ -124,7 +123,14 @@ export default function LoginPage() {
       <div className="flex flex-[0.8] flex-col items-center justify-center rounded-t-[40px] bg-white p-6 lg:rounded-t-none lg:rounded-l-[40px]">
         <div className="flex h-full w-full max-w-[340px] flex-col justify-center">
           <div className="flex justify-center">
-            <AnimatedLogo />
+            <Image
+              src="/logo_vertical.svg"
+              alt="logo"
+              width={230}
+              height={200}
+              priority
+              className="lg:w-75"
+            />
           </div>
           <div className="mb-8 flex flex-col items-center text-center lg:items-start lg:text-left">
             <h2 className="text-brand-strong text-3xl font-extrabold tracking-tight">
