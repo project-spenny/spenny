@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { onboardingProfileSchema, profilePatchSchema } from '@/schemas/profile';
+import { cookies } from 'next/headers';
 
 async function requireUser() {
   const supabase = await createClient();
@@ -111,7 +112,16 @@ export async function PUT(req: Request) {
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  // 온보딩 완료 캐시 쿠키 갱신
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set('onboarded', '1', {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV !== 'development',
+  });
+
+  return res;
 }
 
 // MyInfo - 프로필 수정
