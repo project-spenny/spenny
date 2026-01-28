@@ -2,10 +2,10 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { useEffect, useState } from 'react';
 
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   month: i + 1,
@@ -28,19 +28,27 @@ const MonthPicker = ({
 }: MonthPickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<'month' | 'year'>('month');
+  const [tempYear, setTempYear] = useState(year); // 임시 연도 상태
+
+  useEffect(() => {
+    if (isOpen) {
+      setTempYear(year);
+      setMode('month'); // 월 선택 모드
+    }
+  }, [isOpen, year]);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
 
   // 연도 선택 핸들러
   const handleYearSelect = (selectedYear: number) => {
-    onDateChange(selectedYear, month);
+    setTempYear(selectedYear);
     setMode('month'); // 연도 선택 후 월 선택 모드로 돌아가기
   };
 
   // 월 선택 핸들러
   const handleMonthSelect = (selectedMonth: number) => {
-    onDateChange(year, selectedMonth);
+    onDateChange(tempYear, selectedMonth);
     setIsOpen(false); // 팝오버 닫기
   };
 
@@ -91,7 +99,7 @@ const MonthPicker = ({
                   onClick={() => setMode('year')}
                   className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer rounded p-2 text-center font-bold"
                 >
-                  {year}
+                  {tempYear}
                 </div>
 
                 {MONTHS.map(({ month, monthDisplay }) => (
