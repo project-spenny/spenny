@@ -7,6 +7,7 @@ import { CalendarProvider } from '@/context/CalendarContext';
 import { TransactionProvider } from '@/app/(app)/history/TransactionContext';
 import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
 import { useMonthTransactions } from '@/hooks/useMonthTransactions';
+import { useInfiniteTransactions } from '@/hooks/useInfiniteTransactions';
 import { ITransaction } from '@/types/transactions';
 import { DailyRecResult, DailyRecChartData } from '@/types/dailyRec';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -75,6 +76,15 @@ export function CalendarClient({
     initialTransactions,
   });
 
+  // 가계부 탭에서 무한스크롤 사용
+  const {
+    transactions: listTransactions,
+    isLoading: infiniteLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteTransactions({ month });
+
   return (
     <CalendarProvider>
       <TransactionProvider>
@@ -114,7 +124,15 @@ export function CalendarClient({
               <div>
                 <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
               </div>
-              <TransactionList transactions={transactions || []} />
+              <TransactionList
+                transactions={listTransactions}
+                isLoading={infiniteLoading}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
+                month={month}
+                onMonthChange={setMonth}
+              />
               <TransactionClient />
             </TabsContent>
           </Tabs>

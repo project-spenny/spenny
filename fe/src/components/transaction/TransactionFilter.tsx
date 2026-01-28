@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,76 +12,64 @@ import {
 import { Button } from '../ui/button';
 import { X } from 'lucide-react';
 import { Search, ChevronRight, ChevronLeft } from 'lucide-react';
+import { TransactionFilters } from '@/app/(app)/history/actions';
 
-export function TransactionFilter() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+interface TransactionFilterProps {
+  month: string; // 'YYYY-MM' 형식
+  onMonthChange: (month: string) => void;
+  filters?: Omit<TransactionFilters, 'start_date' | 'end_date'>;
+  onFiltersChange?: (filters: Omit<TransactionFilters, 'start_date' | 'end_date'>) => void;
+}
 
-  const getCurrentMonth = () => {
-    const startDate = searchParams.get('start_date');
-    if (startDate) {
-      return new Date(startDate);
-    }
-    return new Date();
-  };
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
+export function TransactionFilter({
+  month,
+  onMonthChange,
+  filters,
+  onFiltersChange,
+}: TransactionFilterProps) {
+  // month를 Date로 변환
+  const selectedMonth = new Date(`${month}-01`);
 
-  const updateMonthFilter = (date: Date) => {
-    const params = new URLSearchParams(searchParams);
-
-    const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
-    const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-    const formatDate = (d: Date) => {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-
-    params.set('start_date', formatDate(startDate));
-    params.set('end_date', formatDate(endDate));
-
-    router.push(`/history?${params.toString()}`);
-  };
   const handlePreviousMonth = () => {
-    const newMonth = new Date(
+    const newDate = new Date(
       selectedMonth.getFullYear(),
       selectedMonth.getMonth() - 1,
       1
     );
-    setSelectedMonth(newMonth);
-    updateMonthFilter(newMonth);
+    const newMonth = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}`;
+    onMonthChange(newMonth);
   };
 
   const handleNextMonth = () => {
-    const newMonth = new Date(
+    const newDate = new Date(
       selectedMonth.getFullYear(),
       selectedMonth.getMonth() + 1,
       1
     );
-    setSelectedMonth(newMonth);
-    updateMonthFilter(newMonth);
+    const newMonth = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}`;
+    onMonthChange(newMonth);
   };
-  const updateFilter = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams);
+
+  const updateFilter = (key: keyof Omit<TransactionFilters, 'start_date' | 'end_date'>, value: string | undefined) => {
+    if (!onFiltersChange) return;
+    const newFilters = { ...filters };
     if (value && value !== 'all') {
-      params.set(key, value);
+      (newFilters as Record<string, string | undefined>)[key] = value;
     } else {
-      params.delete(key);
+      delete (newFilters as Record<string, string | undefined>)[key];
     }
-    router.push(`/history?${params.toString()}`);
+    onFiltersChange(newFilters);
   };
-  const [searchValue, setSearchValue] = useState(
-    searchParams.get('queryString') || ''
-  );
+
+  const [searchValue, setSearchValue] = useState(filters?.searchQuery || '');
+
   const handleSearch = () => {
-    updateFilter('queryString', searchValue);
+    updateFilter('searchQuery', searchValue);
   };
 
   const handleClearSearch = () => {
     setSearchValue('');
-    updateFilter('queryString', '');
+    updateFilter('searchQuery', undefined);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -90,16 +77,12 @@ export function TransactionFilter() {
       handleSearch();
     }
   };
-  const formatMonthDisplay = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    return `${year}.${String(month).padStart(2, '0')}`;
-  };
 
   const monthDisplay = (date: Date) => {
-    const month = date.getMonth() + 1;
-    return `${String(month)}월`;
+    const m = date.getMonth() + 1;
+    return `${String(m)}월`;
   };
+
   const yearDisplay = (date: Date) => {
     const year = date.getFullYear();
     return `${String(year)}년`;
@@ -137,8 +120,8 @@ export function TransactionFilter() {
           </Button>
         </div>
         <Select
-          value={searchParams.get('type') || 'all'}
-          onValueChange={(value) => updateFilter('type', value)}
+          value={filters?.type || 'all'}
+          onValueChange={(value) => updateFilter('type', value as 'income' | 'expense' | undefined)}
         >
           <SelectTrigger className="w-32">
             <SelectValue placeholder="유형" />
