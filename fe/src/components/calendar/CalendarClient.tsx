@@ -113,7 +113,7 @@ export function CalendarClient({
             </TabsContent>
 
             <TabsContent value="list">
-              <TransactionList transactions={transactions || []} compact />
+              <TransactionList transactions={transactions || []} />
               <TransactionClient />
             </TabsContent>
           </Tabs>
