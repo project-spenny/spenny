@@ -4,6 +4,7 @@ export interface ITransaction {
   user_id: string;
   category_id: string;
   type: 'income' | 'expense';
+  origin_date: string;
   date: string;
   amount: number;
   fixed_rule_id: string | null;

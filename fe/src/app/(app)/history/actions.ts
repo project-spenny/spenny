@@ -4,6 +4,8 @@ import { formatLocalDate, parseLocalDate } from '@/utils/date';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 import { revalidatePath } from 'next/cache';
 import { getMonthRange } from '@/utils/date';
+import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
+import { buildScheduledFixedByDateMap } from '@/utils/fixed-costs/scheduled';
 
 export interface TransactionFilters {
   type?: 'income' | 'expense';
@@ -79,20 +81,52 @@ export const getTransaction = async (
 
   return data || [];
 };
-export const getMonthTransactions= async(month : string)=>{
+
+export const getMonthTransactions = async (month: string) => {
   const { supabase, user } = await requireUserServer();
-  const { startDate, endDate} = getMonthRange(new Date(`${month}-1`))
-  
-  const { data, error } = await supabase
+
+  const monthDate = new Date(`${month}-01`);
+  const { startDate, endDate } = getMonthRange(monthDate);
+
+  // 고정비 동기화 (오늘까지)
+  const generateThroughDate = formatLocalDate(new Date());
+  await syncByMonthServer({
+    monthDate,
+    startDate,
+    endDate,
+    generateThroughDate,
+  });
+
+  // 거래 조회
+  const { data: transactions, error } = await supabase
     .from('transactions')
     .select('*')
     .eq('user_id', user.id)
     .gte('date', startDate)
     .lte('date', endDate)
     .order('date', { ascending: false });
-    if (error) throw error;
-    return data || [];
-}
+  if (error) throw error;
+
+  // 해당 월 고정비 규칙 조회
+  const fixedRules = await fetchFixedRulesByMonthServer(monthDate);
+
+  // 예정 고정비 맵 생성
+  const scheduledFixedByDateMap = buildScheduledFixedByDateMap({
+    monthDate,
+    today: new Date(),
+    fixedRules,
+    transactions: (transactions ?? []).map((t) => ({
+      fixed_rule_id: t.fixed_rule_id,
+      origin_date: t.origin_date,
+    })),
+  });
+
+  return {
+    transactions: transactions ?? [],
+    scheduledFixedByDateMap,
+  };
+};
+
 export async function revalidateTransactions() {
   revalidatePath('/history');
   revalidatePath('/');
