@@ -76,15 +76,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-brand min-h-screen w-full overflow-hidden lg:flex">
+    <div className="bg-brand flex h-screen w-full flex-col overflow-hidden lg:flex-row">
       {/* 브랜드 섹션 */}
-      <div className="px-6 pt-14 pb-10 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-16">
-        <h1 className="text-4xl leading-tight font-extrabold tracking-tighter text-white lg:text-6xl lg:leading-[1.05]">
-          어제보다 더 나은 <br />
-          <span className="text-brand-soft">소비 생활</span>
+      <div className="px-6 py-10 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-16">
+        <h1 className="text-3xl leading-tight font-extrabold tracking-tighter text-white lg:text-6xl">
+          어제보다 더 나은
+          <br className="hidden lg:block" />
+          <span className="text-brand-soft ml-2 text-4xl lg:ml-0 lg:text-6xl">
+            소비 생활
+          </span>
         </h1>
 
-        <div className="text-brand-subtle mt-5 text-base lg:mt-8 lg:text-xl">
+        <div className="text-brand-subtle mt-2 text-sm lg:mt-5 lg:mt-8 lg:text-xl">
           <span className="mb-2 flex items-center">
             <Image
               src="/logo_text.svg"
@@ -120,23 +123,23 @@ export default function LoginPage() {
       </div>
 
       {/* 로그인 섹션 */}
-      <div className="flex flex-[0.8] flex-col items-center justify-center rounded-t-[40px] bg-white p-6 lg:rounded-t-none lg:rounded-l-[40px]">
+      <div className="flex flex-1 flex-col items-center justify-center rounded-t-[40px] bg-white p-6 lg:flex-[0.8] lg:rounded-t-none lg:rounded-l-[40px]">
         <div className="flex h-full w-full max-w-[340px] flex-col justify-center">
-          <div className="flex justify-center">
+          <div className="mb-3 flex justify-center lg:mb-10">
             <Image
               src="/logo_vertical.svg"
               alt="logo"
-              width={230}
+              width={180}
               height={200}
               priority
               className="lg:w-75"
             />
           </div>
           <div className="mb-8 flex flex-col items-center text-center lg:items-start lg:text-left">
-            <h2 className="text-brand-strong text-3xl font-extrabold tracking-tight">
+            <h2 className="text-brand-strong text-xl font-extrabold tracking-tight lg:text-3xl">
               환영합니다
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 lg:text-sm">
               간편 로그인으로 서비스를 시작하세요.
             </p>
           </div>
@@ -162,7 +165,7 @@ export default function LoginPage() {
           </div>
 
           {/* 구분선 */}
-          <div className="relative my-7 flex items-center justify-center">
+          <div className="relative my-5 flex items-center justify-center">
             <div className="absolute w-full border-t border-slate-200"></div>
             <span className="relative bg-white px-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
               OR
@@ -170,7 +173,7 @@ export default function LoginPage() {
           </div>
 
           {/* 게스트 로그인 */}
-          <div className="space-y-4">
+          <div className="space-y-1">
             <button
               onClick={signInAsGuest}
               disabled={isLoading}
@@ -179,8 +182,7 @@ export default function LoginPage() {
               {loadingAction === 'guest' ? <Spinner /> : '서비스 둘러보기'}
             </button>
             <p className="text-center text-xs leading-relaxed text-gray-400">
-              체험 계정은 읽기 전용 모드입니다. <br />
-              직접 수입과 지출을 관리하려면 본인 계정으로 시작해 보세요.
+              체험 계정은 읽기 전용 모드입니다.
             </p>
           </div>
         </div>
