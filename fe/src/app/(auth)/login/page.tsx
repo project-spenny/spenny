@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import AnimatedLogo from '@/components/login/AnimatedLogo';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/utils/supabase/client';
@@ -7,6 +8,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Sparkles, PieChart, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Provider = 'google' | 'kakao';
@@ -96,6 +98,25 @@ export default function LoginPage() {
             와 함께
           </span>
           똑똑한 자산 관리 습관을 만들어보세요.
+        </div>
+
+        {/* 기능 소개 (데스크탑 전용) */}
+        <div className="mt-15 hidden space-y-6 border-l-2 border-white/15 pl-6 lg:block">
+          <FeatureItem
+            icon={<CalendarDays className="h-5 w-5" />}
+            title="직접 기록하는 수입과 지출"
+            desc="최소한의 입력으로 매일 기록해요"
+          />
+          <FeatureItem
+            icon={<Sparkles className="h-5 w-5" />}
+            title="데이터 기반의 소비 패턴 분석"
+            desc="패턴을 분석해 오늘 사용 가능한 권장 금액을 제안해요"
+          />
+          <FeatureItem
+            icon={<PieChart className="h-5 w-5" />}
+            title="세분화된 예산 설정과 관리"
+            desc="나에게 딱 맞는 예산을 설정하고 습관을 만들어요"
+          />
         </div>
       </div>
 
@@ -197,5 +218,30 @@ function SocialButton({
       {isLoading && <Spinner />}
       <span className="ml-2">{label}</span>
     </button>
+  );
+}
+
+// 기능 소개 아이템
+function FeatureItem({
+  icon,
+  title,
+  desc,
+}: {
+  icon: ReactNode;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div className="flex items-start gap-4 text-white">
+      <div className="text-brand-subtle flex h-11 w-11 items-center justify-center rounded-lg bg-white/10">
+        {icon}
+      </div>
+      <div>
+        <h4 className="flex items-center gap-2 font-bold text-white">
+          {title}
+        </h4>
+        <p className="text-brand-subtle mt-0.5 text-sm opacity-80">{desc}</p>
+      </div>
+    </div>
   );
 }
