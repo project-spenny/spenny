@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 type Provider = 'google' | 'kakao';
 type LoadingAction = 'google' | 'kakao' | 'guest' | null;
@@ -115,42 +116,22 @@ export default function LoginPage() {
 
           {/* 소셜 로그인 */}
           <div className="space-y-3">
-            <button
-              type="button"
+            <SocialButton
+              label="구글로 시작하기"
+              icon="/google_logo.svg"
               onClick={() => signInWithProvider('google')}
+              isLoading={loadingAction === 'google'}
               disabled={isLoading}
-              className="relative flex h-11 w-full cursor-pointer items-center justify-center rounded-xl border text-sm font-semibold text-black disabled:opacity-60"
-            >
-              <Image
-                src="/google_logo.svg"
-                alt="Google"
-                width={20}
-                height={20}
-                className="absolute left-5"
-              />
-              <span className="inline-flex items-center gap-2 whitespace-nowrap">
-                <span>{loadingAction === 'google' && <Spinner />}</span>
-                구글로 시작하기
-              </span>
-            </button>
-            <button
-              type="button"
+              className="border-slate-200 bg-white hover:bg-slate-100"
+            />
+            <SocialButton
+              label="카카오톡로 시작하기"
+              icon="/kakao_symbol.svg"
               onClick={() => signInWithProvider('kakao')}
+              isLoading={loadingAction === 'kakao'}
               disabled={isLoading}
-              className="relative flex h-11 w-full cursor-pointer items-center justify-center rounded-xl border text-sm font-semibold text-black disabled:opacity-60"
-            >
-              <Image
-                src="/kakao_symbol.svg"
-                alt="Kakao"
-                width={20}
-                height={20}
-                className="absolute left-5"
-              />
-              <span className="inline-flex items-center gap-2 whitespace-nowrap">
-                <span>{loadingAction === 'kakao' && <Spinner />}</span>
-                카카오로 시작하기
-              </span>
-            </button>
+              className="border-none bg-[#FEE500] hover:bg-[#F4DC00]"
+            />
           </div>
 
           {/* 구분선 */}
@@ -166,7 +147,7 @@ export default function LoginPage() {
             <button
               onClick={signInAsGuest}
               disabled={isLoading}
-              className="bg-brand-subtle text-brand-strong hover:bg-brand-soft/30 flex h-11 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold disabled:opacity-50"
+              className="bg-brand-subtle text-brand-strong hover:bg-brand-soft/30 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-sm font-semibold disabled:opacity-50"
             >
               {loadingAction === 'guest' ? <Spinner /> : '서비스 둘러보기'}
             </button>
@@ -178,5 +159,43 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 소셜 로그인 버튼
+function SocialButton({
+  label,
+  icon,
+  onClick,
+  isLoading,
+  disabled,
+  className,
+}: {
+  onClick: () => void;
+  isLoading: boolean;
+  disabled: boolean;
+  icon: string;
+  label: string;
+  className?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'relative flex h-11 w-full cursor-pointer items-center justify-center rounded-xl border text-sm font-semibold text-black disabled:opacity-50',
+        className
+      )}
+    >
+      <Image
+        src={icon}
+        alt={label}
+        width={20}
+        height={20}
+        className="absolute left-5"
+      />
+      {isLoading && <Spinner />}
+      <span className="ml-2">{label}</span>
+    </button>
   );
 }
