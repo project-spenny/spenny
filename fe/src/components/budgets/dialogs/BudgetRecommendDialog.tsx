@@ -10,7 +10,6 @@ import {
   calculateKeepPatternBudget,
   calculateSaveFlexible,
 } from '@/utils/calculateBudget';
-import { useEffect, useMemo, useState } from 'react';
 
 import { BUDGET_GROUPS } from '@/constants/analysis';
 import BudgetResultStep from '@/components/budgets/steps/BudgetResultStep';
@@ -20,6 +19,8 @@ import { Progress } from '@/components/ui/progress';
 import SavingGoalStep from '@/components/budgets/steps/SavingGoalStep';
 import { Spinner } from '@/components/ui/spinner';
 import TemplateSelectionStep from '@/components/budgets/steps/TemplateSelectionStep';
+import { useBudgetRecommendState } from '@/hooks/useBudgetRecommendState';
+import { useMemo } from 'react';
 
 type BudgetRecommendDialogProps = {
   open: boolean;
@@ -36,59 +37,20 @@ const BudgetRecommendDialog = ({
   onConfirm,
   isSubmitting = false,
 }: BudgetRecommendDialogProps) => {
-  const [step, setStep] = useState(1);
-  const [goalData, setGoalData] = useState({
-    income: 0,
-    savingsAmount: 0,
-  });
-  const [isAdjusted, setIsAdjusted] = useState(false);
-
-  const [selectedTemplateId, setSelectedTemplateId] =
-    useState<TemplateId>('keep-pattern'); // 선택된 템플릿
-  const [budgetDraft, setBudgetDraft] = useState<CalculatedBudgetItem[]>([]); // 계산된 예산 초안
-
   const processedData = guideData;
 
-  useEffect(() => {
-    // 초기값 설정
-    if (processedData && goalData.income === 0) {
-      const initialIncome = processedData.lastMonthIncome;
-      const initialSavings = Math.floor(initialIncome * 0.2); // 초기값 20%
+  const {
+    state,
+    setStep,
+    setGoalData,
+    setSelectedTemplateId,
+    setBudgetDraft,
+    setIsAdjusted,
+    clearSession,
+  } = useBudgetRecommendState(open, guideData.lastMonthIncome);
+  const { step, goalData, budgetDraft, selectedTemplateId, isAdjusted } = state;
 
-      setGoalData({
-        income: initialIncome,
-        savingsAmount: initialSavings,
-      });
-    }
-  }, [processedData, goalData.income]); // processedData가 로드되는 순간 실행됨
-
-  // 다이얼로그가 닫힐 때 상태 리셋
-  useEffect(() => {
-    if (!open) {
-      const timer = setTimeout(() => {
-        setStep(1);
-        setSelectedTemplateId('keep-pattern');
-        setBudgetDraft([]);
-        setIsAdjusted(false);
-
-        setGoalData({
-          income: 0,
-          savingsAmount: 0,
-        });
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [open]);
-
-  // Step 2에서 데이터가 바뀔 때 부모 상태 업데이트
-  const handleGoalDataChange = (newIncome: number, newSavings: number) => {
-    setGoalData({ income: newIncome, savingsAmount: newSavings });
-  };
-
-  // 템플릿 선택 핸들러
-  const handleTemplateSelect = (id: TemplateId) => {
-    setSelectedTemplateId(id);
-  };
+  const spendableBudget = goalData.income - goalData.savingsAmount; // 가용 예산
 
   // step 이동 버튼 핸들러
   const handleNextStep = () => {
@@ -137,6 +99,7 @@ const BudgetRecommendDialog = ({
 
       if (budgetDraft.length > 0) {
         onConfirm(budgetDraft, spendableBudget); // 부모 컴포넌트로 데이터 전달
+        clearSession(); // 세션 데이터 삭제
       }
     } else {
       setStep(step + 1);
@@ -173,14 +136,12 @@ const BudgetRecommendDialog = ({
   const activeMonths = monthlyData.length;
   const isFewData = activeMonths > 0 && activeMonths < 3;
 
-  // 가용 예산
-  const spendableBudget = goalData.income - goalData.savingsAmount;
-
   return (
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
         if (isSubmitting) return; // 저장 중 닫기 방지
+        if (!isOpen) clearSession();
         onOpenChange(isOpen);
       }}
     >
@@ -207,7 +168,9 @@ const BudgetRecommendDialog = ({
             <SavingGoalStep
               income={goalData.income}
               savingsAmount={goalData.savingsAmount}
-              onChange={handleGoalDataChange}
+              onChange={(income, savings) =>
+                setGoalData({ income, savingsAmount: savings })
+              }
             />
           )}
 
@@ -216,7 +179,9 @@ const BudgetRecommendDialog = ({
             <TemplateSelectionStep
               activeMonths={activeMonths}
               selectedId={selectedTemplateId}
-              onSelect={handleTemplateSelect}
+              onSelect={(id: TemplateId) => {
+                setSelectedTemplateId(id);
+              }}
             />
           )}
 
