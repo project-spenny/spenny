@@ -1,16 +1,14 @@
 'use client';
 
-import { BudgetGuideData, CalculatedBudgetItem } from '@/types/budgetGuide';
 import { BudgetWithCategory, TransactionAnalysis } from '@/types/analysis';
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import BudgetCategoryList from '@/components/budgets/common/BudgetCategoryList';
 import BudgetCategorySetting from '@/components/budgets/BudgetCategorySetting';
+import { BudgetGuideData } from '@/types/budgetGuide';
 import BudgetOverview from './BudgetOverview';
-import BudgetRecommendDialog from '@/components/budgets/dialogs/BudgetRecommendDialog';
 import BudgetSetupDialog from '@/components/budgets/dialogs/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
 import { Calculator } from 'lucide-react';
@@ -19,6 +17,7 @@ import ConfirmDialog from '@/components/budgets/dialogs/ConfirmDialog';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import UnbudgetedList from '@/components/budgets/common/UnbudgetedList';
 import useBudgetData from '@/hooks/useBudgetData';
+import { useRouter } from 'next/navigation';
 
 type BudgetViewProps = {
   selectedDate: Date;
@@ -45,19 +44,12 @@ const BudgetView = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTotalConfirmOpen, setIsTotalConfirmOpen] = useState(false);
   const [isCategoryConfirmOpen, setIsCategoryConfirmOpen] = useState(false);
-  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
   const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(
     null
   );
 
-  const {
-    totalBudget,
-    categoryBudgets,
-    removeBudget,
-    applyRecommendTemplate,
-    isDeleting,
-    isApplyingTemplate,
-  } = useBudgetData(selectedDate, initialBudgetData);
+  const { totalBudget, categoryBudgets, removeBudget, isDeleting } =
+    useBudgetData(selectedDate, initialBudgetData);
 
   const {
     totalAmount: totalExpense,
@@ -67,38 +59,12 @@ const BudgetView = ({
   const processedData = initialBudgetGuideData;
 
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // 다이얼로그 열기
   const openRecommend = () => {
-    setIsRecommendOpen(true); // 즉시 열기
-    // URL 업데이트
     const params = new URLSearchParams(window.location.search);
-    params.set('mode', 'recommend');
-    router.replace(`?${params.toString()}`, { scroll: false });
+    router.push(`/budget/recommend?${params.toString()}`);
   };
-
-  // 다이얼로그 닫기
-  const closeRecommend = () => {
-    setIsRecommendOpen(false); // 즉시 닫기
-    // URL에서 제거
-    const params = new URLSearchParams(window.location.search);
-    params.delete('mode');
-    router.replace(`?${params.toString()}`, { scroll: false });
-  };
-
-  useEffect(() => {
-    // URL 파라미터를 확인하여 창 띄움
-    const isModeRecommend = searchParams.get('mode') === 'recommend';
-
-    if (isModeRecommend) {
-      if (!totalBudget) {
-        setIsRecommendOpen(true);
-      } else {
-        closeRecommend(); // 이미 예산이 있는데 URL만 남아있는 경우
-      }
-    }
-  }, [totalBudget, searchParams]);
 
   // 과거 데이터 유무 판단 (이번 달 제외 3개월)
   const hasPastData = useMemo(() => {
@@ -127,21 +93,6 @@ const BudgetView = ({
   const openCategorySetting = (key: string) => {
     setActiveCategoryKey(key);
     setIsCategoryPanelOpen(true);
-  };
-
-  // 추천 예산 적용 핸들러
-  const handleRecommendConfirm = (
-    budgetDraft: CalculatedBudgetItem[],
-    totalAmount: number
-  ) => {
-    const categoryData = budgetDraft.map((item) => ({
-      categoryId: item.categoryId,
-      amount: item.amount,
-    }));
-
-    applyRecommendTemplate(totalAmount, categoryData, {
-      onSuccess: () => closeRecommend(),
-    });
   };
 
   return (
@@ -230,17 +181,6 @@ const BudgetView = ({
         onOpenChange={setIsDialogOpen}
         selectedDate={selectedDate}
         defaultAmount={totalBudget?.amount} // 기존 금액 전달
-      />
-
-      {/* 예산 추천 */}
-      <BudgetRecommendDialog
-        open={isRecommendOpen}
-        onOpenChange={(open) => {
-          if (!open) closeRecommend(); // 닫힐 때 URL 파라미터 제거
-        }}
-        guideData={initialBudgetGuideData}
-        onConfirm={handleRecommendConfirm}
-        isSubmitting={isApplyingTemplate}
       />
 
       {/* 총 예산 초기화 모달창 */}

@@ -1,7 +1,7 @@
 import { CalculatedBudgetItem, TemplateId } from '@/types/budgetGuide';
 import { useEffect, useState } from 'react';
 
-const BUDGET_STORAGE_KEY = 'budget_recommend_state';
+export const BUDGET_STORAGE_KEY = 'budget_recommend_state';
 
 // 예산 추천 상태
 type BudgetRecommendState = {
