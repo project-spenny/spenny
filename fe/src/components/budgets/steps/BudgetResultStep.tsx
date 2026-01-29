@@ -1,7 +1,7 @@
 import { CheckCircle2, Info, Lightbulb } from 'lucide-react';
 
-import { BUDGET_GROUPS } from '@/constants/analysis';
-import { BUDGET_TEMPLATES } from '@/constants/budgetTemplates';
+import { BUDGET_GROUPS } from '@/constants/budget';
+import { BUDGET_TEMPLATES } from '@/constants/budget';
 import { Badge } from '@/components/ui/badge';
 import BudgetResultSection from '@/components/budgets/steps/BudgetResultSection';
 import { CalculatedBudgetItem } from '@/types/budgetGuide';

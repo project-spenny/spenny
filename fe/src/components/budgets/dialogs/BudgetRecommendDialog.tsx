@@ -11,7 +11,7 @@ import {
   calculateSaveFlexible,
 } from '@/utils/calculateBudget';
 
-import { BUDGET_GROUPS } from '@/constants/analysis';
+import { BUDGET_GROUPS } from '@/constants/budget';
 import BudgetResultStep from '@/components/budgets/steps/BudgetResultStep';
 import { Button } from '@/components/ui/button';
 import ExpenseAnalysisStep from '@/components/budgets/steps/ExpenseAnalysisStep';
