@@ -78,15 +78,21 @@ export const useBudgetRecommendState = (
   useEffect(() => {
     if (!open) {
       const timer = setTimeout(() => {
+        const saved = sessionStorage.getItem(BUDGET_STORAGE_KEY);
+        if (saved) return;
+
         setStep(1);
         setSelectedTemplateId('keep-pattern');
         setBudgetDraft([]);
         setIsAdjusted(false);
-        setGoalData({ income: 0, savingsAmount: 0 });
-      }, 300); // 애니메이션 시간 고려
+        setGoalData({
+          income: initialIncome,
+          savingsAmount: Math.floor(initialIncome * 0.2),
+        });
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [open]);
+  }, [open, initialIncome]);
 
   // 완료 혹은 취소 시 스토리지 비우기
   const clearSession = () => sessionStorage.removeItem(BUDGET_STORAGE_KEY);
