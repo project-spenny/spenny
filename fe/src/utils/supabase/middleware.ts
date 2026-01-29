@@ -55,19 +55,20 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const claims = data?.claims;
+  const userId = claims?.sub;
 
   const isAuthPath = pathname.startsWith('/auth');
   const isLoginPath = pathname.startsWith('/login');
   const isOnboardingPath = pathname.startsWith('/onboarding');
   const isOnboardingIntroPath = pathname.startsWith('/onboarding/intro');
 
-  // 온보딩 완료 여부 판단 쿠키
+  // 쿠키를 통해 온보딩 완료 여부 판단
   const onboardedCookie = request.cookies.get('onboarded')?.value;
-  const isOnboarded = onboardedCookie === '1';
+  let isOnboarded = onboardedCookie === '1';
 
   // 비로그인 : login/auth만 허용
-  if (!user) {
+  if (!userId) {
     if (!isLoginPath && !isAuthPath) {
       // no user, potentially respond by redirecting the user to the login page
       const url = request.nextUrl.clone();
@@ -75,6 +76,28 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
     return supabaseResponse;
+  }
+
+  // 쿠키가 없으면 DB로 profiles 존재 확인
+  if (!isOnboarded) {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!error && profile) {
+      isOnboarded = true;
+
+      // 쿠키 재발급
+      supabaseResponse.cookies.set('onboarded', '1', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 365, // 1년
+      });
+    }
   }
 
   // 로그인 상태에서 /login 접근 차단

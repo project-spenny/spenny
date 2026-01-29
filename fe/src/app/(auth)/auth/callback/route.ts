@@ -58,12 +58,18 @@ export async function GET(request: Request) {
   }
 
   const response = NextResponse.redirect(redirectUrl);
-  response.cookies.set('onboarded', onboarded ? '1' : '0', {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: !isLocalEnv,
-  });
+  if (onboarded) {
+    response.cookies.set('onboarded', '1', {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: !isLocalEnv,
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  } else {
+    // 미완료 시 쿠키 삭제
+    response.cookies.delete('onboarded');
+  }
 
   return response;
 }
