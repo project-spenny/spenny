@@ -3,9 +3,11 @@
 import {
   useForm,
   useWatch,
+  Controller,
   type FieldNamesMarkedBoolean,
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { formatBirthDateInput, padBirthDateOnBlur } from '@/utils/birthDate';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
@@ -71,10 +73,30 @@ export default function ProfileForm({
 
       <div className="space-y-2">
         <Label htmlFor="birth">생년월일</Label>
-        <Input
-          id="birth"
-          placeholder="YYYY-MM-DD"
-          {...register('birth_date')}
+        <Controller
+          name="birth_date"
+          control={control}
+          render={({ field }) => (
+            <Input
+              id="birth"
+              placeholder="YYYY-MM-DD"
+              inputMode="numeric"
+              autoComplete="bday"
+              value={field.value ?? ''}
+              onChange={(e) => {
+                const formatted = formatBirthDateInput(e.target.value);
+                field.onChange(formatted);
+              }}
+              onBlur={(e) => {
+                const padded = padBirthDateOnBlur(e.target.value);
+                setValue('birth_date', padded, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                field.onBlur();
+              }}
+            />
+          )}
         />
         {errors.birth_date?.message ? (
           <p className="text-sm text-red-500">{errors.birth_date.message}</p>
