@@ -13,6 +13,9 @@ import { DailyRecResult, DailyRecChartData } from '@/types/dailyRec';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { TransactionList } from '@/components/transaction/TransactionList';
 import TransactionClient from '@/app/(app)/history/TransactionClient';
+import { TransactionFilters } from '@/app/(app)/history/actions';
+
+type ListFilters = Omit<TransactionFilters, 'startDate' | 'endDate'>;
 
 type TabValue = 'calendar' | 'list';
 
@@ -37,6 +40,7 @@ export function CalendarClient({
   dailyChartData,
 }: CalendarClientProps) {
   const [month, setMonth] = useState(currentMonth);
+  const [filters, setFilters] = useState<ListFilters>({});
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabValue>(
     () => (searchParams.get('view') as TabValue) || 'list'
@@ -83,7 +87,7 @@ export function CalendarClient({
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteTransactions({ month });
+  } = useInfiniteTransactions({ month, filters });
 
   return (
     <CalendarProvider>
@@ -129,6 +133,8 @@ export function CalendarClient({
                 fetchNextPage={fetchNextPage}
                 month={month}
                 onMonthChange={setMonth}
+                filters={filters}
+                onFiltersChange={setFilters}
               >
                 <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
               </TransactionList>

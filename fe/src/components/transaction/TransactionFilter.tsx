@@ -178,40 +178,6 @@ export function TransactionFilter({
             </SelectContent>
           </Select>
         </div>
-        <div>
-          <Select
-            value={filters?.type || 'all'}
-            onValueChange={(value) =>
-              updateFilter('type', value as 'income' | 'expense' | undefined)
-            }
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="유형" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="income">수입</SelectItem>
-              <SelectItem value="expense">지출</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Select
-            value={filters?.type || 'all'}
-            onValueChange={(value) =>
-              updateFilter('type', value as 'income' | 'expense' | undefined)
-            }
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="유형" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="income">수입</SelectItem>
-              <SelectItem value="expense">지출</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
     </div>
   );
