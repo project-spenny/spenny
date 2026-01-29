@@ -35,6 +35,12 @@ type ProfileFormProps = {
   children?: (state: ProfileFormState) => React.ReactNode;
 };
 
+// 에러 메시지 컴포넌트
+function FormError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="text-sm text-red-500">{message}</p>;
+}
+
 export default function ProfileForm({
   defaultValues,
   onSubmit,
@@ -66,9 +72,7 @@ export default function ProfileForm({
           placeholder="닉네임을 입력해주세요."
           {...register('nickname')}
         />
-        {errors.nickname?.message ? (
-          <p className="text-sm text-red-500">{errors.nickname.message}</p>
-        ) : null}
+        <FormError message={errors.nickname?.message} />
       </div>
 
       <div className="space-y-2">
@@ -98,9 +102,7 @@ export default function ProfileForm({
             />
           )}
         />
-        {errors.birth_date?.message ? (
-          <p className="text-sm text-red-500">{errors.birth_date.message}</p>
-        ) : null}
+        <FormError message={errors.birth_date?.message} />
       </div>
 
       <div className="space-y-2">
@@ -127,9 +129,7 @@ export default function ProfileForm({
             </div>
           </RadioGroup>
         </div>
-        {errors.gender?.message ? (
-          <p className="text-sm text-red-500">{errors.gender.message}</p>
-        ) : null}
+        <FormError message={errors.gender?.message} />
       </div>
 
       {children ? (
