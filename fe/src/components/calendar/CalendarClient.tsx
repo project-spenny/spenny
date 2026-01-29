@@ -18,9 +18,9 @@ type TabValue = 'calendar' | 'list';
 
 // 현재 URL에서 탭 값을 읽어오기
 const getTabFromUrl = (): TabValue => {
-  if (typeof window === 'undefined') return 'calendar';
+  if (typeof window === 'undefined') return 'list';
   const params = new URLSearchParams(window.location.search);
-  return (params.get('view') as TabValue) || 'calendar';
+  return (params.get('view') as TabValue) || 'list';
 };
 
 interface CalendarClientProps {
@@ -39,7 +39,7 @@ export function CalendarClient({
   const [month, setMonth] = useState(currentMonth);
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabValue>(
-    () => (searchParams.get('view') as TabValue) || 'calendar'
+    () => (searchParams.get('view') as TabValue) || 'list'
   );
 
   // 동기화
