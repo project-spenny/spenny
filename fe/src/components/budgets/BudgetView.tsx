@@ -2,7 +2,8 @@
 
 import { BudgetGuideData, CalculatedBudgetItem } from '@/types/budgetGuide';
 import { BudgetWithCategory, TransactionAnalysis } from '@/types/analysis';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
 import AnalysisSection from '@/components/analysis/common/AnalysisSection';
@@ -65,6 +66,40 @@ const BudgetView = ({
   } = initialAnalysisData;
   const processedData = initialBudgetGuideData;
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // 다이얼로그 열기
+  const openRecommend = () => {
+    setIsRecommendOpen(true); // 즉시 열기
+    // URL 업데이트
+    const params = new URLSearchParams(window.location.search);
+    params.set('mode', 'recommend');
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
+  // 다이얼로그 닫기
+  const closeRecommend = () => {
+    setIsRecommendOpen(false); // 즉시 닫기
+    // URL에서 제거
+    const params = new URLSearchParams(window.location.search);
+    params.delete('mode');
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    // URL 파라미터를 확인하여 창 띄움
+    const isModeRecommend = searchParams.get('mode') === 'recommend';
+
+    if (isModeRecommend) {
+      if (!totalBudget) {
+        setIsRecommendOpen(true);
+      } else {
+        closeRecommend(); // 이미 예산이 있는데 URL만 남아있는 경우
+      }
+    }
+  }, [totalBudget, searchParams]);
+
   // 과거 데이터 유무 판단 (이번 달 제외 3개월)
   const hasPastData = useMemo(() => {
     return processedData && processedData.monthlyData.length > 0;
@@ -105,7 +140,7 @@ const BudgetView = ({
     }));
 
     applyRecommendTemplate(totalAmount, categoryData, {
-      onSuccess: () => setIsRecommendOpen(false),
+      onSuccess: () => closeRecommend(),
     });
   };
 
@@ -123,7 +158,7 @@ const BudgetView = ({
               <Button
                 variant="outline"
                 className="cursor-pointer"
-                onClick={() => setIsRecommendOpen(true)}
+                onClick={openRecommend}
               >
                 추천 템플릿으로 시작
               </Button>
@@ -200,7 +235,9 @@ const BudgetView = ({
       {/* 예산 추천 */}
       <BudgetRecommendDialog
         open={isRecommendOpen}
-        onOpenChange={setIsRecommendOpen}
+        onOpenChange={(open) => {
+          if (!open) closeRecommend(); // 닫힐 때 URL 파라미터 제거
+        }}
         guideData={initialBudgetGuideData}
         onConfirm={handleRecommendConfirm}
         isSubmitting={isApplyingTemplate}
