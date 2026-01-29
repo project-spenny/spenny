@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { TransactionItem } from './TransactionItem';
 import { ITransaction } from '@/types/transactions';
 import { TransactionFilter } from './TransactionFilter';
@@ -21,6 +21,7 @@ interface TransactionListProps {
   onMonthChange?: (month: string) => void;
   filters?: ListFilters;
   onFiltersChange?: (filters: ListFilters) => void;
+  children?: React.ReactNode;
 }
 
 // 날짜별로 그룹화
@@ -60,6 +61,7 @@ export const TransactionList = ({
   onMonthChange,
   filters,
   onFiltersChange,
+  children,
 }: TransactionListProps) => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -125,12 +127,16 @@ export const TransactionList = ({
   const renderFilter = () => {
     if (!month || !onMonthChange) return null;
     return (
-      <TransactionFilter
-        month={month}
-        onMonthChange={onMonthChange}
-        filters={filters}
-        onFiltersChange={onFiltersChange}
-      />
+      <>
+        <TransactionFilter
+          month={month}
+          onMonthChange={onMonthChange}
+          filters={filters}
+          onFiltersChange={onFiltersChange}
+        >
+          {children}
+        </TransactionFilter>
+      </>
     );
   };
 

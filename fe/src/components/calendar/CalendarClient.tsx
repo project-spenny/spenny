@@ -121,9 +121,6 @@ export function CalendarClient({
             </TabsContent>
 
             <TabsContent value="list">
-              <div>
-                <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
-              </div>
               <TransactionList
                 transactions={listTransactions}
                 isLoading={infiniteLoading}
@@ -132,7 +129,9 @@ export function CalendarClient({
                 fetchNextPage={fetchNextPage}
                 month={month}
                 onMonthChange={setMonth}
-              />
+              >
+                <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
+              </TransactionList>
               <TransactionClient />
             </TabsContent>
           </Tabs>

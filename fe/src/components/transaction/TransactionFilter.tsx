@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -21,6 +21,7 @@ interface TransactionFilterProps {
   onFiltersChange?: (
     filters: Omit<TransactionFilters, 'start_date' | 'end_date'>
   ) => void;
+  children?: React.ReactNode;
 }
 
 export function TransactionFilter({
@@ -28,6 +29,7 @@ export function TransactionFilter({
   onMonthChange,
   filters,
   onFiltersChange,
+  children,
 }: TransactionFilterProps) {
   // month를 Date로 변환
   const selectedMonth = new Date(`${month}-01`);
@@ -95,11 +97,8 @@ export function TransactionFilter({
 
   return (
     <div className="flex-col">
-      <div className="m-4 ml-0 text-2xl font-semibold">
-        {yearDisplay(selectedMonth)}
-      </div>
       <div className="flex gap-2">
-        <div className="flex items-center gap-1 rounded-md border px-2">
+        <div className="flex items-center gap-1 border border-none px-2">
           <Button
             type="button"
             variant="ghost"
@@ -110,7 +109,10 @@ export function TransactionFilter({
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <span className="min-w-24 text-center text-sm font-medium">
+          <span className="lg min-w-24 text-center text-xl font-semibold">
+            <p className="text-muted-foreground text-xs font-light">
+              {yearDisplay(selectedMonth)}
+            </p>
             {monthDisplay(selectedMonth)}
           </span>
 
@@ -124,21 +126,6 @@ export function TransactionFilter({
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <Select
-          value={filters?.type || 'all'}
-          onValueChange={(value) =>
-            updateFilter('type', value as 'income' | 'expense' | undefined)
-          }
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="유형" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">전체</SelectItem>
-            <SelectItem value="income">수입</SelectItem>
-            <SelectItem value="expense">지출</SelectItem>
-          </SelectContent>
-        </Select>
 
         <div className="relative max-w-lg flex-1">
           <Input
@@ -170,6 +157,60 @@ export function TransactionFilter({
               <Search className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+      </div>
+      <div className="mt-4">{children}</div>
+      <div className="mt-4 flex gap-2">
+        <div>
+          <Select
+            value={filters?.type || 'all'}
+            onValueChange={(value) =>
+              updateFilter('type', value as 'income' | 'expense' | undefined)
+            }
+          >
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="유형" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체</SelectItem>
+              <SelectItem value="income">수입</SelectItem>
+              <SelectItem value="expense">지출</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Select
+            value={filters?.type || 'all'}
+            onValueChange={(value) =>
+              updateFilter('type', value as 'income' | 'expense' | undefined)
+            }
+          >
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="유형" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체</SelectItem>
+              <SelectItem value="income">수입</SelectItem>
+              <SelectItem value="expense">지출</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Select
+            value={filters?.type || 'all'}
+            onValueChange={(value) =>
+              updateFilter('type', value as 'income' | 'expense' | undefined)
+            }
+          >
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="유형" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체</SelectItem>
+              <SelectItem value="income">수입</SelectItem>
+              <SelectItem value="expense">지출</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>
