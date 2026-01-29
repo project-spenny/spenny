@@ -1,25 +1,23 @@
 'use client';
 
+import { usePathname, useRouter } from 'next/navigation';
+
 import MonthPicker from '@/components/common/MonthPicker';
-import { useRouter } from 'next/navigation';
 
 type MonthNavigatorProps = {
   year: number;
   month: number;
   baseUrl: string;
-  disabled?: boolean;
 };
 
-const MonthNavigator = ({
-  year,
-  month,
-  baseUrl,
-  disabled = false,
-}: MonthNavigatorProps) => {
+const MonthNavigator = ({ year, month, baseUrl }: MonthNavigatorProps) => {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isRecommendMode = pathname?.endsWith('/recommend');
 
   const handleDateChange = (newYear: number, newMonth: number) => {
-    if (disabled) return;
+    if (isRecommendMode) return;
 
     const queryString = `?year=${newYear}&month=${newMonth}`;
 
@@ -32,11 +30,11 @@ const MonthNavigator = ({
         year={year}
         month={month}
         onDateChange={handleDateChange}
-        disabled={disabled}
+        disabled={isRecommendMode}
       />
 
-      {disabled && (
-        <span className="text-destructive text-sm">
+      {isRecommendMode && (
+        <span className="text-destructive animate-in fade-in slide-in-from-bottom-1 text-sm duration-200">
           예산 추천 중에는 월 변경이 제한됩니다.
         </span>
       )}

@@ -38,16 +38,9 @@ const BudgetPage = async ({ searchParams }: BudgetPageProps) => {
     params.month
   );
 
-  const isRecommendMode = params.mode === 'recommend';
-
   return (
     <div className="flex min-h-screen w-full flex-col py-4">
-      <MonthNavigator
-        year={year}
-        month={month}
-        baseUrl="/budget"
-        disabled={isRecommendMode}
-      />
+      <MonthNavigator year={year} month={month} baseUrl="/budget" />
 
       <div className="mx-auto w-full max-w-4xl px-6 md:px-12">
         <Suspense
