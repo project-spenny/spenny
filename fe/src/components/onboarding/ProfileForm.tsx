@@ -2,7 +2,6 @@
 
 import {
   useForm,
-  useWatch,
   Controller,
   type FieldNamesMarkedBoolean,
 } from 'react-hook-form';
@@ -58,8 +57,6 @@ export default function ProfileForm({
     defaultValues,
   });
 
-  const gender = useWatch({ control, name: 'gender' });
-
   return (
     <form
       className="space-y-6"
@@ -108,26 +105,27 @@ export default function ProfileForm({
       <div className="space-y-2">
         <div className="flex items-center gap-6">
           <Label>성별</Label>
-          <RadioGroup
-            value={gender}
-            onValueChange={(v) =>
-              setValue('gender', v as 'male' | 'female', {
-                shouldValidate: true,
-                shouldDirty: true,
-              })
-            }
-            className="flex gap-6"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="male" id="male" />
-              <Label htmlFor="male">남</Label>
-            </div>
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <RadioGroup
+                value={field.value ?? ''}
+                onValueChange={field.onChange}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="male" id="maleId" />
+                  <Label htmlFor="maleId">남</Label>
+                </div>
 
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="female" id="female" />
-              <Label htmlFor="female">여</Label>
-            </div>
-          </RadioGroup>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="female" id="femaleId" />
+                  <Label htmlFor="femaleId">여</Label>
+                </div>
+              </RadioGroup>
+            )}
+          />
         </div>
         <FormError message={errors.gender?.message} />
       </div>
