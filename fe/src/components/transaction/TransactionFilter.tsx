@@ -69,7 +69,7 @@ export function TransactionFilter({
   };
 
   const [searchValue, setSearchValue] = useState(filters?.searchQuery || '');
-
+  const [onSearch, setOnSearch] = useState<boolean>(false);
   const handleSearch = () => {
     updateFilter('searchQuery', searchValue);
   };
@@ -97,7 +97,7 @@ export function TransactionFilter({
 
   return (
     <div className="flex-col">
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <div className="flex items-center gap-1 border border-none px-2">
           <Button
             type="button"
@@ -109,7 +109,7 @@ export function TransactionFilter({
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <span className="lg min-w-24 text-center text-xl font-semibold">
+          <span className="min-w-12 text-center text-base font-semibold sm:min-w-8 sm:text-xl">
             <p className="text-muted-foreground text-xs font-light">
               {yearDisplay(selectedMonth)}
             </p>
@@ -125,37 +125,58 @@ export function TransactionFilter({
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
-
-        <div className="relative max-w-lg flex-1">
-          <Input
-            placeholder="검색..."
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full"
-          />
-          <div className="absolute top-1/2 right-1 flex -translate-y-1/2 gap-1">
-            {searchValue && (
+          <div className="ml-auto flex">
+            <div
+              className={`relative sm:ml-auto sm:block ${onSearch ? 'block' : 'hidden'}`}
+            >
+              <div>
+                <Input
+                  placeholder="검색어를 입력해주세요"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="mr-auto w-60 rounded-full text-xs"
+                />
+                <div className="absolute top-2/5 right-0 flex -translate-y-1/2 gap-1">
+                  {searchValue && (
+                    <div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleClearSearch}
+                        className="mr-auto"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            {onSearch ? (
+              <div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="right-auto h-8 w-8 sm:hidden"
+                  onClick={() => setOnSearch(!onSearch)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
-                onClick={handleClearSearch}
+                className="right-auto h-8 w-8 sm:hidden"
+                onClick={() => setOnSearch(!onSearch)}
               >
-                <X className="h-4 w-4" />
+                <Search className="h-4 w-4" />
               </Button>
             )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={handleSearch}
-            >
-              <Search className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
