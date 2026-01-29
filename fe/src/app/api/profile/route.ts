@@ -119,6 +119,7 @@ export async function PUT(req: Request) {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV !== 'development',
+    maxAge: 60 * 60 * 24 * 365, // 1년
   });
 
   return res;
