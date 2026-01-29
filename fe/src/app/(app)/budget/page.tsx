@@ -6,7 +6,7 @@ import { getBudgetBundle } from '@/services/analysis/budgetService.server';
 import { validateDateParams } from '../analysis/page';
 
 type BudgetPageProps = {
-  searchParams: Promise<{ year?: string; month?: string }>;
+  searchParams: Promise<{ year?: string; month?: string; mode?: string }>;
 };
 
 // 예산 데이터 패칭 섹션
@@ -38,9 +38,16 @@ const BudgetPage = async ({ searchParams }: BudgetPageProps) => {
     params.month
   );
 
+  const isRecommendMode = params.mode === 'recommend';
+
   return (
     <div className="flex min-h-screen w-full flex-col py-4">
-      <MonthNavigator year={year} month={month} baseUrl="/budget" />
+      <MonthNavigator
+        year={year}
+        month={month}
+        baseUrl="/budget"
+        disabled={isRecommendMode}
+      />
 
       <div className="mx-auto w-full max-w-4xl px-6 md:px-12">
         <Suspense
