@@ -78,7 +78,7 @@ export default function LoginPage() {
   return (
     <div className="bg-brand flex h-screen w-full flex-col overflow-hidden lg:flex-row">
       {/* 브랜드 섹션 */}
-      <div className="px-6 py-10 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-16">
+      <div className="flex flex-col items-center px-6 py-10 lg:flex-1 lg:items-start lg:justify-center lg:p-16">
         <h1 className="text-3xl leading-tight font-extrabold tracking-tighter text-white lg:text-6xl">
           어제보다 더 나은
           <br className="hidden lg:block" />
@@ -87,7 +87,7 @@ export default function LoginPage() {
           </span>
         </h1>
 
-        <div className="text-brand-subtle mt-2 text-sm lg:mt-5 lg:mt-8 lg:text-xl">
+        <div className="text-brand-subtle mt-2 flex flex-col items-center text-sm lg:mt-8 lg:items-start lg:text-xl">
           <span className="mb-2 flex items-center">
             <Image
               src="/logo_text.svg"
