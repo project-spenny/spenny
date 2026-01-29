@@ -5,7 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/utils/supabase/client';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Sparkles, PieChart, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -74,6 +74,17 @@ export default function LoginPage() {
       setLoadingAction(null);
     }
   };
+
+  // 페이지 복원 시 로딩 상태 초기화
+  useEffect(() => {
+    const reset = () => setLoadingAction(null);
+    window.addEventListener('pageshow', reset);
+    window.addEventListener('popstate', reset);
+    return () => {
+      window.removeEventListener('pageshow', reset);
+      window.removeEventListener('popstate', reset);
+    };
+  }, []);
 
   return (
     <div className="bg-brand flex h-screen w-full flex-col overflow-hidden lg:flex-row">
@@ -179,7 +190,8 @@ export default function LoginPage() {
               disabled={isLoading}
               className="bg-brand-subtle text-brand-strong hover:bg-brand-soft/30 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-sm font-semibold disabled:opacity-50"
             >
-              {loadingAction === 'guest' ? <Spinner /> : '서비스 둘러보기'}
+              {loadingAction === 'guest' && <Spinner />}
+              <span className="ml-2">서비스 둘러보기</span>
             </button>
             <p className="text-center text-xs leading-relaxed text-gray-400">
               체험 계정은 읽기 전용 모드입니다.
