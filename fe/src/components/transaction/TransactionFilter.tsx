@@ -18,7 +18,9 @@ interface TransactionFilterProps {
   month: string; // 'YYYY-MM' 형식
   onMonthChange: (month: string) => void;
   filters?: Omit<TransactionFilters, 'start_date' | 'end_date'>;
-  onFiltersChange?: (filters: Omit<TransactionFilters, 'start_date' | 'end_date'>) => void;
+  onFiltersChange?: (
+    filters: Omit<TransactionFilters, 'start_date' | 'end_date'>
+  ) => void;
 }
 
 export function TransactionFilter({
@@ -50,7 +52,10 @@ export function TransactionFilter({
     onMonthChange(newMonth);
   };
 
-  const updateFilter = (key: keyof Omit<TransactionFilters, 'start_date' | 'end_date'>, value: string | undefined) => {
+  const updateFilter = (
+    key: keyof Omit<TransactionFilters, 'start_date' | 'end_date'>,
+    value: string | undefined
+  ) => {
     if (!onFiltersChange) return;
     const newFilters = { ...filters };
     if (value && value !== 'all') {
@@ -121,7 +126,9 @@ export function TransactionFilter({
         </div>
         <Select
           value={filters?.type || 'all'}
-          onValueChange={(value) => updateFilter('type', value as 'income' | 'expense' | undefined)}
+          onValueChange={(value) =>
+            updateFilter('type', value as 'income' | 'expense' | undefined)
+          }
         >
           <SelectTrigger className="w-32">
             <SelectValue placeholder="유형" />

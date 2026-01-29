@@ -5,10 +5,11 @@ import {
   getTransactionsPaginated,
   TransactionFilters,
 } from '@/app/(app)/history/actions';
+import { getMonthRange } from '@/utils/date';
 
 interface UseInfiniteTransactionsProps {
   month: string;
-  filters?: Omit<TransactionFilters, 'start_date' | 'end_date'>;
+  filters?: Omit<TransactionFilters, 'startDate' | 'endDate'>;
   pageSize?: number;
 }
 
@@ -18,19 +19,8 @@ export function useInfiniteTransactions({
   pageSize = 10,
 }: UseInfiniteTransactionsProps) {
   // 월 범위 계산
-  const getMonthRange = (monthStr: string) => {
-    const date = new Date(`${monthStr}-01`);
-    const year = date.getFullYear();
-    const monthNum = String(date.getMonth() + 1).padStart(2, '0');
-    const lastDay = new Date(year, date.getMonth() + 1, 0).getDate();
 
-    return {
-      start_date: `${year}-${monthNum}-01`,
-      end_date: `${year}-${monthNum}-${String(lastDay).padStart(2, '0')}`,
-    };
-  };
-
-  const { start_date, end_date } = getMonthRange(month);
+  const { startDate, endDate } = getMonthRange(new Date(`${month}-1`));
 
   const infiniteQuery = useInfiniteQuery({
     queryKey: ['transactions-infinite', month, filters],
@@ -38,8 +28,8 @@ export function useInfiniteTransactions({
       getTransactionsPaginated(
         {
           ...filters,
-          start_date,
-          end_date,
+          startDate,
+          endDate,
         },
         pageParam,
         pageSize

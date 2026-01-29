@@ -8,8 +8,8 @@ import { getMonthRange } from '@/utils/date';
 export interface TransactionFilters {
   type?: 'income' | 'expense';
   category_id?: string;
-  start_date?: string;
-  end_date?: string;
+  startDate?: string;
+  endDate?: string;
   searchQuery?: string;
 }
 
@@ -19,8 +19,8 @@ export const getTransaction = async (
 ) => {
   const { supabase, user } = await requireUserServer();
 
-  let startDate = filters?.start_date;
-  let endDate = filters?.end_date;
+  let startDate = filters?.startDate;
+  let endDate = filters?.endDate;
 
   if ((!startDate || !endDate) && defaultMonth) {
     const now = new Date();
@@ -108,8 +108,8 @@ export const getTransactionsPaginated = async (
 ): Promise<PaginatedTransactionsResult> => {
   const { supabase, user } = await requireUserServer();
 
-  let startDate = filters?.start_date;
-  let endDate = filters?.end_date;
+  let startDate = filters?.startDate;
+  let endDate = filters?.endDate;
 
   if (!startDate || !endDate) {
     const now = new Date();
