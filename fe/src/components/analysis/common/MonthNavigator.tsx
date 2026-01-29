@@ -7,14 +7,14 @@ type MonthNavigatorProps = {
   year: number;
   month: number;
   baseUrl: string;
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 const MonthNavigator = ({
   year,
   month,
   baseUrl,
-  disabled,
+  disabled = false,
 }: MonthNavigatorProps) => {
   const router = useRouter();
 
