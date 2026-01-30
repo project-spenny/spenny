@@ -51,10 +51,14 @@ const BudgetRecommendDialog = ({
   const { step, goalData, budgetDraft, selectedTemplateId, isAdjusted } = state;
 
   const spendableBudget = goalData.income - goalData.savingsAmount; // 가용 예산
+  const isIncomeEmpty = step === 2 && goalData.income <= 0;
 
   // step 이동 버튼 핸들러
   const handleNextStep = () => {
     if (step === 2) {
+      // 수입이 0원인 경우 진행 막기
+      if (isIncomeEmpty) return;
+
       setStep(step + 1);
     } else if (step === 3 && processedData) {
       let result: CalculatedBudgetItem[] = [];
@@ -212,7 +216,7 @@ const BudgetRecommendDialog = ({
               <Button
                 className="h-12 flex-2 cursor-pointer text-base font-bold"
                 onClick={handleNextStep}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isIncomeEmpty}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

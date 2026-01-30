@@ -67,10 +67,17 @@ const SavingGoalStep = ({
 
       {/* 수입 입력 섹션 */}
       <div className="flex items-center justify-between rounded-xl">
-        <div className="flex items-center">
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-4">
           <Label htmlFor="income" className="text-base font-bold">
             이번 달 예상 수입
           </Label>
+
+          {income === 0 && (
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs font-medium">
+              <AlertTriangle className="h-3 w-3" />
+              수입을 먼저 입력해 주세요.
+            </p>
+          )}
         </div>
 
         <div className="border-primary/20 focus-within:border-brand flex w-fit items-center gap-1 border-b-2">
@@ -128,7 +135,7 @@ const SavingGoalStep = ({
 
           {/* 최대치 도달 시 문구 표시 */}
           {savingsRate >= 70 && (
-            <p className="animate-in fade-in slide-in-from-top-1 flex items-center gap-1 pt-4 text-xs text-orange-400">
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 pt-4 text-xs">
               <AlertTriangle className="h-3 w-3" />
               저축 목표는 최대 70%까지 설정할 수 있어요.
             </p>
