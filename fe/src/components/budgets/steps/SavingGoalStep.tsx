@@ -1,6 +1,6 @@
-import { AlertTriangle } from 'lucide-react';
 import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { Label } from '@/components/ui/label';
+import { MAX_BUDGET_AMOUNT } from '@/constants/budget';
 import { Slider } from '@/components/ui/slider';
 
 type SavingGoalStepProps = {
@@ -26,11 +26,26 @@ const SavingGoalStep = ({
     onChange(income, newAmount);
   };
 
+  // 수입 입력 시
+  const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+
+    if (value > MAX_BUDGET_AMOUNT) return;
+
+    const newIncome = value;
+    // 현재 설정된 저축률(savingsRate)에 맞춰 저축 금액 업데이트
+    const newAmount = Math.floor((newIncome * savingsRate) / 100);
+
+    onChange(newIncome, newAmount);
+  };
+
   // 금액 입력 시
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value.replace(/[^0-9]/g, ''));
-    let newAmount = value;
 
+    if (value > MAX_BUDGET_AMOUNT) return; // 10억 초과 입력 방지
+
+    let newAmount = value;
     // 70% 제한 로직
     if (income > 0) {
       const calculatedRate = Math.round((value / income) * 100);
@@ -40,15 +55,6 @@ const SavingGoalStep = ({
     }
 
     onChange(income, newAmount);
-  };
-
-  // 수입 입력 시
-  const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newIncome = Number(e.target.value);
-    // 현재 설정된 저축률(savingsRate)에 맞춰 저축 금액 업데이트
-    const newAmount = Math.floor((newIncome * savingsRate) / 100);
-
-    onChange(newIncome, newAmount);
   };
 
   const titleDesc =
@@ -73,9 +79,13 @@ const SavingGoalStep = ({
           </Label>
 
           {income === 0 && (
-            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs font-medium">
-              <AlertTriangle className="h-3 w-3" />
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
               수입을 먼저 입력해 주세요.
+            </p>
+          )}
+          {income >= MAX_BUDGET_AMOUNT && (
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
+              최대 10억 원까지 입력 가능합니다.
             </p>
           )}
         </div>
@@ -135,8 +145,7 @@ const SavingGoalStep = ({
 
           {/* 최대치 도달 시 문구 표시 */}
           {savingsRate >= 70 && (
-            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 pt-4 text-xs">
-              <AlertTriangle className="h-3 w-3" />
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
               저축 목표는 최대 70%까지 설정할 수 있어요.
             </p>
           )}
