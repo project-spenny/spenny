@@ -84,7 +84,7 @@ const BudgetCategoryEditItem = ({
           className={cn(
             'focus-visible:ring-brand-soft h-9 pr-7 text-right text-sm',
             Number(amount) >= MAX_BUDGET_AMOUNT &&
-              'border-destructive/50 focus-visible:ring-destructive/50 border-2'
+              'focus-visible:ring-destructive/50'
           )}
         />
 
