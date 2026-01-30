@@ -4,7 +4,9 @@ import { HelpCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
+import { MAX_BUDGET_AMOUNT } from '@/constants/budget';
 import PercentageBadge from '@/components/budgets/common/PercentageBadge';
+import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
 type BudgetCategoryEditItemProps = {
@@ -36,6 +38,14 @@ const BudgetCategoryEditItem = ({
       ? Math.round((Number(amount || 0) / totalBudgetAmount) * 100)
       : 0;
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+
+    if (Number(value) > MAX_BUDGET_AMOUNT) return; // 10억 초과 입력 방지
+
+    onChange(category.category_key, value);
+  };
+
   return (
     <div className="flex items-center gap-2 py-1">
       {/* 아이콘 원형 배경 */}
@@ -55,7 +65,7 @@ const BudgetCategoryEditItem = ({
       </div>
 
       {/* 금액 입력부 */}
-      <div className="relative w-36">
+      <div className="relative w-38">
         <Input
           ref={inputRef}
           type="text"
@@ -70,9 +80,22 @@ const BudgetCategoryEditItem = ({
           }
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          onChange={(e) => onChange(category.category_key, e.target.value)}
-          className="focus-visible:ring-brand-soft h-9 pr-7 text-right text-sm"
+          onChange={handleAmountChange}
+          className={cn(
+            'focus-visible:ring-brand-soft h-9 pr-7 text-right text-sm',
+            Number(amount) >= MAX_BUDGET_AMOUNT &&
+              'border-destructive/50 focus-visible:ring-destructive/50 border-2'
+          )}
         />
+
+        {isFocused && Number(amount) >= MAX_BUDGET_AMOUNT && (
+          <div className="animate-in fade-in zoom-in absolute -top-6 right-0 duration-200">
+            <span className="text-destructive bg-background rounded border px-2 py-0.5 text-xs font-bold whitespace-nowrap shadow-sm">
+              최대 10억 원까지 가능
+            </span>
+          </div>
+        )}
+
         {amount && (
           <Button
             variant="ghost"
