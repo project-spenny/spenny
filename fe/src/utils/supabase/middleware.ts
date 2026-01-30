@@ -97,6 +97,15 @@ export async function updateSession(request: NextRequest) {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 365, // 1년
       });
+    } else {
+      // 프로필 없으면 쿠키 제거
+      supabaseResponse.cookies.set('onboarded', '', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 0,
+      });
     }
   }
 

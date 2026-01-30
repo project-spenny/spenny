@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { onboardingProfileSchema, profilePatchSchema } from '@/schemas/profile';
-import { cookies } from 'next/headers';
 
 async function requireUser() {
   const supabase = await createClient();
