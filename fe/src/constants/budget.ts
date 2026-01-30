@@ -4,6 +4,8 @@ import {
   GroupInfo,
 } from '@/types/budgetGuide';
 
+export const MAX_BUDGET_AMOUNT = 1000000000 as const; // 10억
+
 /** 카테고리별 그룹 매핑 */
 export const EXPENSE_CATEGORY_GROUP_MAP: Record<string, CategoryGroupId> = {
   // Essential (필수)

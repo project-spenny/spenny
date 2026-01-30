@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { THEME_COLOR } from '@/constants/colors';
+import { MAX_BUDGET_AMOUNT } from '@/constants/budget';
 import { toast } from 'sonner';
 import useBudgetData from '@/hooks/useBudgetData';
 
@@ -38,7 +38,8 @@ const BudgetSetupDialog = ({
 
   // 유효성 검사
   const numericAmount = Number(amount);
-  const isInvalid = numericAmount <= 0;
+  const isOverLimit = numericAmount > MAX_BUDGET_AMOUNT; // 10억 초과 여부
+  const isInvalid = numericAmount <= 0 || isOverLimit; // 0 이하이거나 최대치 초과면 Invalid
   // 변경 여부 확인 (기존 값과 비교)
   const isChanged = defaultAmount !== numericAmount;
 
@@ -70,6 +71,9 @@ const BudgetSetupDialog = ({
     if (!isTouched) setIsTouched(true);
 
     const value = e.target.value.replace(/[^0-9]/g, '');
+
+    if (Number(value) > MAX_BUDGET_AMOUNT) return; // 10억 초과 입력 방지
+
     setAmount(value);
   };
 
@@ -101,15 +105,23 @@ const BudgetSetupDialog = ({
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onChange={handleAmountChange}
-              className="focus-visible:ring-brand-soft text-lg font-semibold"
+              className="focus-visible:ring-brand-soft font-semibold"
             />
 
-            {isTouched && isInvalid && (
-              <p className={`text-sm ${THEME_COLOR.EXPENSE}`}>
-                {amount === ''
-                  ? '예산 금액을 입력해주세요.'
-                  : '0보다 큰 숫자를 입력해야 합니다.'}
-              </p>
+            {isTouched && (
+              <div className={`text-destructive space-y-1 text-sm`}>
+                {numericAmount <= 0 && amount !== '' && (
+                  <p>0보다 큰 숫자를 입력해야 합니다.</p>
+                )}
+                {amount === '' && <p>예산 금액을 입력해주세요.</p>}
+
+                {numericAmount >= MAX_BUDGET_AMOUNT && (
+                  <p>
+                    최대 {MAX_BUDGET_AMOUNT.toLocaleString()}원까지 설정
+                    가능합니다.
+                  </p>
+                )}
+              </div>
             )}
 
             {!isInvalid && !isChanged && defaultAmount !== undefined && (
