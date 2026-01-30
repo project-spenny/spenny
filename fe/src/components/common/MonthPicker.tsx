@@ -17,7 +17,7 @@ interface MonthPickerProps {
   month: number;
   onDateChange: (year: number, month: number) => void; // 날짜 변경 시
   onMoveClick?: (delta: number) => void; // 화살표 이동 시
-  className?: string;
+  disabled?: boolean;
 }
 
 const MonthPicker = ({
@@ -25,6 +25,7 @@ const MonthPicker = ({
   month,
   onDateChange,
   onMoveClick,
+  disabled = false,
 }: MonthPickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<'month' | 'year'>('month');
@@ -75,6 +76,7 @@ const MonthPicker = ({
           size="icon"
           className="hover:bg-brand-soft/40 h-8 w-8"
           onClick={() => handleMove(-1)}
+          disabled={disabled}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -88,6 +90,7 @@ const MonthPicker = ({
                 'hover:bg-brand-soft/40 w-16 justify-center font-semibold',
                 'text-lg tracking-tight md:text-xl'
               )}
+              disabled={disabled}
             >
               {month}월
             </Button>
@@ -141,6 +144,7 @@ const MonthPicker = ({
           size="icon"
           className="hover:bg-brand-soft/40 h-8 w-8"
           onClick={() => handleMove(1)}
+          disabled={disabled}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
