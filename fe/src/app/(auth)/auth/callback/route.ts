@@ -68,7 +68,13 @@ export async function GET(request: Request) {
     });
   } else {
     // 미완료 시 쿠키 삭제
-    response.cookies.delete('onboarded');
+    response.cookies.set('onboarded', '', {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: !isLocalEnv,
+      maxAge: 0,
+    });
   }
 
   return response;
