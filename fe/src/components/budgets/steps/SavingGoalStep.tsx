@@ -2,6 +2,7 @@ import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { Label } from '@/components/ui/label';
 import { MAX_BUDGET_AMOUNT } from '@/constants/budget';
 import { Slider } from '@/components/ui/slider';
+import { useState } from 'react';
 
 type SavingGoalStepProps = {
   income: number;
@@ -14,6 +15,9 @@ const SavingGoalStep = ({
   savingsAmount,
   onChange,
 }: SavingGoalStepProps) => {
+  const [isIncomeFocused, setIsIncomeFocused] = useState(false);
+  const [isSavingsFocused, setIsSavingsFocused] = useState(false);
+
   const savingsRate =
     income > 0 ? Math.round((savingsAmount / income) * 100) : 0;
   const spendableBudget = income - savingsAmount || 0;
@@ -95,7 +99,15 @@ const SavingGoalStep = ({
             id="income"
             type="text"
             inputMode="numeric"
-            value={income || ''}
+            value={
+              isIncomeFocused
+                ? income || ''
+                : income !== 0
+                  ? income.toLocaleString()
+                  : ''
+            }
+            onFocus={() => setIsIncomeFocused(true)}
+            onBlur={() => setIsIncomeFocused(false)}
             onChange={handleIncomeChange}
             className="w-32 text-right text-lg font-bold focus:outline-none"
             placeholder="0"
@@ -118,8 +130,15 @@ const SavingGoalStep = ({
               id="saving"
               type="text"
               inputMode="numeric"
-              pattern="[0-9]*"
-              value={savingsAmount || ''}
+              value={
+                isSavingsFocused
+                  ? savingsAmount || ''
+                  : savingsAmount !== 0
+                    ? savingsAmount.toLocaleString()
+                    : ''
+              }
+              onFocus={() => setIsSavingsFocused(true)}
+              onBlur={() => setIsSavingsFocused(false)}
               onChange={handleAmountChange}
               className="w-32 text-right text-lg font-bold focus:outline-none"
               placeholder="0"
