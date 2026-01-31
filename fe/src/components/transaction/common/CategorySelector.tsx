@@ -42,19 +42,24 @@ export const CategorySelector = ({
   onOpenChange,
   onChange,
 }: CategorySelectorProps) => {
-  if (!transactionType) return null;
-
   const categories =
     transactionType === 'income' ? CATEGORIES.income : CATEGORIES.expense;
-
+  const isDisabled = !transactionType;
   return (
     <div className="flex items-center">
       <Label className="w-28 pr-2">카테고리</Label>
       <div className="w-full">
         <Popover open={open} onOpenChange={onOpenChange}>
           <PopoverTrigger asChild>
-            <Button type="button" variant="outline" className="h-10 w-full">
-              {SelectedIcon(categories, value)}
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 w-full text-xs"
+              disabled={isDisabled}
+            >
+              {isDisabled
+                ? '거래유형을 먼저 선택하세요'
+                : SelectedIcon(categories, value)}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
