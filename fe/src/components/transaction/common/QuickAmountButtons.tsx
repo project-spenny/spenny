@@ -25,7 +25,7 @@ export const QuickAmountButtons = ({
         type="button"
         onClick={(e) => addAmount(e, 100000)}
         size="sm"
-        className="h-8 flex-1 px-2 text-xs"
+        className="text-foreground h-6 flex-1 px-2 text-xs"
       >
         +100,000
       </Button>
@@ -34,7 +34,7 @@ export const QuickAmountButtons = ({
         type="button"
         onClick={(e) => addAmount(e, 10000)}
         size="sm"
-        className="h-8 flex-1 px-2 text-xs"
+        className="text-foreground h-6 flex-1 px-2 text-xs"
       >
         +10,000
       </Button>
@@ -43,7 +43,7 @@ export const QuickAmountButtons = ({
         type="button"
         onClick={(e) => addAmount(e, 1000)}
         size="sm"
-        className="h-8 flex-1 px-2 text-xs"
+        className="text-foreground h-6 flex-1 px-2 text-xs"
       >
         +1,000
       </Button>
