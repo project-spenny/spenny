@@ -20,9 +20,9 @@ export const AmountInput = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             min="0"
-            className="focus-visible:border-brand h-12 flex-1 [appearance:textfield] rounded-none border-0 border-b-1 text-right !text-2xl focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="focus-visible:border-brand h-8 flex-1 [appearance:textfield] rounded-none border-0 border-b-1 text-right text-sm focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
-          <span className="text-lg font-medium">원</span>
+          <span className="text-sm font-medium">원</span>
         </div>
         <QuickAmountButtons
           value={value}
