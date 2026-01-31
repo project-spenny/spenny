@@ -54,7 +54,7 @@ export const CategorySelector = ({
             <Button
               type="button"
               variant="outline"
-              className="h-10 w-full text-xs"
+              className="h-8 w-full text-xs"
               disabled={isDisabled}
             >
               {isDisabled
@@ -63,14 +63,14 @@ export const CategorySelector = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="grid grid-cols-3">
+            <div className="grid grid-cols-4">
               {categories.map((cat) => (
                 <div
                   onClick={() => {
                     onChange(cat.category_key);
                     onOpenChange(false);
                   }}
-                  className="flex h-20 w-24 cursor-pointer flex-col items-center justify-center gap-2 text-center text-sm hover:bg-gray-100"
+                  className="flex h-18 w-18 cursor-pointer flex-col items-center justify-center gap-2 text-center text-sm hover:bg-gray-100"
                   key={cat.category_key}
                 >
                   <Image
