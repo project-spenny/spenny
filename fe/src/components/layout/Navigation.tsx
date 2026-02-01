@@ -19,7 +19,7 @@ const Navigation = () => {
   return (
     <nav
       className={cn(
-        'bg-background fixed z-50 border px-2 py-2 shadow-xl backdrop-blur-lg',
+        'bg-background/80 fixed z-50 border px-2 py-2 shadow-xl backdrop-blur-lg',
         'bottom-0 w-full rounded-t-2xl',
         'md:top-1/2 md:left-0 md:h-fit md:w-24 md:-translate-y-1/2 md:rounded-t-none md:rounded-r-2xl md:py-4'
       )}
