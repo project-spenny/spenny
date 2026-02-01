@@ -19,12 +19,12 @@ const Header = () => {
       <h1 className="shrink-0 px-2 pt-1">
         <Link href="/">
           <Image
-            src="/logo_horizontal.svg"
+            src="/logo_text.svg"
             alt="Spenny"
-            width={180}
+            width={160}
             height={80}
             draggable="false"
-            className="h-auto w-36 md:w-[180px]"
+            className="h-auto w-32 md:w-40"
             priority
           />
         </Link>
