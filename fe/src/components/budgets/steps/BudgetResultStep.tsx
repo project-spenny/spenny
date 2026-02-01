@@ -58,8 +58,7 @@ const BudgetResultStep = ({
         step={4}
         subTitle="예산 산출 결과 확인"
         title="이번 달, 이렇게 소비해 보는 건 어떨까요?"
-        description="수입과 지출 습관을 바탕으로 항목별 예산을 나누었습니다. 확인 후 아래
-          버튼을 눌러 이번 달 자산 관리를 시작해 보세요!"
+        description="최근 지출 패턴을 분석하여 항목별 최적 예산을 제안해 드려요. 확인 후 아래 버튼을 눌러 계획적인 자산 관리를 시작해 보세요!"
       />
 
       {/* 조정 상태 피드백 섹션 */}
@@ -137,8 +136,8 @@ const BudgetResultStep = ({
             </div>
           </div>
 
-          <div className="text-muted-foreground flex gap-1 text-xs">
-            <Info className="h-3.5 w-3.5 shrink-0" />
+          <div className="text-muted-foreground flex items-center gap-1 text-xs">
+            <Info className="h-3 w-3 shrink-0" />
             <p>수입에서 저축 목표를 제외한 금액입니다.</p>
           </div>
         </Card>
@@ -166,11 +165,10 @@ const BudgetResultStep = ({
         />
       </section>
 
-      <div className="text-muted-foreground flex gap-1 px-2 text-xs">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+      <div className="text-muted-foreground flex items-center gap-1 px-2 text-xs">
+        <Info className="mt-0.5 h-3 w-3 shrink-0" />
         <p className="break-keep">
-          과거 소비 비중을 바탕으로 산출된 예산입니다. 100원 단위 미만의 잔돈은
-          가장 지출 비중이 높은 항목에 자동으로 포함되었습니다.
+          과거 소비 비중을 반영해 관리하기 편한 100원 단위로 산출되었습니다.
         </p>
       </div>
     </div>
