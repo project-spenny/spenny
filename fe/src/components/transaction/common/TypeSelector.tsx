@@ -16,7 +16,7 @@ export const TypeSelector = ({ value, onChange }: Props) => {
           type="button"
           onClick={() => onChange('income')}
           className={cn(
-            'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
+            'cursor-pointer rounded-lg border-2 px-6 py-2 text-sm font-medium transition-all',
             value === 'income'
               ? 'border-gray-500'
               : 'border-gray-300 hover:border-gray-400'
@@ -28,7 +28,7 @@ export const TypeSelector = ({ value, onChange }: Props) => {
           type="button"
           onClick={() => onChange('expense')}
           className={cn(
-            'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
+            'cursor-pointer rounded-lg border-2 px-6 py-2 text-sm font-medium transition-all',
             value === 'expense'
               ? 'border-gray-500'
               : 'border-gray-300 hover:border-gray-400'
