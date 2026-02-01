@@ -6,6 +6,9 @@ const distributeGroupBudget = (
   targetTotal: number,
   totalBudget: number
 ): CalculatedBudgetItem[] => {
+  // 필수/유연 중 한 그룹이 아예 비어있을 때
+  if (items.length === 0) return [];
+
   // 그룹 내 과거 지출 총합 계산
   const groupPastTotal = items.reduce(
     (sum, [_, stat]) => sum + stat.avgAmount,
@@ -37,14 +40,14 @@ const distributeGroupBudget = (
   );
   let gap = targetTotal - currentTotal;
 
-  if (gap > 0) {
+  if (gap > 0 && calculatedItems.length > 0) {
     // 과거 평균 지출액이 큰 순서대로 정렬하여 100원씩 분배
     const sortedIndices = calculatedItems
       .map((item, index) => ({ index, amount: item.amount }))
       .sort((a, b) => b.amount - a.amount); // 금액 큰 순
 
     let i = 0;
-    while (gap > 0) {
+    while (gap > 0 && sortedIndices.length > 0) {
       const targetIndex = sortedIndices[i % sortedIndices.length].index;
       calculatedItems[targetIndex].amount += 100;
       gap -= 100;
