@@ -125,8 +125,9 @@ const BudgetRecommendDialog = ({
     return BUDGET_GROUPS.map((group) => {
       // processedData에서 해당 그룹의 평균 금액 가져오기
       const amount = groupAverages[group.id as CategoryGroupId] || 0;
-      // 전체에서 차지하는 비중 계산 (분모가 0일 경우 대비)
-      const percent = avgTotal > 0 ? Math.round((amount / avgTotal) * 100) : 0;
+      // 전체에서 차지하는 비중 계산 (소수점 첫째 자리까지 계산)
+      const percent =
+        avgTotal > 0 ? Math.round((amount / avgTotal) * 1000) / 10 : 0;
 
       return { ...group, amount, percent };
     });

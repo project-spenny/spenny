@@ -46,9 +46,11 @@ const BudgetResultStep = ({
     0
   );
 
-  // 전체 예산 대비 그룹별 비중(%) 계산
-  const getPercent = (total: number) =>
-    Math.round((total / (spendableBudget || 1)) * 100);
+  // 1. 전체 예산 대비 그룹별 비중(%) 계산 (소수점 첫째 자리까지)
+  const getPercent = (total: number) => {
+    if (!spendableBudget || spendableBudget === 0) return 0;
+    return Math.round((total / spendableBudget) * 1000) / 10;
+  };
 
   return (
     <div className="flex flex-col gap-6">
