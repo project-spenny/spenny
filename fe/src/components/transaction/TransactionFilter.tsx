@@ -9,10 +9,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Button } from '../ui/button';
 import { X } from 'lucide-react';
 import { Search, ChevronRight, ChevronLeft } from 'lucide-react';
 import { TransactionFilters } from '@/app/(app)/history/actions';
+
+const MONTHS = Array.from({ length: 12 }, (_, i) => ({
+  month: i + 1,
+  monthDisplay: `${i + 1}월`,
+}));
 
 interface TransactionFilterProps {
   month: string; // 'YYYY-MM' 형식
@@ -31,8 +41,13 @@ export function TransactionFilter({
   onFiltersChange,
   children,
 }: TransactionFilterProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<'month' | 'year'>('month');
+
   // month를 Date로 변환
   const selectedMonth = new Date(`${month}-01`);
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
 
   const handlePreviousMonth = () => {
     const newDate = new Date(
@@ -52,6 +67,17 @@ export function TransactionFilter({
     );
     const newMonth = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}`;
     onMonthChange(newMonth);
+  };
+
+  const navigateMonth = (targetMonth: number) => {
+    const newMonth = `${selectedMonth.getFullYear()}-${String(targetMonth).padStart(2, '0')}`;
+    onMonthChange(newMonth);
+  };
+
+  const handleYearSelect = (selectedYear: number) => {
+    const newMonth = `${selectedYear}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}`;
+    onMonthChange(newMonth);
+    setMode('month');
   };
 
   const updateFilter = (
@@ -85,16 +111,6 @@ export function TransactionFilter({
     }
   };
 
-  const monthDisplay = (date: Date) => {
-    const m = date.getMonth() + 1;
-    return `${String(m)}월`;
-  };
-
-  const yearDisplay = (date: Date) => {
-    const year = date.getFullYear();
-    return `${String(year)}년`;
-  };
-
   return (
     <div className="flex-col">
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -103,24 +119,75 @@ export function TransactionFilter({
             type="button"
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="hover:bg-brand-soft/40 h-8 w-8"
             onClick={handlePreviousMonth}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <span className="min-w-12 text-center text-base font-semibold sm:min-w-8 sm:text-xl">
-            <p className="text-muted-foreground text-xs font-light">
-              {yearDisplay(selectedMonth)}
-            </p>
-            {monthDisplay(selectedMonth)}
-          </span>
+          <div className="flex flex-col items-center">
+            <span className="text-muted-foreground text-xs">
+              {selectedMonth.getFullYear()}
+            </span>
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="hover:bg-brand-soft/40 w-16 justify-center font-semibold text-xl tracking-tight sm:text-2xl"
+                >
+                  {selectedMonth.getMonth() + 1}월
+                </Button>
+              </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              {mode === 'month' ? (
+                <div className="grid grid-cols-3 p-2">
+                  <div
+                    onClick={() => setMode('year')}
+                    className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer rounded p-2 text-center font-bold"
+                  >
+                    {selectedMonth.getFullYear()}
+                  </div>
+                  {MONTHS.map(({ month, monthDisplay }) => (
+                    <div
+                      className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer flex-col items-center justify-center gap-2 rounded text-center text-xs"
+                      onClick={() => {
+                        navigateMonth(month);
+                        setIsOpen(false);
+                      }}
+                      key={month}
+                    >
+                      {monthDisplay}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 p-2">
+                  <div
+                    className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer rounded p-2 text-center font-bold"
+                    onClick={() => setMode('month')}
+                  >
+                    {selectedMonth.getMonth() + 1}월
+                  </div>
+                  {years.map((y) => (
+                    <div
+                      key={y}
+                      className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer items-center justify-center rounded text-sm"
+                      onClick={() => handleYearSelect(y)}
+                    >
+                      {y}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </PopoverContent>
+            </Popover>
+          </div>
 
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="hover:bg-brand-soft/40 h-8 w-8"
             onClick={handleNextMonth}
           >
             <ChevronRight className="h-4 w-4" />
