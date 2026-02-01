@@ -54,7 +54,7 @@ export const CategorySelector = ({
             <Button
               type="button"
               variant="outline"
-              className="h-8 w-full text-xs"
+              className="h-10 w-full text-sm"
               disabled={isDisabled}
             >
               {isDisabled
