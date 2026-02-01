@@ -149,7 +149,7 @@ const BudgetRecommendDialog = ({
         onOpenChange(isOpen);
       }}
     >
-      <DialogContent className="flex h-[800px] w-full flex-col md:max-w-2xl">
+      <DialogContent className="flex h-[80dvh] w-full flex-col md:h-[800px] md:max-w-2xl">
         {/* 상단 Step 표시 */}
         <div className="px-6 pt-6">
           <Progress value={(step / 4) * 100} className="[&>div]:bg-brand h-2" />
