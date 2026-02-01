@@ -78,6 +78,8 @@ export const CategorySelector = ({
                     alt={cat.name_ko}
                     width={22}
                     height={22}
+                    priority
+                    quality={85}
                   />
                   <p className="text-muted-foreground text-xs">{cat.name_ko}</p>
                 </div>
