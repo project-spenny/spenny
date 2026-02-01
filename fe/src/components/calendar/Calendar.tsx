@@ -102,15 +102,16 @@ export const Calendar = ({
     </>
   );
   return (
-    <div className="flex w-full flex-col">
-      {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            <Spinner className="text-brand h-12 w-12" />
+    <div className="flex w-full flex-col items-center p-4 md:p-6 lg:p-8">
+      <div className="relative w-full max-w-xl">
+        {isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              <Spinner className="text-brand h-12 w-12" />
+            </div>
           </div>
-        </div>
-      )}
-      <CalendarView
+        )}
+        <CalendarView
         month={month}
         mode="single"
         selected={date}
@@ -129,6 +130,7 @@ export const Calendar = ({
         }}
         disableNavigation
       />
+      </div>
       <ResponsivePanel isOpen={isOpen} setIsOpen={handleClose}>
         <div className="space-y-4">
           <h3 className="pl-8 text-lg font-semibold">
