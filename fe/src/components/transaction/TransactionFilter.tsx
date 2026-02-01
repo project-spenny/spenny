@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -18,6 +18,8 @@ import { Button } from '../ui/button';
 import { X } from 'lucide-react';
 import { Search, ChevronRight, ChevronLeft } from 'lucide-react';
 import { TransactionFilters } from '@/app/(app)/history/actions';
+import { CATEGORIES } from '@/constants/categories';
+import Image from 'next/image';
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   month: i + 1,
@@ -96,6 +98,28 @@ export function TransactionFilter({
 
   const [searchValue, setSearchValue] = useState(filters?.searchQuery || '');
   const [onSearch, setOnSearch] = useState<boolean>(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+
+  // type 필터에 따라 카테고리 목록 결정
+  const availableCategories = useMemo(() => {
+    if (filters?.type === 'income') return CATEGORIES.income;
+    if (filters?.type === 'expense') return CATEGORIES.expense;
+    return [...CATEGORIES.income, ...CATEGORIES.expense];
+  }, [filters?.type]);
+
+  // 유형 변경 시 카테고리 초기화
+  const handleTypeChange = (value: string) => {
+    if (!onFiltersChange) return;
+    const newFilters = { ...filters };
+    if (value === 'all') {
+      delete (newFilters as Record<string, string | undefined>).type;
+    } else {
+      (newFilters as Record<string, string | undefined>).type = value;
+    }
+    // 유형 변경 시 카테고리 초기화
+    delete (newFilters as Record<string, string | undefined>).category_id;
+    onFiltersChange(newFilters);
+  };
   const handleSearch = () => {
     updateFilter('searchQuery', searchValue);
   };
@@ -133,53 +157,53 @@ export function TransactionFilter({
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="hover:bg-brand-soft/40 w-16 justify-center font-semibold text-xl tracking-tight sm:text-2xl"
+                  className="hover:bg-brand-soft/40 w-16 justify-center text-xl font-semibold tracking-tight sm:text-2xl"
                 >
                   {selectedMonth.getMonth() + 1}월
                 </Button>
               </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              {mode === 'month' ? (
-                <div className="grid grid-cols-3 p-2">
-                  <div
-                    onClick={() => setMode('year')}
-                    className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer rounded p-2 text-center font-bold"
-                  >
-                    {selectedMonth.getFullYear()}
-                  </div>
-                  {MONTHS.map(({ month, monthDisplay }) => (
+              <PopoverContent className="w-auto p-0" align="start">
+                {mode === 'month' ? (
+                  <div className="grid grid-cols-3 p-2">
                     <div
-                      className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer flex-col items-center justify-center gap-2 rounded text-center text-xs"
-                      onClick={() => {
-                        navigateMonth(month);
-                        setIsOpen(false);
-                      }}
-                      key={month}
+                      onClick={() => setMode('year')}
+                      className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer rounded p-2 text-center font-bold"
                     >
-                      {monthDisplay}
+                      {selectedMonth.getFullYear()}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-3 p-2">
-                  <div
-                    className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer rounded p-2 text-center font-bold"
-                    onClick={() => setMode('month')}
-                  >
-                    {selectedMonth.getMonth() + 1}월
+                    {MONTHS.map(({ month, monthDisplay }) => (
+                      <div
+                        className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer flex-col items-center justify-center gap-2 rounded text-center text-xs"
+                        onClick={() => {
+                          navigateMonth(month);
+                          setIsOpen(false);
+                        }}
+                        key={month}
+                      >
+                        {monthDisplay}
+                      </div>
+                    ))}
                   </div>
-                  {years.map((y) => (
+                ) : (
+                  <div className="grid grid-cols-3 p-2">
                     <div
-                      key={y}
-                      className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer items-center justify-center rounded text-sm"
-                      onClick={() => handleYearSelect(y)}
+                      className="hover:bg-accent hover:text-accent-foreground col-span-3 cursor-pointer rounded p-2 text-center font-bold"
+                      onClick={() => setMode('month')}
                     >
-                      {y}
+                      {selectedMonth.getMonth() + 1}월
                     </div>
-                  ))}
-                </div>
-              )}
-            </PopoverContent>
+                    {years.map((y) => (
+                      <div
+                        key={y}
+                        className="hover:bg-accent hover:text-accent-foreground flex h-12 w-12 cursor-pointer items-center justify-center rounded text-sm"
+                        onClick={() => handleYearSelect(y)}
+                      >
+                        {y}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PopoverContent>
             </Popover>
           </div>
 
@@ -252,19 +276,87 @@ export function TransactionFilter({
         <div>
           <Select
             value={filters?.type || 'all'}
-            onValueChange={(value) =>
-              updateFilter('type', value as 'income' | 'expense' | undefined)
-            }
+            onValueChange={handleTypeChange}
           >
             <SelectTrigger className="w-32">
               <SelectValue placeholder="유형" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
+              <SelectItem value="all">모든 내역</SelectItem>
               <SelectItem value="income">수입</SelectItem>
               <SelectItem value="expense">지출</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div>
+          <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-36 justify-start text-sm"
+                disabled={!filters?.type}
+              >
+                {!filters?.type ? (
+                  '유형 먼저 선택'
+                ) : filters?.category_id ? (
+                  (() => {
+                    const selected = availableCategories.find(
+                      (cat) => cat.category_key === filters.category_id
+                    );
+                    return selected ? (
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={selected.icon}
+                          alt={selected.name_ko}
+                          width={18}
+                          height={18}
+                        />
+                        <span>{selected.name_ko}</span>
+                      </div>
+                    ) : (
+                      '모든 카테고리'
+                    );
+                  })()
+                ) : (
+                  '모든 카테고리'
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-2" align="start">
+              <div
+                onClick={() => {
+                  updateFilter('category_id', 'all');
+                  setCategoryOpen(false);
+                }}
+                className="hover:bg-accent mb-2 cursor-pointer rounded p-2 text-center text-sm"
+              >
+                모든 카테고리
+              </div>
+              <div className="grid grid-cols-4 gap-1">
+                {availableCategories.map((cat) => (
+                  <div
+                    key={cat.category_key}
+                    onClick={() => {
+                      updateFilter('category_id', cat.category_key);
+                      setCategoryOpen(false);
+                    }}
+                    className="hover:bg-accent flex h-16 w-16 cursor-pointer flex-col items-center justify-center gap-1 rounded text-center"
+                  >
+                    <Image
+                      src={cat.icon}
+                      alt={cat.name_ko}
+                      width={22}
+                      height={22}
+                    />
+                    <p className="text-muted-foreground text-xs">
+                      {cat.name_ko}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>
