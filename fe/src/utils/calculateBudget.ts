@@ -1,143 +1,182 @@
 import { CalculatedBudgetItem, CategoryStat } from '@/types/budgetGuide';
 
-// 기본 비중 배분 함수
-const getBasicDraft = (
-  spendableBudget: number,
-  categoryStats: Record<string, CategoryStat>
+// 그룹 내에서 예산 배분 및 자투리 보정 (공통 로직)
+const distributeGroupBudget = (
+  items: [string, CategoryStat][],
+  targetTotal: number,
+  totalBudget: number
 ): CalculatedBudgetItem[] => {
-  const statsArray = Object.entries(categoryStats);
-  // 과거 지출 총합 (가중치 계산용)
-  const totalPastAvg = statsArray.reduce(
+  // 그룹 내 과거 지출 총합 계산
+  const groupPastTotal = items.reduce(
     (sum, [_, stat]) => sum + stat.avgAmount,
     0
   );
 
-  // 과거 데이터가 없는 경우 균등 배분
-  if (totalPastAvg === 0) {
-    const count = statsArray.length;
-    const equalAmount = Math.floor(spendableBudget / count / 100) * 100;
+  // 각 항목별 금액 1차 계산 (내림 처리)
+  const calculatedItems = items.map(([id, stat]) => {
+    // 그룹 내에서의 비중 계산
+    const localWeight =
+      groupPastTotal === 0 ? 1 / items.length : stat.avgAmount / groupPastTotal;
 
-    return statsArray.map(([id, stat]) => ({
-      categoryId: id,
-      name: stat.name,
-      groupId: stat.groupId,
-      amount: equalAmount,
-      weight: 1 / count,
-    }));
-  }
-
-  // 비중대로 배분 및 100원 단위 절삭
-  return statsArray.map(([id, stat]) => {
-    const weight = stat.avgAmount / totalPastAvg; // 비중(가중치) 계산
-    const rawAmount = spendableBudget * weight; // 가중치 적용
-    const amount = Math.floor(rawAmount / 100) * 100; // 100원 단위 절삭
+    // 목표 금액에 비중을 곱해 금액 산출 (100원 단위 내림)
+    const amount = Math.floor((targetTotal * localWeight) / 100) * 100;
 
     return {
       categoryId: id,
       name: stat.name,
       groupId: stat.groupId,
       amount,
-      weight,
+      weight: 0,
     };
   });
-};
 
-// 자투리 금액 보정 함수 (총액 맞추기)
-const fillGap = (
-  items: CalculatedBudgetItem[],
-  targetTotal: number
-): CalculatedBudgetItem[] => {
-  const currentTotal = items.reduce((sum, item) => sum + item.amount, 0);
-  const gap = targetTotal - currentTotal;
-
-  if (gap <= 0) return items;
-
-  // 가장 비중이 큰 항목에 차액 합산
-  const topItem = items.reduce((prev, curr) =>
-    prev.amount > curr.amount ? prev : curr
+  // 자투리 금액 계산 및 보정 (같은 그룹 내에서 비중이 큰 순서대로 100원씩 분배)
+  const currentTotal = calculatedItems.reduce(
+    (sum, item) => sum + item.amount,
+    0
   );
-  topItem.amount += gap;
+  let gap = targetTotal - currentTotal;
 
-  return items;
+  if (gap > 0) {
+    // 과거 평균 지출액이 큰 순서대로 정렬하여 100원씩 분배
+    const sortedIndices = calculatedItems
+      .map((item, index) => ({ index, amount: item.amount }))
+      .sort((a, b) => b.amount - a.amount); // 금액 큰 순
+
+    let i = 0;
+    while (gap > 0) {
+      const targetIndex = sortedIndices[i % sortedIndices.length].index;
+      calculatedItems[targetIndex].amount += 100;
+      gap -= 100;
+      i++;
+    }
+  }
+
+  // 최종 비중 갱신 및 반환
+  return calculatedItems.map((item) => ({
+    ...item,
+    weight: item.amount / totalBudget,
+  }));
 };
 
-// 지출 패턴 유지 예산 산출
+// 지출 패턴 유지 (Keep Pattern)
 export const calculateKeepPatternBudget = (
   spendableBudget: number,
   categoryStats: Record<string, CategoryStat>
 ): CalculatedBudgetItem[] => {
-  if (Object.keys(categoryStats).length === 0) return [];
+  const statsArray = Object.entries(categoryStats);
+  if (statsArray.length === 0) return [];
 
-  // 비중대로 나누기
-  const distributedItems = getBasicDraft(spendableBudget, categoryStats);
+  // 전체 데이터 기준, 그룹별 비중 계산
+  const totalPastAvg = statsArray.reduce(
+    (sum, [_, stat]) => sum + stat.avgAmount,
+    0
+  );
 
-  // 자투리 금액 보정하여 최종 반환
-  return fillGap(distributedItems, spendableBudget).sort(
+  // 필수 지출 그룹의 과거 총액
+  const essentialPastTotal = statsArray
+    .filter(([_, stat]) => stat.groupId !== 'flexible')
+    .reduce((sum, [_, stat]) => sum + stat.avgAmount, 0);
+
+  // 필수 지출 비중
+  const essentialRatio =
+    totalPastAvg === 0 ? 0.5 : essentialPastTotal / totalPastAvg;
+
+  // 그룹별 목표 금액 확정
+  const targetEssentialTotal =
+    Math.floor((spendableBudget * essentialRatio) / 100) * 100;
+
+  const targetFlexibleTotal = spendableBudget - targetEssentialTotal;
+
+  // 그룹별 배분
+  const essentialItems = statsArray.filter(
+    ([_, stat]) => stat.groupId !== 'flexible'
+  );
+  const flexibleItems = statsArray.filter(
+    ([_, stat]) => stat.groupId === 'flexible'
+  );
+
+  const finalEssential = distributeGroupBudget(
+    essentialItems,
+    targetEssentialTotal,
+    spendableBudget
+  );
+  const finalFlexible = distributeGroupBudget(
+    flexibleItems,
+    targetFlexibleTotal,
+    spendableBudget
+  );
+
+  // 결과 반환
+  return [...finalEssential, ...finalFlexible].sort(
     (a, b) => b.amount - a.amount
   );
 };
 
-// 유연 지출 절감형/강력 절약형 공통 예산 산출 함수
+// 유연 지출 조정
 export const calculateSaveFlexible = (
   spendableBudget: number,
   categoryStats: Record<string, CategoryStat>,
   maxFlexibleRatio: number
 ): { items: CalculatedBudgetItem[]; isAdjusted: boolean } => {
-  if (Object.keys(categoryStats).length === 0)
-    return { items: [], isAdjusted: false };
+  const statsArray = Object.entries(categoryStats);
+  if (statsArray.length === 0) return { items: [], isAdjusted: false };
 
-  // 과거 비중으로 먼저 계산
-  const distributedItems = getBasicDraft(spendableBudget, categoryStats);
+  // 조정 여부 판단
+  const totalPastAvg = statsArray.reduce(
+    (sum, [_, stat]) => sum + stat.avgAmount,
+    0
+  );
 
-  // 현재 유연 지출(flexible) 그룹의 총 비중 계산
-  const currentFlexibleTotal = distributedItems
-    .filter((item) => item.groupId === 'flexible')
-    .reduce((sum, item) => sum + item.amount, 0);
+  const flexiblePastTotal = statsArray
+    .filter(([_, stat]) => stat.groupId === 'flexible')
+    .reduce((sum, [_, stat]) => sum + stat.avgAmount, 0);
 
-  const currentFlexibleRatio = currentFlexibleTotal / spendableBudget;
-
-  // 조정이 필요한지 확인 (상한선보다 클 때만 조정)
+  const currentFlexibleRatio =
+    totalPastAvg === 0 ? 0 : flexiblePastTotal / totalPastAvg;
   const isAdjusted = currentFlexibleRatio > maxFlexibleRatio;
 
-  if (!isAdjusted) {
-    // 조정이 필요 없으면 원본에 차액만 보정해서 반환
-    return {
-      items: fillGap(distributedItems, spendableBudget),
-      isAdjusted: false,
-    };
+  // 그룹별 목표 금액 확정
+  let targetEssentialTotal: number;
+  let targetFlexibleTotal: number;
+
+  if (isAdjusted) {
+    // 조정 필요 시 유연 지출을 제한 비율에 맞춤 (나머지는 필수 지출)
+    targetFlexibleTotal =
+      Math.floor((spendableBudget * maxFlexibleRatio) / 100) * 100;
+    targetEssentialTotal = spendableBudget - targetFlexibleTotal;
+  } else {
+    // 조정 불필요 시 기존 비율 유지
+    const essentialRatio = 1 - currentFlexibleRatio;
+    targetEssentialTotal =
+      Math.floor((spendableBudget * essentialRatio) / 100) * 100;
+    targetFlexibleTotal = spendableBudget - targetEssentialTotal;
   }
 
-  // 조정 로직: 유연 지출을 상한선 금액으로 강제 고정
-  const targetFlexibleTotal = spendableBudget * maxFlexibleRatio;
-  const targetEssentialTotal = spendableBudget - targetFlexibleTotal;
+  // 그룹별 배분
+  const essentialItems = statsArray.filter(
+    ([_, stat]) => stat.groupId !== 'flexible'
+  );
+  const flexibleItems = statsArray.filter(
+    ([_, stat]) => stat.groupId === 'flexible'
+  );
 
-  // 그룹별 내에서 다시 비중 재배분
-  const adjustedItems = distributedItems.map((item) => {
-    if (item.groupId === 'flexible') {
-      // 유연 그룹 내에서의 상대적 비중 계산
-      const groupWeight = item.amount / currentFlexibleTotal;
+  const finalEssential = distributeGroupBudget(
+    essentialItems,
+    targetEssentialTotal,
+    spendableBudget
+  );
+  const finalFlexible = distributeGroupBudget(
+    flexibleItems,
+    targetFlexibleTotal,
+    spendableBudget
+  );
 
-      return {
-        ...item,
-        amount: Math.floor((targetFlexibleTotal * groupWeight) / 100) * 100,
-      };
-    } else {
-      // 필수/고정 그룹 합산 (essential)
-      const currentEssentialTotal = spendableBudget - currentFlexibleTotal;
-      const groupWeight = item.amount / currentEssentialTotal;
-
-      return {
-        ...item,
-        amount: Math.floor((targetEssentialTotal * groupWeight) / 100) * 100,
-      };
-    }
-  });
-
-  // 자투리 보정 및 반환
+  // 결과 반환
   return {
-    items: fillGap(adjustedItems, spendableBudget).sort(
+    items: [...finalEssential, ...finalFlexible].sort(
       (a, b) => b.amount - a.amount
     ),
-    isAdjusted: true,
+    isAdjusted,
   };
 };
