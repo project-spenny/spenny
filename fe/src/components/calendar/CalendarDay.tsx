@@ -11,9 +11,6 @@ interface DayData {
   transactions: ITransaction[];
 }
 
-const CALENDAR_CELL_HEIGHT =
-  '[&_td]:!h-[50px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
-
 export const CalendarDay = ({
   day,
   modifiers,
@@ -29,25 +26,23 @@ export const CalendarDay = ({
     <Button
       ref={ref}
       variant="ghost"
-      size="icon"
       data-day={formatLocalDate(day.date)}
       data-selected-single={modifiers.selected}
       {...props}
       className={cn(
-        'flex flex-col items-center justify-start gap-1',
-        'aspect-square h-full w-full',
+        'flex flex-col items-center justify-start',
+        'h-full min-h-0 w-full min-w-0 overflow-hidden',
         'p-0.5 sm:p-2 sm:pt-1',
         'gap-0 sm:gap-1',
-        CALENDAR_CELL_HEIGHT,
         defaultClassNames.day
       )}
     >
-      <div className="flex flex-col gap-0.5 sm:gap-0.5 md:gap-1">
-        <span className="text-sm font-medium sm:text-base md:text-lg">
+      <div className="flex w-full flex-col items-center gap-0 overflow-hidden sm:gap-0.5 md:gap-1">
+        <span className="text-xs font-medium sm:text-base md:text-lg">
           {day.date.getDate()}
         </span>
         {dayData && (dayData.income > 0 || dayData.expense > 0) && (
-          <div className="flex flex-col text-[7px] sm:text-[10px] md:text-xs">
+          <div className="flex w-full flex-col items-center overflow-hidden text-[6px] leading-tight sm:text-[10px] md:text-xs">
             {dayData.income > 0 && (
               <span className="text-blue-500">
                 +{dayData.income.toLocaleString()}

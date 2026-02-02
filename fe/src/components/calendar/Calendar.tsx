@@ -36,7 +36,7 @@ interface PanelState {
   editingTransaction?: ITransaction;
 }
 const CALENDAR_CELL_HEIGHT =
-  '[&_td]:!h-[50px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
+  '[&_td]:!h-[44px] sm:[&_td]:!h-[70px] md:[&_td]:!h-[80px]';
 
 export const Calendar = ({
   currentMonth,
@@ -123,9 +123,9 @@ export const Calendar = ({
           onMonthChange={handleMonthChange}
           onDayClick={(day) => open(day)}
           className={cn(
-            'w-full rounded-md border border-none shadow-sm',
+            'w-full min-w-[280px] rounded-md border border-none shadow-sm',
             '[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden',
-            '[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_td]:p-0',
+            '[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_.rdp-table]:table-fixed [&_td]:overflow-hidden [&_td]:p-0',
             CALENDAR_CELL_HEIGHT
           )}
           components={{

@@ -100,11 +100,11 @@ export function CalendarClient({
   return (
     <CalendarProvider>
       <TransactionProvider>
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 px-6 md:px-12">
+        <div className="mx-auto flex w-full flex-col gap-3">
           <Tabs
             value={activeTab}
             onValueChange={handleTabChange}
-            className="w-full"
+            className="w-full p-2"
           >
             <TabsList className="bg-brand-subtle dark:bg-brand/10 mx-auto mt-4 flex h-12 w-full max-w-md gap-2 p-2 md:h-14">
               <TabsTrigger
