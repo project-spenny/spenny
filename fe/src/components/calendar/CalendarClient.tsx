@@ -11,6 +11,7 @@ import { useInfiniteTransactions } from '@/hooks/useInfiniteTransactions';
 import { ITransaction } from '@/types/transactions';
 import { DailyRecResult, DailyRecChartData } from '@/types/dailyRec';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { TransactionList } from '@/components/transaction/TransactionList';
 import TransactionClient from '@/app/(app)/history/TransactionClient';
 import { TransactionFilters } from '@/app/(app)/history/actions';
@@ -99,28 +100,34 @@ export function CalendarClient({
   return (
     <CalendarProvider>
       <TransactionProvider>
-        <div className="m-6 flex w-full flex-col gap-3">
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 px-6 md:px-12">
           <Tabs
             value={activeTab}
             onValueChange={handleTabChange}
             className="w-full"
           >
-            <div className="flex justify-center px-4">
-              <TabsList className="bg-brand-soft rounded-full">
-                <TabsTrigger
-                  className="data-[state=active]:bg-brand cursor-pointer rounded-full px-3 text-xs text-white"
-                  value="list"
-                >
-                  가계부
-                </TabsTrigger>
-                <TabsTrigger
-                  className="data-[state=active]:bg-brand cursor-pointer rounded-full px-3 text-xs text-white"
-                  value="calendar"
-                >
-                  캘린더
-                </TabsTrigger>
-              </TabsList>
-            </div>
+            <TabsList className="bg-brand-subtle dark:bg-brand/10 mx-auto mt-4 flex h-12 w-full max-w-md gap-2 p-2 md:h-14">
+              <TabsTrigger
+                value="list"
+                className={cn(
+                  'flex-1 cursor-pointer transition-all md:text-base',
+                  'hover:bg-brand/10',
+                  'data-[state=active]:font-bold'
+                )}
+              >
+                가계부
+              </TabsTrigger>
+              <TabsTrigger
+                value="calendar"
+                className={cn(
+                  'flex-1 cursor-pointer transition-all md:text-base',
+                  'hover:bg-brand/10',
+                  'data-[state=active]:font-bold'
+                )}
+              >
+                캘린더
+              </TabsTrigger>
+            </TabsList>
 
             <TabsContent value="calendar">
               <Calendar
