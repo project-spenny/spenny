@@ -92,7 +92,7 @@ export function CalendarClient({
   return (
     <CalendarProvider>
       <TransactionProvider>
-        <div className="m-3 flex w-full flex-col gap-3">
+        <div className="m-6 flex w-full flex-col gap-3">
           <Tabs
             value={activeTab}
             onValueChange={handleTabChange}

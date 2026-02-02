@@ -102,7 +102,7 @@ export const Calendar = ({
     </>
   );
   return (
-    <div className="flex w-full flex-col items-center p-4 md:p-6 lg:p-8">
+    <div className="flex w-full flex-col items-center">
       <div className="relative w-full max-w-xl">
         {isLoading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center">
@@ -112,24 +112,24 @@ export const Calendar = ({
           </div>
         )}
         <CalendarView
-        month={month}
-        mode="single"
-        selected={date}
-        onSelect={setDate}
-        onMonthChange={handleMonthChange}
-        onDayClick={(day) => open(day)}
-        className={cn(
-          'w-full rounded-md border border-none shadow-sm',
-          '[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden',
-          '[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_td]:p-0',
-          CALENDAR_CELL_HEIGHT
-        )}
-        components={{
-          DayButton: DayButtonWithData,
-          MonthCaption: CustomCaption,
-        }}
-        disableNavigation
-      />
+          month={month}
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          onMonthChange={handleMonthChange}
+          onDayClick={(day) => open(day)}
+          className={cn(
+            'w-full rounded-md border border-none shadow-sm',
+            '[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden',
+            '[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_td]:p-0',
+            CALENDAR_CELL_HEIGHT
+          )}
+          components={{
+            DayButton: DayButtonWithData,
+            MonthCaption: CustomCaption,
+          }}
+          disableNavigation
+        />
       </div>
       <ResponsivePanel isOpen={isOpen} setIsOpen={handleClose}>
         <div className="space-y-4">
