@@ -138,9 +138,9 @@ export function CalendarClient({
               >
                 <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
               </TransactionList>
-              <TransactionClient />
             </TabsContent>
           </Tabs>
+          <TransactionClient />
         </div>
       </TransactionProvider>
     </CalendarProvider>
