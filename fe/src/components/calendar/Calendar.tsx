@@ -123,7 +123,7 @@ export const Calendar = ({
           onMonthChange={handleMonthChange}
           onDayClick={(day) => open(day)}
           className={cn(
-            'w-full min-w-[280px] rounded-md border border-none shadow-sm',
+            'w-full min-w-[320px] rounded-md border border-none shadow-sm',
             '[&_.rdp-caption]:!hidden [&_.rdp-nav]:hidden',
             '[&_.rdp-month]:w-full [&_.rdp-table]:w-full [&_.rdp-table]:table-fixed [&_td]:overflow-hidden [&_td]:p-0',
             CALENDAR_CELL_HEIGHT
