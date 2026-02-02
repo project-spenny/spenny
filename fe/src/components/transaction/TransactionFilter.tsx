@@ -102,67 +102,75 @@ export function TransactionFilter({
 
   return (
     <div className="flex-col">
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <div className="flex w-full items-center gap-1 border border-none px-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex w-full items-center gap-1 px-2">
           <MonthPicker
             year={year}
             month={monthNum}
             onDateChange={handleDateChange}
           />
-          <div className="ml-auto flex">
-            <div
-              className={`relative sm:block ${onSearch ? 'block' : 'hidden'}`}
+          <div className="ml-auto flex sm:hidden">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setOnSearch(!onSearch)}
             >
-              <div>
-                <Input
-                  placeholder="검색어를 입력해주세요"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="mr-auto w-60 rounded-full text-xs"
-                />
-                <div className="absolute top-2/5 right-0 flex -translate-y-1/2 gap-1">
-                  {searchValue && (
-                    <div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleClearSearch}
-                        className="mr-auto"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            {onSearch ? (
-              <div>
+              {onSearch ? (
+                <X className="h-4 w-4" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          <div className="ml-auto hidden sm:block">
+            <div className="relative">
+              <Input
+                placeholder="검색어를 입력해주세요"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-48 rounded-full pr-8 text-xs md:w-60"
+              />
+              {searchValue && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="right-auto h-8 w-8 sm:hidden"
-                  onClick={() => setOnSearch(!onSearch)}
+                  onClick={handleClearSearch}
+                  className="absolute top-1/2 right-1 h-6 w-6 -translate-y-1/2"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3 w-3" />
                 </Button>
-              </div>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="right-auto h-8 w-8 sm:hidden"
-                onClick={() => setOnSearch(!onSearch)}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            )}
+              )}
+            </div>
           </div>
         </div>
+        {onSearch && (
+          <div className="px-2 sm:hidden">
+            <div className="relative">
+              <Input
+                placeholder="검색어를 입력해주세요"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-full rounded-full pr-8 text-xs"
+              />
+              {searchValue && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClearSearch}
+                  className="absolute top-1/2 right-1 h-6 w-6 -translate-y-1/2"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
       <div className="mt-4">{children}</div>
       <div className="mt-4 flex gap-2">
