@@ -6,6 +6,7 @@ import ResponsivePanel from '../panel/ResponsivePanel';
 import { DailyRecPanel } from './DailyRecPanel';
 import { DailyRecChartData, DailyRecResult } from '@/types/dailyRec';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   daily: DailyRecResult;
@@ -13,6 +14,33 @@ type Props = {
 };
 
 export const DailyRecBar = ({ daily, dailyChartData }: Props) => {
+  const router = useRouter();
+  const hasBudget = (daily?.debug?.varTotal ?? 0) > 0;
+  if (!hasBudget) {
+    return (
+      <div
+        className={cn(
+          'flex h-full items-center justify-between rounded-md px-4 py-3',
+          'bg-brand-subtle dark:bg-muted/40',
+          'dark:border-border border border-transparent',
+          'border-l-brand border-l-4'
+        )}
+      >
+        <div className="text-brand-strong text-sm font-medium">
+          이 달 예산을 설정해주세요
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="hover:bg-brand-soft/40"
+          onClick={() => router.push(`/budget`)}
+        >
+          예산 설정하기
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -55,6 +83,7 @@ export const DailyRecBar = ({ daily, dailyChartData }: Props) => {
             size="sm"
             className="hover:bg-brand-soft/40 flex items-center gap-1"
           >
+            <span className="text-xs">상세보기</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         }

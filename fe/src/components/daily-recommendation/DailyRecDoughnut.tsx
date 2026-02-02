@@ -63,30 +63,37 @@ export const DailyRecUsageCard = ({
       </CardHeader>
 
       <CardContent>
-        <div className="grid grid-cols-2 items-center">
+        <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-2">
           {/* Doughnut */}
-          <div className="h-38 w-38">
-            <Doughnut data={doughnutData} options={doughnutOptions} />
+          <div className="flex justify-center sm:justify-start">
+            <div className="h-32 w-32 sm:h-40 sm:w-40">
+              <Doughnut data={doughnutData} options={doughnutOptions} />
+            </div>
           </div>
 
-          <div className="space-y-1">
-            <p className="flex items-center justify-between">
+          {/* Text */}
+          <div className="space-y-2">
+            <p className="flex items-center justify-between gap-3">
               <span className="text-muted-foreground text-sm">
                 이번 달 사용 가능 금액
               </span>
-              <span className="font-medium">{varTotal.toLocaleString()}원</span>
+              <span className="shrink-0 font-medium">
+                {varTotal.toLocaleString()}원
+              </span>
             </p>
-            <p className="flex items-center justify-between">
+
+            <p className="flex items-center justify-between gap-3">
               <span className="text-muted-foreground text-sm">
                 어제까지의 지출
               </span>
-              <span className="font-medium">
+              <span className="shrink-0 font-medium">
                 {varSpentUntilYesterday.toLocaleString()}원
               </span>
             </p>
-            <p className="flex items-center justify-between">
+
+            <p className="flex items-center justify-between gap-3">
               <span className="text-muted-foreground text-sm">남은 금액</span>
-              <span className="font-medium">
+              <span className="shrink-0 font-medium">
                 {varRemaining.toLocaleString()}원
               </span>
             </p>

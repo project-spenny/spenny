@@ -5,10 +5,10 @@ import LoginActions from '@/components/login/LoginActions';
 
 export default function LoginPage() {
   return (
-    <div className="bg-brand flex h-screen w-full flex-col overflow-hidden lg:flex-row">
+    <div className="bg-brand flex min-h-dvh w-full flex-col lg:flex-row">
       {/* 브랜드 섹션 */}
-      <div className="flex flex-col items-center px-6 py-10 lg:flex-1 lg:items-start lg:justify-center lg:p-16">
-        <h1 className="text-3xl leading-tight font-extrabold tracking-tighter text-white lg:text-6xl">
+      <div className="flex flex-col items-center justify-center px-6 py-10 text-center lg:flex-1 lg:items-start lg:p-16 lg:text-left">
+        <h1 className="text-2xl leading-tight font-extrabold tracking-tighter text-white lg:text-6xl">
           어제보다 더 나은
           <br className="hidden lg:block" />
           <span className="text-brand-soft ml-2 text-4xl lg:ml-0 lg:text-6xl">
@@ -56,12 +56,12 @@ export default function LoginPage() {
         <div className="flex h-full w-full max-w-[340px] flex-col justify-center">
           <div className="mb-3 flex justify-center lg:mb-10">
             <Image
-              src="/logo_vertical.svg"
+              src="/logo_pig.svg"
               alt="logo"
-              width={180}
+              width={150}
               height={200}
               priority
-              className="lg:w-75"
+              className="lg:w-65"
             />
           </div>
           <div className="mb-8 flex flex-col items-center text-center lg:items-start lg:text-left">
