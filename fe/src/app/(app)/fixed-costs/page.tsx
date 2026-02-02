@@ -1,12 +1,13 @@
+import { formatLocalDate, parseLocalDate } from '@/utils/date';
+
+import type { FixedCostsFilters as Filters } from '@/types/fixed-costs';
 import FixedCostsClient from '@/components/fixed-costs/FixedCostsClient';
+import FixedCostsFilters from '@/components/fixed-costs/FixedCostsFilters';
 import FixedCostsList from '@/components/fixed-costs/FixedCostsList';
 import FixedCostsListSkeleton from '@/components/fixed-costs/FixedCostsListSkeleton';
-import { fetchFixedRulesServer } from '@/services/fixed-costs/fixedCostsServer';
-import { Suspense } from 'react';
 import { FixedCostsProvider } from './FixedCostsContext';
-import FixedCostsFilters from '@/components/fixed-costs/FixedCostsFilters';
-import type { FixedCostsFilters as Filters } from '@/types/fixed-costs';
-import { formatLocalDate, parseLocalDate } from '@/utils/date';
+import { Suspense } from 'react';
+import { fetchFixedRulesServer } from '@/services/fixed-costs/fixedCostsServer';
 
 interface PageProps {
   searchParams: Promise<{
@@ -40,7 +41,7 @@ export default async function FixedCostsPage({ searchParams }: PageProps) {
 
   return (
     <FixedCostsProvider>
-      <div className="flex min-h-screen w-full flex-col">
+      <div className="flex w-full flex-col">
         <div className="flex w-full flex-col items-center space-y-6 p-4 md:p-6 lg:p-8">
           <div className="w-full max-w-xl space-y-6">
             <header>
