@@ -6,7 +6,6 @@ import { TitleInput } from '../transaction/common/TitleInput';
 import { TypeSelector } from '../transaction/common/TypeSelector';
 import { CategorySelector } from '../transaction/common/CategorySelector';
 import { AmountInput } from '../transaction/common/AmountInput';
-import { IFixedCostFormData, useFixedCostForm } from '@/hooks/useFixedCostForm';
 import { toast } from 'sonner';
 import FixedCostScheduleFields from './FixedCostsScheduleFields';
 import { CreateFixedRuleInput } from '@/types/fixed-costs';
@@ -22,10 +21,17 @@ import FixedCostDeleteDialog from './FixedCostDeleteDialog';
 import { Spinner } from '../ui/spinner';
 import { useAuth } from '@/providers/AuthProvider';
 import { isEndedFixedRule } from '@/utils/fixed-costs/rule';
+import {
+  fixedCostFormSchema,
+  fixedCostFormDefaultValues,
+  type FixedCostFormValues,
+} from '@/schemas/fixedCosts';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
-  initialData?: Partial<IFixedCostFormData>;
+  initialData?: Partial<FixedCostFormValues>;
   ruleId?: string;
   onSuccess: () => void;
 };
@@ -42,54 +48,65 @@ export default function FixedCostSubmitForm({
   const [pendingPayload, setPendingPayload] =
     useState<CreateFixedRuleInput | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   const isEndedRule = mode === 'edit' && isEndedFixedRule(initialData);
 
-  const {
-    formData,
-    categoryOpen,
-    setCategoryOpen,
-    UpdateField,
-    validateFormData,
-  } = useFixedCostForm(initialData);
+  const form = useForm<FixedCostFormValues>({
+    resolver: zodResolver(fixedCostFormSchema),
+    defaultValues: {
+      ...fixedCostFormDefaultValues,
+      ...(initialData ?? {}),
+    },
+    mode: 'onSubmit',
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const { control, handleSubmit, watch, formState } = form;
+  const { isDirty } = form.formState;
+
+  const cycle = watch('cycle');
+  const weekday = watch('weekday');
+  const monthday = watch('monthday');
+
+  const initialScheduleRef = useRef({
+    cycle: initialData?.cycle ?? null,
+    weekday: initialData?.weekday ?? null,
+    monthday: initialData?.monthday ?? null,
+  });
+
+  const hasScheduleChange = () => {
+    const init = initialScheduleRef.current;
+    return (
+      init.cycle !== cycle ||
+      (cycle === 'WEEKLY' && init.weekday !== weekday) ||
+      (cycle === 'MONTHLY' && init.monthday !== monthday)
+    );
+  };
+
+  const onValid = async (data: FixedCostFormValues) => {
     if (isEndedRule) {
       toast.error('종료된 고정비 규칙은 수정할 수 없습니다.');
       return;
     }
     if (isSubmitting) return; // 중복 제출 방지
-
-    const errorMsg = validateFormData();
-    if (errorMsg) {
-      toast(errorMsg);
-      return;
-    }
-
     if (authLoading) return;
     if (!userId) return;
 
     const payload: CreateFixedRuleInput = {
-      title: formData.title.trim(),
-      type: formData.type as 'income' | 'expense',
-      amount: Number(formData.amount),
-      category_id: formData.category_id,
+      title: data.title.trim(),
+      type: data.type,
+      amount: Number(data.amount), // 팀원 스키마 재사용(문자열)이라 그대로 Number()
+      category_id: data.category_id,
 
-      cycle: formData.cycle as 'WEEKLY' | 'MONTHLY',
-      weekday: formData.weekday,
-      monthday: formData.monthday,
+      cycle: data.cycle,
+      weekday: data.weekday,
+      monthday: data.monthday,
 
-      start_date: formatLocalDate(formData.start_date),
-      end_date: formData.end_date ? formatLocalDate(formData.end_date) : null,
+      start_date: formatLocalDate(data.start_date),
+      end_date: data.end_date ? formatLocalDate(data.end_date) : null,
     };
 
     if (mode === 'edit') {
-      if (isEndedRule) {
-        toast.error('종료된 고정비 규칙은 수정할 수 없습니다.');
-        return;
-      }
-
       setPendingPayload(payload);
       setConfirmOpen(true);
       return;
@@ -105,6 +122,21 @@ export default function FixedCostSubmitForm({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const onInvalid = () => {
+    const err =
+      formState.errors.title?.message ||
+      formState.errors.type?.message ||
+      formState.errors.category_id?.message ||
+      formState.errors.amount?.message ||
+      formState.errors.cycle?.message ||
+      formState.errors.weekday?.message ||
+      formState.errors.monthday?.message ||
+      formState.errors.start_date?.message ||
+      formState.errors.end_date?.message;
+
+    if (err) toast.error(String(err));
   };
 
   const closeConfirm = () => {
@@ -182,25 +214,10 @@ export default function FixedCostSubmitForm({
     }
   };
 
-  const initialScheduleRef = useRef({
-    cycle: initialData?.cycle ?? null,
-    weekday: initialData?.weekday ?? null,
-    monthday: initialData?.monthday ?? null,
-  });
-
-  const hasScheduleChange = () => {
-    const init = initialScheduleRef.current;
-    return (
-      init.cycle !== formData.cycle ||
-      (formData.cycle === 'WEEKLY' && init.weekday !== formData.weekday) ||
-      (formData.cycle === 'MONTHLY' && init.monthday !== formData.monthday)
-    );
-  };
-
   return (
     <div className="flex flex-1 flex-col">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onValid, onInvalid)}
         className="mx-auto flex min-h-full w-full flex-1 flex-col px-10"
       >
         <div className="bg-background sticky top-0 z-10 flex items-center justify-between border-b pb-4">
@@ -215,38 +232,57 @@ export default function FixedCostSubmitForm({
         </div>
 
         <div className="min-h-0 flex-1 space-y-6 py-6">
-          <TitleInput
-            value={formData.title}
-            onChange={(title) => UpdateField('title', title)}
+          <Controller
+            control={control}
+            name="title"
+            render={({ field }) => (
+              <TitleInput value={field.value} onChange={field.onChange} />
+            )}
           />
-          <TypeSelector
-            value={formData.type}
-            onChange={(type) => {
-              UpdateField('type', type);
-              UpdateField('category_id', '');
-            }}
+          <Controller
+            control={control}
+            name="type"
+            render={({ field }) => (
+              <TypeSelector
+                value={field.value}
+                onChange={(type) => {
+                  field.onChange(type);
+                  form.setValue('category_id', '');
+                }}
+              />
+            )}
           />
-          <CategorySelector
-            transactionType={formData.type}
-            value={formData.category_id}
-            open={categoryOpen}
-            onOpenChange={setCategoryOpen}
-            onChange={(category) => UpdateField('category_id', category)}
+          <Controller
+            control={control}
+            name="category_id"
+            render={({ field }) => (
+              <CategorySelector
+                transactionType={watch('type')}
+                value={field.value}
+                open={categoryOpen}
+                onOpenChange={setCategoryOpen}
+                onChange={field.onChange}
+              />
+            )}
           />
-          <AmountInput
-            value={formData.amount}
-            onChange={(amount) => UpdateField('amount', amount)}
+          <Controller
+            control={control}
+            name="amount"
+            render={({ field }) => (
+              <AmountInput value={field.value} onChange={field.onChange} />
+            )}
           />
           {/* 고정비 영역 */}
-          <FixedCostScheduleFields
-            formData={formData}
-            UpdateField={UpdateField}
-          />
+          <FixedCostScheduleFields form={form} />
         </div>
 
         <div className="bg-background sticky bottom-0 z-10 border-t py-4">
           {mode === 'create' ? (
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting || !isDirty}
+            >
               {isSubmitting && <Spinner />}
               저장
             </Button>
@@ -261,7 +297,7 @@ export default function FixedCostSubmitForm({
               <Button
                 type="submit"
                 className="flex-1"
-                disabled={isSubmitting || isEndedRule}
+                disabled={isSubmitting || isEndedRule || !isDirty}
               >
                 {isSubmitting && <Spinner />}
                 수정
@@ -275,7 +311,7 @@ export default function FixedCostSubmitForm({
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         hasScheduleChange={hasScheduleChange()}
-        cycle={formData.cycle as 'WEEKLY' | 'MONTHLY'}
+        cycle={cycle}
         onApplyIncludeCurrent={handleApplyIncludeCurrent}
         onApplyExcludeCurrent={handleApplyExcludeCurrent}
         pending={isSubmitting}
