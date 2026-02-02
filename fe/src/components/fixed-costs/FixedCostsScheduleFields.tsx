@@ -91,10 +91,10 @@ export default function FixedCostScheduleFields({ form }: Props) {
               setValue('monthday', null, { shouldDirty: true });
             }}
             className={cn(
-              'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
+              'cursor-pointer rounded-lg border-2 px-6 py-2 text-sm font-medium transition-all',
               cycle === 'WEEKLY'
-                ? 'border-gray-500'
-                : 'border-gray-300 hover:border-gray-400'
+                ? 'border-brand-strong bg-brand-soft/20 text-brand-strong dark:border-brand-soft dark:bg-brand-soft/10 dark:text-brand-soft'
+                : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
             )}
           >
             주간
@@ -111,10 +111,10 @@ export default function FixedCostScheduleFields({ form }: Props) {
               setValue('monthday', null, { shouldDirty: true });
             }}
             className={cn(
-              'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
+              'cursor-pointer rounded-lg border-2 px-6 py-2 text-sm font-medium transition-all',
               cycle === 'MONTHLY'
-                ? 'border-gray-500'
-                : 'border-gray-300 hover:border-gray-400'
+                ? 'border-brand-strong bg-brand-soft/20 text-brand-strong dark:border-brand-soft dark:bg-brand-soft/10 dark:text-brand-soft'
+                : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
             )}
           >
             월간
@@ -138,10 +138,10 @@ export default function FixedCostScheduleFields({ form }: Props) {
                   })
                 }
                 className={cn(
-                  'h-10 rounded-md border text-sm font-medium transition-colors',
+                  'h-10 rounded-md border text-sm font-medium transition-all',
                   weekday === d.value
-                    ? 'border-gray-500'
-                    : 'border-gray-300 hover:border-gray-400'
+                    ? 'border-brand-strong bg-brand-soft/20 text-brand-strong dark:border-brand-soft dark:bg-brand-soft/10 dark:text-brand-soft'
+                    : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
                 )}
               >
                 {d.label}
