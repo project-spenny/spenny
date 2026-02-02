@@ -88,8 +88,22 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
         {/* 요약 카드 */}
         <Card className="border-l-brand border-l-4">
           <CardHeader>
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <Badge
+                variant="outline"
+                className={cn(
+                  'order-1 flex w-fit items-center gap-2 self-start',
+                  'sm:order-2 sm:self-auto',
+                  badgeStyle.badgeClass
+                )}
+              >
+                <span
+                  className={cn('h-2 w-2 rounded-full', badgeStyle.dotClass)}
+                />
+                {title}
+              </Badge>
+
+              <div className="order-2 space-y-1 sm:order-1">
                 <p className="text-muted-foreground text-xs">
                   오늘 남은 권장 사용액
                 </p>
@@ -97,7 +111,7 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
                   {amount.toLocaleString()}원
                 </CardTitle>
 
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-sm break-keep">
                   총 권장액{' '}
                   <span className="text-foreground font-medium">
                     {totalAmount.toLocaleString()}원
@@ -109,15 +123,6 @@ export const DailyRecPanel = ({ daily, dailyChartData, loading }: Props) => {
                   </span>
                 </p>
               </div>
-              <Badge
-                variant="outline"
-                className={cn('flex items-center gap-2', badgeStyle.badgeClass)}
-              >
-                <span
-                  className={cn('h-2 w-2 rounded-full', badgeStyle.dotClass)}
-                />
-                {title}
-              </Badge>
             </div>
           </CardHeader>
 
