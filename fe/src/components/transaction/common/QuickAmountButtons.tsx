@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { RefreshCcw } from 'lucide-react';
 export const QuickAmountButtons = ({
   value,
   onClick,

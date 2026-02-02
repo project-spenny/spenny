@@ -27,6 +27,7 @@ export const CalendarDay = ({
   }, [modifiers.focused]);
   return (
     <Button
+      ref={ref}
       variant="ghost"
       size="icon"
       data-day={formatLocalDate(day.date)}

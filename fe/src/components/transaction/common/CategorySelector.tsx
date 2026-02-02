@@ -8,7 +8,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import Image from 'next/image';
-import { se } from 'date-fns/locale';
 
 interface CategorySelectorProps {
   transactionType: string;
