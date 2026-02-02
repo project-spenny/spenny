@@ -15,7 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Button } from '../ui/button';
-import { X, Search } from 'lucide-react';
+import { X, Search, RotateCcw } from 'lucide-react';
 import { TransactionFilters } from '@/app/(app)/history/actions';
 import { CATEGORIES } from '@/constants/categories';
 import Image from 'next/image';
@@ -93,6 +93,17 @@ export function TransactionFilter({
     setSearchValue('');
     updateFilter('searchQuery', undefined);
   };
+
+  const handleClearAllFilters = () => {
+    setSearchValue('');
+    setOnSearch(false);
+    if (onFiltersChange) {
+      onFiltersChange({});
+    }
+  };
+
+  const hasActiveFilters =
+    !!filters?.type || !!filters?.category_id || !!filters?.searchQuery;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -173,22 +184,20 @@ export function TransactionFilter({
         )}
       </div>
       <div className="mt-4">{children}</div>
-      <div className="mt-4 flex gap-2">
-        <div>
-          <Select
-            value={filters?.type || 'all'}
-            onValueChange={handleTypeChange}
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="유형" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">모든 내역</SelectItem>
-              <SelectItem value="income">수입</SelectItem>
-              <SelectItem value="expense">지출</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="mt-4 flex items-center gap-2">
+        <Select
+          value={filters?.type || 'all'}
+          onValueChange={handleTypeChange}
+        >
+          <SelectTrigger className="w-28 sm:w-32">
+            <SelectValue placeholder="유형" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">모든 내역</SelectItem>
+            <SelectItem value="income">수입</SelectItem>
+            <SelectItem value="expense">지출</SelectItem>
+          </SelectContent>
+        </Select>
         <div>
           <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
             <PopoverTrigger asChild>
@@ -257,6 +266,18 @@ export function TransactionFilter({
             </PopoverContent>
           </Popover>
         </div>
+        {hasActiveFilters && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={handleClearAllFilters}
+            className="ml-auto h-8 w-8 shrink-0"
+            title="필터 초기화"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );
