@@ -14,6 +14,7 @@ import {
 import { CHART_COLORS } from '@/constants/colors';
 import { Line } from 'react-chartjs-2';
 import { TransactionAnalysis } from '@/types/analysis';
+import { text } from 'stream/consumers';
 import { useTheme } from 'next-themes';
 
 // Line Chart에 필요한 요소 등록
@@ -137,7 +138,7 @@ const WeeklyChart = ({
   };
 
   return (
-    <div className="relative h-[250px] w-full md:h-[300px]">
+    <div className="relative h-[200px] w-full md:h-[300px]">
       <Line data={chartData} options={options} />
     </div>
   );

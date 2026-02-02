@@ -13,7 +13,7 @@ const AnalysisTabs = ({ children }: { children: React.ReactNode }) => {
   return (
     <Tabs
       defaultValue="지출"
-      className="mx-auto w-full max-w-4xl px-6 md:px-12"
+      className="mx-auto w-full max-w-4xl px-4 md:px-12"
     >
       <TabsList className="bg-brand-subtle dark:bg-brand/10 flex h-12 w-full gap-2 p-2 md:h-14">
         {TABS_CONFIG.map((tab) => (
