@@ -138,7 +138,7 @@ export function TransactionFilter({
   return (
     <div className="flex-col">
       <div className="flex flex-col gap-2 sm:flex-row">
-        <div className="flex items-center gap-1 border border-none px-2">
+        <div className="flex w-full items-center gap-1 border border-none px-2">
           <Button
             type="button"
             variant="ghost"
@@ -218,7 +218,7 @@ export function TransactionFilter({
           </Button>
           <div className="ml-auto flex">
             <div
-              className={`relative sm:ml-auto sm:block ${onSearch ? 'block' : 'hidden'}`}
+              className={`relative sm:block ${onSearch ? 'block' : 'hidden'}`}
             >
               <div>
                 <Input
@@ -297,30 +297,28 @@ export function TransactionFilter({
                 className="w-36 justify-start text-sm"
                 disabled={!filters?.type}
               >
-                {!filters?.type ? (
-                  '유형 먼저 선택'
-                ) : filters?.category_id ? (
-                  (() => {
-                    const selected = availableCategories.find(
-                      (cat) => cat.category_key === filters.category_id
-                    );
-                    return selected ? (
-                      <div className="flex items-center gap-2">
-                        <Image
-                          src={selected.icon}
-                          alt={selected.name_ko}
-                          width={18}
-                          height={18}
-                        />
-                        <span>{selected.name_ko}</span>
-                      </div>
-                    ) : (
-                      '모든 카테고리'
-                    );
-                  })()
-                ) : (
-                  '모든 카테고리'
-                )}
+                {!filters?.type
+                  ? '유형 먼저 선택'
+                  : filters?.category_id
+                    ? (() => {
+                        const selected = availableCategories.find(
+                          (cat) => cat.category_key === filters.category_id
+                        );
+                        return selected ? (
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={selected.icon}
+                              alt={selected.name_ko}
+                              width={18}
+                              height={18}
+                            />
+                            <span>{selected.name_ko}</span>
+                          </div>
+                        ) : (
+                          '모든 카테고리'
+                        );
+                      })()
+                    : '모든 카테고리'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-2" align="start">
