@@ -28,6 +28,7 @@ import {
 } from '@/schemas/fixedCosts';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Badge } from '../ui/badge';
 
 type FixedCostSubmitFormProps = {
   mode: 'create' | 'edit';
@@ -220,14 +221,17 @@ export default function FixedCostSubmitForm({
         onSubmit={handleSubmit(onValid, onInvalid)}
         className="mx-auto flex min-h-full w-full flex-1 flex-col px-10"
       >
-        <div className="bg-background sticky top-0 z-10 flex items-center justify-between border-b pb-4">
+        <div className="bg-background sticky top-0 z-10 border-b pb-4">
           <Label className="text-xl">
             {mode === 'create' ? '고정비 추가' : '고정비 수정'}
           </Label>
           {isEndedRule && (
-            <div className="bg-muted text-muted-foreground rounded-md px-3 py-2 text-sm">
+            <Badge
+              variant="outline"
+              className="border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400"
+            >
               종료된 고정비 규칙은 수정할 수 없습니다.
-            </div>
+            </Badge>
           )}
         </div>
 

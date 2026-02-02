@@ -49,7 +49,10 @@ export default function FixedCostItem({ rule, onEdit }: FixedCostItemProps) {
           </Badge>
 
           {isEnded && (
-            <Badge variant="secondary" className="h-5 px-2 text-xs">
+            <Badge
+              variant="secondary"
+              className="border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400"
+            >
               종료됨
             </Badge>
           )}
