@@ -165,7 +165,7 @@ export default function FixedCostScheduleFields({ form }: Props) {
                   value={field.value ? String(field.value) : ''}
                   onValueChange={(v) => field.onChange(v ? Number(v) : null)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="날짜를 선택해주세요" />
                   </SelectTrigger>
                   <SelectContent>
