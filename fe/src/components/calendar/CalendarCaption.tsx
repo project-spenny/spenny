@@ -74,25 +74,6 @@ export const CalendarCaption = ({
             </div>
           </div>
         </div>
-        <div className="space-y-1 text-right">
-          <div className="flex items-baseline justify-end gap-2">
-            <span className="text-muted-foreground min-w-24 text-xs font-medium sm:text-sm">
-              수입
-            </span>
-            <span className="text-sm font-semibold tracking-tight text-blue-500 sm:text-base">
-              {income.toLocaleString()}원
-            </span>
-          </div>
-
-          <div className="flex items-baseline justify-end gap-2">
-            <span className="text-muted-foreground text-xs font-medium sm:text-sm">
-              지출
-            </span>
-            <span className="text-sm font-semibold tracking-tight text-red-400 sm:text-base">
-              {expense.toLocaleString()}원
-            </span>
-          </div>
-        </div>
       </div>
 
       <div className="flex-2">{children}</div>
