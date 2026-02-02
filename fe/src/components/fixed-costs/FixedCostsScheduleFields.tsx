@@ -12,29 +12,35 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import type { IFixedCostFormData } from '@/hooks/useFixedCostForm';
+import { Controller, type UseFormReturn } from 'react-hook-form';
+import { FixedCostFormValues } from '@/schemas/fixedCosts';
 
 type Props = {
-  formData: IFixedCostFormData;
-  UpdateField: <K extends keyof IFixedCostFormData>(
-    key: K,
-    value: IFixedCostFormData[K]
-  ) => void;
+  form: UseFormReturn<FixedCostFormValues>;
 };
 
-export default function FixedCostScheduleFields({
-  formData,
-  UpdateField,
-}: Props) {
+export default function FixedCostScheduleFields({ form }: Props) {
+  const { control, watch, setValue } = form;
+
+  const cycle = watch('cycle');
+  const endDate = watch('end_date');
+  const weekday = watch('weekday');
+
   return (
     <>
       {/* 시작일 */}
       <div className="flex">
         <Label className="w-28 pr-2">시작일</Label>
-        <DatePicker
-          value={formData.start_date}
-          onChange={(date) => UpdateField('start_date', date)}
-          hideLabel
+        <Controller
+          control={control}
+          name="start_date"
+          render={({ field }) => (
+            <DatePicker
+              value={field.value}
+              onChange={(date) => field.onChange(date)}
+              hideLabel
+            />
+          )}
         />
       </div>
 
@@ -43,20 +49,29 @@ export default function FixedCostScheduleFields({
         <div className="flex items-center justify-between">
           <Label>종료일 (선택)</Label>
           <Switch
-            checked={formData.end_date !== null}
+            checked={endDate !== null}
             onCheckedChange={(checked) => {
-              UpdateField('end_date', checked ? new Date() : null);
+              setValue('end_date', checked ? new Date() : null, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
             }}
           />
         </div>
         <p className="text-muted-foreground text-xs">
           종료일을 설정하려면 오른쪽 스위치를 켜세요.
         </p>
-        {formData.end_date && (
-          <DatePicker
-            value={formData.end_date}
-            onChange={(date) => UpdateField('end_date', date)}
-            hideLabel
+        {endDate && (
+          <Controller
+            control={control}
+            name="end_date"
+            render={({ field }) => (
+              <DatePicker
+                value={field.value as Date}
+                onChange={(date) => field.onChange(date)}
+                hideLabel
+              />
+            )}
           />
         )}
       </div>
@@ -68,13 +83,16 @@ export default function FixedCostScheduleFields({
           <button
             type="button"
             onClick={() => {
-              UpdateField('cycle', 'WEEKLY');
-              UpdateField('weekday', null);
-              UpdateField('monthday', null);
+              setValue('cycle', 'WEEKLY', {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              setValue('weekday', null, { shouldDirty: true });
+              setValue('monthday', null, { shouldDirty: true });
             }}
             className={cn(
               'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
-              formData.cycle === 'WEEKLY'
+              cycle === 'WEEKLY'
                 ? 'border-gray-500'
                 : 'border-gray-300 hover:border-gray-400'
             )}
@@ -85,13 +103,16 @@ export default function FixedCostScheduleFields({
           <button
             type="button"
             onClick={() => {
-              UpdateField('cycle', 'MONTHLY');
-              UpdateField('weekday', null);
-              UpdateField('monthday', null);
+              setValue('cycle', 'MONTHLY', {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              setValue('weekday', null, { shouldDirty: true });
+              setValue('monthday', null, { shouldDirty: true });
             }}
             className={cn(
               'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
-              formData.cycle === 'MONTHLY'
+              cycle === 'MONTHLY'
                 ? 'border-gray-500'
                 : 'border-gray-300 hover:border-gray-400'
             )}
@@ -102,7 +123,7 @@ export default function FixedCostScheduleFields({
       </div>
 
       {/* 주간 : 요일 버튼 */}
-      {formData.cycle === 'WEEKLY' && (
+      {cycle === 'WEEKLY' && (
         <div className="space-y-5">
           <Label className="w-28 pr-2">반복 요일</Label>
           <div className="grid grid-cols-7 gap-2">
@@ -110,10 +131,15 @@ export default function FixedCostScheduleFields({
               <button
                 key={d.value}
                 type="button"
-                onClick={() => UpdateField('weekday', d.value)}
+                onClick={() =>
+                  setValue('weekday', d.value, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
                 className={cn(
                   'h-10 rounded-md border text-sm font-medium transition-colors',
-                  formData.weekday === d.value
+                  weekday === d.value
                     ? 'border-gray-500'
                     : 'border-gray-300 hover:border-gray-400'
                 )}
@@ -126,25 +152,32 @@ export default function FixedCostScheduleFields({
       )}
 
       {/* 월간 : 날짜 Select */}
-      {formData.cycle === 'MONTHLY' && (
+      {cycle === 'MONTHLY' && (
         <>
           <div className="flex items-center">
             <Label className="w-28 pr-2">반복 날짜</Label>
-            <Select
-              value={formData.monthday ? String(formData.monthday) : ''}
-              onValueChange={(v) => UpdateField('monthday', Number(v))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="날짜를 선택해주세요" />
-              </SelectTrigger>
-              <SelectContent>
-                {MONTH_DAYS.map((d) => (
-                  <SelectItem key={d} value={String(d)}>
-                    {d}일
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+            <Controller
+              control={control}
+              name="monthday"
+              render={({ field }) => (
+                <Select
+                  value={field.value ? String(field.value) : ''}
+                  onValueChange={(v) => field.onChange(v ? Number(v) : null)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="날짜를 선택해주세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MONTH_DAYS.map((d) => (
+                      <SelectItem key={d} value={String(d)}>
+                        {d}일
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
           <p className="text-muted-foreground text-xs">
             29~31일은 해당 월에 날짜가 없으면 말일로 자동 조정돼요.
