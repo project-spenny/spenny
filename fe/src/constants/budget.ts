@@ -4,6 +4,8 @@ import {
   GroupInfo,
 } from '@/types/budgetGuide';
 
+export const MAX_BUDGET_AMOUNT = 1000000000 as const; // 10억
+
 /** 카테고리별 그룹 매핑 */
 export const EXPENSE_CATEGORY_GROUP_MAP: Record<string, CategoryGroupId> = {
   // Essential (필수)
@@ -53,14 +55,15 @@ export const BUDGET_TEMPLATES: BudgetTemplate[] = [
     id: 'keep-pattern',
     title: '지출 패턴 유지',
     subtitle: '현재 상태 유지',
-    description: '최근 3개월 소비 비율을 그대로 유지하여 예산을 짭니다.',
+    description:
+      '최근 소비 비중을 반영하여 익숙한 패턴 안에서 예산을 설정합니다.',
     // 비율 제한 없음 (기존 데이터 그대로)
   },
   {
     id: 'save-flexible',
     title: '유연 지출 절감형',
     subtitle: 'Flexible ≤ 40%',
-    description: '쇼핑, 외식 등 유연 지출을 40% 이하로 줄여 예산을 짭니다.',
+    description: '유연 지출을 40% 이내로 조정하여 불필요한 지출을 줄입니다.',
     flexibleLimitRatio: 0.4,
   },
   {
@@ -68,7 +71,7 @@ export const BUDGET_TEMPLATES: BudgetTemplate[] = [
     title: '강력 절약형',
     subtitle: 'Flexible ≤ 30%',
     description:
-      '꼭 필요한 지출 위주로 70%를 배분하고 유연 지출을 30%로 제한합니다.',
+      '유연 지출을 30% 이하로 엄격히 제한하여 불필요한 지출을 최소화합니다.',
     flexibleLimitRatio: 0.3,
   },
 ] as const;

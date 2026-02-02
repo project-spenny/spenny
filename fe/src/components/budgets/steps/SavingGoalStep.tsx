@@ -1,7 +1,8 @@
-import { AlertTriangle } from 'lucide-react';
 import DialogStepHeader from '@/components/budgets/steps/DialogStepHeader';
 import { Label } from '@/components/ui/label';
+import { MAX_BUDGET_AMOUNT } from '@/constants/budget';
 import { Slider } from '@/components/ui/slider';
+import { useState } from 'react';
 
 type SavingGoalStepProps = {
   income: number;
@@ -14,6 +15,9 @@ const SavingGoalStep = ({
   savingsAmount,
   onChange,
 }: SavingGoalStepProps) => {
+  const [isIncomeFocused, setIsIncomeFocused] = useState(false);
+  const [isSavingsFocused, setIsSavingsFocused] = useState(false);
+
   const savingsRate =
     income > 0 ? Math.round((savingsAmount / income) * 100) : 0;
   const spendableBudget = income - savingsAmount || 0;
@@ -26,10 +30,26 @@ const SavingGoalStep = ({
     onChange(income, newAmount);
   };
 
-  // 금액 입력 시
+  // 수입 입력 시
+  const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+
+    let newIncome = value;
+    if (value > MAX_BUDGET_AMOUNT) {
+      newIncome = MAX_BUDGET_AMOUNT;
+    }
+
+    // 현재 설정된 저축률(savingsRate)에 맞춰 저축 금액 업데이트
+    const newAmount = Math.floor((newIncome * savingsRate) / 100);
+
+    onChange(newIncome, newAmount);
+  };
+
+  // 저축 금액 입력 시
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value.replace(/[^0-9]/g, ''));
-    let newAmount = value;
+
+    let newAmount = value > MAX_BUDGET_AMOUNT ? MAX_BUDGET_AMOUNT : value;
 
     // 70% 제한 로직
     if (income > 0) {
@@ -40,15 +60,6 @@ const SavingGoalStep = ({
     }
 
     onChange(income, newAmount);
-  };
-
-  // 수입 입력 시
-  const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newIncome = Number(e.target.value);
-    // 현재 설정된 저축률(savingsRate)에 맞춰 저축 금액 업데이트
-    const newAmount = Math.floor((newIncome * savingsRate) / 100);
-
-    onChange(newIncome, newAmount);
   };
 
   const titleDesc =
@@ -67,10 +78,21 @@ const SavingGoalStep = ({
 
       {/* 수입 입력 섹션 */}
       <div className="flex items-center justify-between rounded-xl">
-        <div className="flex items-center">
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-4">
           <Label htmlFor="income" className="text-base font-bold">
             이번 달 예상 수입
           </Label>
+
+          {income === 0 && (
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
+              수입을 먼저 입력해 주세요.
+            </p>
+          )}
+          {income >= MAX_BUDGET_AMOUNT && (
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
+              최대 10억 원까지 입력 가능합니다.
+            </p>
+          )}
         </div>
 
         <div className="border-primary/20 focus-within:border-brand flex w-fit items-center gap-1 border-b-2">
@@ -78,7 +100,15 @@ const SavingGoalStep = ({
             id="income"
             type="text"
             inputMode="numeric"
-            value={income || ''}
+            value={
+              isIncomeFocused
+                ? income || ''
+                : income !== 0
+                  ? income.toLocaleString()
+                  : ''
+            }
+            onFocus={() => setIsIncomeFocused(true)}
+            onBlur={() => setIsIncomeFocused(false)}
             onChange={handleIncomeChange}
             className="w-32 text-right text-lg font-bold focus:outline-none"
             placeholder="0"
@@ -101,8 +131,15 @@ const SavingGoalStep = ({
               id="saving"
               type="text"
               inputMode="numeric"
-              pattern="[0-9]*"
-              value={savingsAmount || ''}
+              value={
+                isSavingsFocused
+                  ? savingsAmount || ''
+                  : savingsAmount !== 0
+                    ? savingsAmount.toLocaleString()
+                    : ''
+              }
+              onFocus={() => setIsSavingsFocused(true)}
+              onBlur={() => setIsSavingsFocused(false)}
               onChange={handleAmountChange}
               className="w-32 text-right text-lg font-bold focus:outline-none"
               placeholder="0"
@@ -128,8 +165,7 @@ const SavingGoalStep = ({
 
           {/* 최대치 도달 시 문구 표시 */}
           {savingsRate >= 70 && (
-            <p className="animate-in fade-in slide-in-from-top-1 flex items-center gap-1 pt-4 text-xs text-orange-400">
-              <AlertTriangle className="h-3 w-3" />
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
               저축 목표는 최대 70%까지 설정할 수 있어요.
             </p>
           )}

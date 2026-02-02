@@ -51,10 +51,14 @@ const BudgetRecommendDialog = ({
   const { step, goalData, budgetDraft, selectedTemplateId, isAdjusted } = state;
 
   const spendableBudget = goalData.income - goalData.savingsAmount; // 가용 예산
+  const isIncomeEmpty = step === 2 && goalData.income <= 0;
 
   // step 이동 버튼 핸들러
   const handleNextStep = () => {
     if (step === 2) {
+      // 수입이 0원인 경우 진행 막기
+      if (isIncomeEmpty) return;
+
       setStep(step + 1);
     } else if (step === 3 && processedData) {
       let result: CalculatedBudgetItem[] = [];
@@ -121,8 +125,9 @@ const BudgetRecommendDialog = ({
     return BUDGET_GROUPS.map((group) => {
       // processedData에서 해당 그룹의 평균 금액 가져오기
       const amount = groupAverages[group.id as CategoryGroupId] || 0;
-      // 전체에서 차지하는 비중 계산 (분모가 0일 경우 대비)
-      const percent = avgTotal > 0 ? Math.round((amount / avgTotal) * 100) : 0;
+      // 전체에서 차지하는 비중 계산 (소수점 첫째 자리까지 계산)
+      const percent =
+        avgTotal > 0 ? Math.round((amount / avgTotal) * 1000) / 10 : 0;
 
       return { ...group, amount, percent };
     });
@@ -212,7 +217,7 @@ const BudgetRecommendDialog = ({
               <Button
                 className="h-12 flex-2 cursor-pointer text-base font-bold"
                 onClick={handleNextStep}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isIncomeEmpty}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
