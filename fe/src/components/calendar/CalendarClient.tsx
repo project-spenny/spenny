@@ -47,7 +47,9 @@ export function CalendarClient({
             isLoading={isLoading}
             onMonthChange={setMonth}
           >
-            <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
+            {currentMonth === month && (
+              <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
+            )}
           </Calendar>
         </div>
       </TransactionProvider>
