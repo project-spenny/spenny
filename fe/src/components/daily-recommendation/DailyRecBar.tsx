@@ -55,6 +55,7 @@ export const DailyRecBar = ({ daily, dailyChartData }: Props) => {
             size="sm"
             className="hover:bg-brand-soft/40 flex items-center gap-1"
           >
+            <span className="text-xs">상세보기</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         }
