@@ -41,7 +41,11 @@ const BudgetCategoryEditItem = ({
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
 
-    if (Number(value) > MAX_BUDGET_AMOUNT) return; // 10억 초과 입력 방지
+    // 10억 초과 입력 시도 시 10억으로 고정
+    if (Number(value) > MAX_BUDGET_AMOUNT) {
+      onChange(category.category_key, MAX_BUDGET_AMOUNT.toString());
+      return;
+    }
 
     onChange(category.category_key, value);
   };

@@ -34,22 +34,23 @@ const SavingGoalStep = ({
   const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value.replace(/[^0-9]/g, ''));
 
-    if (value > MAX_BUDGET_AMOUNT) return;
+    let newIncome = value;
+    if (value > MAX_BUDGET_AMOUNT) {
+      newIncome = MAX_BUDGET_AMOUNT;
+    }
 
-    const newIncome = value;
     // 현재 설정된 저축률(savingsRate)에 맞춰 저축 금액 업데이트
     const newAmount = Math.floor((newIncome * savingsRate) / 100);
 
     onChange(newIncome, newAmount);
   };
 
-  // 금액 입력 시
+  // 저축 금액 입력 시
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value.replace(/[^0-9]/g, ''));
 
-    if (value > MAX_BUDGET_AMOUNT) return; // 10억 초과 입력 방지
+    let newAmount = value > MAX_BUDGET_AMOUNT ? MAX_BUDGET_AMOUNT : value;
 
-    let newAmount = value;
     // 70% 제한 로직
     if (income > 0) {
       const calculatedRate = Math.round((value / income) * 100);

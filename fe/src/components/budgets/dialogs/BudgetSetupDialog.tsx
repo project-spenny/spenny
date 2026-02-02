@@ -72,7 +72,11 @@ const BudgetSetupDialog = ({
 
     const value = e.target.value.replace(/[^0-9]/g, '');
 
-    if (Number(value) > MAX_BUDGET_AMOUNT) return; // 10억 초과 입력 방지
+    // 10억 초과 입력 시도 시 10억으로 고정
+    if (Number(value) > MAX_BUDGET_AMOUNT) {
+      setAmount(MAX_BUDGET_AMOUNT.toString());
+      return;
+    }
 
     setAmount(value);
   };
@@ -116,10 +120,7 @@ const BudgetSetupDialog = ({
                 {amount === '' && <p>예산 금액을 입력해주세요.</p>}
 
                 {numericAmount >= MAX_BUDGET_AMOUNT && (
-                  <p>
-                    최대 {MAX_BUDGET_AMOUNT.toLocaleString()}원까지 설정
-                    가능합니다.
-                  </p>
+                  <p>최대 10억 원까지 설정 가능합니다.</p>
                 )}
               </div>
             )}
