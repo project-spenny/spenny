@@ -4,6 +4,8 @@ import { formatLocalDate, parseLocalDate } from '@/utils/date';
 import { requireUserServer } from '@/utils/supabase/requireUserServer';
 import { revalidatePath } from 'next/cache';
 import { getMonthRange } from '@/utils/date';
+import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
+import { buildScheduledFixedByDateMap } from '@/utils/fixed-costs/scheduled';
 
 export interface TransactionFilters {
   type?: 'income' | 'expense';
@@ -82,9 +84,18 @@ export const getTransaction = async (
 };
 export const getMonthTransactions = async (month: string) => {
   const { supabase, user } = await requireUserServer();
-  const { startDate, endDate } = getMonthRange(new Date(`${month}-1`));
+  const monthDate = new Date(`${month}-01`);
+  const { startDate, endDate } = getMonthRange(monthDate);
 
-  const { data, error } = await supabase
+  const generateThroughDate = formatLocalDate(new Date());
+  await syncByMonthServer({
+    monthDate,
+    startDate,
+    endDate,
+    generateThroughDate,
+  });
+
+  const { data: transactions, error } = await supabase
     .from('transactions')
     .select('*')
     .eq('user_id', user.id)
@@ -92,7 +103,25 @@ export const getMonthTransactions = async (month: string) => {
     .lte('date', endDate)
     .order('updated_at', { ascending: false });
   if (error) throw error;
-  return data || [];
+
+  // 해당 월 고정비 규칙 조회
+  const fixedRules = await fetchFixedRulesByMonthServer(monthDate);
+
+  // 예정 고정비 맵 생성
+  const scheduledFixedByDateMap = buildScheduledFixedByDateMap({
+    monthDate,
+    today: new Date(),
+    fixedRules,
+    transactions: (transactions ?? []).map((t) => ({
+      fixed_rule_id: t.fixed_rule_id,
+      origin_date: t.origin_date,
+    })),
+  });
+
+  return {
+    transactions: transactions ?? [],
+    scheduledFixedByDateMap,
+  };
 };
 
 export interface PaginatedTransactionsResult {
