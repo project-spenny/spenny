@@ -25,7 +25,7 @@ const Header = () => {
   return (
     <header
       className={cn(
-        'fixed top-0 z-10 flex h-16 w-full items-center justify-between p-2 shadow-sm',
+        'border-border/50 fixed top-0 z-10 flex h-16 w-full items-center justify-between border-b p-2 shadow-[0_1px_12px_rgba(0,0,0,0.03)]',
         'bg-background/80 backdrop-blur-lg',
         'md:px-4'
       )}
