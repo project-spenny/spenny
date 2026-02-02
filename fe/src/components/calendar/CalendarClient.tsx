@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { TransactionList } from '@/components/transaction/TransactionList';
 import TransactionClient from '@/app/(app)/history/TransactionClient';
 import { TransactionFilters } from '@/app/(app)/history/actions';
+import { ScheduledFixedByDateMap } from '@/types/fixed-costs';
 
 type ListFilters = Omit<TransactionFilters, 'startDate' | 'endDate'>;
 
@@ -29,6 +30,7 @@ const getTabFromUrl = (): TabValue => {
 interface CalendarClientProps {
   currentMonth: string;
   initialTransactions: ITransaction[];
+  initialScheduledFixedByDateMap: ScheduledFixedByDateMap;
   dailyRec: DailyRecResult;
   dailyChartData: DailyRecChartData;
 }
@@ -36,6 +38,7 @@ interface CalendarClientProps {
 export function CalendarClient({
   currentMonth,
   initialTransactions,
+  initialScheduledFixedByDateMap,
   dailyRec,
   dailyChartData,
 }: CalendarClientProps) {
@@ -74,10 +77,11 @@ export function CalendarClient({
     );
   };
 
-  const { data: transactions, isLoading } = useMonthTransactions({
+  const { data, isLoading } = useMonthTransactions({
     month,
     currentMonth,
     initialTransactions,
+    initialScheduledFixedByDateMap,
   });
 
   // 가계부 탭에서 무한스크롤 사용
@@ -88,6 +92,9 @@ export function CalendarClient({
     hasNextPage,
     fetchNextPage,
   } = useInfiniteTransactions({ month, filters });
+
+  const dataTransactions = data?.transactions ?? [];
+  const scheduledFixedByDateMap = data?.scheduledFixedByDateMap ?? {};
 
   return (
     <CalendarProvider>
@@ -118,10 +125,11 @@ export function CalendarClient({
             <TabsContent value="calendar">
               <Calendar
                 currentMonth={month}
-                transactions={transactions || []}
+                transactions={dataTransactions}
+                scheduledFixedByDateMap={scheduledFixedByDateMap}
                 isLoading={isLoading}
                 onMonthChange={setMonth}
-              ></Calendar>
+              />
             </TabsContent>
 
             <TabsContent value="list">

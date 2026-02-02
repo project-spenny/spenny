@@ -6,7 +6,7 @@ import { getBudgetBundle } from '@/services/analysis/budgetService.server';
 import { validateDateParams } from '../analysis/page';
 
 type BudgetPageProps = {
-  searchParams: Promise<{ year?: string; month?: string }>;
+  searchParams: Promise<{ year?: string; month?: string; mode?: string }>;
 };
 
 // 예산 데이터 패칭 섹션

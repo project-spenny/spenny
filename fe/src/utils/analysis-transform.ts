@@ -9,7 +9,7 @@ import {
   MonthlySummary,
 } from '@/types/budgetGuide';
 
-import { EXPENSE_CATEGORY_GROUP_MAP } from '@/constants/analysis';
+import { EXPENSE_CATEGORY_GROUP_MAP } from '@/constants/budget';
 
 /* 데이터 정규화 */
 // 카테고리 필드가 배열 혹은 객체일 수 있음

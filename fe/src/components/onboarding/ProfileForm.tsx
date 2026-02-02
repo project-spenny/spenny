@@ -2,10 +2,11 @@
 
 import {
   useForm,
-  useWatch,
+  Controller,
   type FieldNamesMarkedBoolean,
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { formatBirthDateInput, padBirthDateOnBlur } from '@/utils/birthDate';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,12 @@ type ProfileFormProps = {
   children?: (state: ProfileFormState) => React.ReactNode;
 };
 
+// 에러 메시지 컴포넌트
+function FormError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="text-sm text-red-500">{message}</p>;
+}
+
 export default function ProfileForm({
   defaultValues,
   onSubmit,
@@ -50,8 +57,6 @@ export default function ProfileForm({
     defaultValues,
   });
 
-  const gender = useWatch({ control, name: 'gender' });
-
   return (
     <form
       className="space-y-6"
@@ -64,50 +69,65 @@ export default function ProfileForm({
           placeholder="닉네임을 입력해주세요."
           {...register('nickname')}
         />
-        {errors.nickname?.message ? (
-          <p className="text-sm text-red-500">{errors.nickname.message}</p>
-        ) : null}
+        <FormError message={errors.nickname?.message} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="birth">생년월일</Label>
-        <Input
-          id="birth"
-          placeholder="YYYY-MM-DD"
-          {...register('birth_date')}
+        <Controller
+          name="birth_date"
+          control={control}
+          render={({ field }) => (
+            <Input
+              id="birth"
+              placeholder="YYYY-MM-DD"
+              inputMode="numeric"
+              autoComplete="bday"
+              value={field.value ?? ''}
+              onChange={(e) => {
+                const formatted = formatBirthDateInput(e.target.value);
+                field.onChange(formatted);
+              }}
+              onBlur={(e) => {
+                const padded = padBirthDateOnBlur(e.target.value);
+                setValue('birth_date', padded, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+                field.onBlur();
+              }}
+            />
+          )}
         />
-        {errors.birth_date?.message ? (
-          <p className="text-sm text-red-500">{errors.birth_date.message}</p>
-        ) : null}
+        <FormError message={errors.birth_date?.message} />
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center gap-6">
           <Label>성별</Label>
-          <RadioGroup
-            value={gender}
-            onValueChange={(v) =>
-              setValue('gender', v as 'male' | 'female', {
-                shouldValidate: true,
-                shouldDirty: true,
-              })
-            }
-            className="flex gap-6"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="male" id="male" />
-              <Label htmlFor="male">남</Label>
-            </div>
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <RadioGroup
+                value={field.value ?? ''}
+                onValueChange={field.onChange}
+                className="flex gap-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="male" id="maleId" />
+                  <Label htmlFor="maleId">남</Label>
+                </div>
 
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="female" id="female" />
-              <Label htmlFor="female">여</Label>
-            </div>
-          </RadioGroup>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="female" id="femaleId" />
+                  <Label htmlFor="femaleId">여</Label>
+                </div>
+              </RadioGroup>
+            )}
+          />
         </div>
-        {errors.gender?.message ? (
-          <p className="text-sm text-red-500">{errors.gender.message}</p>
-        ) : null}
+        <FormError message={errors.gender?.message} />
       </div>
 
       {children ? (

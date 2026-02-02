@@ -55,15 +55,20 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const claims = data?.claims;
+  const userId = claims?.sub;
 
   const isAuthPath = pathname.startsWith('/auth');
   const isLoginPath = pathname.startsWith('/login');
   const isOnboardingPath = pathname.startsWith('/onboarding');
   const isOnboardingIntroPath = pathname.startsWith('/onboarding/intro');
 
+  // 쿠키를 통해 온보딩 완료 여부 판단
+  const onboardedCookie = request.cookies.get('onboarded')?.value;
+  let isOnboarded = onboardedCookie === '1';
+
   // 비로그인 : login/auth만 허용
-  if (!user) {
+  if (!userId) {
     if (!isLoginPath && !isAuthPath) {
       // no user, potentially respond by redirecting the user to the login page
       const url = request.nextUrl.clone();
@@ -73,31 +78,46 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  const userId = user.sub; // claims의 subject = auth uid(uuid)
+  // 쿠키가 없으면 DB로 profiles 존재 확인
+  if (!isOnboarded) {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
 
-  // 로그인 : 프로필 존재 여부 조회
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('id', userId)
-    .maybeSingle();
+    if (!error && profile) {
+      isOnboarded = true;
 
-  if (profileError) {
-    console.error('[middleware] profile fetch error', profileError);
-    return supabaseResponse;
+      // 쿠키 재발급
+      supabaseResponse.cookies.set('onboarded', '1', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 365, // 1년
+      });
+    } else {
+      // 프로필 없으면 쿠키 제거
+      supabaseResponse.cookies.set('onboarded', '', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 0,
+      });
+    }
   }
 
-  const hasProfile = !!profile;
-
-  // 로그인 상태에서 login 페이지 접근 차단
+  // 로그인 상태에서 /login 접근 차단
   if (isLoginPath) {
     const url = request.nextUrl.clone();
-    url.pathname = hasProfile ? '/' : '/onboarding';
+    url.pathname = isOnboarded ? '/' : '/onboarding';
     return NextResponse.redirect(url);
   }
 
-  // 온보딩 미완료면 onboarding만 허용
-  if (!hasProfile) {
+  // 온보딩 미완료면 /onboarding만 허용
+  if (!isOnboarded) {
     // /auth는 OAuth 플로우 때문에 허용
     if (!isOnboardingPath && !isAuthPath) {
       const url = request.nextUrl.clone();
@@ -107,7 +127,7 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // 온보딩 완료면 onboarding 접근 차단
+  // 온보딩 완료면 /onboarding 접근 차단
   if (isOnboardingPath && !isOnboardingIntroPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/';

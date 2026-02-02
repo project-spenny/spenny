@@ -1,7 +1,8 @@
 'use client';
 
 import { AnalysisData, TransactionType } from '@/types/analysis';
-import { useEffect, useState } from 'react';
+import { formatLocalDate, getMonthRange, getWeeksInMonth } from '@/utils/date';
+import { useEffect, useMemo, useState } from 'react';
 
 import { ANALYSIS_CONFIG } from '@/constants/analysis';
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
@@ -12,7 +13,8 @@ import CategoryChart from '@/components/analysis/CategoryChart';
 import Link from 'next/link';
 import { PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { getMonthRange } from '@/utils/date';
+import WeeklyChart from '@/components/analysis/WeeklyChart';
+import WeeklyListCard from '@/components/analysis/WeeklyListCard';
 
 type AnalysisViewProps = {
   type: TransactionType;
@@ -31,11 +33,44 @@ const AnalysisView = ({
   const { current, prev, totalAmount, diff, categoryData } = initialData;
 
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  // 사용자가 달을 옮기면 '가장 많이 쓴 카테고리'부터 보여줌
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState<number>(0);
+
+  // 주차별 데이터 가공
+  const weeklyData = useMemo(() => {
+    const weeks = getWeeksInMonth(selectedDate);
+    const todayStr = formatLocalDate(new Date());
+
+    return weeks.map((week) => {
+      const weekTransactions = current.filter(
+        (t) => t.date >= week.startDate && t.date <= week.endDate
+      );
+      const totalAmount = weekTransactions.reduce(
+        (sum, t) => sum + t.amount,
+        0
+      );
+
+      return {
+        label: `${week.weekNumber}주차`,
+        period: `${week.startDate} ~ ${week.endDate}`,
+        amount: totalAmount,
+        transactions: weekTransactions.sort((a, b) =>
+          a.date.localeCompare(b.date)
+        ),
+        isCurrentWeek: todayStr >= week.startDate && todayStr <= week.endDate,
+      };
+    });
+  }, [current, selectedDate]);
+
+  // 현재 선택된 주차의 상세 데이터
+  const selectedWeekDetail = weeklyData[selectedWeekIndex];
+
+  // 달이 바뀌면 선택 인덱스 초기화
   useEffect(() => {
-    if (categoryData && categoryData.length > 0) {
-      setSelectedIndex(0);
-    }
+    if (categoryData && categoryData.length > 0) setSelectedIndex(0);
+
+    // 이번 달이라면 오늘이 포함된 주차, 아니면 1주차
+    const currentIndex = weeklyData.findIndex((w) => w.isCurrentWeek);
+    setSelectedWeekIndex(currentIndex !== -1 ? currentIndex : 0);
   }, [selectedDate]);
 
   // 선택된 월 기준으로 history 페이지 이동용 URL 생성
@@ -85,30 +120,56 @@ const AnalysisView = ({
                 </p>
               )}
             </div>
+
+            <Separator className="my-6" />
+
+            {/* 주간 차트 */}
+            <div className="space-y-3">
+              <p className="font-semibold md:text-lg">주간 {config.label}</p>
+
+              <WeeklyChart
+                data={weeklyData}
+                type={type}
+                selectedIndex={selectedWeekIndex}
+                onSelect={setSelectedWeekIndex}
+              />
+
+              {/* 주간 상세 */}
+              {selectedWeekIndex !== -1 && selectedWeekDetail && (
+                <div className="mt-4">
+                  <WeeklyListCard
+                    index={selectedWeekIndex}
+                    detail={selectedWeekDetail}
+                  />
+                </div>
+              )}
+            </div>
           </AnalysisSection>
 
           <AnalysisSection
             title={`카테고리별 ${config.label}`}
             icon={<PieChart className={config.color} />}
           >
-            {/* 카테고리 차트 */}
-            <div className="flex items-center justify-center p-4">
-              <CategoryChart
-                data={categoryData}
-                selectedIndex={selectedIndex}
-                onSelect={setSelectedIndex}
-              />
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              {/* 카테고리 차트 */}
+              <div className="flex items-center justify-center lg:flex-1">
+                <CategoryChart
+                  data={categoryData}
+                  selectedIndex={selectedIndex}
+                  onSelect={setSelectedIndex}
+                />
+              </div>
+
+              <div className="lg:flex-1">
+                {/* 카테고리 리스트 */}
+                <CategoryAnalysisList
+                  data={categoryData}
+                  allTransactions={current}
+                  selectedIndex={selectedIndex}
+                  onSelect={setSelectedIndex}
+                />
+              </div>
             </div>
-
-            <Separator />
-
-            {/* 카테고리 리스트 */}
-            <CategoryAnalysisList
-              data={categoryData}
-              allTransactions={current}
-              selectedIndex={selectedIndex}
-              onSelect={setSelectedIndex}
-            />
           </AnalysisSection>
         </>
       )}

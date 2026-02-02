@@ -36,7 +36,7 @@ const CategoryAnalysisList = ({
         const index = Number(value.replace('item-', ''));
         if (!isNaN(index)) onSelect(index);
       }}
-      className="space-y-2 px-2 pt-6"
+      className="space-y-2 px-2"
     >
       {data.map((item, i) => {
         const isSelected = i === selectedIndex;

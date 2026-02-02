@@ -20,10 +20,13 @@ import { useCalendarData } from '@/hooks/useCalendarData';
 import { useCalendarNavigation } from '@/hooks/useCalendarNavigation';
 import { Spinner } from '../ui/spinner';
 import { CalendarCaption } from './CalendarCaption';
+import { ScheduledFixedByDateMap } from '@/types/fixed-costs';
+import { ScheduledFixedInfo } from './ScheduledFixedInfo';
 
 interface CalendarProps {
   currentMonth: string;
   transactions: ITransaction[];
+  scheduledFixedByDateMap: ScheduledFixedByDateMap;
   isLoading: boolean;
   onMonthChange: (month: string) => void;
   children?: React.ReactNode;
@@ -38,6 +41,7 @@ const CALENDAR_CELL_HEIGHT =
 export const Calendar = ({
   currentMonth,
   transactions,
+  scheduledFixedByDateMap,
   isLoading,
   onMonthChange,
   children,
@@ -139,6 +143,11 @@ export const Calendar = ({
 
           {panelState.view === 'list' && (
             <div>
+              {/* 예정된 고정비 표시 */}
+              <ScheduledFixedInfo
+                selectedDate={selectedDate}
+                scheduledFixedByDateMap={scheduledFixedByDateMap}
+              />
               <div className="space-y-2 p-4 md:p-6 lg:p-8">
                 <Item
                   className="cursor-pointer hover:bg-gray-100"
@@ -151,6 +160,7 @@ export const Calendar = ({
                   <ItemContent>가계부 작성하기</ItemContent>
                 </Item>
               </div>
+
               <TransactionList
                 compact={true}
                 transactions={selectedDayTransactions}
