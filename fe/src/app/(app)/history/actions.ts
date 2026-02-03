@@ -10,8 +10,8 @@ import { buildScheduledFixedByDateMap } from '@/utils/fixed-costs/scheduled';
 export interface TransactionFilters {
   type?: 'income' | 'expense';
   category_id?: string;
-  start_date?: string;
-  end_date?: string;
+  startDate?: string;
+  endDate?: string;
   searchQuery?: string;
 }
 
@@ -21,8 +21,8 @@ export const getTransaction = async (
 ) => {
   const { supabase, user } = await requireUserServer();
 
-  let startDate = filters?.start_date;
-  let endDate = filters?.end_date;
+  let startDate = filters?.startDate;
+  let endDate = filters?.endDate;
 
   if ((!startDate || !endDate) && defaultMonth) {
     const now = new Date();
@@ -56,7 +56,8 @@ export const getTransaction = async (
     .from('transactions')
     .select('*')
     .eq('user_id', user.id)
-    .order('date', { ascending: false });
+    .order('date', { ascending: false })
+    .order('updated_at', { ascending: false });
 
   if (startDate) {
     query = query.gte('date', startDate);
@@ -81,14 +82,11 @@ export const getTransaction = async (
 
   return data || [];
 };
-
 export const getMonthTransactions = async (month: string) => {
   const { supabase, user } = await requireUserServer();
-
   const monthDate = new Date(`${month}-01`);
   const { startDate, endDate } = getMonthRange(monthDate);
 
-  // 고정비 동기화 (오늘까지)
   const generateThroughDate = formatLocalDate(new Date());
   await syncByMonthServer({
     monthDate,
@@ -97,14 +95,13 @@ export const getMonthTransactions = async (month: string) => {
     generateThroughDate,
   });
 
-  // 거래 조회
   const { data: transactions, error } = await supabase
     .from('transactions')
     .select('*')
     .eq('user_id', user.id)
     .gte('date', startDate)
     .lte('date', endDate)
-    .order('date', { ascending: false });
+    .order('updated_at', { ascending: false });
   if (error) throw error;
 
   // 해당 월 고정비 규칙 조회
@@ -127,6 +124,74 @@ export const getMonthTransactions = async (month: string) => {
   };
 };
 
+export interface PaginatedTransactionsResult {
+  data: Awaited<ReturnType<typeof getTransaction>>;
+  nextCursor: number | null;
+  hasMore: boolean;
+}
+
+export const getTransactionsPaginated = async (
+  filters?: TransactionFilters,
+  cursor: number = 0,
+  pageSize: number = 20
+): Promise<PaginatedTransactionsResult> => {
+  const { supabase, user } = await requireUserServer();
+
+  let startDate = filters?.startDate;
+  let endDate = filters?.endDate;
+
+  if (!startDate || !endDate) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+
+    startDate = `${year}-${month}-01`;
+
+    const lastDay = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0
+    ).getDate();
+    endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+  }
+
+  let query = supabase
+    .from('transactions')
+    .select('*', { count: 'exact' })
+    .eq('user_id', user.id)
+    .order('date', { ascending: false })
+    .order('updated_at', { ascending: false })
+    .range(cursor, cursor + pageSize - 1);
+
+  if (startDate) {
+    query = query.gte('date', startDate);
+  }
+  if (endDate) {
+    query = query.lte('date', endDate);
+  }
+  if (filters?.type) {
+    query = query.eq('type', filters.type);
+  }
+  if (filters?.category_id) {
+    query = query.eq('category_id', filters.category_id);
+  }
+  if (filters?.searchQuery) {
+    query = query.ilike('title', `%${filters.searchQuery}%`);
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  const totalCount = count || 0;
+  const nextCursor = cursor + pageSize;
+  const hasMore = nextCursor < totalCount;
+
+  return {
+    data: data || [],
+    nextCursor: hasMore ? nextCursor : null,
+    hasMore,
+  };
+};
 export async function revalidateTransactions() {
   revalidatePath('/history');
   revalidatePath('/');

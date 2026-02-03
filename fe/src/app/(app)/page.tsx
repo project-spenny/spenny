@@ -1,27 +1,28 @@
-import { getTransaction, getMonthTransactions } from './history/actions';
-import { Suspense } from 'react';
 import { formatLocalDate, formatMonth } from '@/utils/date';
-import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
-import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
-import { getTotalBudgetAmount } from '@/utils/budget';
-import { fetchBudgetsServer } from '@/services/budgets/budget';
+import { getMonthTransactions, getTransaction } from './history/actions';
 import {
   sumExpenseUntilYesterday,
   sumFixedExpenseUntilYesterday,
 } from '@/utils/transaction';
-import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
-import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs/fixedCosts';
+
+import { CalendarClient } from '@/components/calendar/CalendarClient';
+import { CalendarSkeleton } from '@/components/calendar/CalendarSkeleton';
+import { DailyRecBar } from '@/components/daily-recommendation/DailyRecBar';
+import { SpendingTransaction } from '@/services/daily-recommendation/spendingPattern';
+import { Suspense } from 'react';
 import { buildDailyRecChartData } from '@/services/daily-recommendation/chart';
 import { calculateDailyRec } from '@/services/daily-recommendation/calculate';
-import { SpendingTransaction } from '@/services/daily-recommendation/spendingPattern';
-import { CalendarClient } from '@/components/calendar/CalendarClient';
+import { fetchBudgetsServer } from '@/services/budgets/budget';
+import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
+import { getFixedPlannedExpenseByMonth } from '@/utils/fixed-costs/fixedCosts';
+import { getTotalBudgetAmount } from '@/utils/budget';
 
 export default async function Home() {
   const today = new Date();
   const currentMonth = formatMonth(today);
 
   return (
-    <div className="flex min-h-screen w-full max-w-6xl self-start">
+    <div className="flex w-full max-w-6xl self-start">
       <Suspense fallback={<CalendarSkeleton />}>
         <InitialDataLoader currentMonth={currentMonth} />
       </Suspense>
@@ -67,8 +68,8 @@ async function InitialDataLoader({ currentMonth }: { currentMonth: string }) {
   // 최근 N일 거래 (소비 패턴 가중치 계산용)
   const patternTransactions = await getTransaction(
     {
-      start_date: lookbackStartDateString,
-      end_date: lookbackEndDateString,
+      startDate: lookbackStartDateString,
+      endDate: lookbackEndDateString,
     },
     true
   );

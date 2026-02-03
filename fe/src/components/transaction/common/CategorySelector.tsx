@@ -8,7 +8,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import Image from 'next/image';
-import { se } from 'date-fns/locale';
 
 interface CategorySelectorProps {
   transactionType: string;
@@ -42,30 +41,35 @@ export const CategorySelector = ({
   onOpenChange,
   onChange,
 }: CategorySelectorProps) => {
-  if (!transactionType) return null;
-
   const categories =
     transactionType === 'income' ? CATEGORIES.income : CATEGORIES.expense;
-
+  const isDisabled = !transactionType;
   return (
     <div className="flex items-center">
       <Label className="w-28 pr-2">카테고리</Label>
       <div className="w-full">
         <Popover open={open} onOpenChange={onOpenChange}>
           <PopoverTrigger asChild>
-            <Button type="button" variant="outline" className="h-10 w-full">
-              {SelectedIcon(categories, value)}
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 w-full text-sm"
+              disabled={isDisabled}
+            >
+              {isDisabled
+                ? '거래유형을 먼저 선택하세요'
+                : SelectedIcon(categories, value)}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="grid grid-cols-3">
+            <div className="grid grid-cols-4">
               {categories.map((cat) => (
                 <div
                   onClick={() => {
                     onChange(cat.category_key);
                     onOpenChange(false);
                   }}
-                  className="flex h-20 w-24 cursor-pointer flex-col items-center justify-center gap-2 text-center text-sm hover:bg-gray-100"
+                  className="flex h-18 w-18 cursor-pointer flex-col items-center justify-center gap-2 text-center text-sm hover:bg-gray-100"
                   key={cat.category_key}
                 >
                   <Image
@@ -73,6 +77,8 @@ export const CategorySelector = ({
                     alt={cat.name_ko}
                     width={22}
                     height={22}
+                    priority
+                    quality={85}
                   />
                   <p className="text-muted-foreground text-xs">{cat.name_ko}</p>
                 </div>
