@@ -129,6 +129,10 @@ export function CalendarClient({
               </TabsTrigger>
             </TabsList>
 
+            <div className="mx-auto my-4 w-full max-w-xl">
+              <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
+            </div>
+
             <TabsContent value="calendar">
               <Calendar
                 currentMonth={month}
@@ -150,9 +154,7 @@ export function CalendarClient({
                 onMonthChange={setMonth}
                 filters={filters}
                 onFiltersChange={setFilters}
-              >
-                <DailyRecBar daily={dailyRec} dailyChartData={dailyChartData} />
-              </TransactionList>
+              />
             </TabsContent>
           </Tabs>
           <TransactionClient />

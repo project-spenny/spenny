@@ -1,4 +1,3 @@
-import { IFixedCostFormData } from '@/hooks/useFixedCostForm';
 import { ApplyScope, IFixedRule } from '@/types/fixed-costs';
 import { parseLocalDate } from '../date';
 import {
@@ -10,6 +9,7 @@ import {
   addWeeks,
 } from 'date-fns';
 import { getFixedRuleDates } from '@/services/fixed-costs/getRuleDates';
+import { FixedCostFormValues } from '@/schemas/fixedCosts';
 
 const WEEKDAY_LABEL: Record<number, string> = {
   1: '월',
@@ -40,7 +40,7 @@ export const formatFixedRuleCycle = (rule: {
 // 고정비 테이블 값을 고정비 폼 초기값으로 변환
 export const mapFixedRuleToFormData = (
   rule: IFixedRule
-): Partial<IFixedCostFormData> => ({
+): Partial<FixedCostFormValues> => ({
   title: rule.title ?? '',
   type: rule.type,
   amount: String(rule.amount),
