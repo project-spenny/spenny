@@ -42,6 +42,7 @@ export const TagInput = ({ tags, addTag, removeTag }: TagInputProps) => {
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagInputKeyDown}
             maxLength={20}
+            className="text-sm"
           />
           <Button type="button" onClick={handleAddTag} variant="outline">
             추가
@@ -53,13 +54,13 @@ export const TagInput = ({ tags, addTag, removeTag }: TagInputProps) => {
           {tags.map((tag, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm"
+              className="bg-brand text-background flex items-center gap-2 rounded-full px-3 py-1 text-sm"
             >
               {tag}
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="rounded-full p-0.5 hover:bg-gray-200"
+                className="hover:bg-brand-soft rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
               </button>

@@ -74,9 +74,9 @@ export const CalendarCaption = ({
             </div>
           </div>
         </div>
-
-        <div className="flex-2">{children}</div>
       </div>
+
+      <div className="flex-2">{children}</div>
     </div>
   );
 };

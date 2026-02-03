@@ -68,8 +68,8 @@ async function InitialDataLoader({ currentMonth }: { currentMonth: string }) {
   // 최근 N일 거래 (소비 패턴 가중치 계산용)
   const patternTransactions = await getTransaction(
     {
-      start_date: lookbackStartDateString,
-      end_date: lookbackEndDateString,
+      startDate: lookbackStartDateString,
+      endDate: lookbackEndDateString,
     },
     true
   );
