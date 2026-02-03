@@ -289,8 +289,11 @@ export default function ReceiptOCR() {
     <>
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogTrigger asChild>
-          <Button className="h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100">
-            {loading ? <Spinner /> : <Sparkles size={20} />}
+          <Button
+            className="fixed bottom-16 left-0 z-50 m-4 h-16 w-16 cursor-pointer rounded-full bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100"
+            asChild
+          >
+            {loading ? <Spinner /> : <Sparkles size={24} />}
           </Button>
         </DialogTrigger>
         <DialogContent
