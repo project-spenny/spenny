@@ -22,34 +22,34 @@ const BudgetResultSection = ({
   badgeColor,
 }: BudgetResultSectionProps) => {
   return (
-    <div className="group space-y-4">
+    <div className="space-y-4">
       {/* 섹션 헤더 */}
-      <div className="flex items-end justify-between px-1">
+      <div className="flex items-center justify-between gap-2">
         <div className="space-y-1">
           <div
-            className={`flex items-center gap-2 text-lg font-bold ${textColor}`}
+            className={`flex items-center gap-2 text-base font-bold md:text-lg ${textColor}`}
           >
             {title}
             <Badge
-              className={`${badgeColor} border-none px-2 py-0.5 font-bold`}
+              className={`${badgeColor} border-none px-1.5 py-0.5 text-[10px] font-bold md:text-xs`}
             >
               {percent}%
             </Badge>
           </div>
 
-          <p className="text-muted-foreground text-sm font-medium">
+          <p className="text-muted-foreground text-xs font-medium md:text-sm">
             {description}
           </p>
         </div>
         <div className="text-right">
-          <span className="text-lg font-bold">
+          <span className="text-sm font-bold whitespace-nowrap md:text-lg">
             {totalAmount.toLocaleString()}원
           </span>
         </div>
       </div>
 
       {/* 아이템 그리드 */}
-      <div className="grid gap-2 md:grid-cols-2">
+      <div className="grid gap-2 px-2 py-2 md:grid-cols-2 md:px-4">
         {items.map((item) => (
           <BudgetResultRow
             key={item.categoryId}

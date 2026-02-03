@@ -18,7 +18,7 @@ const TemplateSelectionStep = ({
   onSelect,
 }: TemplateSelectionStepProps) => {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300">
+    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300 md:space-y-8">
       <DialogStepHeader
         step={3}
         subTitle="예산 템플릿"
@@ -27,7 +27,7 @@ const TemplateSelectionStep = ({
       />
 
       {/* 템플릿 선택 섹션 */}
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-2 md:gap-4">
         {BUDGET_TEMPLATES.map((template) => {
           const isSelected = selectedId === template.id;
 
@@ -36,14 +36,14 @@ const TemplateSelectionStep = ({
               key={template.id}
               onClick={() => onSelect(template.id)}
               className={cn(
-                'relative cursor-pointer gap-1 border-2 p-5 text-left transition-all',
+                'relative cursor-pointer gap-1 border-2 px-4 py-3 text-left transition-all md:px-5 md:py-4',
                 isSelected
                   ? 'border-brand bg-brand-subtle dark:bg-brand/10 shadow-md'
-                  : 'hover:border-brand-soft border-border'
+                  : 'hover:border-brand/50 border-border/50'
               )}
             >
               <div className="flex items-center justify-between">
-                <span
+                <p
                   className={cn(
                     'rounded-full px-2 py-1 text-xs font-bold',
                     isSelected
@@ -52,15 +52,17 @@ const TemplateSelectionStep = ({
                   )}
                 >
                   {template.subtitle}
-                </span>
+                </p>
                 {isSelected && (
-                  <CheckCircle2 className="text-brand-strong h-5 w-5 shrink-0" />
+                  <CheckCircle2 className="text-brand-strong h-4 w-4 shrink-0 md:h-5 md:w-5" />
                 )}
               </div>
 
               <div>
-                <p className="text-lg font-bold">{template.title}</p>
-                <p className="text-muted-foreground mt-1 text-sm break-keep">
+                <p className="text-base font-bold md:text-lg">
+                  {template.title}
+                </p>
+                <p className="text-muted-foreground mt-1 text-xs break-keep md:text-sm">
                   {template.description}
                 </p>
               </div>
@@ -69,10 +71,10 @@ const TemplateSelectionStep = ({
         })}
       </section>
 
-      <div className="text-muted-foreground flex gap-1 px-2 text-xs">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        <p className="break-keep">
-          최근 {activeMonths}개월간의 소비 습관을 기반으로 카테고리별 가중치를
+      <div className="text-muted-foreground flex items-center gap-1">
+        <Info className="h-3 w-3 shrink-0" />
+        <p className="text-[11px] break-keep md:text-xs">
+          최근 {activeMonths}개월간의 소비를 기반으로 카테고리별 가중치를
           계산하여 이번 달 예산을 자동으로 배분합니다.
         </p>
       </div>

@@ -68,7 +68,7 @@ const SavingGoalStep = ({
       : '지난 소비 데이터를 기반으로 이번 달 예산을 미리 구성해 보았습니다. 필요에 따라 금액을 직접 수정해 보세요.';
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300">
+    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-300 md:space-y-8">
       <DialogStepHeader
         step={2}
         subTitle="저축 및 가용 예산 목표 설정"
@@ -77,25 +77,25 @@ const SavingGoalStep = ({
       />
 
       {/* 수입 입력 섹션 */}
-      <div className="flex items-center justify-between rounded-xl">
+      <div className="flex items-center justify-between gap-1">
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-4">
-          <Label htmlFor="income" className="text-base font-bold">
+          <Label htmlFor="income" className="text-sm font-bold md:text-base">
             이번 달 예상 수입
           </Label>
 
           {income === 0 && (
-            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-[11px] md:text-xs">
               수입을 먼저 입력해 주세요.
             </p>
           )}
           {income >= MAX_BUDGET_AMOUNT && (
-            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-[11px] md:text-xs">
               최대 10억 원까지 입력 가능합니다.
             </p>
           )}
         </div>
 
-        <div className="border-primary/20 focus-within:border-brand flex w-fit items-center gap-1 border-b-2">
+        <div className="border-primary/20 focus-within:border-brand flex items-center gap-1 border-b-2">
           <input
             id="income"
             type="text"
@@ -110,7 +110,7 @@ const SavingGoalStep = ({
             onFocus={() => setIsIncomeFocused(true)}
             onBlur={() => setIsIncomeFocused(false)}
             onChange={handleIncomeChange}
-            className="w-32 text-right text-lg font-bold focus:outline-none"
+            className="w-28 text-right text-sm font-bold focus:outline-none md:w-32 md:text-base"
             placeholder="0"
           />
           <span className="font-bold">원</span>
@@ -118,36 +118,36 @@ const SavingGoalStep = ({
       </div>
 
       {/* 저축 목표 슬라이더 */}
-      <div className="space-y-6 px-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold">
-            <Label htmlFor="saving" className="text-base font-bold">
-              저축 목표 ({savingsRate}%)
-            </Label>
-          </div>
-
-          <div className="border-primary/20 focus-within:border-brand flex items-center gap-1 border-b-2">
-            <input
-              id="saving"
-              type="text"
-              inputMode="numeric"
-              value={
-                isSavingsFocused
-                  ? savingsAmount || ''
-                  : savingsAmount !== 0
-                    ? savingsAmount.toLocaleString()
-                    : ''
-              }
-              onFocus={() => setIsSavingsFocused(true)}
-              onBlur={() => setIsSavingsFocused(false)}
-              onChange={handleAmountChange}
-              className="w-32 text-right text-lg font-bold focus:outline-none"
-              placeholder="0"
-            />
-            <span className="font-bold">원</span>
-          </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1 font-bold">
+          <Label htmlFor="saving" className="text-sm font-bold md:text-base">
+            저축 목표 ({savingsRate}%)
+          </Label>
         </div>
 
+        <div className="border-primary/20 focus-within:border-brand flex items-center gap-1 border-b-2">
+          <input
+            id="saving"
+            type="text"
+            inputMode="numeric"
+            value={
+              isSavingsFocused
+                ? savingsAmount || ''
+                : savingsAmount !== 0
+                  ? savingsAmount.toLocaleString()
+                  : ''
+            }
+            onFocus={() => setIsSavingsFocused(true)}
+            onBlur={() => setIsSavingsFocused(false)}
+            onChange={handleAmountChange}
+            className="w-28 text-right text-sm font-bold focus:outline-none md:w-32 md:text-base"
+            placeholder="0"
+          />
+          <span className="font-bold">원</span>
+        </div>
+      </div>
+
+      <div className="space-y-2">
         <Slider
           value={[savingsRate]}
           onValueChange={handleSliderChange}
@@ -165,7 +165,7 @@ const SavingGoalStep = ({
 
           {/* 최대치 도달 시 문구 표시 */}
           {savingsRate >= 70 && (
-            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-xs">
+            <p className="animate-in fade-in slide-in-from-top-1 text-destructive flex items-center gap-1 text-[11px] md:text-xs">
               저축 목표는 최대 70%까지 설정할 수 있어요.
             </p>
           )}
@@ -174,8 +174,8 @@ const SavingGoalStep = ({
 
       {/* 예산 미리보기 결과 */}
       <div className="space-y-2 py-2">
-        <p className="font-bold">사용 가능한 한 달 예산</p>
-        <p className="text-brand mt-1 text-2xl font-black tracking-tight">
+        <p className="text-sm font-bold md:text-base">사용 가능한 한 달 예산</p>
+        <p className="text-brand mt-1 text-lg font-bold tracking-tight md:text-xl">
           {Math.max(0, spendableBudget).toLocaleString()}원
         </p>
       </div>
