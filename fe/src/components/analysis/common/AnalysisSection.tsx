@@ -12,8 +12,12 @@ const AnalysisSection = ({ title, children, icon }: AnalysisSectionProps) => {
       <Card className="gap-0 px-4 py-4 md:px-6">
         {title && (
           <div className="flex items-center gap-2">
-            {icon}
-            <h2 className="py-2 text-lg font-bold tracking-tight md:text-xl">
+            {icon && (
+              <div className="flex shrink-0 items-center [&>svg]:h-5 [&>svg]:w-5 md:[&>svg]:h-6 md:[&>svg]:w-6">
+                {icon}
+              </div>
+            )}
+            <h2 className="py-2 text-base font-bold tracking-tight md:text-lg">
               {title}
             </h2>
           </div>

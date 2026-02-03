@@ -1,6 +1,7 @@
 'use client';
 
 import { BudgetWithCategory, TransactionAnalysis } from '@/types/analysis';
+import { Calculator, Tags } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import AnalysisEmpty from '@/components/analysis/common/AnalysisEmpty';
@@ -8,10 +9,9 @@ import AnalysisSection from '@/components/analysis/common/AnalysisSection';
 import BudgetCategoryList from '@/components/budgets/common/BudgetCategoryList';
 import BudgetCategorySetting from '@/components/budgets/BudgetCategorySetting';
 import { BudgetGuideData } from '@/types/budgetGuide';
-import BudgetOverview from './BudgetOverview';
+import BudgetOverview from '@/components/budgets/BudgetOverview';
 import BudgetSetupDialog from '@/components/budgets/dialogs/BudgetSetupDialog';
 import { Button } from '@/components/ui/button';
-import { Calculator } from 'lucide-react';
 import { Category } from '@/constants/categories';
 import ConfirmDialog from '@/components/budgets/dialogs/ConfirmDialog';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
@@ -137,7 +137,10 @@ const BudgetView = ({
 
           <div className="relative">
             {/* 카테고리별 예산 */}
-            <AnalysisSection title={'카테고리별 예산'}>
+            <AnalysisSection
+              title={'카테고리별 예산'}
+              icon={<Tags className="text-brand" />}
+            >
               <BudgetCategoryList
                 budgets={categoryBudgets}
                 categoryTotalsByKey={categoryTotalsByKey}
