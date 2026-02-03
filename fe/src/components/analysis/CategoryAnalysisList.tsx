@@ -83,7 +83,7 @@ const CategoryAnalysisList = ({
                     </span>
                     <Badge
                       variant="default"
-                      className="bg-brand/10 text-brand ring-brand/20 rounded-full px-1.5 py-0.5 text-[11px] font-medium whitespace-nowrap ring-1 ring-inset md:text-xs"
+                      className="bg-brand/10 text-brand ring-brand/20 rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap ring-1 ring-inset md:text-xs"
                     >
                       {item.percentage.toFixed(1)}%
                     </Badge>

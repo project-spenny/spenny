@@ -111,7 +111,7 @@ const BudgetOverview = ({
 
             <Progress
               value={totalPercentage}
-              className="h-3 md:h-4"
+              className="h-2.5 md:h-3.5"
               indicatorClassName={
                 totalPercentage >= 90 ? 'bg-red-400' : 'bg-brand'
               }
