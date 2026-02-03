@@ -32,7 +32,7 @@ const ExpenseAnalysisStep = ({
           <>
             최근 {activeMonths}개월간 월 평균{' '}
             <span className="text-brand">
-              {Math.floor(avgTotal).toLocaleString()}원
+              {Math.round(avgTotal).toLocaleString()}원
             </span>
             을 지출했어요
           </>
@@ -72,7 +72,7 @@ const ExpenseAnalysisStep = ({
                 className="flex h-full flex-1 flex-col items-center justify-end gap-2"
               >
                 <span className="text-xs font-bold tracking-tight">
-                  {Math.floor(m.total).toLocaleString()}원
+                  {Math.round(m.total).toLocaleString()}원
                 </span>
                 <div
                   style={{ height: `${height * 0.8}%` }}
@@ -130,7 +130,7 @@ const ExpenseAnalysisStep = ({
               </div>
               <div className="text-right">
                 <div className="text-sm font-bold">
-                  {Math.floor(g.amount).toLocaleString()}원
+                  {Math.round(g.amount).toLocaleString()}원
                 </div>
                 <div className="text-xs">{g.percent}%</div>
               </div>

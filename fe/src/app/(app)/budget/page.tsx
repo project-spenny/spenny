@@ -39,7 +39,7 @@ const BudgetPage = async ({ searchParams }: BudgetPageProps) => {
   );
 
   return (
-    <div className="flex min-h-screen w-full flex-col py-4">
+    <div className="flex w-full flex-col py-4">
       <MonthNavigator year={year} month={month} baseUrl="/budget" />
 
       <div className="mx-auto w-full max-w-4xl px-6 md:px-12">

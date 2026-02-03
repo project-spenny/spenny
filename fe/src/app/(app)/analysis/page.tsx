@@ -61,7 +61,7 @@ const AnalysisPage = async ({ searchParams }: AnalysisPageProps) => {
   ];
 
   return (
-    <div className="flex min-h-screen w-full flex-col py-4">
+    <div className="flex w-full flex-col py-4">
       {/* 달 이동 */}
       <MonthNavigator year={year} month={month} baseUrl="/analysis" />
 

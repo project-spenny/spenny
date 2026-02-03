@@ -2,8 +2,8 @@ import { Spinner } from '@/components/ui/spinner';
 
 export default function Loading() {
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
-      <div className="bg-muted flex flex-col items-center gap-6 rounded-2xl p-10 shadow-2xl ring-1 ring-black/5">
+    <div className="no-scrollbar fixed inset-0 z-100 flex items-center justify-center overflow-auto bg-black/50">
+      <div className="bg-background flex h-[80dvh] w-full max-w-[calc(100%-2rem)] flex-col items-center justify-center gap-6 rounded-2xl p-10 shadow-2xl ring-1 ring-black/5 md:h-[800px] md:max-w-2xl">
         <div className="relative">
           <Spinner className="text-brand h-12 w-12" />
         </div>

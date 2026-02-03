@@ -9,18 +9,21 @@ const AppLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-dvh flex-col">
       <Header />
 
-      <div className="flex flex-1 flex-col pt-16 md:flex-row">
+      <div className="flex flex-1 flex-col pt-16">
         <Navigation />
 
-        <div className="flex w-full flex-col md:pl-28">
+        <div className="flex w-full flex-col pb-18 md:pb-0 md:pl-28">
           <main className="flex flex-1 justify-center">{children}</main>
-          <Footer />
         </div>
 
         <Toaster />
+      </div>
+
+      <div className="hidden md:block">
+        <Footer />
       </div>
     </div>
   );
