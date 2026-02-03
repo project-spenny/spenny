@@ -53,9 +53,9 @@ const BudgetCategoryEditItem = ({
   return (
     <div className="flex items-center gap-2 py-1">
       {/* 아이콘 원형 배경 */}
-      <div className="bg-brand-subtle dark:bg-brand/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+      <div className="bg-brand-subtle dark:bg-brand/20 flex h-8 w-8 shrink-0 items-center justify-center rounded-full md:h-10 md:w-10">
         {iconSrc ? (
-          <Image src={iconSrc} alt={category.name_ko} width={24} height={24} />
+          <Image src={iconSrc} alt={category.name_ko} width={20} height={20} />
         ) : (
           // 기본 아이콘
           <HelpCircle size={20} className="text-muted-foreground" />
@@ -69,7 +69,7 @@ const BudgetCategoryEditItem = ({
       </div>
 
       {/* 금액 입력부 */}
-      <div className="relative w-38">
+      <div className="relative w-32 md:w-38">
         <Input
           ref={inputRef}
           type="text"
@@ -86,7 +86,7 @@ const BudgetCategoryEditItem = ({
           onBlur={() => setIsFocused(false)}
           onChange={handleAmountChange}
           className={cn(
-            'focus-visible:ring-brand-soft h-9 pr-7 text-right text-sm',
+            'focus-visible:ring-brand-soft h-9 pr-7 text-right text-xs tracking-tight md:text-sm',
             Number(amount) >= MAX_BUDGET_AMOUNT &&
               'focus-visible:ring-destructive/50'
           )}
@@ -104,7 +104,7 @@ const BudgetCategoryEditItem = ({
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-destructive absolute top-1/2 left-0.5 h-8 w-8 shrink-0 -translate-y-1/2"
+            className="text-muted-foreground hover:text-destructive absolute top-1/2 left-0.5 h-6 w-6 shrink-0 -translate-y-1/2 md:h-8 md:w-8"
             onClick={() => onReset(category.category_key)}
           >
             <X size={16} />

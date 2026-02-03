@@ -31,19 +31,21 @@ const ConfirmDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle className="text-start">{title}</DialogTitle>
+          <DialogTitle className="text-start text-base md:text-lg">
+            {title}
+          </DialogTitle>
 
           <div className="flex items-center gap-4 p-2 md:p-4">
             <div className="flex">
-              <AlertTriangle className="h-8 w-8 text-amber-400" />
+              <AlertTriangle className="h-6 w-6 text-amber-400 md:h-8 md:w-8" />
             </div>
-            <DialogDescription className="text-start whitespace-pre-wrap">
+            <DialogDescription className="text-start text-xs whitespace-pre-wrap md:text-sm">
               {description}
             </DialogDescription>
           </div>
         </DialogHeader>
 
-        <DialogFooter className="mt-2 flex gap-2">
+        <DialogFooter className="flex gap-2">
           <Button
             variant="outline"
             className="flex-1 cursor-pointer"

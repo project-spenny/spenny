@@ -1,5 +1,6 @@
+import { Edit, TriangleAlert } from 'lucide-react';
+
 import { Card } from '@/components/ui/card';
-import { Edit } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { THEME_COLOR } from '@/constants/colors';
 import { cn } from '@/lib/utils';
@@ -22,7 +23,7 @@ const BudgetSummary = ({
   return (
     <Card
       className={cn(
-        'my-2 gap-2 p-5 transition-all',
+        'my-2 gap-2 p-4 transition-all md:p-5',
         isOverBudget ? 'bg-destructive/5' : 'bg-primary-foreground'
       )}
     >
@@ -67,19 +68,20 @@ const BudgetSummary = ({
       <div className="space-y-2">
         <Progress
           value={progressValue}
-          className="h-2"
+          className="h-1.5 md:h-2"
           indicatorClassName={isOverBudget ? 'bg-red-400' : 'bg-brand'}
         />
 
         {isOverBudget && (
-          <p
+          <div
             className={cn(
-              'mt-2 text-xs font-medium md:text-sm',
+              'mt-2 flex items-center gap-1 text-[11px] font-medium break-keep md:text-sm',
               THEME_COLOR.EXPENSE
             )}
           >
-            ⚠️ 설정된 카테고리 예산이 총 예산을 초과했습니다.
-          </p>
+            <TriangleAlert className="h-3 w-3 shrink-0" />
+            설정된 카테고리 예산이 총 예산을 초과했습니다.
+          </div>
         )}
       </div>
     </Card>

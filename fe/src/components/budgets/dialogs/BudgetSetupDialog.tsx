@@ -85,13 +85,13 @@ const BudgetSetupDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">월 예산 설정</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg md:text-xl">월 예산 설정</DialogTitle>
+          <DialogDescription className="text-xs md:text-sm">
             지출 계획을 세우기 위해 이번 달 총 예산을 입력해주세요.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="md:py-2">
           <div className="space-y-2">
             <Label htmlFor="total-amount">목표 금액 (원)</Label>
             <Input
@@ -109,11 +109,11 @@ const BudgetSetupDialog = ({
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onChange={handleAmountChange}
-              className="focus-visible:ring-brand-soft font-semibold"
+              className="focus-visible:ring-brand-soft text-sm font-semibold tracking-tight md:text-base"
             />
 
             {isTouched && (
-              <div className={`text-destructive space-y-1 text-sm`}>
+              <div className={`text-destructive space-y-1 text-xs md:text-sm`}>
                 {numericAmount <= 0 && amount !== '' && (
                   <p>0보다 큰 숫자를 입력해야 합니다.</p>
                 )}
@@ -126,7 +126,7 @@ const BudgetSetupDialog = ({
             )}
 
             {!isInvalid && !isChanged && defaultAmount !== undefined && (
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-xs md:text-sm">
                 기존에 설정된 금액과 동일합니다.
               </p>
             )}

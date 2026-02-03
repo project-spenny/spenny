@@ -60,7 +60,7 @@ const UnbudgetedList = ({ items, onSetBudget }: UnbudgetedListProps) => {
                       </Badge>
                     </div>
 
-                    <p className="text-sm md:text-base">
+                    <p className="text-xs md:text-sm">
                       <span className={`font-semibold ${THEME_COLOR.EXPENSE}`}>
                         {item.amount.toLocaleString()}원
                       </span>{' '}
