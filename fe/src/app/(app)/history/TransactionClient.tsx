@@ -39,12 +39,12 @@ export default function TransactionClient() {
 
   return (
     <>
-      <div className="bg-foreground fixed bottom-0 z-50 m-4 flex gap-4 rounded-full p-1">
+      <div className="bg-foreground fixed bottom-16 z-50 m-4 flex gap-4 rounded-full p-1">
         <ReceiptOCR />
       </div>
       <Button
         onClick={openCreate}
-        className="fixed right-0 bottom-0 z-50 m-4 h-16 w-16 rounded-full"
+        className="fixed right-0 bottom-16 z-50 m-4 h-20 w-20 rounded-full"
         asChild
       >
         <Plus size={20} />
