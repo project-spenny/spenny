@@ -16,10 +16,10 @@ export const TypeSelector = ({ value, onChange }: Props) => {
           type="button"
           onClick={() => onChange('income')}
           className={cn(
-            'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
+            'cursor-pointer rounded-lg border-2 px-6 py-2 text-sm font-medium transition-all',
             value === 'income'
-              ? 'border-gray-500'
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950 dark:text-blue-300'
+              : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
           )}
         >
           수입
@@ -28,10 +28,10 @@ export const TypeSelector = ({ value, onChange }: Props) => {
           type="button"
           onClick={() => onChange('expense')}
           className={cn(
-            'cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all',
+            'cursor-pointer rounded-lg border-2 px-6 py-2 text-sm font-medium transition-all',
             value === 'expense'
-              ? 'border-gray-500'
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'border-red-500 bg-red-50 text-red-700 dark:border-red-400 dark:bg-red-950 dark:text-red-300'
+              : 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'
           )}
         >
           지출

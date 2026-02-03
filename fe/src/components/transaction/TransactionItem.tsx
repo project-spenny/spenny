@@ -32,14 +32,14 @@ export const TransactionItem = ({
       className="hover:border-brand-soft cursor-pointer transition-colors"
       onClick={handleClick}
     >
-      <ItemContent className="flex flex-row items-center">
-        <div className="flex w-32 flex-col gap-1">
-          <span className="text-muted-foreground text-xs">
+      <ItemContent className="flex flex-row items-center gap-2 sm:gap-3">
+        <div className="flex w-20 shrink-0 flex-col gap-0.5 sm:w-28 sm:gap-1">
+          <span className="text-muted-foreground text-[10px] sm:text-xs">
             {formatDateKR(new Date(transaction.date))}
           </span>
           <span
             className={cn(
-              'text-sm font-bold',
+              'text-xs font-bold sm:text-sm',
               transaction.type === 'income' ? 'text-blue-400' : 'text-red-400'
             )}
           >
@@ -47,18 +47,20 @@ export const TransactionItem = ({
             {transaction.amount.toLocaleString()}원
           </span>
         </div>
-        <div>
-          <ItemTitle className="text-muted-foreground pl-2 text-left text-xs">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <ItemTitle className="text-muted-foreground text-[10px] sm:text-xs">
             {
               CATEGORIES[transaction.type].find(
                 (cat) => cat.category_key === transaction.category_id
               )?.name_ko
             }
           </ItemTitle>
-          <ItemTitle className="p-2 text-left">{transaction.title}</ItemTitle>
+          <ItemTitle className="truncate text-xs sm:text-sm">
+            {transaction.title}
+          </ItemTitle>
         </div>
-        <div className='ml-auto'>
-          <ChevronRight />
+        <div className="shrink-0">
+          <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
       </ItemContent>
     </Item>

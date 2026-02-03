@@ -82,6 +82,22 @@ export default function TransactionSubmitForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isFormChanged = useMemo(() => {
+    if (mode !== 'edit') return true;
+
+    const initialDate = initialFormData.date.getTime();
+    const currentDate = formData.date.getTime();
+
+    return (
+      formData.title !== initialFormData.title ||
+      formData.type !== initialFormData.type ||
+      formData.amount !== initialFormData.amount ||
+      currentDate !== initialDate ||
+      formData.category_id !== initialFormData.category_id ||
+      JSON.stringify(formData.tags) !== JSON.stringify(initialFormData.tags)
+    );
+  }, [mode, formData, initialFormData]);
+
   useEffect(() => {
     if (defaultValue) {
       setFormData({
@@ -235,15 +251,13 @@ export default function TransactionSubmitForm({
           }}
         />
 
-        {formData.type !== '' && (
-          <CategorySelector
-            transactionType={formData.type}
-            value={formData.category_id}
-            open={categoryOpen}
-            onOpenChange={setCategoryOpen}
-            onChange={(category) => UpdateField('category_id', category)}
-          />
-        )}
+        <CategorySelector
+          transactionType={formData.type}
+          value={formData.category_id}
+          open={categoryOpen}
+          onOpenChange={setCategoryOpen}
+          onChange={(category) => UpdateField('category_id', category)}
+        />
 
         <AmountInput
           value={formData.amount}
@@ -271,7 +285,11 @@ export default function TransactionSubmitForm({
               <Trash className="h-4 w-4" />
             </Button>
           )}
-          <Button type="submit" className="flex-1" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="flex-1"
+            disabled={isSubmitting || (mode === 'edit' && !isFormChanged)}
+          >
             {isSubmitting && <Spinner />}
             {mode === 'create' ? '저장' : '수정'}
           </Button>
