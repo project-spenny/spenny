@@ -52,7 +52,7 @@ const BudgetCategoryList = ({
         </Button>
       </div>
 
-      <div className="w-full max-w-lg space-y-2 md:space-y-4">
+      <div className="grid w-full items-center gap-2 sm:grid-cols-2 sm:gap-4 md:px-2">
         {budgets.map((budget) => (
           <BudgetCategoryItem
             key={budget.id}

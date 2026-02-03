@@ -23,8 +23,8 @@ const UnbudgetedList = ({ items, onSetBudget }: UnbudgetedListProps) => {
     <>
       <Separator className="my-4 md:my-8" />
 
-      <div className="flex w-full flex-col items-center">
-        <div className="mt-4 w-full max-w-lg">
+      <div className="flex w-full flex-col items-center md:px-2">
+        <div className="mt-4 w-full">
           <div className="mb-4 flex flex-col justify-between md:flex-row md:items-center">
             <div className="flex items-center gap-2">
               <div className="h-1.5 w-1.5 rounded-full bg-red-400" />
@@ -45,26 +45,26 @@ const UnbudgetedList = ({ items, onSetBudget }: UnbudgetedListProps) => {
             </span>
           </div>
 
-          <div className="flex flex-col gap-2 md:gap-4">
+          <div className="grid gap-2 sm:grid-cols-2 sm:gap-4">
             {items.map((item) => (
-              <Card key={item.key} className="px-4 py-3 md:px-5 md:py-4">
-                <div className="flex items-center justify-between">
+              <Card key={item.key} className="border-border/50 px-4 py-3">
+                <div className="flex items-center justify-between text-xs md:text-sm">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-foreground text-sm font-bold transition-colors md:text-base">
+                      <p className="text-foreground font-bold transition-colors">
                         {item.name}
                       </p>
 
-                      <Badge className="bg-primary/10 text-primary px-1.5 py-0.5 text-[10px] md:text-xs">
+                      <Badge className="bg-primary/10 text-primary px-1.5 py-0.5 text-[10px]">
                         미설정
                       </Badge>
                     </div>
 
-                    <p className="text-xs md:text-sm">
+                    <p>
                       <span className={`font-semibold ${THEME_COLOR.EXPENSE}`}>
                         {item.amount.toLocaleString()}원
                       </span>{' '}
-                      <span className="text-xs md:text-sm">지출됨</span>
+                      <span className="text-[11px] md:text-xs">지출됨</span>
                     </p>
                   </div>
 

@@ -13,7 +13,7 @@ const PercentageBadge = ({ percentage }: { percentage: number }) => {
   return (
     <Badge
       className={cn(
-        'px-1.5 py-0.5 text-[10px] font-semibold transition-colors md:text-xs',
+        'px-1.5 py-0.5 text-[10px] font-semibold transition-colors',
         isWarning
           ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
           : 'bg-brand-subtle dark:bg-brand/10 text-brand hover:bg-brand-subtle/80'
