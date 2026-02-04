@@ -73,14 +73,6 @@ const AnalysisView = ({
     setSelectedWeekIndex(currentIndex !== -1 ? currentIndex : 0);
   }, [selectedDate]);
 
-  // 선택된 월 기준으로 history 페이지 이동용 URL 생성
-  const { startDate, endDate } = getMonthRange(selectedDate);
-  const historyParams = new URLSearchParams({
-    start_date: startDate,
-    end_date: endDate,
-  }).toString();
-  const historyUrl = `/history?${historyParams}`;
-
   return (
     <div className="animate-in fade-in slide-in-from-top-1 space-y-4 duration-300">
       {current.length === 0 ? (
@@ -90,7 +82,7 @@ const AnalysisView = ({
           description={config.emptyDescription}
         >
           <Button asChild>
-            <Link href={historyUrl}>기록하러 가기</Link>
+            <Link href={'/'}>기록하러 가기</Link>
           </Button>
         </AnalysisEmpty>
       ) : (
@@ -100,7 +92,7 @@ const AnalysisView = ({
             icon={<Icon className={config.color} />}
           >
             {/* 월별 분석 */}
-            <div className="text-lg font-bold">
+            <div className="font-bold md:text-lg">
               총 {config.label}{' '}
               <span className={config.color}>
                 {totalAmount.toLocaleString()}
@@ -108,15 +100,18 @@ const AnalysisView = ({
               원
             </div>
 
-            <div className="mt-2 text-base font-medium">
+            <div className="mt-2 text-sm md:text-base">
               {prev.length === 0 ? (
                 <p>이전 달 {config.label} 내역이 없어요!</p>
               ) : diff === 0 ? (
                 <p>지난 달과 총 {config.label} 금액이 똑같아요!</p>
               ) : (
                 <p>
-                  지난달보다 <span>{Math.abs(diff).toLocaleString()}</span>원{' '}
-                  {diff > 0 ? config.increaseText : config.decreaseText}
+                  지난달보다{' '}
+                  <span className="font-semibold">
+                    {Math.abs(diff).toLocaleString()}
+                  </span>
+                  원 {diff > 0 ? config.increaseText : config.decreaseText}
                 </p>
               )}
             </div>
@@ -124,8 +119,8 @@ const AnalysisView = ({
             <Separator className="my-6" />
 
             {/* 주간 차트 */}
-            <div className="space-y-3">
-              <p className="font-semibold md:text-lg">주간 {config.label}</p>
+            <div className="space-y-4">
+              <p className="font-bold md:text-lg">주간 {config.label}</p>
 
               <WeeklyChart
                 data={weeklyData}
@@ -136,12 +131,10 @@ const AnalysisView = ({
 
               {/* 주간 상세 */}
               {selectedWeekIndex !== -1 && selectedWeekDetail && (
-                <div className="mt-4">
-                  <WeeklyListCard
-                    index={selectedWeekIndex}
-                    detail={selectedWeekDetail}
-                  />
-                </div>
+                <WeeklyListCard
+                  index={selectedWeekIndex}
+                  detail={selectedWeekDetail}
+                />
               )}
             </div>
           </AnalysisSection>
@@ -150,7 +143,7 @@ const AnalysisView = ({
             title={`카테고리별 ${config.label}`}
             icon={<PieChart className={config.color} />}
           >
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               {/* 카테고리 차트 */}
               <div className="flex items-center justify-center lg:flex-1">
                 <CategoryChart

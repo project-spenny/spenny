@@ -53,7 +53,7 @@ const BudgetResultStep = ({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="space-y-6 md:space-y-8">
       <DialogStepHeader
         step={4}
         subTitle="예산 산출 결과 확인"
@@ -62,25 +62,22 @@ const BudgetResultStep = ({
       />
 
       {/* 조정 상태 피드백 섹션 */}
-      <Card
-        className={cn(
-          'flex flex-col gap-3 rounded-xl border p-4 transition-all'
-        )}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <Card className="border-border/50 flex flex-col gap-3 rounded-xl border p-4 transition-all">
+        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-1">
             {isAdjusted ? (
-              <Lightbulb className="h-5 w-5 text-amber-600" />
+              <Lightbulb className="h-3.5 w-3.5 shrink-0 text-amber-600 md:h-4 md:w-4" />
             ) : (
-              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600 md:h-4 md:w-4" />
             )}
-            <span className="font-bold">
+            <span className="text-sm font-bold md:text-base">
               {currentTemplate?.title || '맞춤 예산'} 적용 결과
             </span>
           </div>
+
           <Badge
             className={cn(
-              'px-2 py-1 font-bold',
+              'px-1.5 py-0.5 text-[10px] font-bold md:text-xs',
               isAdjusted
                 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'
                 : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200'
@@ -90,7 +87,7 @@ const BudgetResultStep = ({
           </Badge>
         </div>
 
-        <p className="text-muted-foreground px-2 text-sm break-keep">
+        <p className="text-muted-foreground text-xs md:text-sm">
           {templateId === 'keep-pattern'
             ? `최근 ${activeMonths}개월간의 지출 패턴을 그대로 반영하여 예산을 구성했습니다.`
             : isAdjusted
@@ -100,7 +97,7 @@ const BudgetResultStep = ({
 
         <Separator />
 
-        <div className="flex items-center justify-between px-2 text-xs">
+        <div className="flex items-center justify-between px-2 text-[11px] md:text-xs">
           <span className="text-muted-foreground">유연 지출 비중</span>
           <span
             className={cn(
@@ -122,21 +119,21 @@ const BudgetResultStep = ({
 
       <Separator />
 
-      <section className="space-y-10">
+      <section className="space-y-6 md:space-y-8">
         {/* 가용 예산 카드 */}
-        <Card className="gap-1 p-5">
-          <div className="flex items-center justify-between">
-            <p>이번 달 가용 지출 예산</p>
+        <Card className="border-border/50 gap-1 px-5 py-4">
+          <div className="flex flex-col justify-between md:flex-row md:items-center">
+            <p className="text-sm md:text-base">이번 달 가용 지출 예산</p>
 
             <div className="text-brand flex items-baseline gap-1 font-bold">
-              <span className="text-2xl tracking-tight">
+              <span className="text-base tracking-tight md:text-xl">
                 {spendableBudget.toLocaleString()}
               </span>
               <span className="text-base">원</span>
             </div>
           </div>
 
-          <div className="text-muted-foreground flex items-center gap-1 text-xs">
+          <div className="text-muted-foreground flex items-center gap-1 text-[11px] md:text-xs">
             <Info className="h-3 w-3 shrink-0" />
             <p>수입에서 저축 목표를 제외한 금액입니다.</p>
           </div>
@@ -165,8 +162,8 @@ const BudgetResultStep = ({
         />
       </section>
 
-      <div className="text-muted-foreground flex items-center gap-1 px-2 text-xs">
-        <Info className="mt-0.5 h-3 w-3 shrink-0" />
+      <div className="text-muted-foreground flex items-center gap-1 text-[11px] md:text-xs">
+        <Info className="h-3 w-3 shrink-0" />
         <p className="break-keep">
           과거 소비 비중을 반영해 관리하기 편한 100원 단위로 산출되었습니다.
         </p>

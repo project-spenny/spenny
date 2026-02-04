@@ -34,25 +34,25 @@ const BudgetCategoryList = ({
   }
 
   return (
-    <div className="flex flex-col items-center py-6">
-      <div className="absolute top-8 right-8 flex gap-1">
+    <div className="flex flex-col items-center py-2 md:py-4">
+      <div className="absolute top-6 right-6 flex gap-1">
         <Button
           variant="ghost"
-          className="text-muted-foreground hover:bg-brand/10 h-8 cursor-pointer px-2"
+          className="hover:bg-brand/10 h-8 px-2 text-xs md:text-sm"
           onClick={onEditAll}
         >
           수정
         </Button>
         <Button
           variant="ghost"
-          className="text-destructive hover:bg-brand/10 hover:text-destructive h-8 cursor-pointer px-2"
+          className="text-destructive hover:bg-brand/10 hover:text-destructive h-8 px-2 text-xs md:text-sm"
           onClick={onResetAll}
         >
           초기화
         </Button>
       </div>
 
-      <div className="w-full max-w-lg space-y-6">
+      <div className="grid w-full items-center gap-2 sm:grid-cols-2 sm:gap-4 md:px-2">
         {budgets.map((budget) => (
           <BudgetCategoryItem
             key={budget.id}

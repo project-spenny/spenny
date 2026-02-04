@@ -151,11 +151,14 @@ const BudgetRecommendDialog = ({
     >
       <DialogContent className="flex h-[80dvh] w-full flex-col md:h-[800px] md:max-w-2xl">
         {/* 상단 Step 표시 */}
-        <div className="px-6 pt-6">
-          <Progress value={(step / 4) * 100} className="[&>div]:bg-brand h-2" />
+        <div className="px-4 pt-4 md:px-6 md:pt-6">
+          <Progress
+            value={(step / 4) * 100}
+            className="[&>div]:bg-brand h-1.5 md:h-2"
+          />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-2 py-2 md:px-6">
           {/* Step 1: 소비 패턴 분석 */}
           {step === 1 && (
             <ExpenseAnalysisStep
@@ -201,13 +204,13 @@ const BudgetRecommendDialog = ({
           )}
         </div>
 
-        <DialogFooter className="border-t p-6">
-          <div className="flex w-full flex-col gap-3">
+        <DialogFooter className="border-t">
+          <div className="flex w-full flex-col gap-3 px-2 pt-3">
             <div className="flex w-full gap-2">
               {step > 1 && (
                 <Button
                   variant="outline"
-                  className="h-12 flex-1 cursor-pointer text-base font-bold"
+                  className="h-10 flex-1 text-sm font-bold md:h-12 md:text-base"
                   onClick={() => setStep(step - 1)}
                   disabled={isSubmitting}
                 >
@@ -215,14 +218,14 @@ const BudgetRecommendDialog = ({
                 </Button>
               )}
               <Button
-                className="h-12 flex-2 cursor-pointer text-base font-bold"
+                className="h-10 flex-2 text-sm font-bold md:h-12 md:text-base"
                 onClick={handleNextStep}
                 disabled={isSubmitting || isIncomeEmpty}
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <Spinner />
-                    <span className="flex items-center gap-2">저장 중</span>
+                    <span>저장 중</span>
                   </div>
                 ) : (
                   <>
@@ -233,9 +236,11 @@ const BudgetRecommendDialog = ({
               </Button>
             </div>
 
-            <div className="text-muted-foreground flex items-center justify-center gap-1 text-xs">
-              <Info className="h-3 w-3" />
-              과거 소비 비중을 가중치로 활용하여 분배됩니다.
+            <div className="text-muted-foreground flex items-center justify-center gap-1">
+              <Info className="h-3 w-3 shrink-0" />
+              <span className="text-[11px] md:text-sm">
+                과거 소비 비중을 가중치로 활용하여 분배됩니다.
+              </span>
             </div>
           </div>
         </DialogFooter>

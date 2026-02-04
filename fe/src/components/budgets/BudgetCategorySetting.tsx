@@ -132,7 +132,7 @@ const BudgetCategorySetting = ({
   };
 
   return (
-    <div className="flex h-full flex-col px-8">
+    <div className="flex h-full flex-col px-4 md:px-8">
       <div className="bg-background sticky top-0 z-10 space-y-1 border-b pb-4">
         <p className="text-lg font-bold md:text-xl">카테고리별 예산 설정</p>
         <p className="text-muted-foreground text-xs font-medium md:text-sm">
@@ -141,7 +141,7 @@ const BudgetCategorySetting = ({
       </div>
 
       {/* 카테고리 예산 설정 */}
-      <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-2 py-2">
+      <div className="flex flex-1 flex-col gap-1 overflow-y-auto px-1 py-2 md:gap-2 md:px-2">
         <BudgetSummary
           totalBudget={totalBudgetAmount}
           totalAllocated={totalAllocated}
