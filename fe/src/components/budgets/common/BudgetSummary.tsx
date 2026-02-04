@@ -24,14 +24,14 @@ const BudgetSummary = ({
     <Card
       className={cn(
         'my-2 gap-2 p-4 transition-all md:p-5',
-        isOverBudget ? 'bg-destructive/5' : 'bg-primary-foreground'
+        isOverBudget ? 'bg-destructive/5' : 'bg-card'
       )}
     >
-      <div className="flex flex-col items-start gap-2 md:flex-row md:items-end md:justify-between">
-        <div className="space-y-1">
-          <p className="text-sm font-bold">총 예산</p>
+      <div className="flex flex-col items-start gap-2 text-sm md:justify-between md:text-base">
+        <div className="flex items-center gap-1">
+          <p className="text-muted-foreground text-sm font-medium">총 예산</p>
 
-          <div className="flex items-center gap-2 tracking-tight">
+          <div className="flex items-center gap-1 tracking-tight">
             <span className="font-bold md:text-lg">
               {totalAllocated.toLocaleString()}
             </span>
@@ -48,11 +48,11 @@ const BudgetSummary = ({
           </div>
         </div>
 
-        <div className="md:text-right">
-          <p className="text-muted-foreground text-xs font-medium">남은 예산</p>
+        <div className="flex items-center gap-1">
+          <p className="text-muted-foreground text-sm font-medium">남은 예산</p>
           <p
             className={cn(
-              'font-bold tracking-tight md:text-lg',
+              'font-bold tracking-tight',
               isOverBudget ? THEME_COLOR.EXPENSE : 'text-brand'
             )}
           >

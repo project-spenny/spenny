@@ -40,14 +40,12 @@ const BudgetCategoryItem = ({
 
         <div>
           <div className="flex items-center gap-1 tracking-tight">
-            <p className="text-muted-foreground text-[11px] whitespace-nowrap md:text-xs">
+            <p className="text-muted-foreground text-[11px] font-medium whitespace-nowrap md:text-xs">
               현재 지출
             </p>
 
             <div className="flex items-center">
-              <span className="tight font-bold">
-                {expense.toLocaleString()}
-              </span>
+              <span className="font-bold">{expense.toLocaleString()}</span>
               <div className="text-muted-foreground flex items-center text-[10px] md:text-xs">
                 <span className="px-1">/</span>
                 <div
@@ -62,7 +60,7 @@ const BudgetCategoryItem = ({
           </div>
 
           <div className="flex shrink-0 items-center gap-1 text-right tracking-tight">
-            <p className="text-muted-foreground text-[11px] whitespace-nowrap md:text-xs">
+            <p className="text-muted-foreground text-[11px] font-medium whitespace-nowrap md:text-xs">
               남은 예산
             </p>
             <p
