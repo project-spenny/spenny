@@ -6,14 +6,13 @@ import { Plus } from 'lucide-react';
 import ResponsivePanel from '@/components/panel/ResponsivePanel';
 import { useRouter } from 'next/navigation';
 import { useSelected } from './TransactionContext';
-import { useEffect, useState, useTransition } from 'react';
 import ReceiptOCR from '@/components/transaction/ReceiptOCR';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function TransactionClient() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { selectedTransaction, isOpen, openCreate, close } = useSelected();
-  const [isPending, startTransition] = useTransition();
-  const [closeAfterRefresh, setCloseAfterRefresh] = useState(false);
 
   const handlePanelOpenChange = (open: boolean) => {
     if (!open) {
@@ -22,18 +21,11 @@ export default function TransactionClient() {
   };
 
   const handleSuccess = () => {
-    setCloseAfterRefresh(true);
-    startTransition(() => {
-      router.refresh();
-    });
+    close();
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['transactions-infinite'] });
+    router.refresh();
   };
-
-  useEffect(() => {
-    if (closeAfterRefresh && !isPending) {
-      close();
-      setCloseAfterRefresh(false);
-    }
-  }, [closeAfterRefresh, isPending, close]);
 
   const mode = selectedTransaction ? 'edit' : 'create';
 
