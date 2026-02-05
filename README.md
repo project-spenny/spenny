@@ -41,7 +41,9 @@
 
 |일일 지출 추천 |산정 기준 및 소비패턴|
 |------|------|
-| <img width="300" alt="spenny (8)" src="https://github.com/user-attachments/assets/09467e48-f569-473d-a339-e7dca0b79012" /> |<img width="300" alt="spenny (8)" src="https://github.com/user-attachments/assets/305645b7-8e4f-46e6-ae2a-47e2968a9191" />|
+|<img width="300" alt="localhost_3000_" src="https://github.com/user-attachments/assets/00c81070-ad17-4abf-b8e8-66f1412b247b" />|<img width="300" alt="localhost_3000_ (1)" src="https://github.com/user-attachments/assets/51845e2b-fd46-4b6e-a497-cbc35c786df8" /> |
+
+
 
 
 ### 고정비 관리
@@ -138,7 +140,7 @@ src/
 
 ---
 
-## 최아로인
+### 최아로인
 
 #### 인증/인가
 - Supabase 기반 OAuth 인증 (Google/Kakao)
