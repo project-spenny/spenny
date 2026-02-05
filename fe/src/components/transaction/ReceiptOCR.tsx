@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { Button } from '../ui/button';
-import { Camera, Upload, X, Sparkles, Router } from 'lucide-react';
+import { Camera, Upload, X, Sparkles } from 'lucide-react';
 import { Spinner } from '../ui/spinner';
 import { OCRResult } from '@/types/transactions';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ import { DatePicker } from './common/DatePicker';
 import { Checkbox } from '../ui/checkbox';
 import { formatLocalDate } from '@/utils/date';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Popover,
   PopoverContent,
@@ -37,6 +38,7 @@ interface ResultWithPreview {
 
 export default function ReceiptOCR() {
   const { userId, isLoading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -251,6 +253,8 @@ export default function ReceiptOCR() {
       toast.success(`등록 완료!`);
       setOpen(false);
       reset();
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions-infinite'] });
       router.refresh();
     } catch (error) {
       toast.error('등록 중 오류가 발생했습니다');

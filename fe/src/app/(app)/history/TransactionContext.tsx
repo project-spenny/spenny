@@ -31,6 +31,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
   const close = () => {
     setIsOpen(false);
+    setSelectedTransaction(null);
   };
 
   return (
