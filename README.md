@@ -1,5 +1,5 @@
 # Spenny
-
+#### 수입/지출을 기록하고 소비 패턴을 분석해 다양한 서비스를 제공하는 개인 자산 관리 웹 어플리케이션입니다
 <a href="https://spenny.vercel.app">
   <img width="1200" alt="spenny-intro" src="https://github.com/user-attachments/assets/bff263ed-6613-4c38-a329-21a5695e124b" />
 </a>
