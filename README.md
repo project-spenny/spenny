@@ -1,6 +1,27 @@
 # Spenny
-<img width="1200" alt="spenny-intro" src="https://github.com/user-attachments/assets/bff263ed-6613-4c38-a329-21a5695e124b" />
 
+<a href="https://spenny.vercel.app">
+  <img width="1200" alt="spenny-intro" src="https://github.com/user-attachments/assets/bff263ed-6613-4c38-a329-21a5695e124b" />
+</a>
+(이미지 클릭 시 배포 사이트로 이동합니다)
+
+## Tech Stack
+
+### Frontend
+![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![shadcn/ui](https://img.shields.io/badge/shadcn/ui-000000?style=for-the-badge&logo=shadcnui&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-443E38?style=for-the-badge&logo=react&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
+![React Hook Form](https://img.shields.io/badge/React_Hook_Form-EC5990?style=for-the-badge&logo=reacthookform&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
+![date-fns](https://img.shields.io/badge/date--fns-770C56?style=for-the-badge&logo=date-fns&logoColor=white)
+
+### Backend
+![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Next.js API](https://img.shields.io/badge/Next.js_API_Routes-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ## Features
 
 ### 가계부 관리
@@ -44,39 +65,6 @@
 |------|------|
 | <img width="300" alt="spenny (10)" src="https://github.com/user-attachments/assets/f305d156-4b91-44e2-8a2d-3f9a7046e672" /> | <img width="300" alt="spenny (11)" src="https://github.com/user-attachments/assets/b2660f87-81e9-44de-b7cf-7c712bb435e6" /> |
 
-## Tech Stack
-
-### Frontend
-![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![shadcn/ui](https://img.shields.io/badge/shadcn/ui-000000?style=for-the-badge&logo=shadcnui&logoColor=white)
-![Zustand](https://img.shields.io/badge/Zustand-443E38?style=for-the-badge&logo=react&logoColor=white)
-![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
-![React Hook Form](https://img.shields.io/badge/React_Hook_Form-EC5990?style=for-the-badge&logo=reacthookform&logoColor=white)
-![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)
-![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
-![date-fns](https://img.shields.io/badge/date--fns-770C56?style=for-the-badge&logo=date-fns&logoColor=white)
-
-### Backend
-![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![Next.js API](https://img.shields.io/badge/Next.js_API_Routes-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-
-## Getting Started
-```bash
-# 의존성 설치
-yarn install
-
-# 개발 서버 실행
-yarn dev
-
-# 빌드
-yarn build
-
-# 프로덕션 실행
-yarn start
-```
-
 ## Project Structure
 ```
 src/
@@ -94,4 +82,93 @@ src/
 ├── stores/              # Tanstack Query Client
 ├── types/               # TypeScript 타입 정의
 └── utils/               # 유틸리티 함수
+```
+
+##  팀원 및 담당 기능
+### 개발 기간
+`2025.12.22`~`2026.02.05`
+
+
+### 김형진
+
+#### 거래내역 관리
+- 거래내역 CRUD 기능 구현
+- 거래 입력 폼 유효성 검증 및 공통 컴포넌트화
+- 거래내역 필터링 및 검색 UI
+
+#### 캘린더
+- 반응형 월별 캘린더 구현
+- 일자별 총 수입/지출 표시 및 거래내역 관리
+
+#### 영수증 OCR
+- OpenAI GPT-4o mini 기반 영수증 OCR API 구현
+- 한국 영수증 인식 및 연도 추론 프롬프팅
+- 다중 영수증 스캔 UI (카메라 촬영, 드래그 앤 드롭)
+- 배치 OCR 비동기 처리를 통한 API 최적화
+- OCR 결과 편집 및 선택적 등록 기능
+
+#### 통합 및 최적화
+- 홈 화면 통합 (거래내역/캘린더 탭, Floating Button)
+- 초기 데이터 페칭 아키텍처 설계 (서버/클라이언트 컴포넌트 분리)
+- 월별 데이터 클라이언트 캐싱 및 useMemo 활용 최적화
+
+---
+
+### 정윤진
+
+#### 공통 UI
+- Header, Navigation, Footer 공통 레이아웃
+- 반응형 패널 컴포넌트 (모바일 Drawer / 데스크탑 Sheet)
+
+#### 분석 페이지
+- **월별 분석**: 총 사용 금액, 전월 대비 증감
+- **주간 분석**: 지출/수입 라인 차트 및 거래 리스트
+- **카테고리별 분석**: 도넛 차트 시각화 및 거래 리스트
+
+#### 예산 페이지
+- **예산 관리**: 총 예산 및 카테고리 예산 CRUD
+- **예산 현황**: 총 예산/현재 지출/고정비/남은 예산 요약
+- **시각화**: Progress Bar, 예산 초과 피드백 UI
+- **예산 추천 시스템** (4단계)
+  - 최근 3개월 소비 패턴 분석 (Essential/Flexible 그룹)
+  - 수입 및 저축 목표 기반 가용 예산 산출
+  - 템플릿 기반 예산 설계 (유지형/절감형/강력절약형)
+  - 그룹 → 카테고리 예산 자동 분배
+  - 진행 상태 및 입력 데이터 유지
+
+---
+
+## 최아로인
+
+#### 인증/인가
+- Supabase 기반 OAuth 인증 (Google/Kakao)
+- 게스트 로그인 기능 및 데모 데이터 구조
+- Supabase RLS 정책을 통한 게스트 데이터 접근 제한
+
+#### 온보딩 및 프로필
+- 신규 사용자 온보딩 페이지
+- MyInfo 패널 (프로필 조회/수정)
+
+#### 고정비 관리
+- 월·주 단위 반복 지출 규칙 CRUD
+- 고정비 규칙 기반 월별 거래 자동 생성
+
+#### 일일 권장 사용 금액 추천
+- 월 예산, 고정비, 실제 지출 기반 **가변 지출 분리 계산**
+- 평일/주말, 월 초·중·말 소비 패턴 가중치 적용
+- 과도한 변동 방지 (상·하한 처리)
+- UI 차트 및 안내 문구 연동
+## Getting Started
+```bash
+# 의존성 설치
+yarn install
+
+# 개발 서버 실행
+yarn dev
+
+# 빌드
+yarn build
+
+# 프로덕션 실행
+yarn start
 ```
