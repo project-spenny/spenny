@@ -30,7 +30,6 @@
 | 홈화면(가계부) | 홈화면(캘린더) | 캘린더 일자별 가계부 |
 |------|------|------|
 | <img width="300" alt="spenny (6)" src="https://github.com/user-attachments/assets/a5a0da49-3500-4025-9a36-e78b56bd6a12" />| <img width="300" alt="spenny (9)" src="https://github.com/user-attachments/assets/5eda18e0-4fca-4fb4-8909-96d864707a7c" />| <img width="300" alt="spenny (14)" src="https://github.com/user-attachments/assets/19009f59-de6f-46cc-8837-9e702802b0bd" />|
-| 설명 입력 | 설명 입력 | 설명 입력 |
 
 |가계부 작성 폼 |영수증 업로드 |OCR 영수증 자동인식 |
 |------|------|------|
