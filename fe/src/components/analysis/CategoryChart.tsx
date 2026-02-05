@@ -1,0 +1,109 @@
+import {
+  ArcElement,
+  Chart as ChartJS,
+  ChartOptions,
+  Legend,
+  Tooltip,
+} from 'chart.js';
+
+import { CHART_COLORS } from '@/constants/colors';
+import { CategoryAnalysis } from '@/types/analysis';
+import { Doughnut } from 'react-chartjs-2';
+import { useTheme } from 'next-themes';
+
+// Chart.js에 필요한 요소들을 등록
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+type CategoryChartProps = {
+  data: CategoryAnalysis[];
+  selectedIndex: number;
+  onSelect: (index: number) => void;
+};
+
+const CategoryChart = ({
+  data,
+  selectedIndex,
+  onSelect,
+}: CategoryChartProps) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const chartData = {
+    labels: data.map((item) => item.name),
+    datasets: [
+      {
+        label: '금액',
+        data: data.map((item) => item.amount),
+        backgroundColor: data.map((_, i) =>
+          i < 5
+            ? CHART_COLORS.TOP_5[i]
+            : isDark
+              ? CHART_COLORS.GRAY.DARK
+              : CHART_COLORS.GRAY.LIGHT
+        ),
+        hoverBackgroundColor: data.map((_, i) =>
+          i < 5 ? CHART_COLORS.TOP_5[i] : CHART_COLORS.GRAY.LIGHT
+        ),
+        borderWidth:
+          data.length === 1
+            ? 0
+            : data.map((_, i) => (i === selectedIndex ? 0 : 1)),
+        borderColor: isDark
+          ? CHART_COLORS.BORDER.DARK
+          : CHART_COLORS.BORDER.LIGHT,
+        offset:
+          data.length === 1
+            ? 0
+            : data.map((_, i) => (i === selectedIndex ? 20 : 0)), // 선택된 인덱스만 튀어나오도록
+        hoverOffset: data.length === 1 ? 0 : 15, // 마우스 올렸을 때 튀어나오는 효과
+      },
+    ],
+  };
+
+  // Chart.js 공식 옵션 타입 적용
+  const options: ChartOptions<'doughnut'> = {
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+    },
+    // 마우스 호버 시 커서 변경
+    onHover: (event, elements) => {
+      if (event.native && event.native.target instanceof HTMLElement) {
+        event.native.target.style.cursor =
+          elements.length > 0 ? 'pointer' : 'default';
+      }
+    },
+    // 클릭 시 해당 조각의 인덱스 저장
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        onSelect(elements[0].index);
+      }
+    },
+  };
+
+  // 현재 선택된 데이터 정보
+  const selectedItem = data[selectedIndex] || data[0];
+
+  return (
+    <div className="relative mx-auto flex h-[250px] items-center justify-center md:h-[300px]">
+      <Doughnut data={chartData} options={options} />
+
+      <div className="pointer-events-none absolute flex flex-col items-center justify-center text-center">
+        {selectedItem ? (
+          <>
+            <span className="text-sm font-semibold md:text-base">
+              {selectedItem.name}
+            </span>
+            <span className="text-brand animate-in zoom-in font-bold duration-300 md:text-lg">
+              {selectedItem.percentage.toFixed(1)}%
+            </span>
+          </>
+        ) : (
+          <span className="text-muted-foreground text-sm">데이터 없음</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CategoryChart;

@@ -1,0 +1,94 @@
+import { syncByMonthShared } from './syncFixedTransactions.shared';
+import { PG_ERROR } from '@/constants/postgres';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
+
+// 서버 환경에서 고정비 규칙 기반 월별 거래 동기화
+export const syncByMonthServer = async ({
+  monthDate,
+  startDate,
+  endDate,
+  generateThroughDate,
+}: {
+  monthDate: Date;
+  startDate: string;
+  endDate: string;
+  generateThroughDate?: string;
+}) => {
+  const { supabase, user } = await requireUserServer();
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_guest')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const isGuest = !!profile?.is_guest;
+
+  return syncByMonthShared(
+    {
+      // 해당 월에 유효한 고정비 규칙 조회
+      fetchFixedRules: async ({ userId, startDate, endDate }) => {
+        const { data, error } = await supabase
+          .from('fixed_rules')
+          .select('*')
+          .eq('user_id', userId)
+          .lte('start_date', endDate)
+          .or(`end_date.is.null,end_date.gte.${startDate}`);
+
+        if (error) throw error;
+        return data ?? [];
+      },
+
+      // 이미 생성된 거래 조회 후 key Set 반환
+      fetchExistingKeys: async ({ userId, ruleIds, startDate, endDate }) => {
+        const { data, error } = await supabase
+          .from('transactions')
+          .select('fixed_rule_id, origin_date')
+          .eq('user_id', userId)
+          .in('fixed_rule_id', ruleIds)
+          .gte('origin_date', startDate)
+          .lte('origin_date', endDate);
+
+        if (error) throw error;
+        return new Set(
+          (data ?? []).map((t) => `${t.fixed_rule_id}__${t.origin_date}`)
+        );
+      },
+
+      fetchOverrideKeys: async ({ userId, ruleIds, startDate, endDate }) => {
+        const { data, error } = await supabase
+          .from('fixed_transaction_overrides')
+          .select('fixed_rule_id, origin_date')
+          .eq('user_id', userId)
+          .in('fixed_rule_id', ruleIds)
+          .gte('origin_date', startDate)
+          .lte('origin_date', endDate)
+          .eq('action', 'deleted');
+
+        if (error) throw error;
+
+        return new Set(
+          (data ?? []).map((r) => `${r.fixed_rule_id}__${r.origin_date}`)
+        );
+      },
+
+      // 누락된 거래만 transactions에 insert
+      insertTransactions: async ({ rows }) => {
+        const { error } = await supabase.from('transactions').insert(rows);
+        if (!error) return;
+
+        // 동시에 실행되어 이미 생성된 경우(유니크 충돌)는 무시
+        if (error.code === PG_ERROR.UNIQUE_VIOLATION) return;
+        throw error;
+      },
+    },
+    {
+      userId: user.id,
+      isGuest,
+      monthDate,
+      startDate,
+      endDate,
+      generateThroughDate,
+    }
+  );
+};

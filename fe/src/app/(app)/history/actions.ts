@@ -1,0 +1,198 @@
+'use server';
+import { syncByMonthServer } from '@/services/fixed-costs/syncFixedTransactions.server';
+import { formatLocalDate, parseLocalDate } from '@/utils/date';
+import { requireUserServer } from '@/utils/supabase/requireUserServer';
+import { revalidatePath } from 'next/cache';
+import { getMonthRange } from '@/utils/date';
+import { fetchFixedRulesByMonthServer } from '@/services/fixed-costs/fixedCostsServer';
+import { buildScheduledFixedByDateMap } from '@/utils/fixed-costs/scheduled';
+
+export interface TransactionFilters {
+  type?: 'income' | 'expense';
+  category_id?: string;
+  startDate?: string;
+  endDate?: string;
+  searchQuery?: string;
+}
+
+export const getTransaction = async (
+  filters?: TransactionFilters,
+  defaultMonth: boolean = true
+) => {
+  const { supabase, user } = await requireUserServer();
+
+  let startDate = filters?.startDate;
+  let endDate = filters?.endDate;
+
+  if ((!startDate || !endDate) && defaultMonth) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+
+    startDate = `${year}-${month}-01`;
+
+    const lastDay = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0
+    ).getDate();
+    endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+  }
+
+  // 고정비 동기화 (오늘까지)
+  if (startDate && endDate) {
+    const monthDate = parseLocalDate(startDate)!;
+    const generateThroughDate = formatLocalDate(new Date());
+
+    await syncByMonthServer({
+      monthDate,
+      startDate,
+      endDate,
+      generateThroughDate,
+    });
+  }
+
+  let query = supabase
+    .from('transactions')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('date', { ascending: false })
+    .order('updated_at', { ascending: false });
+
+  if (startDate) {
+    query = query.gte('date', startDate);
+  }
+  if (endDate) {
+    query = query.lte('date', endDate);
+  }
+  if (filters?.type) {
+    query = query.eq('type', filters.type);
+  }
+
+  if (filters?.category_id) {
+    query = query.eq('category_id', filters.category_id);
+  }
+
+  if (filters?.searchQuery) {
+    query = query.ilike('title', `%${filters.searchQuery}%`);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  return data || [];
+};
+export const getMonthTransactions = async (month: string) => {
+  const { supabase, user } = await requireUserServer();
+  const monthDate = new Date(`${month}-01`);
+  const { startDate, endDate } = getMonthRange(monthDate);
+
+  const generateThroughDate = formatLocalDate(new Date());
+  await syncByMonthServer({
+    monthDate,
+    startDate,
+    endDate,
+    generateThroughDate,
+  });
+
+  const { data: transactions, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('user_id', user.id)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+
+  // 해당 월 고정비 규칙 조회
+  const fixedRules = await fetchFixedRulesByMonthServer(monthDate);
+
+  // 예정 고정비 맵 생성
+  const scheduledFixedByDateMap = buildScheduledFixedByDateMap({
+    monthDate,
+    today: new Date(),
+    fixedRules,
+    transactions: (transactions ?? []).map((t) => ({
+      fixed_rule_id: t.fixed_rule_id,
+      origin_date: t.origin_date,
+    })),
+  });
+
+  return {
+    transactions: transactions ?? [],
+    scheduledFixedByDateMap,
+  };
+};
+
+export interface PaginatedTransactionsResult {
+  data: Awaited<ReturnType<typeof getTransaction>>;
+  nextCursor: number | null;
+  hasMore: boolean;
+}
+
+export const getTransactionsPaginated = async (
+  filters?: TransactionFilters,
+  cursor: number = 0,
+  pageSize: number = 20
+): Promise<PaginatedTransactionsResult> => {
+  const { supabase, user } = await requireUserServer();
+
+  let startDate = filters?.startDate;
+  let endDate = filters?.endDate;
+
+  if (!startDate || !endDate) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+
+    startDate = `${year}-${month}-01`;
+
+    const lastDay = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0
+    ).getDate();
+    endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+  }
+
+  let query = supabase
+    .from('transactions')
+    .select('*', { count: 'exact' })
+    .eq('user_id', user.id)
+    .order('date', { ascending: false })
+    .order('updated_at', { ascending: false })
+    .range(cursor, cursor + pageSize - 1);
+
+  if (startDate) {
+    query = query.gte('date', startDate);
+  }
+  if (endDate) {
+    query = query.lte('date', endDate);
+  }
+  if (filters?.type) {
+    query = query.eq('type', filters.type);
+  }
+  if (filters?.category_id) {
+    query = query.eq('category_id', filters.category_id);
+  }
+  if (filters?.searchQuery) {
+    query = query.ilike('title', `%${filters.searchQuery}%`);
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  const totalCount = count || 0;
+  const nextCursor = cursor + pageSize;
+  const hasMore = nextCursor < totalCount;
+
+  return {
+    data: data || [],
+    nextCursor: hasMore ? nextCursor : null,
+    hasMore,
+  };
+};
+export async function revalidateTransactions() {
+  revalidatePath('/history');
+  revalidatePath('/');
+}

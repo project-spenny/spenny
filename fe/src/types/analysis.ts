@@ -1,0 +1,62 @@
+import { ITransaction } from '@/types/transactions';
+import { TransformAnalysisResult } from '@/utils/analysis-transform';
+
+/**
+ * 거래 내역의 타입 (지출 또는 수입)
+ */
+export type TransactionType = 'expense' | 'income';
+
+/**
+ * 카테고리가 포함된 거래 내역 타입
+ */
+export type TransactionAnalysis = Pick<
+  ITransaction,
+  'id' | 'title' | 'amount' | 'date' | 'type' | 'category_id'
+> & {
+  category: {
+    name_ko: string;
+    category_key: string;
+  } | null;
+};
+
+/**
+ * 카테고리별 통계 분석 데이터 타입
+ */
+export type CategoryAnalysis = {
+  name: string;
+  amount: number;
+  percentage: number;
+};
+
+/** 가공된 분석 통계와 원본 내역을 모두 포함하는 데이터 타입 */
+export type AnalysisData = TransformAnalysisResult & {
+  current: TransactionAnalysis[];
+  prev: TransactionAnalysis[];
+};
+
+/**
+ * 예산 타입
+ */
+export type Budget = {
+  id: string;
+  user_id: string;
+  category_id: string | null;
+  budget_month: string;
+  amount: number;
+  created_at: Date;
+  updated_at: Date;
+};
+
+/**
+ * 카테고리가 포함된 예산 타입
+ */
+export type BudgetWithCategory = {
+  id: string;
+  amount: number;
+  budget_month: string;
+  category_id: string | null;
+  category: {
+    name_ko: string;
+    category_key: string;
+  } | null;
+};
