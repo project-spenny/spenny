@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { supabase } from '@/utils/supabase/client';
 import { Input } from '../ui/input';
 import { DatePicker } from './common/DatePicker';
-import { Checkbox } from '../ui/checkbox';
 import { formatLocalDate } from '@/utils/date';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -413,30 +412,41 @@ export default function ReceiptOCR() {
             <>
               <div className="max-h-[60vh] space-y-3 overflow-y-auto">
                 <div className="flex items-center justify-between">
-                  <label className="flex w-full cursor-pointer items-center gap-2 text-right">
-                    <Checkbox
-                      checked={checkedItems.size === results.length}
-                      onCheckedChange={toggleAll}
-                    />
-                    <span className="text-sm">전체 선택</span>
-                  </label>
+                  <button
+                    onClick={() => toggleAll(checkedItems.size === results.length ? false : true)}
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    {checkedItems.size === results.length ? '전체 해제' : '전체 선택'}
+                  </button>
+                  <span className="text-xs text-muted-foreground">
+                    {checkedItems.size} / {results.filter(r => !r.error).length}개 선택
+                  </span>
                 </div>
                 <div className="flex flex-col gap-2">
                   {results.map((item, index) => (
                     <div
                       key={index}
-                      className="flex gap-4 rounded-lg border p-4"
+                      onClick={(e) => {
+                        // 이미지 클릭이 아니고 error가 아닐 때만 토글
+                        if (!item.error && !(e.target as HTMLElement).tagName.match(/IMG|INPUT|BUTTON/)) {
+                          toggleCheck(index);
+                        }
+                      }}
+                      className={`flex gap-3 rounded-lg border-2 p-3 transition-all ${
+                        item.error
+                          ? 'border-destructive/30 bg-destructive/5'
+                          : checkedItems.has(index)
+                          ? 'border-brand bg-brand/5 cursor-pointer'
+                          : 'border-border cursor-pointer hover:border-brand/50'
+                      }`}
                     >
-                      <Checkbox
-                        checked={checkedItems.has(index)}
-                        onCheckedChange={() => toggleCheck(index)}
-                        className="h-5 w-5"
-                        disabled={item.error}
-                      />
                       <img
                         src={item.preview}
-                        onClick={() => setSelectedImage(item.preview)}
-                        className="h-32 w-24 cursor-pointer rounded object-cover hover:opacity-70"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedImage(item.preview);
+                        }}
+                        className="h-28 w-20 shrink-0 cursor-pointer rounded object-cover hover:opacity-70"
                       />
                       {item.error ? (
                         <div className="flex flex-1 flex-col justify-center gap-2">
@@ -448,19 +458,20 @@ export default function ReceiptOCR() {
                           </p>
                         </div>
                       ) : (
-                        <div className="flex flex-1 flex-col gap-2">
-                          <div className="flex items-center">
-                            <Label className="w-20 shrink-0">거래처</Label>
+                        <div className="flex flex-1 flex-col gap-3">
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">거래처</Label>
                             <Input
                               value={item.result.title}
                               onChange={(e) =>
                                 updateResult(index, 'title', e.target.value)
                               }
                               placeholder="가게명"
+                              className="w-full"
                             />
                           </div>
-                          <div className="flex items-center">
-                            <Label className="w-20 shrink-0">날짜</Label>
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">날짜</Label>
                             <DatePicker
                               value={
                                 typeof item.result.date === 'string'
@@ -475,9 +486,9 @@ export default function ReceiptOCR() {
                             />
                           </div>
 
-                          <div className="flex gap-4">
-                            <div className="flex items-center">
-                              <Label className="w-20 shrink-0">금액</Label>
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">금액</Label>
+                            <div className="flex items-center gap-2">
                               <Input
                                 type="number"
                                 value={item.result.amount}
@@ -489,20 +500,21 @@ export default function ReceiptOCR() {
                                   )
                                 }
                                 placeholder="금액"
+                                className="flex-1"
                               />
-                              <span className="text-muted-foreground ml-2 text-sm">
+                              <span className="text-muted-foreground text-sm">
                                 원
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center">
-                            <Label className="w-20 shrink-0">카테고리</Label>
+                          <div className="flex flex-col gap-1">
+                            <Label className="text-xs">카테고리</Label>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button
                                   type="button"
                                   variant="outline"
-                                  className="flex-1 justify-start text-center"
+                                  className="w-full justify-start"
                                 >
                                   {item.result.category_id
                                     ? CATEGORIES.expense.find(
